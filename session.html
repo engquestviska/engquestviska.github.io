@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Class Session · English Quest</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --purple: #7C3AED; --purple-light: #A78BFA; --purple-soft: #EDE9FE;
+      --purple-mid: #C4B5FD; --white: #FFFFFF; --off-white: #F9F7FF;
+      --text-dark: #1E1040; --text-muted: #6B5B95; --border: #E5DEFF;
+      --accent: #F59E0B; --green: #10B981; --red: #EF4444;
+      --amber: #D97706; --amber-soft: #FEF3C7; --amber-mid: #FCD34D;
+      --red-soft: #FEE2E2; --red-mid: #FCA5A5;
+    }
+    body { font-family: 'IBM Plex Sans', sans-serif; background: var(--off-white); color: var(--text-dark); min-height: 100vh; }
+
+    /* HEADER */
+    header { background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 50%, #4C1D95 100%); padding: 36px 24px 52px; text-align: center; position: relative; overflow: hidden; }
+    header::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px); background-size: 28px 28px; pointer-events: none; }
+    .back-btn { position: absolute; top: 20px; left: 20px; z-index: 2; background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #fff; font-size: 0.88rem; font-weight: 600; padding: 8px 18px; border-radius: 999px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-family: inherit; }
+    .back-btn:hover { background: rgba(255,255,255,0.25); }
+    .logout-btn { position: absolute; top: 20px; right: 20px; z-index: 2; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.85); font-size: 0.78rem; font-weight: 600; padding: 6px 14px; border-radius: 999px; cursor: pointer; font-family: inherit; display: none; align-items: center; gap: 5px; }
+    .logout-btn:hover { background: rgba(255,255,255,0.22); }
+    .teacher-active .logout-btn { display: flex; }
+    header h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem,5vw,2.8rem); font-weight: 800; color: #fff; position: relative; z-index: 1; }
+    header h1 span { color: var(--accent); font-style: italic; }
+    .header-sub { color: rgba(255,255,255,0.75); font-size: 0.95rem; margin-top: 8px; position: relative; z-index: 1; }
+    .wave { display: block; width: 100%; margin-top: -2px; }
+
+    /* MAIN */
+    main { max-width: 900px; margin: 0 auto; padding: 32px 20px 80px; }
+
+    /* SECTION HEADERS */
+    .section-block { margin-bottom: 52px; }
+    .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+    .section-badge { color: #fff; font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; font-weight: 600; padding: 6px 14px; border-radius: 999px; flex-shrink: 0; letter-spacing: 0.05em; }
+    .section-badge.reading { background: linear-gradient(135deg, #D97706, #B45309); }
+    .section-badge.video   { background: linear-gradient(135deg, #DC2626, #991B1B); }
+    .section-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; }
+    .section-line { flex: 1; height: 1.5px; background: var(--border); }
+    .add-btn { display: none; align-items: center; gap: 6px; padding: 7px 14px; background: rgba(124,58,237,0.1); border: 1.5px solid var(--purple-mid); border-radius: 999px; color: var(--purple); font-size: 0.78rem; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Mono', monospace; transition: all 0.15s; flex-shrink: 0; }
+    .add-btn:hover { background: var(--purple-soft); }
+    .teacher-active .add-btn { display: flex; }
+
+    /* CONTENT GRID — same as pdf-grid in lessons.html */
+    .content-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+
+    /* PDF CARD — identical to lessons.html */
+    .pdf-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
+    .pdf-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(124,58,237,0.12); }
+    .pdf-preview { width: 100%; aspect-ratio: 4/3; background: var(--amber-soft); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border-bottom: 1.5px solid var(--border); cursor: pointer; }
+    .pdf-preview iframe { width: 100%; height: 100%; border: none; pointer-events: none; }
+    .pdf-icon { font-size: 3rem; position: absolute; opacity: 0.3; }
+    .pdf-overlay { position: absolute; inset: 0; background: rgba(217,119,6,0.08); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
+    .pdf-card:hover .pdf-overlay { opacity: 1; }
+    .pdf-overlay-btn { background: var(--amber); color: #fff; font-size: 0.85rem; font-weight: 700; padding: 10px 20px; border-radius: 999px; }
+    .pdf-info { padding: 16px 18px 18px; }
+    .pdf-name { font-size: 1rem; font-weight: 700; margin-bottom: 4px; line-height: 1.3; }
+    .pdf-meta { font-size: 0.78rem; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; margin-bottom: 14px; }
+    .pdf-actions { display: flex; gap: 8px; }
+    .btn-view { flex: 1; padding: 10px; background: var(--amber-soft); color: var(--amber); border: 1.5px solid var(--amber-mid); border-radius: 10px; font-size: 0.85rem; font-weight: 700; text-align: center; cursor: pointer; font-family: inherit; text-decoration: none; display: block; transition: background 0.15s; }
+    .btn-view:hover { background: var(--amber-mid); }
+    .btn-download { padding: 10px 14px; background: var(--amber); color: #fff; border: none; border-radius: 10px; font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: inherit; text-decoration: none; display: flex; align-items: center; transition: opacity 0.15s; }
+    .btn-download:hover { opacity: 0.85; }
+
+    /* VIDEO CARD */
+    .video-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
+    .video-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(220,38,38,0.12); }
+    .video-thumb { width: 100%; aspect-ratio: 16/9; background: #111; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border-bottom: 1.5px solid var(--border); cursor: pointer; }
+    .video-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .video-play-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+    .video-card:hover .video-play-overlay { background: rgba(0,0,0,0.5); }
+    .video-play-btn { width: 56px; height: 56px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; transition: transform 0.2s; padding-left: 4px; }
+    .video-card:hover .video-play-btn { transform: scale(1.1); }
+    .video-info { padding: 16px 18px 18px; }
+    .video-name { font-size: 1rem; font-weight: 700; margin-bottom: 4px; line-height: 1.3; }
+    .video-meta { font-size: 0.78rem; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; margin-bottom: 14px; }
+    .video-actions { display: flex; gap: 8px; }
+    .btn-watch { flex: 1; padding: 10px; background: var(--red-soft); color: #DC2626; border: 1.5px solid var(--red-mid); border-radius: 10px; font-size: 0.85rem; font-weight: 700; text-align: center; cursor: pointer; font-family: inherit; text-decoration: none; display: block; transition: background 0.15s; }
+    .btn-watch:hover { background: var(--red-mid); }
+    .btn-yt { padding: 10px 14px; background: #DC2626; color: #fff; border: none; border-radius: 10px; font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: inherit; text-decoration: none; display: flex; align-items: center; transition: opacity 0.15s; }
+    .btn-yt:hover { opacity: 0.85; }
+
+    /* DELETE BUTTON (teacher) */
+    .btn-delete { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(239,68,68,0.9); color: #fff; border: none; font-size: 0.75rem; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 5; }
+    .teacher-active .btn-delete { display: flex; }
+
+    /* EMPTY STATE */
+    .empty-card { background: var(--white); border: 1.5px dashed var(--border); border-radius: 20px; padding: 32px 24px; display: flex; align-items: center; gap: 20px; }
+    .empty-icon { width: 56px; height: 56px; background: var(--off-white); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0; border: 1.5px solid var(--border); }
+    .empty-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
+    .empty-sub { font-size: 0.83rem; color: var(--purple-light); font-weight: 500; }
+
+    /* PDF VIEWER MODAL */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15,10,40,0.85); backdrop-filter: blur(8px); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.hidden { display: none; }
+    .modal-top { width: 100%; max-width: 900px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: #fff; }
+    .modal-actions { display: flex; gap: 10px; align-items: center; }
+    .btn-modal-dl { background: var(--accent); color: #fff; border: none; padding: 9px 18px; border-radius: 999px; font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: inherit; text-decoration: none; display: inline-block; }
+    .btn-modal-close { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #fff; width: 38px; height: 38px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .modal-frame { width: 100%; max-width: 900px; flex: 1; max-height: 80vh; border-radius: 16px; overflow: hidden; background: #fff; }
+    .modal-frame iframe { width: 100%; height: 100%; border: none; min-height: 70vh; }
+
+    /* VIDEO PLAYER MODAL */
+    .video-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(12px); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+    .video-modal-overlay.hidden { display: none; }
+    .video-modal-top { width: 100%; max-width: 960px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .video-modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: #fff; }
+    .video-modal-frame { width: 100%; max-width: 960px; aspect-ratio: 16/9; border-radius: 16px; overflow: hidden; background: #000; }
+    .video-modal-frame iframe { width: 100%; height: 100%; border: none; }
+
+    /* ADD SHEET MODAL */
+    .am-overlay { position: fixed; inset: 0; background: rgba(15,10,40,0.7); backdrop-filter: blur(8px); z-index: 300; display: flex; align-items: flex-end; justify-content: center; }
+    .am-overlay.hidden { display: none; }
+    .am-sheet { background: #fff; border-radius: 28px 28px 0 0; width: 100%; max-width: 540px; padding-bottom: 32px; }
+    .am-handle { width: 40px; height: 4px; background: var(--border); border-radius: 999px; margin: 12px auto 0; }
+    .am-head { padding: 18px 24px 14px; border-bottom: 1.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .am-head-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 800; color: var(--text-dark); }
+    .am-close-btn { width: 30px; height: 30px; border-radius: 50%; background: var(--off-white); border: 1.5px solid var(--border); color: var(--text-muted); cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; }
+    .am-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; }
+    .am-field label { display: block; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 7px; font-family: 'IBM Plex Mono', monospace; }
+    .am-field input { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.92rem; color: var(--text-dark); background: var(--off-white); outline: none; }
+    .am-field input:focus { border-color: var(--purple-light); background: #fff; }
+    .am-hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 5px; line-height: 1.5; }
+    .am-hint code { background: var(--purple-soft); color: var(--purple); padding: 1px 5px; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; }
+    .am-err { background: #FEE2E2; border: 1.5px solid #FCA5A5; border-radius: 10px; padding: 10px 14px; font-size: 0.82rem; color: #991B1B; display: none; }
+    .am-err.show { display: block; }
+    .am-submit { width: 100%; padding: 14px; background: linear-gradient(135deg, #7C3AED, #5B21B6); color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 0.95rem; border: none; border-radius: 14px; cursor: pointer; }
+    .am-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+    .spinner-sm { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    footer { background: #1E1040; color: rgba(255,255,255,0.5); text-align: center; padding: 20px; font-size: 0.85rem; }
+    footer strong { color: #A78BFA; }
+  </style>
+</head>
+<body>
+
+<!-- PDF VIEWER MODAL -->
+<div class="modal-overlay hidden" id="pdfModal">
+  <div class="modal-top">
+    <div class="modal-title" id="pdfModalTitle">Reading Material</div>
+    <div class="modal-actions">
+      <a class="btn-modal-dl" id="pdfModalDl" href="#" target="_blank">&#8595; Download</a>
+      <button class="btn-modal-close" onclick="closePdfModal()">&#10005;</button>
+    </div>
+  </div>
+  <div class="modal-frame">
+    <iframe id="pdfModalIframe" src="" allowfullscreen></iframe>
+  </div>
+</div>
+
+<!-- VIDEO PLAYER MODAL -->
+<div class="video-modal-overlay hidden" id="videoModal">
+  <div class="video-modal-top">
+    <div class="video-modal-title" id="videoModalTitle">Video Lesson</div>
+    <div class="modal-actions">
+      <a class="btn-modal-dl" id="videoModalYt" href="#" target="_blank" style="background:#DC2626;">&#9654; YouTube</a>
+      <button class="btn-modal-close" onclick="closeVideoModal()">&#10005;</button>
+    </div>
+  </div>
+  <div class="video-modal-frame">
+    <iframe id="videoModalIframe" src="" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+  </div>
+</div>
+
+<!-- ADD READING SHEET -->
+<div class="am-overlay hidden" id="addReadingOverlay">
+  <div class="am-sheet">
+    <div class="am-handle"></div>
+    <div class="am-head">
+      <div class="am-head-title">📖 Add Reading Material</div>
+      <button class="am-close-btn" onclick="closeAddReading()">&#10005;</button>
+    </div>
+    <div class="am-body">
+      <div class="am-field">
+        <label>Title</label>
+        <input type="text" id="rTitle" placeholder="e.g. Chapter 5 Reading Text"/>
+      </div>
+      <div class="am-field">
+        <label>Google Drive File ID or URL</label>
+        <input type="text" id="rFileId" placeholder="Paste Drive link or file ID"/>
+        <div class="am-hint">From share link: <code>drive.google.com/file/d/<strong>COPY_THIS</strong>/view</code></div>
+      </div>
+      <div class="am-err" id="rErr"></div>
+      <button class="am-submit" id="rSubmitBtn">&#65291; Add Reading</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD VIDEO SHEET -->
+<div class="am-overlay hidden" id="addVideoOverlay">
+  <div class="am-sheet">
+    <div class="am-handle"></div>
+    <div class="am-head">
+      <div class="am-head-title">🎬 Add Video</div>
+      <button class="am-close-btn" onclick="closeAddVideo()">&#10005;</button>
+    </div>
+    <div class="am-body">
+      <div class="am-field">
+        <label>Title</label>
+        <input type="text" id="vTitle" placeholder="e.g. Chapter 5 Video Explanation"/>
+      </div>
+      <div class="am-field">
+        <label>YouTube URL or Video ID</label>
+        <input type="text" id="vVideoId" placeholder="Paste YouTube link or just the video ID"/>
+        <div class="am-hint">From share link: <code>youtube.com/watch?v=<strong>COPY_THIS</strong></code></div>
+      </div>
+      <div class="am-err" id="vErr"></div>
+      <button class="am-submit" id="vSubmitBtn">&#65291; Add Video</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <a class="back-btn" href="index.html">&#8592; Back</a>
+  <button class="logout-btn" onclick="doLogout()">&#128274; Logout</button>
+  <h1>Class <span>Session</span></h1>
+  <p class="header-sub">English Quest &middot; SMA Negeri 6 Surakarta</p>
+</header>
+<svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
+  <path fill="#4C1D95" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
+  <path fill="#F9F7FF" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
+</svg>
+
+<main>
+
+  <!-- READING SECTION -->
+  <div class="section-block">
+    <div class="section-header">
+      <div class="section-badge reading">📖 READING</div>
+      <div class="section-title">Reading Material</div>
+      <div class="section-line"></div>
+      <button class="add-btn" id="addReadingBtn">&#65291; Add</button>
+    </div>
+    <div class="content-grid" id="readingGrid">
+      <div class="empty-card" id="readingEmpty">
+        <div class="empty-icon">📖</div>
+        <div>
+          <div class="empty-title">No Reading Yet</div>
+          <div class="empty-sub">Teacher will upload reading material soon</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIDEO SECTION -->
+  <div class="section-block">
+    <div class="section-header">
+      <div class="section-badge video">🎬 VIDEO</div>
+      <div class="section-title">Video Lesson</div>
+      <div class="section-line"></div>
+      <button class="add-btn" id="addVideoBtn">&#65291; Add</button>
+    </div>
+    <div class="content-grid" id="videoGrid">
+      <div class="empty-card" id="videoEmpty">
+        <div class="empty-icon">🎬</div>
+        <div>
+          <div class="empty-title">No Video Yet</div>
+          <div class="empty-sub">Teacher will upload the lesson video soon</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>© 2025 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
+
+<script>
+var SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+var savedUser = localStorage.getItem('eq_tu') || '';
+var savedPass = localStorage.getItem('eq_tp') || '';
+var isTeacher = !!savedUser;
+
+if (isTeacher) document.body.classList.add('teacher-active');
+
+// ── API ───────────────────────────────────────────────────────
+function apiGet(params) {
+  var url = SCORES_API + '?';
+  var parts = [];
+  for (var k in params) parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
+  url += parts.join('&');
+  function attempt(retries) {
+    return new Promise(function(resolve, reject) {
+      var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+      var script = document.createElement('script');
+      var timer = setTimeout(function() {
+        cleanup();
+        if (retries > 0) attempt(retries - 1).then(resolve).catch(reject);
+        else reject(new Error('Request timed out. Please try again.'));
+      }, 15000);
+      function cleanup() {
+        clearTimeout(timer); delete window[cb];
+        try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
+      }
+      window[cb] = function(d) { cleanup(); resolve(d); };
+      script.onerror = function() {
+        cleanup();
+        if (retries > 0) attempt(retries - 1).then(resolve).catch(reject);
+        else reject(new Error('Network error. Please try again.'));
+      };
+      script.src = url + '&callback=' + cb;
+      (document.body || document.head).appendChild(script);
+    });
+  }
+  return attempt(1);
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function showToast(msg) {
+  var t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1E1040;color:#fff;padding:12px 22px;border-radius:999px;font-size:0.85rem;font-weight:600;z-index:9999;white-space:nowrap;';
+  document.body.appendChild(t);
+  setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 3000);
+}
+
+// ── PDF MODAL ─────────────────────────────────────────────────
+function openPdf(title, fileId) {
+  document.getElementById('pdfModalTitle').textContent = title;
+  document.getElementById('pdfModalIframe').src = 'https://drive.google.com/file/d/' + fileId + '/preview';
+  document.getElementById('pdfModalDl').href = 'https://drive.google.com/uc?export=download&id=' + fileId;
+  document.getElementById('pdfModal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closePdfModal() {
+  document.getElementById('pdfModal').classList.add('hidden');
+  document.getElementById('pdfModalIframe').src = '';
+  document.body.style.overflow = '';
+}
+document.getElementById('pdfModal').addEventListener('click', function(e) { if (e.target === this) closePdfModal(); });
+
+// ── VIDEO MODAL ───────────────────────────────────────────────
+function openVideo(title, videoId) {
+  document.getElementById('videoModalTitle').textContent = title;
+  document.getElementById('videoModalIframe').src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0';
+  document.getElementById('videoModalYt').href = 'https://www.youtube.com/watch?v=' + videoId;
+  document.getElementById('videoModal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeVideoModal() {
+  document.getElementById('videoModal').classList.add('hidden');
+  document.getElementById('videoModalIframe').src = '';
+  document.body.style.overflow = '';
+}
+document.getElementById('videoModal').addEventListener('click', function(e) { if (e.target === this) closeVideoModal(); });
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closePdfModal(); closeVideoModal(); closeAddReading(); closeAddVideo(); } });
+
+// ── LOAD SAVED CONTENT ────────────────────────────────────────
+function loadAll() {
+  // Reading — stored via ScoresAPI materials with chapter 'r'
+  apiGet({ action: 'getMaterials', chapter: 'reading' }).then(function(res) {
+    if (res.materials && res.materials.length > 0) {
+      res.materials.forEach(function(m) { appendReadingCard(m.title, m.fileId, false); });
+    }
+  }).catch(function() {});
+
+  // Video — stored via ScoresAPI materials with chapter 'video'
+  apiGet({ action: 'getMaterials', chapter: 'video' }).then(function(res) {
+    if (res.materials && res.materials.length > 0) {
+      res.materials.forEach(function(m) { appendVideoCard(m.title, m.fileId, false); });
+    }
+  }).catch(function() {});
+}
+
+// ── READING CARDS ─────────────────────────────────────────────
+function appendReadingCard(title, fileId, animate) {
+  var existing = document.querySelector('[data-reading-id="' + fileId + '"]');
+  if (existing) return;
+  var empty = document.getElementById('readingEmpty');
+  if (empty) empty.remove();
+
+  var previewUrl  = 'https://drive.google.com/file/d/' + fileId + '/preview';
+  var downloadUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
+
+  var card = document.createElement('div');
+  card.className = 'pdf-card';
+  card.setAttribute('data-reading-id', fileId);
+
+  var delBtn = document.createElement('button');
+  delBtn.className = 'btn-delete';
+  delBtn.innerHTML = '&#10005;';
+  delBtn.onclick = function() { deleteReading(fileId, card); };
+
+  var preview = document.createElement('div');
+  preview.className = 'pdf-preview';
+  preview.innerHTML = '<span class="pdf-icon">📖</span><iframe src="' + previewUrl + '" title="' + title + '"></iframe><div class="pdf-overlay"><div class="pdf-overlay-btn">Read</div></div>';
+  preview.onclick = function() { openPdf(title, fileId); };
+
+  var info = document.createElement('div');
+  info.className = 'pdf-info';
+  var pName = document.createElement('div'); pName.className = 'pdf-name'; pName.textContent = title;
+  var pMeta = document.createElement('div'); pMeta.className = 'pdf-meta'; pMeta.textContent = 'PDF · Reading Material';
+  var pActs = document.createElement('div'); pActs.className = 'pdf-actions';
+  var btnView = document.createElement('button'); btnView.className = 'btn-view'; btnView.textContent = '👁 Read'; btnView.onclick = function() { openPdf(title, fileId); };
+  var btnDl = document.createElement('a'); btnDl.className = 'btn-download'; btnDl.href = downloadUrl; btnDl.target = '_blank'; btnDl.textContent = '↓';
+  pActs.appendChild(btnView); pActs.appendChild(btnDl);
+  info.appendChild(pName); info.appendChild(pMeta); info.appendChild(pActs);
+  card.appendChild(delBtn); card.appendChild(preview); card.appendChild(info);
+  document.getElementById('readingGrid').appendChild(card);
+}
+
+function deleteReading(fileId, card) {
+  if (!confirm('Remove this reading material?')) return;
+  apiGet({ action: 'deleteMaterial', username: savedUser, password: savedPass, chapter: 'reading', fileId: fileId })
+    .then(function(res) {
+      if (res.success) {
+        card.remove();
+        if (document.getElementById('readingGrid').children.length === 0) {
+          var e = document.createElement('div'); e.className = 'empty-card'; e.id = 'readingEmpty';
+          e.innerHTML = '<div class="empty-icon">📖</div><div><div class="empty-title">No Reading Yet</div><div class="empty-sub">Add reading material above</div></div>';
+          document.getElementById('readingGrid').appendChild(e);
+        }
+        showToast('Removed!');
+      }
+    });
+}
+
+// ── VIDEO CARDS ───────────────────────────────────────────────
+function appendVideoCard(title, videoId, animate) {
+  var existing = document.querySelector('[data-video-id="' + videoId + '"]');
+  if (existing) return;
+  var empty = document.getElementById('videoEmpty');
+  if (empty) empty.remove();
+
+  var thumbUrl = 'https://img.youtube.com/vi/' + videoId + '/hqdefault.jpg';
+  var ytUrl    = 'https://www.youtube.com/watch?v=' + videoId;
+
+  var card = document.createElement('div');
+  card.className = 'video-card';
+  card.setAttribute('data-video-id', videoId);
+
+  var delBtn = document.createElement('button');
+  delBtn.className = 'btn-delete';
+  delBtn.innerHTML = '&#10005;';
+  delBtn.onclick = function() { deleteVideo(videoId, card); };
+
+  var thumb = document.createElement('div');
+  thumb.className = 'video-thumb';
+  thumb.innerHTML = '<img src="' + thumbUrl + '" alt="' + title + '" onerror="this.style.display=\'none\'"/><div class="video-play-overlay"><div class="video-play-btn">▶</div></div>';
+  thumb.onclick = function() { openVideo(title, videoId); };
+
+  var info = document.createElement('div');
+  info.className = 'video-info';
+  var vName = document.createElement('div'); vName.className = 'video-name'; vName.textContent = title;
+  var vMeta = document.createElement('div'); vMeta.className = 'video-meta'; vMeta.textContent = 'YouTube · Video Lesson';
+  var vActs = document.createElement('div'); vActs.className = 'video-actions';
+  var btnWatch = document.createElement('button'); btnWatch.className = 'btn-watch'; btnWatch.textContent = '▶ Watch'; btnWatch.onclick = function() { openVideo(title, videoId); };
+  var btnYt = document.createElement('a'); btnYt.className = 'btn-yt'; btnYt.href = ytUrl; btnYt.target = '_blank'; btnYt.textContent = '↗';
+  vActs.appendChild(btnWatch); vActs.appendChild(btnYt);
+  info.appendChild(vName); info.appendChild(vMeta); info.appendChild(vActs);
+  card.appendChild(delBtn); card.appendChild(thumb); card.appendChild(info);
+  document.getElementById('videoGrid').appendChild(card);
+}
+
+function deleteVideo(videoId, card) {
+  if (!confirm('Remove this video?')) return;
+  apiGet({ action: 'deleteMaterial', username: savedUser, password: savedPass, chapter: 'video', fileId: videoId })
+    .then(function(res) {
+      if (res.success) {
+        card.remove();
+        if (document.getElementById('videoGrid').children.length === 0) {
+          var e = document.createElement('div'); e.className = 'empty-card'; e.id = 'videoEmpty';
+          e.innerHTML = '<div class="empty-icon">🎬</div><div><div class="empty-title">No Video Yet</div><div class="empty-sub">Add a video above</div></div>';
+          document.getElementById('videoGrid').appendChild(e);
+        }
+        showToast('Removed!');
+      }
+    });
+}
+
+// ── ADD READING ───────────────────────────────────────────────
+document.getElementById('addReadingBtn').onclick = function() {
+  document.getElementById('rTitle').value = '';
+  document.getElementById('rFileId').value = '';
+  document.getElementById('rErr').className = 'am-err';
+  document.getElementById('addReadingOverlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+};
+function closeAddReading() {
+  document.getElementById('addReadingOverlay').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+document.getElementById('addReadingOverlay').onclick = function(e) { if (e.target === this) closeAddReading(); };
+
+document.getElementById('rSubmitBtn').onclick = function() {
+  var raw   = document.getElementById('rFileId').value.trim();
+  var title = document.getElementById('rTitle').value.trim();
+  var err   = document.getElementById('rErr');
+  var btn   = document.getElementById('rSubmitBtn');
+
+  var fileId = raw;
+  var m = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (m) fileId = m[1];
+
+  if (!title) { err.textContent = 'Please enter a title.'; err.className = 'am-err show'; return; }
+  if (!fileId || fileId.length < 10) { err.textContent = 'Please enter a valid Drive link or file ID.'; err.className = 'am-err show'; return; }
+  err.className = 'am-err';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-sm"></span>Saving...';
+
+  apiGet({ action: 'addMaterial', username: savedUser, password: savedPass, chapter: 'reading', title: title, fileId: fileId, fileType: 'PDF' })
+    .then(function(res) {
+      if (res.success) { appendReadingCard(title, fileId, true); closeAddReading(); showToast('Added: ' + title); }
+      else { err.textContent = res.error || 'Failed to save.'; err.className = 'am-err show'; }
+    }).catch(function() { err.textContent = 'Network error. Please try again.'; err.className = 'am-err show'; })
+    .finally(function() { btn.disabled = false; btn.innerHTML = '&#65291; Add Reading'; });
+};
+
+// ── ADD VIDEO ─────────────────────────────────────────────────
+document.getElementById('addVideoBtn').onclick = function() {
+  document.getElementById('vTitle').value = '';
+  document.getElementById('vVideoId').value = '';
+  document.getElementById('vErr').className = 'am-err';
+  document.getElementById('addVideoOverlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+};
+function closeAddVideo() {
+  document.getElementById('addVideoOverlay').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+document.getElementById('addVideoOverlay').onclick = function(e) { if (e.target === this) closeAddVideo(); };
+
+document.getElementById('vSubmitBtn').onclick = function() {
+  var raw   = document.getElementById('vVideoId').value.trim();
+  var title = document.getElementById('vTitle').value.trim();
+  var err   = document.getElementById('vErr');
+  var btn   = document.getElementById('vSubmitBtn');
+
+  // Extract YouTube video ID
+  var videoId = raw;
+  var ytMatch = raw.match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
+  if (ytMatch) videoId = ytMatch[1];
+
+  if (!title) { err.textContent = 'Please enter a title.'; err.className = 'am-err show'; return; }
+  if (!videoId || videoId.length < 5) { err.textContent = 'Please enter a valid YouTube link or video ID.'; err.className = 'am-err show'; return; }
+  err.className = 'am-err';
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-sm"></span>Saving...';
+
+  apiGet({ action: 'addMaterial', username: savedUser, password: savedPass, chapter: 'video', title: title, fileId: videoId, fileType: 'YT' })
+    .then(function(res) {
+      if (res.success) { appendVideoCard(title, videoId, true); closeAddVideo(); showToast('Added: ' + title); }
+      else { err.textContent = res.error || 'Failed to save.'; err.className = 'am-err show'; }
+    }).catch(function() { err.textContent = 'Network error. Please try again.'; err.className = 'am-err show'; })
+    .finally(function() { btn.disabled = false; btn.innerHTML = '&#65291; Add Video'; });
+};
+
+// ── LOGOUT ────────────────────────────────────────────────────
+function doLogout() {
+  localStorage.removeItem('eq_tu'); localStorage.removeItem('eq_tp');
+  window.location.href = 'index.html';
+}
+
+// Load on ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadAll);
+} else {
+  loadAll();
+}
+</script>
+</body>
+</html>
