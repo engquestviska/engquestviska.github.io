@@ -2481,10 +2481,13 @@ document.getElementById('setupSubmit').addEventListener('click', function() {
   greeting.innerHTML =
     '<div class="sg-avatar" id="sgAvatar">' + name.charAt(0).toUpperCase() + '</div>' +
     '<div class="sg-info">' +
-      '<div class="sg-name">' + name.split(' ')[0] + '</div>' +
-      '<div class="sg-class">' + (CLASS_LABELS_FULL[cls] || cls) + '</div>' +
+      '<div class="sg-name" id="sgName">' + name.split(' ')[0] + '</div>' +
+      '<div class="sg-class" id="sgClass">' + (CLASS_LABELS_FULL[cls] || cls) + '</div>' +
     '</div>' +
-    '<span class="sg-change" onclick="openSetup(true)">Change</span>';
+    '<div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0;">' +
+      '<span class="sg-change" onclick="openSetup(true)">Change</span>' +
+      '<span class="sg-change" onclick="logoutStudent()" style="color:rgba(255,100,100,0.7);">Sign out</span>' +
+    '</div>';
 });
 
 // Run on load
