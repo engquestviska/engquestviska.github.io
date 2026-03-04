@@ -266,6 +266,36 @@
     });
   }
 
+  // ── CACHE LAYER ─────────────────────────────────────────────
+  var CACHE_TTL = 30 * 60 * 1000;
+  function cacheKey(params) {
+    var sorted = Object.keys(params).sort();
+    return 'eq_cache_' + sorted.map(function(k) { return k + '=' + params[k]; }).join('_').replace(/[^a-zA-Z0-9_=]/g, '_');
+  }
+  function cacheGet(params) {
+    try {
+      var raw = localStorage.getItem(cacheKey(params));
+      if (!raw) return null;
+      var entry = JSON.parse(raw);
+      if (Date.now() - entry.ts > CACHE_TTL) { localStorage.removeItem(cacheKey(params)); return null; }
+      return entry.data;
+    } catch(e) { return null; }
+  }
+  function cacheSet(params, data) {
+    try { localStorage.setItem(cacheKey(params), JSON.stringify({ ts: Date.now(), data: data })); } catch(e) {}
+  }
+  async function cachedApiGet(params) {
+    var cached = cacheGet(params);
+    if (cached) {
+      apiGet(params).then(function(fresh) { cacheSet(params, fresh); }).catch(function() {});
+      return cached;
+    }
+    var data = await apiGet(params);
+    cacheSet(params, data);
+    return data;
+  }
+
+
   async function apiPost(body) {
     try {
       const res = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
@@ -328,7 +358,7 @@
     if (!cls) { nameSelect.innerHTML = '<option>— Select class first —</option>'; return; }
     try {
       let data = studentsCache[cls];
-      if (!data) { data = await apiGet({ action: 'getStudents', className: cls }); studentsCache[cls] = data; }
+      if (!data) { data = await cachedApiGet({ action: 'getStudents', className: cls }); studentsCache[cls] = data; }
       if (data.error) { showToast(data.error, 'err'); return; }
       nameSelect.innerHTML = '<option value="">— Select your name —</option>';
       data.students.forEach(s => {
@@ -352,7 +382,7 @@
     document.getElementById('sViewBtn').disabled = true;
     document.getElementById('sViewBtn').textContent = '⏳ Loading...';
     try {
-      const data = await apiGet({ action: 'getTaskStatus', className: cls, studentNo: no });
+      const data = await cachedApiGet({ action: 'getTaskStatus', className: cls, studentNo: no });
       if (data.error) { showToast(data.error, 'err'); document.getElementById('studentResult').innerHTML = ''; return; }
       renderStudentTasks(data, clsLabel);
     } catch(e) { showToast('Failed to load tasks', 'err'); document.getElementById('studentResult').innerHTML = ''; }
