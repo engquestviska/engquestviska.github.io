@@ -2756,5 +2756,19 @@ document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { clo
 loadResources();
 </script>
 
+
+<script>
+// Wake up Apps Script while user is on homepage (reduces cold start on inner pages)
+(function() {
+  var API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+  var last = localStorage.getItem('eq_last_ping');
+  if (last && Date.now() - parseInt(last) < 5 * 60 * 1000) return; // skip if pinged <5 min ago
+  var script = document.createElement('script');
+  script.src = API + '?action=ping&callback=eq_ping_cb';
+  window.eq_ping_cb = function() { localStorage.setItem('eq_last_ping', Date.now()); delete window.eq_ping_cb; };
+  setTimeout(function() { (document.body || document.head).appendChild(script); }, 1500); // after page renders
+})();
+</script>
+
 </body>
 </html>
