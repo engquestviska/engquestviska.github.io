@@ -453,6 +453,37 @@ let totalLoaded  = 0;
 let totalStudents = 0;
 
 // Will be called after apiGet is defined below
+
+function renderStudentClass(cls, students) {
+  const list = document.getElementById('list-' + cls);
+  list.innerHTML = '';
+  students.forEach((s, i) => {
+    const name = s.name || '';
+    const item = document.createElement('div');
+    item.className = 'student-item';
+    item.dataset.name  = name.toLowerCase();
+    item.dataset.class = cls;
+    item.innerHTML = `
+      <span class="student-num">${i + 1}</span>
+      <span class="student-dot"></span>
+      <span class="student-name">${name}${s.nickname ? ' <span style="color:var(--text-muted);font-size:0.82em;">(' + s.nickname + ')</span>' : ''}</span>
+    `;
+    item.addEventListener('click', () => openActModal(name, cls));
+    list.appendChild(item);
+  });
+  document.getElementById('count-' + cls).textContent = students.length + ' students';
+  totalStudents += students.length;
+}
+
+function autoOpenSavedStudent() {
+  const savedCls  = localStorage.getItem('eq_student_class');
+  const savedName = localStorage.getItem('eq_student_name');
+  if (savedCls && savedName) {
+    const clsMap = { XE1:'XE-1', XE4:'XE-4', XE5:'XE-5', XE6:'XE-6', XE7:'XE-7', XE8:'XE-8', XE9:'XE-9', XE10:'XE-10', XE11:'XE-11' };
+    openActModal(savedName, clsMap[savedCls] || savedCls);
+  }
+}
+
 function loadAllStudents() {
   classes.forEach(cls => {
     const list = document.getElementById('list-' + cls);
@@ -460,43 +491,43 @@ function loadAllStudents() {
   });
   document.getElementById('countBadge').textContent = 'Loading...';
 
-  Promise.all(classes.map(cls =>
-    apiGet({ action: 'getStudents', className: apiClsMap[cls] })
-      .then(res => ({ cls, students: res.students || [] }))
-      .catch(() => ({ cls, students: [] }))
-  )).then(results => {
-    results.forEach(({ cls, students }) => {
-      const list = document.getElementById('list-' + cls);
-      list.innerHTML = '';
-      students.forEach((s, i) => {
-        const name = s.name || '';
-        const item = document.createElement('div');
-        item.className = 'student-item';
-        item.dataset.name  = name.toLowerCase();
-        item.dataset.class = cls;
-        item.innerHTML = `
-          <span class="student-num">${i + 1}</span>
-          <span class="student-dot"></span>
-          <span class="student-name">${name}${s.nickname ? ' <span style="color:var(--text-muted);font-size:0.82em;">(' + s.nickname + ')</span>' : ''}</span>
-        `;
-        item.addEventListener('click', () => openActModal(name, cls));
-        list.appendChild(item);
-      });
-      document.getElementById('count-' + cls).textContent = students.length + ' students';
-      totalStudents += students.length;
-    });
+  // Check cache first — render instantly if available
+  var cachedAny = false;
+  classes.forEach(cls => {
+    var params = { action: 'getStudents', className: apiClsMap[cls] };
+    var cached = cacheGet(params);
+    if (cached && cached.students) {
+      renderStudentClass(cls, cached.students);
+      cachedAny = true;
+    }
+  });
+
+  if (cachedAny) {
     document.getElementById('countBadge').textContent = totalStudents + ' students';
     updateCount();
+    autoOpenSavedStudent();
+  }
 
-    // Auto-open saved student's stats popup — no timer, data is already loaded here
-    const savedCls  = localStorage.getItem('eq_student_class');
-    const savedName = localStorage.getItem('eq_student_name');
-    if (savedCls && savedName) {
-      const clsMap = { XE1:'XE-1', XE4:'XE-4', XE5:'XE-5', XE6:'XE-6', XE7:'XE-7', XE8:'XE-8', XE9:'XE-9', XE10:'XE-10', XE11:'XE-11' };
-      openActModal(savedName, clsMap[savedCls] || savedCls);
+  // Always fetch fresh in background (or foreground if no cache)
+  Promise.all(classes.map(cls => {
+    var params = { action: 'getStudents', className: apiClsMap[cls] };
+    return apiGet(params)
+      .then(res => { cacheSet(params, res); return { cls, students: res.students || [] }; })
+      .catch(() => ({ cls, students: [] }));
+  })).then(results => {
+    if (!cachedAny) {
+      results.forEach(({ cls, students }) => renderStudentClass(cls, students));
+      document.getElementById('countBadge').textContent = totalStudents + ' students';
+      updateCount();
+      autoOpenSavedStudent();
+    } else {
+      // Silent refresh — update counts only
+      results.forEach(({ cls, students }) => {
+        document.getElementById('count-' + cls).textContent = students.length + ' students';
+      });
     }
   }).catch(() => {
-    document.getElementById('countBadge').textContent = 'Failed to load';
+    if (!cachedAny) document.getElementById('countBadge').textContent = 'Failed to load';
   });
 }
 
@@ -535,6 +566,30 @@ function updateCount(n) {
 }
 
 // ── ACTIVENESS STATS ──────────────────────────────────────────
+
+// ── CACHE LAYER ───────────────────────────────────────────────
+var CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+
+function cacheKey(params) {
+  var sorted = Object.keys(params).sort();
+  var parts = sorted.map(function(k) { return k + '=' + params[k]; });
+  return 'eq_cache_' + parts.join('_').replace(/[^a-zA-Z0-9_=]/g, '_');
+}
+
+function cacheGet(params) {
+  try {
+    var raw = localStorage.getItem(cacheKey(params));
+    if (!raw) return null;
+    var entry = JSON.parse(raw);
+    if (Date.now() - entry.ts > CACHE_TTL) { localStorage.removeItem(cacheKey(params)); return null; }
+    return entry.data;
+  } catch(e) { return null; }
+}
+
+function cacheSet(params, data) {
+  try { localStorage.setItem(cacheKey(params), JSON.stringify({ ts: Date.now(), data: data })); } catch(e) {}
+}
+
 const SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
 const activenessCache = {};
 
