@@ -1070,7 +1070,10 @@
       <div class="sg-name" id="sgName">Student</div>
       <div class="sg-class" id="sgClass">Class</div>
     </div>
-    <span class="sg-change" onclick="openSetup(true)">Change</span>
+    <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0;">
+      <span class="sg-change" onclick="openSetup(true)">Change</span>
+      <span class="sg-change" onclick="logoutStudent()" style="color:rgba(255,100,100,0.7);">Sign out</span>
+    </div>
   </div>
 </header>
 
@@ -2394,6 +2397,16 @@ function openSetup(isChange) {
   document.getElementById('setupSubmit').disabled = true;
 }
 
+function logoutStudent() {
+  localStorage.removeItem('eq_student_class');
+  localStorage.removeItem('eq_student_no');
+  localStorage.removeItem('eq_student_name');
+  localStorage.removeItem('eq_setup_skipped');
+  document.getElementById('studentGreeting').classList.remove('show');
+  // Show setup modal so they can pick again or skip
+  openSetup(false);
+}
+
 function skipSetup() {
   localStorage.setItem('eq_setup_skipped', '1');
   document.getElementById('setupOverlay').classList.add('hidden');
@@ -2514,22 +2527,16 @@ function loadAnnouncement() {
     if (!res.announcement) return;
     var ann = res.announcement;
 
-    // Check if student dismissed this exact announcement
+    // Store postedAt so dismiss works correctly
+    window.__annPostedAt = ann.postedAt;
+
+    // Check if student already dismissed this exact announcement
     var dismissed = localStorage.getItem('eq_ann_dismissed');
     if (dismissed === ann.postedAt) return;
 
-    var banner = document.getElementById('annBanner');
-    banner.className = 'ann-banner show ' + (ann.type || 'info');
-    document.getElementById('annIcon').textContent  = ANN_ICONS[ann.type] || '📢';
-    document.getElementById('annTitle').textContent = ann.title || '';
-    document.getElementById('annBody').textContent  = ann.body  || '';
+    showAnnouncementBanner(ann);
 
-    // Format date
-    var d = new Date(ann.postedAt);
-    var dateStr = d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
-    document.getElementById('annMeta').textContent = 'Posted ' + dateStr;
-
-    // Also pre-fill editor if teacher
+    // Pre-fill editor if teacher
     if (localStorage.getItem('eq_tu')) {
       document.getElementById('annType').value       = ann.type  || 'info';
       document.getElementById('annTitleInput').value = ann.title || '';
@@ -2539,12 +2546,20 @@ function loadAnnouncement() {
   }).catch(function() {});
 }
 
-function dismissAnnouncement() {
-  // Remember which announcement was dismissed so it doesn't come back
-  var meta = document.getElementById('annMeta').textContent;
+function showAnnouncementBanner(ann) {
   var banner = document.getElementById('annBanner');
-  // Get the postedAt from when we loaded — store it
+  banner.className = 'ann-banner show ' + (ann.type || 'info');
+  document.getElementById('annIcon').textContent  = ANN_ICONS[ann.type] || '📢';
+  document.getElementById('annTitle').textContent = ann.title || '';
+  document.getElementById('annBody').textContent  = ann.body  || '';
+  var d = new Date(ann.postedAt);
+  var dateStr = d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+  document.getElementById('annMeta').textContent = 'Posted ' + dateStr;
+}
+
+function dismissAnnouncement() {
   localStorage.setItem('eq_ann_dismissed', window.__annPostedAt || 'dismissed');
+  var banner = document.getElementById('annBanner');
   banner.style.transition = 'opacity 0.3s';
   banner.style.opacity = '0';
   setTimeout(function() { banner.classList.remove('show'); banner.style.opacity = ''; }, 300);
@@ -2567,13 +2582,8 @@ function postAnnouncement() {
       if (res.success) {
         document.getElementById('annEditorStatus').textContent = '✅ Posted!';
         // Show banner live
-        var banner = document.getElementById('annBanner');
-        banner.className = 'ann-banner show ' + type;
-        document.getElementById('annIcon').textContent  = ANN_ICONS[type] || '📢';
-        document.getElementById('annTitle').textContent = title;
-        document.getElementById('annBody').textContent  = body;
-        document.getElementById('annMeta').textContent  = 'Posted just now';
         window.__annPostedAt = res.announcement.postedAt;
+        showAnnouncementBanner(res.announcement);
         setTimeout(function() { document.getElementById('annEditorStatus').textContent = 'Active announcement'; }, 2000);
       } else {
         alert('Error: ' + (res.error || 'Failed'));
