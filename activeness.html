@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Activeness · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -15,7 +15,7 @@
       --blue: #3B82F6; --pink: #EC4899; --teal: #14B8A6;
       --text: #F1EEFF; --muted: #7C6FA0; --white: #fff;
     }
-    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    body { font-family: 'IBM Plex Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
     /* HEADER */
     header {
@@ -24,10 +24,10 @@
       border-bottom: 1px solid var(--border);
     }
     .header-row { display: flex; align-items: center; justify-content: space-between; max-width: 960px; margin: 0 auto; }
-    .back-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600; padding: 8px 16px; border-radius: 999px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
+    .back-btn { background: var(--surface2); border: 1px solid var(--border); color: var(--muted); font-family: 'IBM Plex Sans', sans-serif; font-size: 0.85rem; font-weight: 600; padding: 8px 16px; border-radius: 999px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
     .back-btn:hover { color: var(--text); border-color: var(--purple); }
     .header-center { text-align: center; flex: 1; }
-    .header-title { font-family: 'Syne', sans-serif; font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 800; background: linear-gradient(135deg, #A78BFA, #F59E0B); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .header-title { font-family: 'IBM Plex Sans', sans-serif; font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 800; background: linear-gradient(135deg, #A78BFA, #F59E0B); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .header-sub { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
     .header-right { min-width: 80px; display: flex; justify-content: flex-end; }
     .teacher-badge { background: linear-gradient(135deg, var(--accent), #D97706); color: #fff; font-size: 0.78rem; font-weight: 700; padding: 7px 14px; border-radius: 999px; display: flex; align-items: center; gap: 6px; }
@@ -41,25 +41,25 @@
     .login-wall { display: flex; align-items: center; justify-content: center; min-height: 60vh; }
     .login-box { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 40px 32px; width: 100%; max-width: 380px; text-align: center; }
     .login-icon { font-size: 2.5rem; margin-bottom: 16px; }
-    .login-title { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
+    .login-title { font-family: 'IBM Plex Sans', sans-serif; font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
     .login-sub { font-size: 0.88rem; color: var(--muted); margin-bottom: 28px; }
-    .input-field { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 13px 16px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; color: var(--text); outline: none; margin-bottom: 12px; }
+    .input-field { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 13px 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.95rem; color: var(--text); outline: none; margin-bottom: 12px; }
     .input-field:focus { border-color: var(--purple); }
     .input-field::placeholder { color: var(--muted); }
     .login-error { font-size: 0.82rem; color: var(--red); margin-bottom: 12px; display: none; }
-    .btn-login { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--purple), #6D28D9); color: #fff; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 1rem; border: none; border-radius: 12px; cursor: pointer; transition: opacity 0.2s; }
+    .btn-login { width: 100%; padding: 14px; background: linear-gradient(135deg, var(--purple), #6D28D9); color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 1rem; border: none; border-radius: 12px; cursor: pointer; transition: opacity 0.2s; }
     .btn-login:hover { opacity: 0.9; }
 
     /* CLASS SELECTOR */
     .top-bar { display: flex; gap: 12px; align-items: center; margin-bottom: 24px; flex-wrap: wrap; }
-    .class-select { flex: 1; min-width: 160px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem; color: var(--text); outline: none; cursor: pointer; }
+    .class-select { flex: 1; min-width: 160px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.95rem; color: var(--text); outline: none; cursor: pointer; }
     .class-select:focus { border-color: var(--purple); }
     .class-select option { background: var(--surface); }
-    .class-info { font-size: 0.82rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+    .class-info { font-size: 0.82rem; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }
 
     /* LEGEND */
     .legend { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; font-family: 'DM Mono', monospace; color: var(--muted); background: var(--surface); border: 1px solid var(--border); padding: 5px 10px; border-radius: 999px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; font-family: 'IBM Plex Mono', monospace; color: var(--muted); background: var(--surface); border: 1px solid var(--border); padding: 5px 10px; border-radius: 999px; }
     .legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
     /* STUDENT CARDS GRID */
@@ -69,9 +69,9 @@
     .student-card { background: var(--surface); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; transition: border-color 0.2s, transform 0.15s; }
     .student-card:hover { border-color: var(--purple); transform: translateY(-2px); }
     .card-top { padding: 14px 16px 10px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
-    .card-no { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: var(--muted); width: 22px; flex-shrink: 0; }
-    .card-name { font-family: 'Syne', sans-serif; font-size: 0.88rem; font-weight: 700; flex: 1; line-height: 1.2; }
-    .card-total { font-family: 'DM Mono', monospace; font-size: 0.78rem; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: var(--surface2); border: 1px solid var(--border); }
+    .card-no { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--muted); width: 22px; flex-shrink: 0; }
+    .card-name { font-family: 'IBM Plex Sans', sans-serif; font-size: 0.88rem; font-weight: 700; flex: 1; line-height: 1.2; }
+    .card-total { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: var(--surface2); border: 1px solid var(--border); }
     .card-total.high { background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.4); color: var(--green); }
     .card-total.mid  { background: rgba(245,158,11,0.15); border-color: rgba(245,158,11,0.4); color: var(--accent); }
     .card-total.low  { background: rgba(239,68,68,0.1);  border-color: rgba(239,68,68,0.3);  color: var(--red); }
@@ -79,7 +79,7 @@
     /* ACTIVITY BUTTONS */
     .card-activities { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 6px; }
     .act-row { display: flex; align-items: center; gap: 8px; }
-    .act-label { font-size: 0.72rem; color: var(--muted); width: 90px; flex-shrink: 0; font-family: 'DM Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .act-label { font-size: 0.72rem; color: var(--muted); width: 90px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .act-controls { display: flex; align-items: center; gap: 6px; flex: 1; }
     .act-btn { width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.15s; flex-shrink: 0; line-height: 1; }
     .act-btn.plus  { background: rgba(139,92,246,0.2); border-color: var(--purple); color: var(--purple-bright); font-size: 1.1rem; }
@@ -87,11 +87,18 @@
     .act-btn.minus { color: var(--muted); font-size: 1rem; }
     .act-btn.minus:hover { background: rgba(239,68,68,0.15); border-color: var(--red); color: var(--red); }
     .act-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-    .act-val { font-family: 'DM Mono', monospace; font-size: 0.9rem; font-weight: 600; min-width: 24px; text-align: center; color: var(--text); transition: color 0.2s; }
+
+    .act-input { width: 44px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 4px 6px; font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; font-weight: 600; color: var(--text); text-align: center; outline: none; -moz-appearance: textfield; }
+    .act-input::-webkit-inner-spin-button, .act-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+    .act-input:focus { border-color: var(--purple); background: var(--surface); }
+
+    .act-val { font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; font-weight: 600; min-width: 24px; text-align: center; color: var(--text); transition: color 0.2s; }
     .act-val.changed { color: var(--accent); }
 
     /* Indicator badge */
-    .card-indicator { margin: 0 12px 12px; font-size: 0.72rem; font-family: 'DM Mono', monospace; padding: 4px 10px; border-radius: 6px; text-align: center; font-weight: 600; }
+    .card-indicator { margin: 0 12px 12px; font-size: 0.72rem; font-family: 'IBM Plex Mono', monospace; padding: 4px 10px; border-radius: 6px; text-align: center; font-weight: 600; }
+    .ind-promax  { background: linear-gradient(135deg,rgba(139,92,246,0.3),rgba(239,68,68,0.2)); color: #fff; border: 1px solid rgba(139,92,246,0.6); font-weight:800; letter-spacing:0.03em; }
+    .ind-ultrapro { background: linear-gradient(135deg,rgba(239,68,68,0.2),rgba(251,191,36,0.2)); color: #FCA5A5; border: 1px solid rgba(239,68,68,0.5); }
     .ind-ultra  { background: linear-gradient(135deg,rgba(239,68,68,0.15),rgba(251,191,36,0.15)); color: #F97316; border: 1px solid rgba(249,115,22,0.5); }
     .ind-hyper  { background: rgba(251,191,36,0.15);  color: #FBBF24; border: 1px solid rgba(251,191,36,0.4); }
     .ind-super  { background: rgba(16,185,129,0.15);  color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
@@ -282,9 +289,16 @@
     grid.className = 'students-grid';
 
     studentsData.forEach(s => {
-      const total = (s.VocabularyBox || 0) + (s.Answering || 0) + (s.Presenting || 0) + (s.DoingTaskOnTime || 0) + (s.HelpingHand || 0);
-      const totalClass = total >= 30 ? 'high' : total >= 10 ? 'mid' : 'low';
-      const indClass   = s.Indicator.includes('Plus Ultra') ? 'ind-ultra' :
+      // Points: VB×1, ANS×2, PRE×5, DTO×2, HH×1
+      const total = (s.VocabularyBox    || 0) * 1
+                  + (s.Answering        || 0) * 2
+                  + (s.Presenting       || 0) * 5
+                  + (s.DoingTaskOnTime  || 0) * 2
+                  + (s.HelpingHand      || 0) * 1;
+      const totalClass = total >= 100 ? 'high' : total >= 25 ? 'mid' : 'low';
+      const indClass   = s.Indicator.includes('Pro Maxxing') ? 'ind-promax' :
+        s.Indicator.includes('Ultra Pro') ? 'ind-ultrapro' :
+        s.Indicator.includes('Plus Ultra') ? 'ind-ultra' :
         s.Indicator.includes('Hyperactive') ? 'ind-hyper' :
         s.Indicator.includes('Super') ? 'ind-super' :
         s.Indicator.includes('Active') && !s.Indicator.includes('Not') ? 'ind-active' :
@@ -305,6 +319,10 @@
             <button class="act-btn minus" onclick="changeVal(${s.no},'${a.key}',-1,this)" ${vals[a.key] <= 0 ? 'disabled' : ''}>−</button>
             <span class="act-val" id="val-${s.no}-${a.key.replace(/\s/g,'_')}">${vals[a.key]}</span>
             <button class="act-btn plus" onclick="changeVal(${s.no},'${a.key}',1,this)">+</button>
+            <input type="number" class="act-input" min="0" placeholder="set"
+              onchange="setVal(${s.no},'${a.key}',this)"
+              onfocus="this.select()"
+              title="Type a number to set directly"/>
           </div>
         </div>`).join('');
 
@@ -376,16 +394,74 @@
     });
   }
 
+  const ACT_PTS = { VocabularyBox: 1, Answering: 2, Presenting: 5, DoingTaskOnTime: 2, HelpingHand: 1 };
+
   function recalcTotal(studentNo) {
     const totalEl = document.getElementById('total-' + studentNo);
     if (!totalEl) return;
     let sum = 0;
     ACTS.forEach(a => {
       const el = document.getElementById('val-' + studentNo + '-' + a.key.replace(/\s/g, '_'));
-      if (el) sum += parseInt(el.textContent) || 0;
+      if (el) sum += (parseInt(el.textContent) || 0) * (ACT_PTS[a.key] || 1);
     });
     totalEl.textContent = sum;
-    totalEl.className = 'card-total ' + (sum >= 30 ? 'high' : sum >= 10 ? 'mid' : 'low');
+    totalEl.className = 'card-total ' + (sum >= 100 ? 'high' : sum >= 25 ? 'mid' : 'low');
+    // Update indicator
+    const indEl = document.getElementById('ind-' + studentNo);
+    if (indEl) {
+      const tier = sum >= 200 ? ['ind-promax',  'Pro Maxxing Active (+35 bonus)'] :
+                   sum >= 150 ? ['ind-ultrapro', 'Ultra Pro Active (+30 bonus)'] :
+                   sum >= 100 ? ['ind-ultra',    'Plus Ultra Active (+25 bonus)'] :
+                   sum >= 75  ? ['ind-hyper',    'Hyperactive (+20 bonus)'] :
+                   sum >= 50  ? ['ind-super',    'Super Active (+15 bonus)'] :
+                   sum >= 25  ? ['ind-active',   'Active (+10 bonus)'] :
+                   sum >= 10  ? ['ind-okay',     'Okay (+5 bonus)'] :
+                                ['ind-not',      'Not Active (+0 bonus)'];
+      indEl.className = 'card-indicator ' + tier[0];
+      indEl.textContent = tier[1];
+    }
+  }
+
+  // ── SET VALUE (bulk input) ────────────────────────────────
+  async function setVal(studentNo, column, inputEl) {
+    const newValue = Math.max(0, parseInt(inputEl.value) || 0);
+    inputEl.value = ''; // clear after use
+    const valKey = 'val-' + studentNo + '-' + column.replace(/\s/g, '_');
+    const valEl  = document.getElementById(valKey);
+    if (!valEl) return;
+    const current = parseInt(valEl.textContent) || 0;
+    const delta = newValue - current;
+    if (delta === 0) return;
+
+    // Optimistic update
+    valEl.textContent = newValue;
+    valEl.classList.add('changed');
+    setTimeout(() => valEl.classList.remove('changed'), 600);
+    recalcTotal(studentNo);
+
+    const card = document.getElementById('card-' + studentNo);
+    card.querySelectorAll('.act-btn').forEach(b => b.disabled = true);
+
+    try {
+      const res = await apiGet({ action: 'incrementActiveness', username: savedUser, password: savedPass, className: currentClass, studentNo: String(studentNo), column, delta: String(delta) });
+      if (res.success) {
+        showToast(`Set ${column.split(' ')[0]} → ${res.newValue}`, 'ok');
+        const minusBtn = valEl.previousElementSibling;
+        if (minusBtn) minusBtn.disabled = res.newValue <= 0;
+      } else {
+        valEl.textContent = current;
+        recalcTotal(studentNo);
+        showToast('Error: ' + res.error, 'err');
+      }
+    } catch(e) {
+      valEl.textContent = current;
+      recalcTotal(studentNo);
+      showToast('Failed to save', 'err');
+    }
+    card.querySelectorAll('.act-btn').forEach(b => b.disabled = false);
+    card.querySelectorAll('.act-val').forEach(v => {
+      v.previousElementSibling.disabled = parseInt(v.textContent) <= 0;
+    });
   }
 
   // ── TOAST ─────────────────────────────────────────────────
