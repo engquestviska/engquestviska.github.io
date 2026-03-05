@@ -124,11 +124,47 @@
     .logout-btn { position: absolute; top: 20px; right: 20px; z-index: 2; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.85); font-size: 0.78rem; font-weight: 600; padding: 6px 14px; border-radius: 999px; cursor: pointer; font-family: inherit; display: none; align-items: center; gap: 5px; }
     .logout-btn:hover { background: rgba(255,255,255,0.22); }
     .teacher-active .logout-btn { display: flex; }
+
+    /* ── SIDEBAR (shared) ───────────────────────────────────── */
+    .hamburger { position:absolute; top:20px; right:20px; z-index:10; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); border-radius:10px; width:40px; height:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; cursor:pointer; padding:0; }
+    .hamburger span { display:block; width:18px; height:2px; background:#fff; border-radius:999px; transition:all 0.3s; }
+    .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity:0; }
+    .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+    .sidebar-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.6); backdrop-filter:blur(6px); z-index:300; opacity:0; pointer-events:none; transition:opacity 0.3s; }
+    .sidebar-overlay.open { opacity:1; pointer-events:all; }
+    .sidebar { position:fixed; top:0; right:0; height:100%; width:min(320px,85vw); background:#1E1040; z-index:301; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.34,1.1,0.64,1); display:flex; flex-direction:column; overflow-y:auto; }
+    .sidebar.open { transform:translateX(0); }
+    .sidebar-head { padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; gap:12px; }
+    .sidebar-logo { width:36px; height:36px; border-radius:10px; object-fit:cover; }
+    .sidebar-head-text { flex:1; }
+    .sidebar-head-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:800; color:#fff; }
+    .sidebar-head-sub { font-size:0.7rem; color:rgba(255,255,255,0.45); margin-top:1px; }
+    .sidebar-close { width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,0.08); border:none; color:rgba(255,255,255,0.5); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
+    .sidebar-section { padding:14px 16px 4px; }
+    .sidebar-section-label { font-size:0.65rem; font-weight:700; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.12em; font-family:'IBM Plex Mono',monospace; padding:0 4px; margin-bottom:6px; }
+    .sidebar-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; text-decoration:none; transition:background 0.15s; margin-bottom:2px; }
+    .sidebar-item:hover, .sidebar-item:active { background:rgba(255,255,255,0.08); }
+    .sidebar-item.active { background:rgba(255,255,255,0.12); border-left:3px solid #A78BFA; padding-left:9px; }
+    .sidebar-item-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0; }
+    .sidebar-item-name { font-size:0.88rem; font-weight:600; color:#fff; flex:1; }
+    .sidebar-item-badge { font-size:0.6rem; font-weight:800; padding:2px 7px; border-radius:999px; font-family:'IBM Plex Mono',monospace; background:#F59E0B; color:#fff; }
+    .sidebar-divider { height:1px; background:rgba(255,255,255,0.07); margin:8px 16px; }
+    .sidebar-teacher { margin:12px 16px 20px; background:rgba(124,58,237,0.2); border:1px solid rgba(124,58,237,0.35); border-radius:14px; padding:12px 14px; }
+    .sidebar-teacher-label { font-size:0.68rem; font-weight:700; color:#A78BFA; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
+    .sidebar-teacher-logged { font-size:0.82rem; color:#A78BFA; font-weight:600; display:flex; align-items:center; gap:8px; }
+    .sidebar-teacher-logged span { cursor:pointer; color:rgba(255,255,255,0.4); font-size:0.75rem; margin-left:auto; }
+    .sidebar-home-btn { display:flex; align-items:center; gap:10px; margin:12px 16px 4px; padding:11px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:12px; text-decoration:none; }
+    .sidebar-home-btn:hover { background:rgba(255,255,255,0.1); }
+    .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
+    .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
+
   </style>
 </head>
-<body>
+<body data-page="scores">
 
 <header>
+  <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
   
   <button class="logout-btn" onclick="doLogout()">&#128274; Logout</button>
   <a class="back-btn" href="index.html">&#8592; Back</a>
@@ -551,5 +587,119 @@ if (document.readyState === 'loading') {
   init();
 }
 </script>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-head">
+    <img class="sidebar-logo" src="logo.jpg" alt="Logo"/>
+    <div class="sidebar-head-text">
+      <div class="sidebar-head-title">English Quest</div>
+      <div class="sidebar-head-sub">SMA Negeri 6 Surakarta</div>
+    </div>
+    <button class="sidebar-close" onclick="closeSidebar()">&#x2715;</button>
+  </div>
+  <a href="index.html" class="sidebar-home-btn">
+    <div>
+      <div class="sidebar-home-btn-text">&#127968; Homepage</div>
+      <div class="sidebar-home-btn-sub">Back to main dashboard</div>
+    </div>
+  </a>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">&#128194; Documents</div>
+    <a href="lessons.html" class="sidebar-item" data-page="lessons">
+      <div class="sidebar-item-icon" style="background:rgba(124,58,237,0.2)">&#128209;</div>
+      <div class="sidebar-item-name">Lesson Materials</div>
+    </a>
+    <a href="session.html" class="sidebar-item" data-page="session">
+      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#127916;</div>
+      <div class="sidebar-item-name">Class Session</div>
+    </a>
+    <a href="assignments.html" class="sidebar-item" data-page="assignments">
+      <div class="sidebar-item-icon" style="background:rgba(59,130,246,0.2)">&#128203;</div>
+      <div class="sidebar-item-name">Assignments</div>
+    </a>
+    <a href="submission.html" class="sidebar-item" style="opacity:0.5;pointer-events:none;">
+      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#128221;</div>
+      <div class="sidebar-item-name">Submission</div>
+      <span class="sidebar-item-badge">SOON</span>
+    </a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">&#128101; Student Data</div>
+    <a href="students.html" class="sidebar-item" data-page="students">
+      <div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">&#127891;</div>
+      <div class="sidebar-item-name">Student List</div>
+    </a>
+    <a href="attendance.html" class="sidebar-item" data-page="attendance">
+      <div class="sidebar-item-icon" style="background:rgba(20,184,166,0.2)">&#9989;</div>
+      <div class="sidebar-item-name">Attendance</div>
+    </a>
+    <a href="scores.html" class="sidebar-item" data-page="scores">
+      <div class="sidebar-item-icon" style="background:rgba(249,115,22,0.2)">&#127942;</div>
+      <div class="sidebar-item-name">Student Scores</div>
+    </a>
+    <a href="tasks.html" class="sidebar-item" data-page="tasks">
+      <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#128204;</div>
+      <div class="sidebar-item-name">Task Status</div>
+    </a>
+    <a href="activeness.html" class="sidebar-item" data-page="activeness">
+      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#9889;</div>
+      <div class="sidebar-item-name">Activeness</div>
+    </a>
+    <a href="strikes.html" class="sidebar-item" data-page="strikes">
+      <div class="sidebar-item-icon" style="background:rgba(220,38,38,0.2)">&#9888;&#65039;</div>
+      <div class="sidebar-item-name">Strikes</div>
+    </a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">&#128226; Info</div>
+    <a href="summative.html" class="sidebar-item" data-page="summative">
+      <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#127919;</div>
+      <div class="sidebar-item-name">Summative</div>
+    </a>
+  </div>
+  <div class="sidebar-teacher">
+    <div class="sidebar-teacher-label">&#128273; Teacher Access</div>
+    <div id="sbTeacherLoggedOut">
+      <button style="width:100%;padding:10px;background:linear-gradient(135deg,#7C3AED,#5B21B6);color:#fff;font-family:inherit;font-weight:700;font-size:0.85rem;border:none;border-radius:10px;cursor:pointer;" onclick="closeSidebar();window.location.href='index.html';">Login as Teacher</button>
+    </div>
+    <div id="sbTeacherLoggedIn" style="display:none;">
+      <div class="sidebar-teacher-logged">&#127891; Logged in as Teacher
+        <span onclick="localStorage.removeItem('eq_tu');localStorage.removeItem('eq_tp');location.reload();">Logout</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<script>
+function toggleSidebar() {
+  var open = document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open', open);
+  document.getElementById('hamburgerBtn').classList.toggle('open', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+  // Highlight current page
+  var page = document.body.getAttribute('data-page') || '';
+  document.querySelectorAll('.sidebar-item[data-page]').forEach(function(el) {
+    el.classList.toggle('active', el.getAttribute('data-page') === page);
+  });
+  // Teacher status
+  var loggedIn = !!localStorage.getItem('eq_tu');
+  document.getElementById('sbTeacherLoggedOut').style.display = loggedIn ? 'none' : 'block';
+  document.getElementById('sbTeacherLoggedIn').style.display  = loggedIn ? 'block' : 'none';
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+  var hb = document.getElementById('hamburgerBtn');
+  if (hb) hb.classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeSidebar(); });
+</script>
+
 </body>
 </html>
