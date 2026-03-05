@@ -1389,7 +1389,7 @@ async function loadHallOfFame() {
 
     // Top 5 overall by total points
     const top5 = [...all].sort((a,b) => b.total - a.total).slice(0, 5);
-    const maxPts = 100; // Fixed to Plus Ultra threshold
+    const maxPts = 200; // Pro Maxxing threshold
 
     // Category champions — highest raw count per activity
     const champs = HOF_ACTS.map(act => {
@@ -2060,25 +2060,27 @@ function openHofPopup(encoded) {
   const initial  = (s.nickname || s.name)[0].toUpperCase();
   const dispName = s.nickname || s.name.split(' ')[0];
   const clsLabel = s.cls.replace('XE','X E-');
-  const barPct   = Math.min(100, Math.round((s.total / 100) * 100));
+  const barPct   = Math.min(100, Math.round((s.total / 200) * 100));
 
   document.getElementById('hofPopupAvatar').textContent = initial;
   document.getElementById('hofPopupAvatar').style.background = avatarBg;
   document.getElementById('hofPopupName').textContent = s.name;
   document.getElementById('hofPopupSub').textContent  = clsLabel + ' · Activeness Stats';
 
-  const indClass = s.Indicator && s.Indicator.includes('Plus Ultra') ? 'ind-ultra' :
+  const indClass = s.Indicator && s.Indicator.includes('Pro Maxxing') ? 'ind-promax' :
+    s.Indicator && s.Indicator.includes('Ultra Pro') ? 'ind-ultrapro' :
+    s.Indicator && s.Indicator.includes('Plus Ultra') ? 'ind-ultra' :
     s.Indicator && s.Indicator.includes('Hyperactive') ? 'ind-hyper' :
     s.Indicator && s.Indicator.includes('Super') ? 'ind-super' :
     s.Indicator && s.Indicator.includes('Active') && !s.Indicator.includes('Not') ? 'ind-active' :
     s.Indicator && s.Indicator.includes('Okay') ? 'ind-okay' : 'ind-not';
 
   const indColors = {
-    'ind-ultra':'#F97316','ind-hyper':'#FBBF24','ind-super':'#10B981',
+    'ind-promax':'#fff','ind-ultrapro':'#FCA5A5','ind-ultra':'#F97316','ind-hyper':'#FBBF24','ind-super':'#10B981',
     'ind-active':'#A78BFA','ind-okay':'#F59E0B','ind-not':'#EF4444'
   };
   const indBgs = {
-    'ind-ultra':'rgba(249,115,22,0.1)','ind-hyper':'rgba(251,191,36,0.12)',
+    'ind-promax':'rgba(139,92,246,0.25)','ind-ultrapro':'rgba(239,68,68,0.15)','ind-ultra':'rgba(249,115,22,0.1)','ind-hyper':'rgba(251,191,36,0.12)',
     'ind-super':'rgba(16,185,129,0.1)','ind-active':'rgba(139,92,246,0.1)',
     'ind-okay':'rgba(245,158,11,0.1)','ind-not':'rgba(239,68,68,0.08)'
   };
