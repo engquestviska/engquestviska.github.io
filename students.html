@@ -303,6 +303,8 @@
 
     /* Indicator badge */
     .act-indicator { margin: 16px 24px 0; padding: 10px 16px; border-radius: 12px; font-size: 0.82rem; font-weight: 700; text-align: center; }
+    .ind-promax  { background: linear-gradient(135deg,rgba(139,92,246,0.3),rgba(239,68,68,0.2)); color: #fff; border: 1px solid rgba(139,92,246,0.6); font-weight:800; }
+    .ind-ultrapro { background: linear-gradient(135deg,rgba(239,68,68,0.2),rgba(251,191,36,0.2)); color: #FCA5A5; border: 1px solid rgba(239,68,68,0.5); }
     .ind-ultra  { background: linear-gradient(135deg,rgba(239,68,68,0.15),rgba(251,191,36,0.15)); color: #F97316; border: 1px solid rgba(249,115,22,0.5); }
     .ind-hyper  { background: rgba(251,191,36,0.15); color: #FBBF24; border: 1px solid rgba(251,191,36,0.4); }
     .ind-super  { background: rgba(16,185,129,0.15);  color: #10B981; border: 1px solid rgba(16,185,129,0.3); }
@@ -695,12 +697,14 @@ async function openActModal(name, cls) {
     if (student.nickname) document.getElementById('actAvatar').textContent = student.nickname[0].toUpperCase();
 
     const total   = (student.VocabularyBox||0)*1 + (student.Answering||0)*2 + (student.Presenting||0)*5 + (student.DoingTaskOnTime||0)*2 + (student.HelpingHand||0)*1 + (student.QuizCh4||0) + (student.QuizCh5||0);
-    const indClass = student.Indicator.includes('Plus Ultra') ? 'ind-ultra' :
+    const indClass = student.Indicator.includes('Pro Maxxing') ? 'ind-promax' :
+      student.Indicator.includes('Ultra Pro') ? 'ind-ultrapro' :
+      student.Indicator.includes('Plus Ultra') ? 'ind-ultra' :
       student.Indicator.includes('Hyperactive') ? 'ind-hyper' :
       student.Indicator.includes('Super') ? 'ind-super' :
       student.Indicator.includes('Active') && !student.Indicator.includes('Not') ? 'ind-active' :
       student.Indicator.includes('Okay') ? 'ind-okay' : 'ind-not';
-    const barPct  = Math.min(100, Math.round((total / 100) * 100)); // 100 = Plus Ultra threshold
+    const barPct  = Math.min(100, Math.round((total / 200) * 100)); // 200 = Pro Maxxing threshold
 
     // Point rules per activity
     const pointRules = {
