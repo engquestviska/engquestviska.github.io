@@ -5,250 +5,81 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Submission · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --purple: #7C3AED;
-      --purple-light: #A78BFA;
-      --purple-soft: #EDE9FE;
-      --purple-mid: #C4B5FD;
-      --white: #FFFFFF;
-      --off-white: #F9F7FF;
-      --text-dark: #1E1040;
-      --text-muted: #6B5B95;
-      --border: #E5DEFF;
-      --accent: #F59E0B;
-      --green: #10B981;
-      --green-soft: #D1FAE5;
+      --purple:#7C3AED; --purple-light:#A78BFA; --purple-soft:#EDE9FE; --purple-mid:#C4B5FD;
+      --white:#FFFFFF; --off-white:#F9F7FF; --text-dark:#1E1040; --text-muted:#6B5B95;
+      --border:#E5DEFF; --accent:#F59E0B; --green:#10B981; --green-soft:#D1FAE5;
+      --red:#EF4444; --red-soft:#FEE2E2;
     }
-
-    body {
-      font-family: 'IBM Plex Sans', sans-serif;
-      background: var(--off-white);
-      color: var(--text-dark);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ── HEADER ── */
-    header {
-      background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 50%, #4C1D95 100%);
-      padding: 36px 24px 48px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    header::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image: radial-gradient(circle, rgba(255,255,255,0.10) 1px, transparent 1px);
-      background-size: 28px 28px;
-      pointer-events: none;
-    }
-
-    .back-btn {
-      position: absolute;
-      top: 20px; left: 20px;
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.25);
-      color: #fff;
-      font-family: 'IBM Plex Sans', sans-serif;
-      font-size: 0.82rem;
-      font-weight: 500;
-      padding: 7px 16px;
-      border-radius: 999px;
-      text-decoration: none;
-      transition: background 0.2s;
-      z-index: 2;
-    }
-    .back-btn:hover { background: rgba(255,255,255,0.25); }
-
-    header h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1.8rem, 4vw, 2.8rem);
-      font-weight: 800;
-      color: #fff;
-      position: relative;
-      z-index: 1;
-    }
-
-    header h1 span { color: var(--accent); }
-
-    .header-sub {
-      color: rgba(255,255,255,0.7);
-      font-size: 0.9rem;
-      margin-top: 8px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .wave { display: block; width: 100%; margin-top: -2px; }
-
-    /* ── MAIN ── */
-    main {
-      flex: 1;
-      max-width: 700px;
-      margin: 48px auto 80px;
-      padding: 0 24px;
-      width: 100%;
-    }
-
-    .section-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-family: 'Playfair Display', serif;
-      font-size: 0.75rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--purple);
-      margin-bottom: 24px;
-    }
-
-    .section-label::before {
-      content: '';
-      display: block;
-      width: 28px; height: 3px;
-      background: linear-gradient(90deg, var(--purple), var(--purple-light));
-      border-radius: 2px;
-    }
-
-    /* ── CHAPTER CARDS ── */
-    .chapter-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
-    }
-
-    .chapter-card {
-      background: var(--white);
-      border: 1.5px solid var(--border);
-      border-radius: 20px;
-      padding: 32px 28px;
-      text-decoration: none;
-      color: inherit;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .chapter-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, var(--purple-soft) 0%, transparent 60%);
-      opacity: 0;
-      transition: opacity 0.22s ease;
-    }
-
-    .chapter-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 40px rgba(124,58,237,0.15);
-      border-color: var(--purple-mid);
-    }
-
-    .chapter-card:hover::before { opacity: 1; }
-
-    .chapter-card.disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-      pointer-events: none;
-    }
-
-    .card-top {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: relative;
-      z-index: 1;
-    }
-
-    .chapter-icon {
-      width: 56px; height: 56px;
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 26px;
-    }
-
-    .ic-green  { background: linear-gradient(135deg, #BBF7D0, #34D399); }
-    .ic-muted  { background: #F3F4F6; }
-
-    .status-badge {
-      font-size: 0.72rem;
-      font-weight: 600;
-      padding: 4px 12px;
-      border-radius: 999px;
-    }
-
-    .status-open {
-      background: var(--green-soft);
-      color: var(--green);
-    }
-
-    .status-soon {
-      background: #F3F4F6;
-      color: #9CA3AF;
-    }
-
-    .chapter-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: var(--text-dark);
-      position: relative;
-      z-index: 1;
-    }
-
-    .chapter-desc {
-      font-size: 0.83rem;
-      color: var(--text-muted);
-      line-height: 1.5;
-      position: relative;
-      z-index: 1;
-    }
-
-    .card-arrow {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--purple);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .chapter-card.disabled .card-arrow {
-      color: #9CA3AF;
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      background: var(--text-dark);
-      color: rgba(255,255,255,0.5);
-      text-align: center;
-      padding: 24px;
-      font-size: 0.82rem;
-    }
-    footer strong { color: var(--purple-light); }
-
-    /* ── SIDEBAR (shared) ───────────────────────────────────── */
+    body { font-family:'IBM Plex Sans',sans-serif; background:var(--off-white); color:var(--text-dark); min-height:100vh; display:flex; flex-direction:column; }
+    header { background:linear-gradient(135deg,#7C3AED 0%,#5B21B6 50%,#4C1D95 100%); padding:36px 24px 48px; text-align:center; position:relative; overflow:hidden; }
+    header::before { content:''; position:absolute; inset:0; background-image:radial-gradient(circle,rgba(255,255,255,0.10) 1px,transparent 1px); background-size:28px 28px; pointer-events:none; }
+    .back-btn { position:absolute; top:20px; left:20px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); color:#fff; font-family:'IBM Plex Sans',sans-serif; font-size:0.82rem; font-weight:500; padding:7px 16px; border-radius:999px; text-decoration:none; z-index:2; }
+    .back-btn:hover { background:rgba(255,255,255,0.25); }
     .hamburger { position:absolute; top:20px; right:20px; z-index:10; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); border-radius:10px; width:40px; height:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; cursor:pointer; padding:0; }
     .hamburger span { display:block; width:18px; height:2px; background:#fff; border-radius:999px; transition:all 0.3s; }
     .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
     .hamburger.open span:nth-child(2) { opacity:0; }
     .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+    header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.8rem,4vw,2.8rem); font-weight:800; color:#fff; position:relative; z-index:1; }
+    header h1 span { color:var(--accent); font-style:italic; }
+    .header-sub { color:rgba(255,255,255,0.7); font-size:0.9rem; margin-top:8px; position:relative; z-index:1; }
+    .wave { display:block; width:100%; margin-top:-2px; }
+    main { flex:1; max-width:780px; margin:40px auto 80px; padding:0 20px; width:100%; }
+
+    /* PDF GUIDE */
+    .pdf-guide { background:var(--white); border:1.5px solid var(--border); border-radius:20px; padding:24px 28px; margin-bottom:40px; }
+    .pdf-guide-title { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; margin-bottom:4px; display:flex; align-items:center; gap:10px; }
+    .pdf-guide-sub { font-size:0.85rem; color:var(--text-muted); margin-bottom:18px; }
+    .pdf-guide-req { display:flex; align-items:center; gap:10px; background:var(--red-soft); border:1.5px solid #FCA5A5; border-radius:12px; padding:12px 16px; margin-bottom:20px; font-size:0.85rem; font-weight:600; color:#991B1B; }
+    .pdf-steps { display:grid; grid-template-columns:repeat(auto-fill,minmax(165px,1fr)); gap:12px; margin-bottom:20px; }
+    .pdf-step { background:var(--off-white); border:1.5px solid var(--border); border-radius:14px; padding:16px; }
+    .pdf-step-num { width:26px; height:26px; background:var(--purple); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:800; font-family:'IBM Plex Mono',monospace; margin-bottom:10px; }
+    .pdf-step-title { font-size:0.84rem; font-weight:700; margin-bottom:5px; }
+    .pdf-step-desc { font-size:0.76rem; color:var(--text-muted); line-height:1.55; }
+    .pdf-step-desc code { background:var(--purple-soft); color:var(--purple); padding:1px 6px; border-radius:4px; font-family:'IBM Plex Mono',monospace; font-size:0.72rem; }
+    .pdf-tools-label { font-size:0.7rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
+    .pdf-tools { display:flex; flex-wrap:wrap; gap:8px; }
+    .pdf-tool-chip { display:inline-flex; align-items:center; gap:6px; background:var(--purple-soft); border:1.5px solid var(--purple-mid); border-radius:999px; padding:6px 14px; font-size:0.78rem; font-weight:600; color:var(--purple); text-decoration:none; transition:background 0.15s; }
+    .pdf-tool-chip:hover { background:var(--purple-mid); }
+
+    /* SECTION */
+    .section-block { margin-bottom:48px; }
+    .section-header { display:flex; align-items:center; gap:14px; margin-bottom:16px; }
+    .section-badge { color:#fff; font-family:'IBM Plex Mono',monospace; font-size:0.75rem; font-weight:600; padding:5px 14px; border-radius:999px; flex-shrink:0; }
+    .badge-ch4 { background:linear-gradient(135deg,#7C3AED,#5B21B6); }
+    .badge-ch5 { background:linear-gradient(135deg,#0EA5E9,#0369A1); }
+    .section-title { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:700; }
+    .section-line { flex:1; height:1.5px; background:var(--border); }
+
+    /* TASK GRID */
+    .task-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(195px,1fr)); gap:14px; }
+    .task-card { background:var(--white); border:1.5px solid var(--border); border-radius:18px; padding:20px; display:flex; flex-direction:column; gap:12px; transition:transform 0.2s,box-shadow 0.2s,border-color 0.2s; text-decoration:none; color:inherit; }
+    .task-card:hover { transform:translateY(-3px); box-shadow:0 8px 28px rgba(124,58,237,0.12); border-color:var(--purple-mid); }
+    .task-card.disabled { opacity:0.5; pointer-events:none; }
+    .task-card.formative { border-color:#FCD34D; background:linear-gradient(160deg,#FFFBEB 0%,#fff 60%); }
+    .task-card.formative:hover { border-color:var(--accent); box-shadow:0 8px 28px rgba(245,158,11,0.15); }
+    .task-card-top { display:flex; align-items:center; justify-content:space-between; }
+    .task-icon { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; }
+    .task-icon.open    { background:var(--green-soft); }
+    .task-icon.locked  { background:#F3F4F6; }
+    .task-icon.special { background:#FEF3C7; }
+    .task-status { font-size:0.68rem; font-weight:700; padding:3px 10px; border-radius:999px; font-family:'IBM Plex Mono',monospace; }
+    .status-open   { background:var(--green-soft); color:#065F46; }
+    .status-locked { background:#F3F4F6; color:#6B7280; }
+    .task-name { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; }
+    .task-desc { font-size:0.77rem; color:var(--text-muted); line-height:1.55; flex:1; }
+    .task-arrow { font-size:0.8rem; font-weight:700; color:var(--purple); }
+    .task-card.formative .task-arrow { color:var(--accent); }
+    .task-card.disabled .task-arrow { color:var(--text-muted); }
+
+    footer { background:#1E1040; color:rgba(255,255,255,0.5); text-align:center; padding:20px; font-size:0.85rem; }
+    footer strong { color:#A78BFA; }
+
+    /* SIDEBAR */
     .sidebar-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.6); backdrop-filter:blur(6px); z-index:300; opacity:0; pointer-events:none; transition:opacity 0.3s; }
     .sidebar-overlay.open { opacity:1; pointer-events:all; }
     .sidebar { position:fixed; top:0; right:0; height:100%; width:min(320px,85vw); background:#1E1040; z-index:301; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.34,1.1,0.64,1); display:flex; flex-direction:column; overflow-y:auto; }
@@ -262,7 +93,7 @@
     .sidebar-section { padding:14px 16px 4px; }
     .sidebar-section-label { font-size:0.65rem; font-weight:700; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.12em; font-family:'IBM Plex Mono',monospace; padding:0 4px; margin-bottom:6px; }
     .sidebar-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; text-decoration:none; transition:background 0.15s; margin-bottom:2px; }
-    .sidebar-item:hover, .sidebar-item:active { background:rgba(255,255,255,0.08); }
+    .sidebar-item:hover,.sidebar-item:active { background:rgba(255,255,255,0.08); }
     .sidebar-item.active { background:rgba(255,255,255,0.12); border-left:3px solid #A78BFA; padding-left:9px; }
     .sidebar-item-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0; }
     .sidebar-item-name { font-size:0.88rem; font-weight:600; color:#fff; flex:1; }
@@ -276,55 +107,161 @@
     .sidebar-home-btn:hover { background:rgba(255,255,255,0.1); }
     .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
     .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
-
   </style>
 </head>
 <body data-page="submission">
 
 <header>
+  <a href="index.html" class="back-btn">&#8592; Back</a>
   <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
-  <a href="index.html" class="back-btn">← Back</a>
   <h1>Task <span>Submission</span></h1>
-  <p class="header-sub">English Quest · SMA Negeri 6 Surakarta</p>
+  <p class="header-sub">English Quest &middot; SMA Negeri 6 Surakarta</p>
 </header>
-
 <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
   <path fill="#4C1D95" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
   <path fill="#F9F7FF" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
 </svg>
 
 <main>
-  <div class="section-label">Select Chapter</div>
 
-  <div class="chapter-grid">
-
-    <!-- Chapter 4 -->
-    <a href="https://s.id/Chap4TaskSubmission" target="_blank" class="chapter-card">
-      <div class="card-top">
-        <div class="chapter-icon ic-green">📤</div>
-        <span class="status-badge status-open">● Open</span>
+  <!-- HOW TO SUBMIT GUIDE -->
+  <div class="pdf-guide">
+    <div class="pdf-guide-title">&#128196; Submission Format Guide</div>
+    <div class="pdf-guide-sub">All tasks must be submitted as a <strong>PDF file</strong>. No photos, screenshots, or image files.</div>
+    <div class="pdf-guide-req">&#9940; Do NOT submit JPG, PNG, or photo files &mdash; only PDF is accepted.</div>
+    <div class="pdf-steps">
+      <div class="pdf-step">
+        <div class="pdf-step-num">1</div>
+        <div class="pdf-step-title">&#128247; Take a clear photo</div>
+        <div class="pdf-step-desc">Use your phone camera. Make sure the text is readable, well-lit, and not blurry or cropped.</div>
       </div>
-      <div class="chapter-title">Chapter 4</div>
-      <div class="chapter-desc">Submit your Chapter 4 task here. Make sure your file is complete before submitting.</div>
-      <div class="card-arrow">Submit now →</div>
-    </a>
-
-    <!-- Chapter 5 -->
-    <div class="chapter-card disabled">
-      <div class="card-top">
-        <div class="chapter-icon ic-muted">🔒</div>
-        <span class="status-badge status-soon">Coming Soon</span>
+      <div class="pdf-step">
+        <div class="pdf-step-num">2</div>
+        <div class="pdf-step-title">&#128269; Scan &amp; extract text</div>
+        <div class="pdf-step-desc">Open <code>Google Lens</code> and tap on your photo. Select all the text, then copy it. Or use <code>Microsoft Lens</code> to scan directly.</div>
       </div>
-      <div class="chapter-title">Chapter 5</div>
-      <div class="chapter-desc">Submission for Chapter 5 is not open yet. Check back later.</div>
-      <div class="card-arrow">Not available yet</div>
+      <div class="pdf-step">
+        <div class="pdf-step-num">3</div>
+        <div class="pdf-step-title">&#128203; Paste into Google Docs</div>
+        <div class="pdf-step-desc">Go to <code>docs.google.com</code>, create a new document, paste your text and tidy up the formatting.</div>
+      </div>
+      <div class="pdf-step">
+        <div class="pdf-step-num">4</div>
+        <div class="pdf-step-title">&#128229; Download as PDF</div>
+        <div class="pdf-step-desc">In Google Docs: <code>File</code> &#8594; <code>Download</code> &#8594; <code>PDF Document (.pdf)</code>. Your file is ready!</div>
+      </div>
     </div>
-
+    <div class="pdf-tools-label">&#128241; Recommended free tools</div>
+    <div class="pdf-tools">
+      <a href="https://lens.google/" target="_blank" class="pdf-tool-chip">&#128269; Google Lens</a>
+      <a href="https://play.google.com/store/apps/details?id=com.microsoft.office.officelens" target="_blank" class="pdf-tool-chip">&#128247; Microsoft Lens</a>
+      <a href="https://docs.google.com" target="_blank" class="pdf-tool-chip">&#128203; Google Docs</a>
+      <a href="https://www.ilovepdf.com/jpg_to_pdf" target="_blank" class="pdf-tool-chip">&#128257; iLovePDF</a>
+      <a href="https://smallpdf.com/jpg-to-pdf" target="_blank" class="pdf-tool-chip">&#9889; SmallPDF</a>
+    </div>
   </div>
+
+  <!-- CHAPTER 4 -->
+  <div class="section-block">
+    <div class="section-header">
+      <div class="section-badge badge-ch4">&#128216; CHAPTER 4</div>
+      <div class="section-title">Tasks &amp; Formative</div>
+      <div class="section-line"></div>
+    </div>
+    <div class="task-grid">
+
+      <a href="https://s.id/Chap4TaskSubmission" target="_blank" class="task-card">
+        <div class="task-card-top"><div class="task-icon open">&#128228;</div><span class="task-status status-open">Open</span></div>
+        <div class="task-name">Task 1</div>
+        <div class="task-desc">Submit as PDF. Name your file: <strong>YourName_Task1.pdf</strong></div>
+        <div class="task-arrow">Submit PDF &#8594;</div>
+      </a>
+
+      <a href="https://s.id/Chap4TaskSubmission" target="_blank" class="task-card">
+        <div class="task-card-top"><div class="task-icon open">&#128228;</div><span class="task-status status-open">Open</span></div>
+        <div class="task-name">Task 2</div>
+        <div class="task-desc">Submit as PDF. Name your file: <strong>YourName_Task2.pdf</strong></div>
+        <div class="task-arrow">Submit PDF &#8594;</div>
+      </a>
+
+      <a href="https://s.id/Chap4TaskSubmission" target="_blank" class="task-card">
+        <div class="task-card-top"><div class="task-icon open">&#128228;</div><span class="task-status status-open">Open</span></div>
+        <div class="task-name">Task 3</div>
+        <div class="task-desc">Submit as PDF. Name your file: <strong>YourName_Task3.pdf</strong></div>
+        <div class="task-arrow">Submit PDF &#8594;</div>
+      </a>
+
+      <a href="https://s.id/Chap4TaskSubmission" target="_blank" class="task-card">
+        <div class="task-card-top"><div class="task-icon open">&#128228;</div><span class="task-status status-open">Open</span></div>
+        <div class="task-name">Task 4</div>
+        <div class="task-desc">Submit as PDF. Name your file: <strong>YourName_Task4.pdf</strong></div>
+        <div class="task-arrow">Submit PDF &#8594;</div>
+      </a>
+
+      <a href="https://s.id/Chap4TaskSubmission" target="_blank" class="task-card">
+        <div class="task-card-top"><div class="task-icon open">&#128228;</div><span class="task-status status-open">Open</span></div>
+        <div class="task-name">Task 5</div>
+        <div class="task-desc">Submit as PDF. Name your file: <strong>YourName_Task5.pdf</strong></div>
+        <div class="task-arrow">Submit PDF &#8594;</div>
+      </a>
+
+      <a href="https://s.id/Chap4TaskSubmission" target="_blank" class="task-card">
+        <div class="task-card-top"><div class="task-icon open">&#128228;</div><span class="task-status status-open">Open</span></div>
+        <div class="task-name">Task 6</div>
+        <div class="task-desc">Submit as PDF. Name your file: <strong>YourName_Task6.pdf</strong></div>
+        <div class="task-arrow">Submit PDF &#8594;</div>
+      </a>
+
+      <a href="https://s.id/Chap4TaskSubmission" target="_blank" class="task-card">
+        <div class="task-card-top"><div class="task-icon open">&#128228;</div><span class="task-status status-open">Open</span></div>
+        <div class="task-name">Task 7</div>
+        <div class="task-desc">Submit as PDF. Name your file: <strong>YourName_Task7.pdf</strong></div>
+        <div class="task-arrow">Submit PDF &#8594;</div>
+      </a>
+
+      <a href="https://s.id/Chap4TaskSubmission" target="_blank" class="task-card">
+        <div class="task-card-top"><div class="task-icon open">&#128228;</div><span class="task-status status-open">Open</span></div>
+        <div class="task-name">Task 8</div>
+        <div class="task-desc">Submit as PDF. Name your file: <strong>YourName_Task8.pdf</strong></div>
+        <div class="task-arrow">Submit PDF &#8594;</div>
+      </a>
+
+      <a href="https://s.id/Chap4TaskSubmission" target="_blank" class="task-card formative">
+        <div class="task-card-top"><div class="task-icon special">&#128221;</div><span class="task-status status-open">Open</span></div>
+        <div class="task-name">Formative</div>
+        <div class="task-desc">Submit your Formative assessment as PDF. Name your file: <strong>YourName_Formative.pdf</strong></div>
+        <div class="task-arrow">Submit PDF &#8594;</div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- CHAPTER 5 -->
+  <div class="section-block">
+    <div class="section-header">
+      <div class="section-badge badge-ch5">&#128217; CHAPTER 5</div>
+      <div class="section-title">Tasks &amp; Formative</div>
+      <div class="section-line"></div>
+    </div>
+    <div class="task-grid">
+      <div class="task-card disabled">
+        <div class="task-card-top"><div class="task-icon locked">&#128274;</div><span class="task-status status-locked">Coming Soon</span></div>
+        <div class="task-name">Task 1 &ndash; 8</div>
+        <div class="task-desc">Chapter 5 submissions are not open yet. Check back later.</div>
+        <div class="task-arrow">Not available yet</div>
+      </div>
+      <div class="task-card formative disabled">
+        <div class="task-card-top"><div class="task-icon locked">&#128274;</div><span class="task-status status-locked">Coming Soon</span></div>
+        <div class="task-name">Formative</div>
+        <div class="task-desc">Chapter 5 Formative is not open yet.</div>
+        <div class="task-arrow">Not available yet</div>
+      </div>
+    </div>
+  </div>
+
 </main>
 
-<footer>© 2025 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
-
+<footer>&#169; 2025 <strong>English Quest</strong> &middot; SMA Negeri 6 Surakarta &middot; Built with &#10084;&#65039; by <strong>LaksMedia</strong></footer>
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <nav class="sidebar" id="sidebar">
@@ -337,81 +274,37 @@
     <button class="sidebar-close" onclick="closeSidebar()">&#x2715;</button>
   </div>
   <a href="index.html" class="sidebar-home-btn">
-    <div>
-      <div class="sidebar-home-btn-text">&#127968; Homepage</div>
-      <div class="sidebar-home-btn-sub">Back to main dashboard</div>
-    </div>
+    <div><div class="sidebar-home-btn-text">&#127968; Homepage</div><div class="sidebar-home-btn-sub">Back to main dashboard</div></div>
   </a>
   <div class="sidebar-divider"></div>
   <div class="sidebar-section">
     <div class="sidebar-section-label">&#128194; Documents</div>
-    <a href="lessons.html" class="sidebar-item" data-page="lessons">
-      <div class="sidebar-item-icon" style="background:rgba(124,58,237,0.2)">&#128209;</div>
-      <div class="sidebar-item-name">Lesson Materials</div>
-    </a>
-    <a href="session.html" class="sidebar-item" data-page="session">
-      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#127916;</div>
-      <div class="sidebar-item-name">Class Session</div>
-    </a>
-    <a href="assignments.html" class="sidebar-item" data-page="assignments">
-      <div class="sidebar-item-icon" style="background:rgba(59,130,246,0.2)">&#128203;</div>
-      <div class="sidebar-item-name">Assignments</div>
-    </a>
-    <a href="submission.html" class="sidebar-item" style="opacity:0.5;pointer-events:none;">
-      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#128221;</div>
-      <div class="sidebar-item-name">Submission</div>
-      <span class="sidebar-item-badge">SOON</span>
-    </a>
+    <a href="lessons.html" class="sidebar-item" data-page="lessons"><div class="sidebar-item-icon" style="background:rgba(124,58,237,0.2)">&#128209;</div><div class="sidebar-item-name">Lesson Materials</div></a>
+    <a href="session.html" class="sidebar-item" data-page="session"><div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#127916;</div><div class="sidebar-item-name">Class Session</div></a>
+    <a href="assignments.html" class="sidebar-item" data-page="assignments"><div class="sidebar-item-icon" style="background:rgba(59,130,246,0.2)">&#128203;</div><div class="sidebar-item-name">Assignments</div></a>
+    <a href="submission.html" class="sidebar-item active" data-page="submission"><div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#128228;</div><div class="sidebar-item-name">Submission</div></a>
   </div>
   <div class="sidebar-divider"></div>
   <div class="sidebar-section">
     <div class="sidebar-section-label">&#128101; Student Data</div>
-    <a href="students.html" class="sidebar-item" data-page="students">
-      <div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">&#127891;</div>
-      <div class="sidebar-item-name">Student List</div>
-    </a>
-    <a href="attendance.html" class="sidebar-item" data-page="attendance">
-      <div class="sidebar-item-icon" style="background:rgba(20,184,166,0.2)">&#9989;</div>
-      <div class="sidebar-item-name">Attendance</div>
-    </a>
-    <a href="scores.html" class="sidebar-item" data-page="scores">
-      <div class="sidebar-item-icon" style="background:rgba(249,115,22,0.2)">&#127942;</div>
-      <div class="sidebar-item-name">Student Scores</div>
-    </a>
-    <a href="tasks.html" class="sidebar-item" data-page="tasks">
-      <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#128204;</div>
-      <div class="sidebar-item-name">Task Status</div>
-    </a>
-    <a href="activeness.html" class="sidebar-item" data-page="activeness">
-      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#9889;</div>
-      <div class="sidebar-item-name">Activeness</div>
-    </a>
-    <a href="strikes.html" class="sidebar-item" data-page="strikes">
-      <div class="sidebar-item-icon" style="background:rgba(220,38,38,0.2)">&#9888;&#65039;</div>
-      <div class="sidebar-item-name">Strikes</div>
-    </a>
+    <a href="students.html" class="sidebar-item" data-page="students"><div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">&#127891;</div><div class="sidebar-item-name">Student List</div></a>
+    <a href="attendance.html" class="sidebar-item" data-page="attendance"><div class="sidebar-item-icon" style="background:rgba(20,184,166,0.2)">&#9989;</div><div class="sidebar-item-name">Attendance</div></a>
+    <a href="scores.html" class="sidebar-item" data-page="scores"><div class="sidebar-item-icon" style="background:rgba(249,115,22,0.2)">&#127942;</div><div class="sidebar-item-name">Student Scores</div></a>
+    <a href="tasks.html" class="sidebar-item" data-page="tasks"><div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#128204;</div><div class="sidebar-item-name">Task Status</div></a>
+    <a href="activeness.html" class="sidebar-item" data-page="activeness"><div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#9889;</div><div class="sidebar-item-name">Activeness</div></a>
+    <a href="strikes.html" class="sidebar-item" data-page="strikes"><div class="sidebar-item-icon" style="background:rgba(220,38,38,0.2)">&#9888;&#65039;</div><div class="sidebar-item-name">Strikes</div></a>
   </div>
   <div class="sidebar-divider"></div>
   <div class="sidebar-section">
     <div class="sidebar-section-label">&#128226; Info</div>
-    <a href="summative.html" class="sidebar-item" data-page="summative">
-      <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#127919;</div>
-      <div class="sidebar-item-name">Summative</div>
-    </a>
+    <a href="summative.html" class="sidebar-item" data-page="summative"><div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#127919;</div><div class="sidebar-item-name">Summative</div></a>
   </div>
   <div class="sidebar-teacher">
     <div class="sidebar-teacher-label">&#128273; Teacher Access</div>
-    <div id="sbTeacherLoggedOut">
-      <button style="width:100%;padding:10px;background:linear-gradient(135deg,#7C3AED,#5B21B6);color:#fff;font-family:inherit;font-weight:700;font-size:0.85rem;border:none;border-radius:10px;cursor:pointer;" onclick="closeSidebar();window.location.href='index.html';">Login as Teacher</button>
-    </div>
-    <div id="sbTeacherLoggedIn" style="display:none;">
-      <div class="sidebar-teacher-logged">&#127891; Logged in as Teacher
-        <span onclick="localStorage.removeItem('eq_tu');localStorage.removeItem('eq_tp');location.reload();">Logout</span>
-      </div>
-    </div>
+    <div id="sbTeacherLoggedOut"><button style="width:100%;padding:10px;background:linear-gradient(135deg,#7C3AED,#5B21B6);color:#fff;font-family:inherit;font-weight:700;font-size:0.85rem;border:none;border-radius:10px;cursor:pointer;" onclick="closeSidebar();window.location.href='index.html';">Login as Teacher</button></div>
+    <div id="sbTeacherLoggedIn" style="display:none;"><div class="sidebar-teacher-logged">&#127891; Logged in as Teacher<span onclick="localStorage.removeItem('eq_tu');localStorage.removeItem('eq_tp');location.reload();">Logout</span></div></div>
   </div>
 </nav>
-
 
 <script>
 function toggleSidebar() {
@@ -419,12 +312,6 @@ function toggleSidebar() {
   document.getElementById('sidebarOverlay').classList.toggle('open', open);
   document.getElementById('hamburgerBtn').classList.toggle('open', open);
   document.body.style.overflow = open ? 'hidden' : '';
-  // Highlight current page
-  var page = document.body.getAttribute('data-page') || '';
-  document.querySelectorAll('.sidebar-item[data-page]').forEach(function(el) {
-    el.classList.toggle('active', el.getAttribute('data-page') === page);
-  });
-  // Teacher status
   var loggedIn = !!localStorage.getItem('eq_tu');
   document.getElementById('sbTeacherLoggedOut').style.display = loggedIn ? 'none' : 'block';
   document.getElementById('sbTeacherLoggedIn').style.display  = loggedIn ? 'block' : 'none';
@@ -438,6 +325,5 @@ function closeSidebar() {
 }
 document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeSidebar(); });
 </script>
-
 </body>
 </html>
