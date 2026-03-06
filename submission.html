@@ -107,6 +107,24 @@
     .sidebar-home-btn:hover { background:rgba(255,255,255,0.1); }
     .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
     .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
+
+    /* Chapter cards */
+    .chapter-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
+    .chapter-card { background:var(--white); border:1.5px solid var(--border); border-radius:20px; padding:32px 28px; text-decoration:none; color:inherit; display:flex; flex-direction:column; gap:14px; transition:transform 0.22s,box-shadow 0.22s,border-color 0.22s; position:relative; overflow:hidden; }
+    .chapter-card::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,var(--purple-soft) 0%,transparent 60%); opacity:0; transition:opacity 0.22s; }
+    .chapter-card:hover { transform:translateY(-5px); box-shadow:0 12px 40px rgba(124,58,237,0.15); border-color:var(--purple-mid); }
+    .chapter-card:hover::before { opacity:1; }
+    .chapter-card.disabled { opacity:0.55; cursor:not-allowed; pointer-events:none; }
+    .card-top { display:flex; align-items:center; justify-content:space-between; position:relative; z-index:1; }
+    .chapter-icon { width:56px; height:56px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:26px; }
+    .ic-green { background:linear-gradient(135deg,#BBF7D0,#34D399); }
+    .ic-muted { background:#F3F4F6; }
+    .status-badge { font-size:0.72rem; font-weight:600; padding:4px 12px; border-radius:999px; }
+    .status-open { background:var(--green-soft); color:#065F46; }
+    .status-soon { background:#F3F4F6; color:#6B7280; }
+    .chapter-title { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:700; position:relative; z-index:1; }
+    .chapter-desc { font-size:0.875rem; color:var(--text-muted); line-height:1.6; position:relative; z-index:1; }
+    .card-arrow { font-size:0.85rem; font-weight:700; color:var(--purple); position:relative; z-index:1; }
   </style>
 </head>
 <body data-page="submission">
@@ -161,102 +179,29 @@
     </div>
   </div>
 
-  <!-- CHAPTER 4 -->
-  <div class="section-block">
-    <div class="section-header">
-      <div class="section-badge badge-ch4">&#128216; CHAPTER 4</div>
-      <div class="section-title">Tasks &amp; Formative</div>
-      <div class="section-line"></div>
-    </div>
-    <div class="task-grid">
+  <!-- CHAPTER CARDS -->
+  <div class="chapter-grid">
 
-      <a href="https://s.id/Chap4TaskSubmission" target="_blank" class="task-card">
-        <div class="task-card-top"><div class="task-icon open">&#128228;</div><span class="task-status status-open">Open</span></div>
-        <div class="task-name">Task 1</div>
-        <div class="task-desc">Submit as PDF. Name your file: <strong>YourName_Task1.pdf</strong></div>
-        <div class="task-arrow">Submit PDF &#8594;</div>
-      </a>
-
-      <a href="https://s.id/Chap4TaskSubmission" target="_blank" class="task-card">
-        <div class="task-card-top"><div class="task-icon open">&#128228;</div><span class="task-status status-open">Open</span></div>
-        <div class="task-name">Task 2</div>
-        <div class="task-desc">Submit as PDF. Name your file: <strong>YourName_Task2.pdf</strong></div>
-        <div class="task-arrow">Submit PDF &#8594;</div>
-      </a>
-
-      <a href="https://s.id/Chap4TaskSubmission" target="_blank" class="task-card">
-        <div class="task-card-top"><div class="task-icon open">&#128228;</div><span class="task-status status-open">Open</span></div>
-        <div class="task-name">Task 3</div>
-        <div class="task-desc">Submit as PDF. Name your file: <strong>YourName_Task3.pdf</strong></div>
-        <div class="task-arrow">Submit PDF &#8594;</div>
-      </a>
-
-      <a href="https://s.id/Chap4TaskSubmission" target="_blank" class="task-card">
-        <div class="task-card-top"><div class="task-icon open">&#128228;</div><span class="task-status status-open">Open</span></div>
-        <div class="task-name">Task 4</div>
-        <div class="task-desc">Submit as PDF. Name your file: <strong>YourName_Task4.pdf</strong></div>
-        <div class="task-arrow">Submit PDF &#8594;</div>
-      </a>
-
-      <a href="https://s.id/Chap4TaskSubmission" target="_blank" class="task-card">
-        <div class="task-card-top"><div class="task-icon open">&#128228;</div><span class="task-status status-open">Open</span></div>
-        <div class="task-name">Task 5</div>
-        <div class="task-desc">Submit as PDF. Name your file: <strong>YourName_Task5.pdf</strong></div>
-        <div class="task-arrow">Submit PDF &#8594;</div>
-      </a>
-
-      <a href="https://s.id/Chap4TaskSubmission" target="_blank" class="task-card">
-        <div class="task-card-top"><div class="task-icon open">&#128228;</div><span class="task-status status-open">Open</span></div>
-        <div class="task-name">Task 6</div>
-        <div class="task-desc">Submit as PDF. Name your file: <strong>YourName_Task6.pdf</strong></div>
-        <div class="task-arrow">Submit PDF &#8594;</div>
-      </a>
-
-      <a href="https://s.id/Chap4TaskSubmission" target="_blank" class="task-card">
-        <div class="task-card-top"><div class="task-icon open">&#128228;</div><span class="task-status status-open">Open</span></div>
-        <div class="task-name">Task 7</div>
-        <div class="task-desc">Submit as PDF. Name your file: <strong>YourName_Task7.pdf</strong></div>
-        <div class="task-arrow">Submit PDF &#8594;</div>
-      </a>
-
-      <a href="https://s.id/Chap4TaskSubmission" target="_blank" class="task-card">
-        <div class="task-card-top"><div class="task-icon open">&#128228;</div><span class="task-status status-open">Open</span></div>
-        <div class="task-name">Task 8</div>
-        <div class="task-desc">Submit as PDF. Name your file: <strong>YourName_Task8.pdf</strong></div>
-        <div class="task-arrow">Submit PDF &#8594;</div>
-      </a>
-
-      <a href="https://s.id/Chap4TaskSubmission" target="_blank" class="task-card formative">
-        <div class="task-card-top"><div class="task-icon special">&#128221;</div><span class="task-status status-open">Open</span></div>
-        <div class="task-name">Formative</div>
-        <div class="task-desc">Submit your Formative assessment as PDF. Name your file: <strong>YourName_Formative.pdf</strong></div>
-        <div class="task-arrow">Submit PDF &#8594;</div>
-      </a>
-
-    </div>
-  </div>
-
-  <!-- CHAPTER 5 -->
-  <div class="section-block">
-    <div class="section-header">
-      <div class="section-badge badge-ch5">&#128217; CHAPTER 5</div>
-      <div class="section-title">Tasks &amp; Formative</div>
-      <div class="section-line"></div>
-    </div>
-    <div class="task-grid">
-      <div class="task-card disabled">
-        <div class="task-card-top"><div class="task-icon locked">&#128274;</div><span class="task-status status-locked">Coming Soon</span></div>
-        <div class="task-name">Task 1 &ndash; 8</div>
-        <div class="task-desc">Chapter 5 submissions are not open yet. Check back later.</div>
-        <div class="task-arrow">Not available yet</div>
+    <a href="https://s.id/Chap4TaskSubmission" target="_blank" class="chapter-card">
+      <div class="card-top">
+        <div class="chapter-icon ic-green">&#128228;</div>
+        <span class="status-badge status-open">&#9679; Open</span>
       </div>
-      <div class="task-card formative disabled">
-        <div class="task-card-top"><div class="task-icon locked">&#128274;</div><span class="task-status status-locked">Coming Soon</span></div>
-        <div class="task-name">Formative</div>
-        <div class="task-desc">Chapter 5 Formative is not open yet.</div>
-        <div class="task-arrow">Not available yet</div>
+      <div class="chapter-title">Chapter 4</div>
+      <div class="chapter-desc">Submit Task 1–8 and Formative as PDF files. One PDF per task.</div>
+      <div class="card-arrow">Submit now &#8594;</div>
+    </a>
+
+    <div class="chapter-card disabled">
+      <div class="card-top">
+        <div class="chapter-icon ic-muted">&#128274;</div>
+        <span class="status-badge status-soon">Coming Soon</span>
       </div>
+      <div class="chapter-title">Chapter 5</div>
+      <div class="chapter-desc">Submission for Chapter 5 is not open yet. Check back later.</div>
+      <div class="card-arrow">Not available yet</div>
     </div>
+
   </div>
 
 </main>
