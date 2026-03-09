@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Assignments · English Quest</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --purple: #7C3AED; --purple-light: #A78BFA; --purple-soft: #EDE9FE;
+      --purple-mid: #C4B5FD; --white: #fff; --off-white: #F9F7FF;
+      --text-dark: #1E1040; --text-muted: #6B5B95; --border: #E5DEFF;
+      --accent: #F59E0B; --green: #10B981;
+    }
+    body { font-family: 'IBM Plex Sans', sans-serif; background: var(--off-white); color: var(--text-dark); min-height: 100vh; }
+
+    /* HEADER */
+    header {
+      background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 50%, #4C1D95 100%);
+      padding: 36px 20px 52px; text-align: center; position: relative; overflow: hidden;
+    }
+    header::before {
+      content: ''; position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+      background-size: 28px 28px; pointer-events: none;
+    }
+    .back-btn {
+      position: absolute; top: 20px; left: 20px; z-index: 2;
+      background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3);
+      color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.88rem;
+      font-weight: 600; padding: 8px 18px; border-radius: 999px; cursor: pointer;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.25); }
+    header h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem,5vw,2.8rem); font-weight: 800; color: #fff; position: relative; z-index: 1; }
+    header h1 span { color: var(--accent); font-style: italic; }
+    .header-sub { color: rgba(255,255,255,0.75); font-size: 0.95rem; margin-top: 8px; position: relative; z-index: 1; }
+    .wave { display: block; width: 100%; margin-top: -2px; }
+
+    /* MAIN */
+    main { max-width: 900px; margin: 0 auto; padding: 32px 16px 80px; }
+
+    /* CHAPTER SECTION */
+    .chapter-section { margin-bottom: 48px; }
+    .chapter-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+    .chapter-badge {
+      background: linear-gradient(135deg, var(--purple), #5B21B6);
+      color: #fff; font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem;
+      font-weight: 600; padding: 6px 14px; border-radius: 999px; flex-shrink: 0;
+      letter-spacing: 0.05em;
+    }
+    .chapter-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; }
+    .chapter-line { flex: 1; height: 1.5px; background: var(--border); }
+
+    /* TASK GRID */
+    .task-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+
+    /* TASK CARD */
+    .task-card {
+      background: var(--white); border: 1.5px solid var(--border); border-radius: 20px;
+      overflow: hidden; transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .task-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(124,58,237,0.12); }
+
+    .task-top {
+      padding: 20px 20px 16px; display: flex; align-items: flex-start; gap: 14px;
+    }
+    .task-number {
+      width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--purple), #5B21B6);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 800; color: #fff;
+    }
+    .task-info { flex: 1; min-width: 0; }
+    .task-name { font-size: 1rem; font-weight: 700; line-height: 1.3; margin-bottom: 4px; }
+    .task-topic {
+      font-size: 0.78rem; font-family: 'IBM Plex Mono', monospace;
+      color: var(--purple-light); font-weight: 600;
+    }
+
+    .task-actions {
+      display: flex; gap: 0; border-top: 1.5px solid var(--border);
+    }
+    .btn-task-view {
+      flex: 1; padding: 13px; background: var(--purple-soft); color: var(--purple);
+      border: none; border-right: 1px solid var(--border); font-size: 0.88rem;
+      font-weight: 700; text-align: center; cursor: pointer; font-family: inherit;
+      text-decoration: none; display: block; transition: background 0.15s;
+    }
+    .btn-task-view:hover { background: var(--purple-mid); }
+    .btn-task-download {
+      padding: 13px 18px; background: var(--purple); color: #fff;
+      border: none; font-size: 0.88rem; font-weight: 700;
+      cursor: pointer; font-family: inherit; text-decoration: none;
+      display: flex; align-items: center; gap: 5px; transition: opacity 0.15s;
+    }
+    .btn-task-download:hover { opacity: 0.85; }
+
+    /* PDF VIEWER MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(15,10,40,0.88);
+      backdrop-filter: blur(8px); z-index: 100; display: flex;
+      flex-direction: column; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.hidden { display: none; }
+    .modal-top {
+      width: 100%; max-width: 900px; display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 12px;
+    }
+    .modal-top-left { display: flex; flex-direction: column; gap: 2px; }
+    .modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: #fff; }
+    .modal-subtitle { font-size: 0.8rem; color: rgba(255,255,255,0.6); font-family: 'IBM Plex Mono', monospace; }
+    .modal-actions { display: flex; gap: 10px; align-items: center; }
+    .btn-modal-download {
+      background: var(--accent); color: #fff; border: none; padding: 9px 18px;
+      border-radius: 999px; font-size: 0.85rem; font-weight: 700; cursor: pointer;
+      font-family: inherit; text-decoration: none; display: inline-block;
+    }
+    .btn-modal-close {
+      background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3);
+      color: #fff; width: 38px; height: 38px; border-radius: 50%; font-size: 1.1rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+    }
+    .modal-iframe-wrap {
+      width: 100%; max-width: 900px; flex: 1; max-height: 80vh;
+      border-radius: 16px; overflow: hidden; background: #fff;
+    }
+    .modal-iframe-wrap iframe { width: 100%; height: 100%; border: none; min-height: 70vh; }
+
+    footer { background: var(--text-dark); color: rgba(255,255,255,0.5); text-align: center; padding: 20px; font-size: 0.85rem; }
+    footer strong { color: var(--purple-light); }
+
+
+    /* ADD MATERIAL */
+    .add-material-btn { display:none; align-items:center; gap:6px; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.35); color:#fff; font-family:'IBM Plex Sans',sans-serif; font-size:0.82rem; font-weight:700; padding:7px 16px; border-radius:999px; cursor:pointer; flex-shrink:0; transition:background 0.2s; }
+    .add-material-btn:hover { background:rgba(255,255,255,0.28); }
+    .btn-delete { display:none; position:absolute; top:8px; right:8px; z-index:5; width:28px; height:28px; border-radius:50%; background:rgba(239,68,68,0.85); border:none; color:#fff; font-size:0.85rem; cursor:pointer; align-items:center; justify-content:center; }
+    .teacher-active .btn-delete { display:flex; }
+    .task-card { position:relative; }
+    .logout-btn { position:absolute; top:20px; right:68px; z-index:10; background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.25); color:rgba(255,255,255,0.85); font-size:0.78rem; font-weight:600; padding:6px 14px; border-radius:999px; cursor:pointer; font-family:inherit; display:none; align-items:center; gap:5px; }
+    .teacher-active .logout-btn { display:flex; }
+
+    /* ADD MODAL */
+    .am-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.7); backdrop-filter:blur(6px); z-index:200; display:flex; align-items:flex-end; justify-content:center; }
+    .am-overlay.hidden { display:none; }
+    .am-sheet { background:#fff; border-radius:24px 24px 0 0; width:100%; max-width:560px; padding:20px 24px 36px; }
+    .am-handle { width:40px; height:4px; background:#E5DEFF; border-radius:999px; margin:0 auto 18px; }
+    .am-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+    .am-head-title { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; }
+    .am-close-btn { background:none; border:none; font-size:1.3rem; cursor:pointer; color:#6B5B95; padding:4px; }
+    .am-field { margin-bottom:16px; }
+    .am-field label { display:block; font-size:0.8rem; font-weight:700; color:#6B5B95; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px; font-family:'IBM Plex Mono',monospace; }
+    .am-field input, .am-field select { width:100%; padding:12px 14px; border:1.5px solid #E5DEFF; border-radius:12px; font-family:inherit; font-size:0.95rem; color:#1E1040; outline:none; }
+    .am-field input:focus, .am-field select:focus { border-color:#7C3AED; }
+    .am-hint { font-size:0.75rem; color:#9e9e9e; margin-top:5px; font-family:'IBM Plex Mono',monospace; }
+    .am-hint code { background:#EDE9FE; color:#7C3AED; padding:1px 5px; border-radius:4px; }
+    .am-err { font-size:0.82rem; color:#EF4444; margin-bottom:8px; display:none; }
+    .am-err.show { display:block; }
+    .am-submit { width:100%; padding:14px; background:linear-gradient(135deg,#7C3AED,#5B21B6); color:#fff; border:none; border-radius:14px; font-family:inherit; font-size:1rem; font-weight:700; cursor:pointer; transition:opacity 0.2s; }
+    .am-submit:disabled { opacity:0.6; cursor:not-allowed; }
+    .spinner-sm { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.4); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; margin-right:8px; vertical-align:middle; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* TOAST */
+    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:#1E1040; color:#fff; padding:10px 22px; border-radius:999px; font-size:0.88rem; font-weight:600; z-index:999; opacity:0; transition:all 0.3s; pointer-events:none; white-space:nowrap; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+    @media (max-width: 600px) {
+      .task-grid { grid-template-columns: 1fr; }
+      .chapter-title { font-size: 1.2rem; }
+      .modal-title { font-size: 1rem; }
+    }
+
+    /* ── SIDEBAR (shared) ───────────────────────────────────── */
+    .hamburger { position:absolute; top:20px; right:20px; z-index:10; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); border-radius:10px; width:40px; height:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; cursor:pointer; padding:0; }
+    .hamburger span { display:block; width:18px; height:2px; background:#fff; border-radius:999px; transition:all 0.3s; }
+    .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity:0; }
+    .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+    .sidebar-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.6); backdrop-filter:blur(6px); z-index:300; opacity:0; pointer-events:none; transition:opacity 0.3s; }
+    .sidebar-overlay.open { opacity:1; pointer-events:all; }
+    .sidebar { position:fixed; top:0; right:0; height:100%; width:min(320px,85vw); background:#1E1040; z-index:301; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.34,1.1,0.64,1); display:flex; flex-direction:column; overflow-y:auto; }
+    .sidebar.open { transform:translateX(0); }
+    .sidebar-head { padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; gap:12px; }
+    .sidebar-logo { width:36px; height:36px; border-radius:10px; object-fit:cover; }
+    .sidebar-head-text { flex:1; }
+    .sidebar-head-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:800; color:#fff; }
+    .sidebar-head-sub { font-size:0.7rem; color:rgba(255,255,255,0.45); margin-top:1px; }
+    .sidebar-close { width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,0.08); border:none; color:rgba(255,255,255,0.5); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
+    .sidebar-section { padding:14px 16px 4px; }
+    .sidebar-section-label { font-size:0.65rem; font-weight:700; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.12em; font-family:'IBM Plex Mono',monospace; padding:0 4px; margin-bottom:6px; }
+    .sidebar-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; text-decoration:none; transition:background 0.15s; margin-bottom:2px; }
+    .sidebar-item:hover, .sidebar-item:active { background:rgba(255,255,255,0.08); }
+    .sidebar-item.active { background:rgba(255,255,255,0.12); border-left:3px solid #A78BFA; padding-left:9px; }
+    .sidebar-item-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0; }
+    .sidebar-item-name { font-size:0.88rem; font-weight:600; color:#fff; flex:1; }
+    .sidebar-item-badge { font-size:0.6rem; font-weight:800; padding:2px 7px; border-radius:999px; font-family:'IBM Plex Mono',monospace; background:#F59E0B; color:#fff; }
+    .sidebar-divider { height:1px; background:rgba(255,255,255,0.07); margin:8px 16px; }
+    .sidebar-teacher { margin:12px 16px 20px; background:rgba(124,58,237,0.2); border:1px solid rgba(124,58,237,0.35); border-radius:14px; padding:12px 14px; }
+    .sidebar-teacher-label { font-size:0.68rem; font-weight:700; color:#A78BFA; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
+    .sidebar-teacher-logged { font-size:0.82rem; color:#A78BFA; font-weight:600; display:flex; align-items:center; gap:8px; }
+    .sidebar-teacher-logged span { cursor:pointer; color:rgba(255,255,255,0.4); font-size:0.75rem; margin-left:auto; }
+    .sidebar-home-btn { display:flex; align-items:center; gap:10px; margin:12px 16px 4px; padding:11px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:12px; text-decoration:none; }
+    .sidebar-home-btn:hover { background:rgba(255,255,255,0.1); }
+    .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
+    .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
+
+  </style>
+</head>
+<body data-page="assignments">
+
+<!-- PDF VIEWER MODAL -->
+<div class="modal-overlay hidden" id="pdfModal">
+  <div class="modal-top">
+    <div class="modal-top-left">
+      <div class="modal-title" id="modalTitle">Task</div>
+      <div class="modal-subtitle" id="modalSubtitle"></div>
+    </div>
+    <div class="modal-actions">
+      <a class="btn-modal-download" id="modalDownload" href="#" target="_blank">⬇ Download</a>
+      <button class="btn-modal-close" onclick="closeModal()">✕</button>
+    </div>
+  </div>
+  <div class="modal-iframe-wrap">
+    <iframe id="modalIframe" src="" allowfullscreen></iframe>
+  </div>
+</div>
+
+<div class="am-overlay hidden" id="amOverlay">
+  <div class="am-sheet">
+    <div class="am-handle"></div>
+    <div class="am-head">
+      <div class="am-head-title" id="amTitle">Add Assignment</div>
+      <button class="am-close-btn" id="amCloseBtn">&#10005;</button>
+    </div>
+    <div class="am-body">
+      <div class="am-field">
+        <label>Assignment Title</label>
+        <input type="text" id="amName" placeholder="e.g. Task 6 — Reading Comprehension"/>
+      </div>
+      <div class="am-field">
+        <label>Topic / Tag</label>
+        <input type="text" id="amTag" placeholder="e.g. READING · COMPREHENSION"/>
+      </div>
+      <div class="am-field">
+        <label>Google Drive File ID or URL</label>
+        <input type="text" id="amFileId" placeholder="Paste Drive link or just the file ID"/>
+        <div class="am-hint">From your share link: <code>drive.google.com/file/d/<strong>COPY_THIS</strong>/view</code></div>
+      </div>
+      <div class="am-err" id="amErr"></div>
+      <button class="am-submit" id="amSubmitBtn">&#65291; Add Assignment</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+
+<!-- HEADER -->
+<header>
+  <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
+  <a class="back-btn" href="index.html">← Back</a>
+  <button class="logout-btn" id="logoutBtn" onclick="doLogout()">&#128274; Logout</button>
+  <h1>Assign<span>ments</span></h1>
+  <p class="header-sub">English Quest · SMA Negeri 6 Surakarta</p>
+</header>
+
+<svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
+  <path fill="#4C1D95" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
+  <path fill="#F9F7FF" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
+</svg>
+
+<main>
+
+  <!-- CHAPTER 4 -->
+  <div class="chapter-section">
+    <div class="chapter-header">
+      <div class="chapter-badge">CHAPTER 4</div>
+      <div class="chapter-title">Analytical Exposition</div>
+      <div class="chapter-line"></div>
+      <button class="add-material-btn" id="addBtn4">&#65291; Add</button>
+    </div>
+    <div class="task-grid" id="grid-ch4">
+
+      <!-- Task 5 -->
+      <div class="task-card" data-fileid="1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8">
+        <button class="btn-delete" onclick="deleteAssignment(4,'1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8',this)">&#10005;</button>
+        <div class="task-top">
+          <div class="task-number">5</div>
+          <div class="task-info">
+            <div class="task-name">Present Perfect Exercise</div>
+            <div class="task-topic">GRAMMAR · PRESENT PERFECT</div>
+          </div>
+        </div>
+        <div class="task-actions">
+          <button class="btn-task-view" onclick="openPDF('Task 5', 'Present Perfect Exercise', 'https://drive.google.com/file/d/1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8/preview', 'https://drive.google.com/uc?export=download&id=1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8')">👁 View</button>
+          <a class="btn-task-download" href="https://drive.google.com/uc?export=download&id=1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8" target="_blank">⬇</a>
+        </div>
+      </div>
+
+      <!-- Add more task cards here following the same pattern -->
+
+    </div>
+  </div>
+
+</main>
+
+<footer>© 2025 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
+
+<script>
+  var SCORES_API = 'https://script.google.com/macros/s/AKfycbywgwhsyFfrle320PvoKK-r149Y5UWnCYPH0-JC_zH7LDfKr-Xdz_Y4gG-xtqPJKW4U/exec';
+  var savedUser = localStorage.getItem('eq_tu') || '';
+  var savedPass = localStorage.getItem('eq_tp') || '';
+  var isTeacher = !!savedUser;
+  var amChapter = 4;
+
+  function apiGet(params) {
+    var url = SCORES_API + '?';
+    var parts = [];
+    for (var k in params) parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
+    url += parts.join('&');
+    return new Promise(function(resolve, reject) {
+      var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+      var script = document.createElement('script');
+      var timer = setTimeout(function() { delete window[cb]; reject(new Error('Timeout')); }, 12000);
+      window[cb] = function(data) { clearTimeout(timer); delete window[cb]; resolve(data); };
+      script.onerror = function() { clearTimeout(timer); delete window[cb]; reject(new Error('Network error')); };
+      script.src = url + '&callback=' + cb;
+      document.head.appendChild(script);
+    });
+  }
+
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 2500);
+  }
+
+  function doLogout() {
+    localStorage.removeItem('eq_tu');
+    localStorage.removeItem('eq_tp');
+    location.reload();
+  }
+
+  if (isTeacher) {
+    document.body.classList.add('teacher-active');
+    document.getElementById('addBtn4').style.display = 'flex';
+  }
+
+  // ── LOAD SAVED ASSIGNMENTS ───────────────────────────────────
+  function loadSavedAssignments() {
+    apiGet({ action: 'getMaterials', chapter: 'assign4' }).then(function(res) {
+      if (res.materials && res.materials.length > 0) {
+        res.materials.forEach(function(m) { appendCard(4, m.title, m.fileId, m.tag || '', false); });
+      }
+    }).catch(function() {});
+  }
+
+  function appendCard(ch, name, fileId, tag, animate) {
+    if (document.querySelector('[data-fileid="' + fileId + '"]')) return;
+    var previewUrl  = 'https://drive.google.com/file/d/' + fileId + '/preview';
+    var downloadUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
+    var num = document.getElementById('grid-ch' + ch).querySelectorAll('.task-card').length + 1;
+
+    var card = document.createElement('div');
+    card.className = 'task-card';
+    card.setAttribute('data-fileid', fileId);
+    if (animate) card.style.animation = 'fadeIn 0.3s ease';
+
+    var delBtn = isTeacher ? '<button class="btn-delete" onclick="deleteAssignment(' + ch + ','' + fileId + '',this)">&#10005;</button>' : '';
+    card.innerHTML = delBtn +
+      '<div class="task-top">' +
+        '<div class="task-number">' + num + '</div>' +
+        '<div class="task-info">' +
+          '<div class="task-name">' + name + '</div>' +
+          (tag ? '<div class="task-topic">' + tag + '</div>' : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="task-actions">' +
+        '<button class="btn-task-view" onclick="openPDF('' + name + '', '' + tag + '', '' + previewUrl + '', '' + downloadUrl + '')">&#128065; View</button>' +
+        '<a class="btn-task-download" href="' + downloadUrl + '" target="_blank">&#11015;</a>' +
+      '</div>';
+
+    document.getElementById('grid-ch' + ch).appendChild(card);
+  }
+
+  loadSavedAssignments();
+
+  // ── ADD ASSIGNMENT ───────────────────────────────────────────
+  document.getElementById('addBtn4').onclick = function() { openAddModal(4); };
+  document.getElementById('amCloseBtn').onclick = closeAddModal;
+  document.getElementById('amOverlay').onclick = function(e) { if (e.target === this) closeAddModal(); };
+
+  function openAddModal(ch) {
+    amChapter = ch;
+    document.getElementById('amTitle').textContent = 'Add Assignment — Chapter ' + ch;
+    document.getElementById('amName').value = '';
+    document.getElementById('amTag').value = '';
+    document.getElementById('amFileId').value = '';
+    document.getElementById('amErr').className = 'am-err';
+    document.getElementById('amSubmitBtn').disabled = false;
+    document.getElementById('amSubmitBtn').innerHTML = '&#65291; Add Assignment';
+    document.getElementById('amOverlay').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeAddModal() {
+    document.getElementById('amOverlay').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('amSubmitBtn').onclick = function() {
+    var raw  = document.getElementById('amFileId').value.trim();
+    var name = document.getElementById('amName').value.trim();
+    var tag  = document.getElementById('amTag').value.trim();
+    var err  = document.getElementById('amErr');
+    var btn  = document.getElementById('amSubmitBtn');
+    var fileId = raw;
+    var m = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (m) fileId = m[1];
+    if (!name) { err.textContent = 'Please enter a title.'; err.className = 'am-err show'; return; }
+    if (!fileId || fileId.length < 10) { err.textContent = 'Please enter a valid Drive file ID or link.'; err.className = 'am-err show'; return; }
+    err.className = 'am-err';
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-sm"></span>Saving...';
+    apiGet({ action: 'addMaterial', username: savedUser, password: savedPass, chapter: 'assign' + amChapter, title: name, fileId: fileId, fileType: tag })
+      .then(function(res) {
+        if (res.success) {
+          appendCard(amChapter, name, fileId, tag, true);
+          closeAddModal();
+          showToast('Added: ' + name);
+        } else {
+          err.textContent = res.error || 'Failed to save.';
+          err.className = 'am-err show';
+          btn.disabled = false;
+          btn.innerHTML = '&#65291; Add Assignment';
+        }
+      }).catch(function() {
+        err.textContent = 'Network error. Please try again.';
+        err.className = 'am-err show';
+        btn.disabled = false;
+        btn.innerHTML = '&#65291; Add Assignment';
+      });
+  };
+
+  // ── DELETE ASSIGNMENT ────────────────────────────────────────
+  function deleteAssignment(ch, fileId, btn) {
+    if (!confirm('Remove this assignment?')) return;
+    apiGet({ action: 'deleteMaterial', username: savedUser, password: savedPass, chapter: 'assign' + ch, fileId: fileId })
+      .then(function(res) {
+        if (res.success) {
+          var card = document.querySelector('[data-fileid="' + fileId + '"]');
+          if (card) card.remove();
+          showToast('Removed!');
+        }
+      });
+  }
+
+  function openPDF(taskNum, topic, previewUrl, downloadUrl) {
+    document.getElementById('modalTitle').textContent    = taskNum;
+    document.getElementById('modalSubtitle').textContent = topic;
+    document.getElementById('modalIframe').src           = previewUrl;
+    document.getElementById('modalDownload').href        = downloadUrl;
+    document.getElementById('pdfModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('pdfModal').classList.add('hidden');
+    document.getElementById('modalIframe').src = '';
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('pdfModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+</script>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-head">
+    <img class="sidebar-logo" src="logo.jpg" alt="Logo"/>
+    <div class="sidebar-head-text">
+      <div class="sidebar-head-title">English Quest</div>
+      <div class="sidebar-head-sub">SMA Negeri 6 Surakarta</div>
+    </div>
+    <button class="sidebar-close" onclick="closeSidebar()">&#x2715;</button>
+  </div>
+  <a href="index.html" class="sidebar-home-btn">
+    <div>
+      <div class="sidebar-home-btn-text">&#127968; Homepage</div>
+      <div class="sidebar-home-btn-sub">Back to main dashboard</div>
+    </div>
+  </a>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">&#128194; Documents</div>
+    <a href="lessons.html" class="sidebar-item" data-page="lessons">
+      <div class="sidebar-item-icon" style="background:rgba(124,58,237,0.2)">&#128209;</div>
+      <div class="sidebar-item-name">Lesson Materials</div>
+    </a>
+    <a href="session.html" class="sidebar-item" data-page="session">
+      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#127916;</div>
+      <div class="sidebar-item-name">Class Session</div>
+    </a>
+    <a href="assignments.html" class="sidebar-item" data-page="assignments">
+      <div class="sidebar-item-icon" style="background:rgba(59,130,246,0.2)">&#128203;</div>
+      <div class="sidebar-item-name">Assignments</div>
+    </a>
+    <a href="submission.html" class="sidebar-item" style="opacity:0.5;pointer-events:none;">
+      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#128221;</div>
+      <div class="sidebar-item-name">Submission</div>
+      <span class="sidebar-item-badge">SOON</span>
+    </a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">&#128101; Student Data</div>
+    <a href="students.html" class="sidebar-item" data-page="students">
+      <div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">&#127891;</div>
+      <div class="sidebar-item-name">Student List</div>
+    </a>
+    <a href="attendance.html" class="sidebar-item" data-page="attendance">
+      <div class="sidebar-item-icon" style="background:rgba(20,184,166,0.2)">&#9989;</div>
+      <div class="sidebar-item-name">Attendance</div>
+    </a>
+    <a href="scores.html" class="sidebar-item" data-page="scores">
+      <div class="sidebar-item-icon" style="background:rgba(249,115,22,0.2)">&#127942;</div>
+      <div class="sidebar-item-name">Student Scores</div>
+    </a>
+    <a href="tasks.html" class="sidebar-item" data-page="tasks">
+      <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#128204;</div>
+      <div class="sidebar-item-name">Task Status</div>
+    </a>
+    <a href="activeness.html" class="sidebar-item" data-page="activeness">
+      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#9889;</div>
+      <div class="sidebar-item-name">Activeness</div>
+    </a>
+    <a href="strikes.html" class="sidebar-item" data-page="strikes">
+      <div class="sidebar-item-icon" style="background:rgba(220,38,38,0.2)">&#9888;&#65039;</div>
+      <div class="sidebar-item-name">Strikes</div>
+    </a>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">&#128226; Info</div>
+    <a href="summative.html" class="sidebar-item" data-page="summative">
+      <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#127919;</div>
+      <div class="sidebar-item-name">Summative</div>
+    </a>
+  </div>
+  <div class="sidebar-teacher">
+    <div class="sidebar-teacher-label">&#128273; Teacher Access</div>
+    <div id="sbTeacherLoggedOut">
+      <button style="width:100%;padding:10px;background:linear-gradient(135deg,#7C3AED,#5B21B6);color:#fff;font-family:inherit;font-weight:700;font-size:0.85rem;border:none;border-radius:10px;cursor:pointer;" onclick="closeSidebar();window.location.href='index.html';">Login as Teacher</button>
+    </div>
+    <div id="sbTeacherLoggedIn" style="display:none;">
+      <div class="sidebar-teacher-logged">&#127891; Logged in as Teacher
+        <span onclick="localStorage.removeItem('eq_tu');localStorage.removeItem('eq_tp');location.reload();">Logout</span>
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<script>
+function toggleSidebar() {
+  var open = document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open', open);
+  document.getElementById('hamburgerBtn').classList.toggle('open', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+  // Highlight current page
+  var page = document.body.getAttribute('data-page') || '';
+  document.querySelectorAll('.sidebar-item[data-page]').forEach(function(el) {
+    el.classList.toggle('active', el.getAttribute('data-page') === page);
+  });
+  // Teacher status
+  var loggedIn = !!localStorage.getItem('eq_tu');
+  document.getElementById('sbTeacherLoggedOut').style.display = loggedIn ? 'none' : 'block';
+  document.getElementById('sbTeacherLoggedIn').style.display  = loggedIn ? 'block' : 'none';
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+  var hb = document.getElementById('hamburgerBtn');
+  if (hb) hb.classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeSidebar(); });
+</script>
+
+</body>
+</html>
