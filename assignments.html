@@ -369,7 +369,7 @@
     card.setAttribute('data-fileid', fileId);
     if (animate) card.style.animation = 'fadeIn 0.3s ease';
 
-    var delBtn = isTeacher ? '<button class="btn-delete" onclick="deleteAssignment(' + ch + ','' + fileId + '',this)">&#10005;</button>' : '';
+    var delBtn = isTeacher ? '<button class="btn-delete" onclick="deleteAssignment(' + ch + ',\''+fileId+'\',this)">&#10005;</button>' : '';
     card.innerHTML = delBtn +
       '<div class="task-top">' +
         '<div class="task-number">' + num + '</div>' +
