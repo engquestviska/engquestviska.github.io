@@ -132,6 +132,41 @@
     footer { background: var(--text-dark); color: rgba(255,255,255,0.5); text-align: center; padding: 20px; font-size: 0.85rem; }
     footer strong { color: var(--purple-light); }
 
+
+    /* ADD MATERIAL */
+    .add-material-btn { display:none; align-items:center; gap:6px; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.35); color:#fff; font-family:'IBM Plex Sans',sans-serif; font-size:0.82rem; font-weight:700; padding:7px 16px; border-radius:999px; cursor:pointer; flex-shrink:0; transition:background 0.2s; }
+    .add-material-btn:hover { background:rgba(255,255,255,0.28); }
+    .btn-delete { display:none; position:absolute; top:8px; right:8px; z-index:5; width:28px; height:28px; border-radius:50%; background:rgba(239,68,68,0.85); border:none; color:#fff; font-size:0.85rem; cursor:pointer; align-items:center; justify-content:center; }
+    .teacher-active .btn-delete { display:flex; }
+    .task-card { position:relative; }
+    .logout-btn { position:absolute; top:20px; right:68px; z-index:10; background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.25); color:rgba(255,255,255,0.85); font-size:0.78rem; font-weight:600; padding:6px 14px; border-radius:999px; cursor:pointer; font-family:inherit; display:none; align-items:center; gap:5px; }
+    .teacher-active .logout-btn { display:flex; }
+
+    /* ADD MODAL */
+    .am-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.7); backdrop-filter:blur(6px); z-index:200; display:flex; align-items:flex-end; justify-content:center; }
+    .am-overlay.hidden { display:none; }
+    .am-sheet { background:#fff; border-radius:24px 24px 0 0; width:100%; max-width:560px; padding:20px 24px 36px; }
+    .am-handle { width:40px; height:4px; background:#E5DEFF; border-radius:999px; margin:0 auto 18px; }
+    .am-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+    .am-head-title { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; }
+    .am-close-btn { background:none; border:none; font-size:1.3rem; cursor:pointer; color:#6B5B95; padding:4px; }
+    .am-field { margin-bottom:16px; }
+    .am-field label { display:block; font-size:0.8rem; font-weight:700; color:#6B5B95; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px; font-family:'IBM Plex Mono',monospace; }
+    .am-field input, .am-field select { width:100%; padding:12px 14px; border:1.5px solid #E5DEFF; border-radius:12px; font-family:inherit; font-size:0.95rem; color:#1E1040; outline:none; }
+    .am-field input:focus, .am-field select:focus { border-color:#7C3AED; }
+    .am-hint { font-size:0.75rem; color:#9e9e9e; margin-top:5px; font-family:'IBM Plex Mono',monospace; }
+    .am-hint code { background:#EDE9FE; color:#7C3AED; padding:1px 5px; border-radius:4px; }
+    .am-err { font-size:0.82rem; color:#EF4444; margin-bottom:8px; display:none; }
+    .am-err.show { display:block; }
+    .am-submit { width:100%; padding:14px; background:linear-gradient(135deg,#7C3AED,#5B21B6); color:#fff; border:none; border-radius:14px; font-family:inherit; font-size:1rem; font-weight:700; cursor:pointer; transition:opacity 0.2s; }
+    .am-submit:disabled { opacity:0.6; cursor:not-allowed; }
+    .spinner-sm { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.4); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; margin-right:8px; vertical-align:middle; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* TOAST */
+    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:#1E1040; color:#fff; padding:10px 22px; border-radius:999px; font-size:0.88rem; font-weight:600; z-index:999; opacity:0; transition:all 0.3s; pointer-events:none; white-space:nowrap; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
     @media (max-width: 600px) {
       .task-grid { grid-template-columns: 1fr; }
       .chapter-title { font-size: 1.2rem; }
@@ -193,10 +228,40 @@
   </div>
 </div>
 
+<div class="am-overlay hidden" id="amOverlay">
+  <div class="am-sheet">
+    <div class="am-handle"></div>
+    <div class="am-head">
+      <div class="am-head-title" id="amTitle">Add Assignment</div>
+      <button class="am-close-btn" id="amCloseBtn">&#10005;</button>
+    </div>
+    <div class="am-body">
+      <div class="am-field">
+        <label>Assignment Title</label>
+        <input type="text" id="amName" placeholder="e.g. Task 6 — Reading Comprehension"/>
+      </div>
+      <div class="am-field">
+        <label>Topic / Tag</label>
+        <input type="text" id="amTag" placeholder="e.g. READING · COMPREHENSION"/>
+      </div>
+      <div class="am-field">
+        <label>Google Drive File ID or URL</label>
+        <input type="text" id="amFileId" placeholder="Paste Drive link or just the file ID"/>
+        <div class="am-hint">From your share link: <code>drive.google.com/file/d/<strong>COPY_THIS</strong>/view</code></div>
+      </div>
+      <div class="am-err" id="amErr"></div>
+      <button class="am-submit" id="amSubmitBtn">&#65291; Add Assignment</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+
 <!-- HEADER -->
 <header>
   <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
   <a class="back-btn" href="index.html">← Back</a>
+  <button class="logout-btn" id="logoutBtn" onclick="doLogout()">&#128274; Logout</button>
   <h1>Assign<span>ments</span></h1>
   <p class="header-sub">English Quest · SMA Negeri 6 Surakarta</p>
 </header>
@@ -214,11 +279,13 @@
       <div class="chapter-badge">CHAPTER 4</div>
       <div class="chapter-title">Analytical Exposition</div>
       <div class="chapter-line"></div>
+      <button class="add-material-btn" id="addBtn4">&#65291; Add</button>
     </div>
-    <div class="task-grid">
+    <div class="task-grid" id="grid-ch4">
 
       <!-- Task 5 -->
-      <div class="task-card">
+      <div class="task-card" data-fileid="1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8">
+        <button class="btn-delete" onclick="deleteAssignment(4,'1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8',this)">&#10005;</button>
         <div class="task-top">
           <div class="task-number">5</div>
           <div class="task-info">
@@ -227,7 +294,7 @@
           </div>
         </div>
         <div class="task-actions">
-          <button class="btn-task-view" onclick="openPDF('Task 5', 'Present Perfect Exercise', 'https://drive.google.com/file/d/1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8/preview', 'https://drive.google.com/uc?export=download&id=1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8')">👁 View</button>
+          <button class="btn-task-view" data-fileid="1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8" onclick="openPDF('Task 5', 'Present Perfect Exercise', 'https://drive.google.com/file/d/1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8/preview', 'https://drive.google.com/uc?export=download&id=1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8')">👁 View</button>
           <a class="btn-task-download" href="https://drive.google.com/uc?export=download&id=1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8" target="_blank">⬇</a>
         </div>
       </div>
@@ -242,6 +309,154 @@
 <footer>© 2025 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
 
 <script>
+  var SCORES_API = 'https://script.google.com/macros/s/AKfycbywgwhsyFfrle320PvoKK-r149Y5UWnCYPH0-JC_zH7LDfKr-Xdz_Y4gG-xtqPJKW4U/exec';
+  var savedUser = localStorage.getItem('eq_tu') || '';
+  var savedPass = localStorage.getItem('eq_tp') || '';
+  var isTeacher = !!savedUser;
+  var amChapter = 4;
+
+  function apiGet(params) {
+    var url = SCORES_API + '?';
+    var parts = [];
+    for (var k in params) parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
+    url += parts.join('&');
+    return new Promise(function(resolve, reject) {
+      var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+      var script = document.createElement('script');
+      var timer = setTimeout(function() { delete window[cb]; reject(new Error('Timeout')); }, 12000);
+      window[cb] = function(data) { clearTimeout(timer); delete window[cb]; resolve(data); };
+      script.onerror = function() { clearTimeout(timer); delete window[cb]; reject(new Error('Network error')); };
+      script.src = url + '&callback=' + cb;
+      document.head.appendChild(script);
+    });
+  }
+
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 2500);
+  }
+
+  function doLogout() {
+    localStorage.removeItem('eq_tu');
+    localStorage.removeItem('eq_tp');
+    location.reload();
+  }
+
+  if (isTeacher) {
+    document.body.classList.add('teacher-active');
+    document.getElementById('addBtn4').style.display = 'flex';
+  }
+
+  // ── LOAD SAVED ASSIGNMENTS ───────────────────────────────────
+  function loadSavedAssignments() {
+    apiGet({ action: 'getMaterials', chapter: 'assign4' }).then(function(res) {
+      if (res.materials && res.materials.length > 0) {
+        res.materials.forEach(function(m) { appendCard(4, m.title, m.fileId, m.tag || '', false); });
+      }
+    }).catch(function() {});
+  }
+
+  function appendCard(ch, name, fileId, tag, animate) {
+    if (document.querySelector('[data-fileid="' + fileId + '"]')) return;
+    var previewUrl  = 'https://drive.google.com/file/d/' + fileId + '/preview';
+    var downloadUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
+    var num = document.getElementById('grid-ch' + ch).querySelectorAll('.task-card').length + 1;
+
+    var card = document.createElement('div');
+    card.className = 'task-card';
+    card.setAttribute('data-fileid', fileId);
+    if (animate) card.style.animation = 'fadeIn 0.3s ease';
+
+    var delBtn = isTeacher ? '<button class="btn-delete" onclick="deleteAssignment(' + ch + ','' + fileId + '',this)">&#10005;</button>' : '';
+    card.innerHTML = delBtn +
+      '<div class="task-top">' +
+        '<div class="task-number">' + num + '</div>' +
+        '<div class="task-info">' +
+          '<div class="task-name">' + name + '</div>' +
+          (tag ? '<div class="task-topic">' + tag + '</div>' : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="task-actions">' +
+        '<button class="btn-task-view" onclick="openPDF('' + name + '', '' + tag + '', '' + previewUrl + '', '' + downloadUrl + '')">&#128065; View</button>' +
+        '<a class="btn-task-download" href="' + downloadUrl + '" target="_blank">&#11015;</a>' +
+      '</div>';
+
+    document.getElementById('grid-ch' + ch).appendChild(card);
+  }
+
+  loadSavedAssignments();
+
+  // ── ADD ASSIGNMENT ───────────────────────────────────────────
+  document.getElementById('addBtn4').onclick = function() { openAddModal(4); };
+  document.getElementById('amCloseBtn').onclick = closeAddModal;
+  document.getElementById('amOverlay').onclick = function(e) { if (e.target === this) closeAddModal(); };
+
+  function openAddModal(ch) {
+    amChapter = ch;
+    document.getElementById('amTitle').textContent = 'Add Assignment — Chapter ' + ch;
+    document.getElementById('amName').value = '';
+    document.getElementById('amTag').value = '';
+    document.getElementById('amFileId').value = '';
+    document.getElementById('amErr').className = 'am-err';
+    document.getElementById('amSubmitBtn').disabled = false;
+    document.getElementById('amSubmitBtn').innerHTML = '&#65291; Add Assignment';
+    document.getElementById('amOverlay').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeAddModal() {
+    document.getElementById('amOverlay').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('amSubmitBtn').onclick = function() {
+    var raw  = document.getElementById('amFileId').value.trim();
+    var name = document.getElementById('amName').value.trim();
+    var tag  = document.getElementById('amTag').value.trim();
+    var err  = document.getElementById('amErr');
+    var btn  = document.getElementById('amSubmitBtn');
+    var fileId = raw;
+    var m = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (m) fileId = m[1];
+    if (!name) { err.textContent = 'Please enter a title.'; err.className = 'am-err show'; return; }
+    if (!fileId || fileId.length < 10) { err.textContent = 'Please enter a valid Drive file ID or link.'; err.className = 'am-err show'; return; }
+    err.className = 'am-err';
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-sm"></span>Saving...';
+    apiGet({ action: 'addMaterial', username: savedUser, password: savedPass, chapter: 'assign' + amChapter, title: name, fileId: fileId, fileType: tag })
+      .then(function(res) {
+        if (res.success) {
+          appendCard(amChapter, name, fileId, tag, true);
+          closeAddModal();
+          showToast('Added: ' + name);
+        } else {
+          err.textContent = res.error || 'Failed to save.';
+          err.className = 'am-err show';
+          btn.disabled = false;
+          btn.innerHTML = '&#65291; Add Assignment';
+        }
+      }).catch(function() {
+        err.textContent = 'Network error. Please try again.';
+        err.className = 'am-err show';
+        btn.disabled = false;
+        btn.innerHTML = '&#65291; Add Assignment';
+      });
+  };
+
+  // ── DELETE ASSIGNMENT ────────────────────────────────────────
+  function deleteAssignment(ch, fileId, btn) {
+    if (!confirm('Remove this assignment?')) return;
+    apiGet({ action: 'deleteMaterial', username: savedUser, password: savedPass, chapter: 'assign' + ch, fileId: fileId })
+      .then(function(res) {
+        if (res.success) {
+          var card = document.querySelector('[data-fileid="' + fileId + '"]');
+          if (card) card.remove();
+          showToast('Removed!');
+        }
+      });
+  }
+
   function openPDF(taskNum, topic, previewUrl, downloadUrl) {
     document.getElementById('modalTitle').textContent    = taskNum;
     document.getElementById('modalSubtitle').textContent = topic;
