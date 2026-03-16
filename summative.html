@@ -138,8 +138,19 @@
     .toggle-label { font-size:0.72rem; color:var(--text-muted); font-weight:600; font-family:'IBM Plex Mono',monospace; }
 
     /* Refresh btn */
-    .tp-refresh { background:none; border:1.5px solid var(--border); color:var(--text-muted); padding:8px 14px; border-radius:10px; font-size:0.82rem; font-weight:600; cursor:pointer; font-family:inherit; display:flex; align-items:center; gap:6px; margin-bottom:16px; }
+    .tp-refresh { background:none; border:1.5px solid var(--border); color:var(--text-muted); padding:8px 14px; border-radius:10px; font-size:0.82rem; font-weight:600; cursor:pointer; font-family:inherit; display:flex; align-items:center; gap:6px; }
     .tp-refresh:hover { border-color:var(--purple-mid); color:var(--purple); }
+    .tp-btn-row { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+    .btn-reveal-all { padding:8px 16px; background:var(--green); color:#fff; border:none; border-radius:10px; font-size:0.82rem; font-weight:700; cursor:pointer; font-family:inherit; display:flex; align-items:center; gap:6px; transition:opacity 0.2s; }
+    .btn-reveal-all:hover { opacity:0.85; }
+    .btn-hide-all { padding:8px 16px; background:var(--red); color:#fff; border:none; border-radius:10px; font-size:0.82rem; font-weight:700; cursor:pointer; font-family:inherit; display:flex; align-items:center; gap:6px; transition:opacity 0.2s; }
+    .btn-hide-all:hover { opacity:0.85; }
+    .btn-reveal-all:disabled, .btn-hide-all:disabled { opacity:0.5; cursor:not-allowed; }
+    .tp-bulk-btns { display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+    .btn-reveal-all { padding:8px 16px; background:var(--green); color:#fff; border:none; border-radius:10px; font-size:0.82rem; font-weight:700; cursor:pointer; font-family:inherit; display:flex; align-items:center; gap:6px; transition:opacity 0.2s; }
+    .btn-reveal-all:hover { opacity:0.85; }
+    .btn-hide-all { padding:8px 16px; background:var(--red); color:#fff; border:none; border-radius:10px; font-size:0.82rem; font-weight:700; cursor:pointer; font-family:inherit; display:flex; align-items:center; gap:6px; transition:opacity 0.2s; }
+    .btn-hide-all:hover { opacity:0.85; }
 
     /* TOAST */
     .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:#1E1040; color:#fff; padding:10px 22px; border-radius:999px; font-size:0.88rem; font-weight:600; z-index:999; opacity:0; transition:all 0.3s; pointer-events:none; white-space:nowrap; }
@@ -218,7 +229,15 @@
     </div>
     <div class="cls-tabs" id="clsTabs"></div>
     <div class="tp-stats" id="tpStats"></div>
-    <button class="tp-refresh" onclick="loadTeacherData()">&#8635; Refresh</button>
+    <div class="tp-bulk-btns">
+      <div class="tp-btn-row">
+        <button class="tp-refresh" onclick="loadTeacherData()">&#8635; Refresh</button>
+        <button class="btn-reveal-all" id="btnRevealAll" onclick="revealAll(true)">&#128275; Reveal All</button>
+        <button class="btn-hide-all" id="btnHideAll" onclick="revealAll(false)">&#128274; Hide All</button>
+      </div>
+      <button class="btn-reveal-all" onclick="bulkReveal(true)">&#128275; Reveal All</button>
+      <button class="btn-hide-all" onclick="bulkReveal(false)">&#128274; Hide All</button>
+    </div>
     <div class="tp-table-wrap">
       <table>
         <thead>
@@ -386,12 +405,34 @@ function loadInnateData() {
 }
 
 // Find who originally owns a topic sentence (for "topic from X" label)
+// Students who did not submit — topic assigned by Mr. Laksma
+var TEACHER_ASSIGNED = {
+  'XE1': [5,7,9,10,15,16,24,33],
+  'XE4': [14,18,36],
+  'XE5': [4,19,30],
+  'XE6': [2,13,14,23],
+  'XE7': [9],
+  'XE8': [8,16,20,24],
+  'XE9': [6,8,10,11,18,32],
+  'XE10': [28,33],
+  'XE11': [20,30]
+};
+
+function isTeacherAssigned(cls, attNum) {
+  return TEACHER_ASSIGNED[cls] && TEACHER_ASSIGNED[cls].indexOf(attNum) !== -1;
+}
+
 function findTopicOwner(cls, topicSentence) {
   if (!topicSentence) return '';
   var match = innateData.find(function(r){
     return r.cls === cls && r.topic.trim() === topicSentence.trim();
   });
-  return match ? match.name : '';
+  if (!match) return 'Mr. Laksma';
+  // Check if the matching student is teacher-assigned
+  var classStudents = innateData.filter(function(r){ return r.cls === cls; });
+  var attNum = classStudents.indexOf(match) + 1;
+  if (isTeacherAssigned(cls, attNum)) return 'Mr. Laksma';
+  return match.name;
 }
 
 // ── POPULATE NAME DROPDOWN ───────────────────────────────────
@@ -499,7 +540,11 @@ function showTopicView(student, attNum) {
   body.innerHTML =
     '<div class="topic-revealed">' +
       '<div class="topic-sentence">' + displayTopic + '</div>' +
-      (topicOwner ? '<div class="topic-from">&#128100; Topic originally written by <strong>' + topicOwner + '</strong></div>' : '') +
+      (topicOwner === 'Mr. Laksma'
+        ? '<div class="topic-from">&#127979; Topic assigned by <strong>Mr. Laksma</strong></div>'
+        : topicOwner
+          ? '<div class="topic-from">&#128100; Topic originally written by <strong>' + topicOwner + '</strong></div>'
+          : '') +
       stanceHtml +
     '</div>';
 }
@@ -618,7 +663,7 @@ function renderTeacherTable() {
       '<tr>' +
         '<td class="td-num">' + String(attNum).padStart(2,'0') + '</td>' +
         '<td class="td-name">' + s.name + '</td>' +
-        '<td class="td-topic">' + (s.topic || '<em style="color:var(--text-muted)">No topic</em>') + (findTopicOwner(s.cls, s.topic) ? '<div style="font-size:0.7rem;color:var(--purple-light);margin-top:3px;font-family:IBM Plex Mono,monospace;">from: ' + findTopicOwner(s.cls, s.topic) + '</div>' : '') + '</td>' +
+        '<td class="td-topic">' + (s.topic || '<em style="color:var(--text-muted)">No topic</em>') + (function(){ var own = findTopicOwner(s.cls, s.topic); return own ? '<div style="font-size:0.7rem;color:var(--purple-light);margin-top:3px;font-family:IBM Plex Mono,monospace;">from: ' + own + '</div>' : ''; })() + '</td>' +
         '<td>' + stance + '</td>' +
         '<td>' + reveal + '</td>' +
       '</tr>';
@@ -641,6 +686,96 @@ function toggleReveal(cls, attNum, revealed) {
         showToast('Failed to update. Try again.');
       }
     }).catch(function(){ showToast('Network error.'); });
+}
+
+// ── BULK REVEAL ─────────────────────────────────────────────
+function bulkReveal(reveal) {
+  var label = reveal ? 'Reveal ALL students in ' : 'Hide ALL students in ';
+  if (!confirm(label + currentCls + '? This will update ' + allData.filter(function(r){ return r.cls === currentCls; }).length + ' students.')) return;
+
+  var students = allData.filter(function(r){ return r.cls === currentCls; });
+  var total = students.length;
+  var done  = 0;
+  var failed = 0;
+
+  showToast((reveal ? '🔓 Revealing' : '🔒 Hiding') + ' all ' + total + ' students...');
+
+  // Call setReveal for each student sequentially to avoid rate limits
+  function next(idx) {
+    if (idx >= total) {
+      showToast(done + ' updated' + (failed ? ', ' + failed + ' failed' : '') + ' ✅');
+      loadTeacherData();
+      return;
+    }
+    var attNum = idx + 1;
+    apiGet({ action: 'setReveal', username: savedUser, password: savedPass, cls: currentCls, attNum: attNum, revealed: reveal ? 'TRUE' : 'FALSE' })
+      .then(function(res){
+        if (res.success) {
+          done++;
+          // Update toggle in table if visible
+          var toggle = document.getElementById('toggle_' + currentCls + '_' + attNum);
+          if (toggle) {
+            toggle.checked = reveal;
+            var label = toggle.closest('.reveal-toggle').querySelector('.toggle-label');
+            if (label) label.textContent = reveal ? 'On' : 'Off';
+          }
+          // Update local data
+          var classStudents = allData.filter(function(r){ return r.cls === currentCls; });
+          if (classStudents[idx]) classStudents[idx].revealed = reveal ? 'TRUE' : 'FALSE';
+        } else {
+          failed++;
+        }
+        setTimeout(function(){ next(idx + 1); }, 200); // 200ms gap to avoid quota
+      }).catch(function(){
+        failed++;
+        setTimeout(function(){ next(idx + 1); }, 200);
+      });
+  }
+  next(0);
+}
+
+// ── REVEAL ALL / HIDE ALL ────────────────────────────────────
+function revealAll(reveal) {
+  var students = allData.filter(function(r){ return r.cls === currentCls; });
+  var label    = reveal ? 'Reveal' : 'Hide';
+  if (!confirm(label + ' all ' + students.length + ' topics for ' + currentCls + '?')) return;
+
+  var btnRA = document.getElementById('btnRevealAll');
+  var btnHA = document.getElementById('btnHideAll');
+  if (btnRA) btnRA.disabled = true;
+  if (btnHA) btnHA.disabled = true;
+
+  var total   = students.length;
+  var done    = 0;
+  var failed  = 0;
+
+  showToast('Processing ' + total + ' students...');
+
+  // Process sequentially to avoid overwhelming the API
+  function next(idx) {
+    if (idx >= total) {
+      if (btnRA) btnRA.disabled = false;
+      if (btnHA) btnHA.disabled = false;
+      showToast(label + ' all done! ' + (failed > 0 ? failed + ' failed.' : '✅'));
+      loadTeacherData();
+      return;
+    }
+    var attNum = idx + 1;
+    apiGet({ action: 'setReveal', username: savedUser, password: savedPass,
+             cls: currentCls, attNum: attNum, revealed: reveal ? 'TRUE' : 'FALSE' })
+      .then(function(res){
+        if (res.success) {
+          done++;
+          if (allData.filter(function(r){ return r.cls === currentCls; })[idx])
+            allData.filter(function(r){ return r.cls === currentCls; })[idx].revealed = reveal ? 'TRUE' : 'FALSE';
+        } else { failed++; }
+        setTimeout(function(){ next(idx + 1); }, 200); // 200ms delay between calls
+      }).catch(function(){
+        failed++;
+        setTimeout(function(){ next(idx + 1); }, 200);
+      });
+  }
+  next(0);
 }
 
 // ── INIT ─────────────────────────────────────────────────────
