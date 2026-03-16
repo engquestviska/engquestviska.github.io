@@ -27,38 +27,27 @@
 
     main { flex:1; max-width:640px; margin:0 auto; padding:24px 16px 80px; width:100%; }
 
-    /* STEP CARDS */
-    .step-card { background:var(--white); border:1.5px solid var(--border); border-radius:24px; padding:28px 24px; margin-bottom:16px; animation:slideUp 0.4s cubic-bezier(0.34,1.2,0.64,1); }
-    @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-    .step-label { font-size:0.7rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; font-family:'IBM Plex Mono',monospace; margin-bottom:16px; }
-    .step-title { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:800; margin-bottom:20px; color:var(--text-dark); }
+    /* JEOPARDY BANNER */
+    .jeop-banner { display:flex; align-items:center; gap:16px; background:linear-gradient(135deg,#4C1D95,#7C3AED); border-radius:20px; padding:20px 24px; margin-bottom:20px; text-decoration:none; transition:opacity 0.2s; box-shadow:0 8px 32px rgba(124,58,237,0.25); }
+    .jeop-banner:hover { opacity:0.9; }
+    .jeop-icon { font-size:2.4rem; flex-shrink:0; }
+    .jeop-body { flex:1; }
+    .jeop-title { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:800; color:#fff; margin-bottom:4px; }
+    .jeop-sub { font-size:0.82rem; color:rgba(255,255,255,0.72); font-family:'IBM Plex Mono',monospace; }
+    .jeop-arrow { font-size:1.4rem; color:rgba(255,255,255,0.5); flex-shrink:0; }
 
-    /* Select boxes */
-    .select-wrap { margin-bottom:14px; }
-    .select-wrap label { display:block; font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; }
-    .select-wrap select { width:100%; padding:13px 16px; border:1.5px solid var(--border); border-radius:12px; font-family:'IBM Plex Sans',sans-serif; font-size:0.95rem; outline:none; background:var(--off-white); color:var(--text-dark); appearance:none; }
-    .select-wrap select:focus { border-color:var(--purple-light); }
-
-    /* Chapter cards */
-    .chapter-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px; }
-    .chapter-card { border:2px solid var(--border); border-radius:16px; padding:16px; cursor:pointer; transition:all 0.2s; background:var(--off-white); text-align:center; }
-    .chapter-card:hover { border-color:var(--purple-light); background:var(--purple-soft); }
-    .chapter-card.selected { border-color:var(--purple); background:var(--purple-soft); }
-    .chapter-card-num { font-family:'IBM Plex Mono',monospace; font-size:0.7rem; font-weight:700; color:var(--purple-light); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px; }
-    .chapter-card-name { font-family:'Playfair Display',serif; font-size:0.95rem; font-weight:700; color:var(--text-dark); }
-    .chapter-card.selected .chapter-card-name { color:var(--purple); }
-    .chapter-card-type { font-size:0.75rem; color:var(--text-muted); margin-top:4px; }
-
-    /* Already attempted warning */
-    .attempted-box { background:#FEF3C7; border:1.5px solid #FCD34D; border-radius:14px; padding:14px 16px; display:flex; gap:12px; align-items:flex-start; margin-bottom:16px; }
-    .attempted-box-icon { font-size:1.3rem; flex-shrink:0; }
-    .attempted-box-text { font-size:0.85rem; color:#92400E; line-height:1.5; }
-    .attempted-box-text strong { display:block; margin-bottom:3px; }
+    /* COMING SOON */
+    .coming-section-label { font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; font-family:'IBM Plex Mono',monospace; margin-bottom:12px; }
+    .coming-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; }
+    .coming-card { background:var(--white); border:1.5px dashed var(--border); border-radius:18px; padding:20px; position:relative; opacity:0.7; }
+    .coming-card-badge { font-size:0.68rem; font-weight:700; color:var(--purple-light); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px; }
+    .coming-card-name { font-family:'Playfair Display',serif; font-size:1rem; font-weight:800; margin-bottom:4px; }
+    .coming-card-sub { font-size:0.78rem; color:var(--text-muted); }
+    .coming-soon-pill { position:absolute; top:14px; right:14px; background:var(--purple-soft); color:var(--purple); font-size:0.68rem; font-weight:800; padding:3px 10px; border-radius:999px; font-family:'IBM Plex Mono',monospace; border:1px solid var(--purple-mid); }
 
     /* Btn */
     .btn-primary { width:100%; padding:15px; background:linear-gradient(135deg,var(--purple),#5B21B6); color:#fff; font-family:'IBM Plex Sans',sans-serif; font-weight:700; font-size:1rem; border:none; border-radius:14px; cursor:pointer; transition:opacity 0.2s; }
-    .btn-primary:disabled { opacity:0.4; cursor:not-allowed; }
-    .btn-primary:hover:not(:disabled) { opacity:0.9; }
+    .btn-primary:hover { opacity:0.9; }
 
     /* GENERATING STATE */
     .gen-state { text-align:center; padding:48px 20px; }
@@ -171,7 +160,7 @@
   <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
   <a class="back-btn" href="index.html">← Back</a>
   <h1>English Quest <span>Quiz</span></h1>
-  <p class="header-sub">AI-generated · Unique to you · 10 questions</p>
+  <p class="header-sub">Chapter review games · English Quest · Mr. Laksma</p>
 </header>
 <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
   <path fill="#4C1D95" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
@@ -180,565 +169,30 @@
 
 <main id="mainArea">
 
-  <!-- STEP 1: SELECT -->
-  <div id="stepSelect" class="step-card">
-    <div class="step-label">Step 1 of 2 · Identity</div>
-    <div class="step-title">Who are you?</div>
-
-    <div class="select-wrap">
-      <label>Class</label>
-      <select id="classSelect" onchange="onClassChange()">
-        <option value="">— Select your class —</option>
-        <option value="XE1">X E-1</option>
-        <option value="XE4">X E-4</option>
-        <option value="XE5">X E-5</option>
-        <option value="XE6">X E-6</option>
-        <option value="XE7">X E-7</option>
-        <option value="XE8">X E-8</option>
-        <option value="XE9">X E-9</option>
-        <option value="XE10">X E-10</option>
-        <option value="XE11">X E-11</option>
-      </select>
+  <!-- JEOPARDY BANNER -->
+  <a href="jeopardyquiz.html" class="jeop-banner">
+    <div class="jeop-icon">&#127918;</div>
+    <div class="jeop-body">
+      <div class="jeop-title">Chapter 4 Jeopardy Quiz</div>
+      <div class="jeop-sub">Play with friends &middot; Fact/Opinion, Vocab, Structure &amp; more</div>
     </div>
+    <div class="jeop-arrow">&#8594;</div>
+  </a>
 
-    <div class="select-wrap">
-      <label>Your Name</label>
-      <select id="nameSelect" disabled>
-        <option value="">— Select your class first —</option>
-      </select>
-    </div>
-
-    <!-- JEOPARDY BANNER -->
-    <a href="jeopardyquiz.html" style="display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#4C1D95,#7C3AED);border-radius:16px;padding:16px 20px;margin-bottom:20px;text-decoration:none;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">
-      <div style="font-size:2rem;flex-shrink:0;">&#127918;</div>
-      <div>
-        <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:800;color:#fff;">Chapter 4 Jeopardy Quiz</div>
-        <div style="font-size:0.8rem;color:rgba(255,255,255,0.7);margin-top:2px;font-family:'IBM Plex Mono',monospace;">Play with friends &middot; Fact/Opinion, Vocab, Structure &amp; more</div>
-      </div>
-      <div style="margin-left:auto;color:rgba(255,255,255,0.6);font-size:1.2rem;">&#8594;</div>
-    </a>
-
-    <div class="step-label" style="margin-top:20px;">Step 2 of 2 · Chapter</div>
-    <div class="step-title">Which chapter?</div>
-
-    <div class="chapter-grid">
-      <div class="chapter-card" id="ch4card" onclick="selectChapter(4)">
-        <div class="chapter-card-num">Chapter 4</div>
-        <div class="chapter-card-name">Analytical Exposition</div>
-        <div class="chapter-card-type">Text structure, grammar, vocabulary</div>
-      </div>
-      <div class="chapter-card" id="ch5card" onclick="selectChapter(5)">
-        <div class="chapter-card-num">Chapter 5</div>
-        <div class="chapter-card-name">Narrative Text</div>
-        <div class="chapter-card-type">Text structure, grammar, vocabulary</div>
-      </div>
-    </div>
-
-    <div id="attemptedWarning" class="attempted-box hidden">
-      <div class="attempted-box-icon">⚠️</div>
-      <div class="attempted-box-text">
-        <strong>Already attempted!</strong>
-        You have already taken this quiz. Each quiz can only be taken once per chapter.
-        Your score: <span id="attemptedScore">—</span>/10
-      </div>
-    </div>
-
-    <button class="btn-primary" id="startBtn" onclick="startQuiz()" disabled>
-      🚀 Generate My Quiz
-    </button>
-
-    <div id="teacherResultsBtn" style="display:none;margin-top:12px;">
-      <button class="btn-primary" onclick="showTeacherResults()" style="background:var(--off-white);color:var(--purple);border:1.5px solid var(--border);">
-        📊 View All Quiz Results (Teacher)
-      </button>
+  <!-- COMING SOON CARDS -->
+  <div class="coming-section-label">More quizzes coming soon</div>
+  <div class="coming-grid">
+    <div class="coming-card">
+      <div class="coming-card-badge">CHAPTER 5</div>
+      <div class="coming-card-name">Narrative Text</div>
+      <div class="coming-card-sub">Jeopardy quiz in progress</div>
+      <div class="coming-soon-pill">Soon</div>
     </div>
   </div>
 
 </main>
 
 <footer>© 2025 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
-
-<script>
-const API    = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
-
-let selectedClass   = '';
-let selectedStudent = null; // { no, name, nickname }
-let selectedChapter = null;
-let questions       = [];
-let answers         = {};
-let submitted       = false;
-let studentList     = {};
-
-// ── API HELPERS ──────────────────────────────────────────────
-async function apiGet(params) {
-  const url = API + '?' + new URLSearchParams(params);
-  try { const r = await fetch(url); if (r.ok) return await r.json(); } catch(e) {}
-  return new Promise((resolve, reject) => {
-    const cb = 'cb_'+Date.now()+'_'+Math.random().toString(36).slice(2);
-    const s  = document.createElement('script'); s.async = true;
-    const t  = setTimeout(()=>{cleanup();reject(new Error('Timeout'));}, 20000);
-    function cleanup(){delete window[cb];try{if(s.parentNode)s.parentNode.removeChild(s);}catch(e){}clearTimeout(t);}
-    window[cb] = d=>{cleanup();resolve(d);};
-    s.onerror  = ()=>{cleanup();reject();};
-    s.src = API+'?'+new URLSearchParams({...params, callback:cb, _t:Date.now()});
-    (document.head||document.body).appendChild(s);
-  });
-}
-
-// ── LOAD STUDENTS ────────────────────────────────────────────
-async function onClassChange() {
-  const cls = document.getElementById('classSelect').value;
-  selectedClass = cls;
-  selectedStudent = null;
-  selectedChapter = null;
-  document.getElementById('ch4card').classList.remove('selected');
-  document.getElementById('ch5card').classList.remove('selected');
-  document.getElementById('attemptedWarning').classList.add('hidden');
-  document.getElementById('startBtn').disabled = true;
-
-  const nameSelect = document.getElementById('nameSelect');
-  nameSelect.innerHTML = '<option value="">Loading...</option>';
-  nameSelect.disabled  = true;
-
-  if (!cls) { nameSelect.innerHTML = '<option value="">— Select your class first —</option>'; return; }
-
-  try {
-    if (!studentList[cls]) {
-      const res = await apiGet({ action:'getAllActiveness', className:cls });
-      studentList[cls] = res.students || [];
-    }
-    const students = studentList[cls];
-    nameSelect.innerHTML = '<option value="">— Select your name —</option>' +
-      students.map(s => `<option value="${s.no}">${s.name}${s.nickname ? ' ('+s.nickname+')' : ''}</option>`).join('');
-    nameSelect.disabled = false;
-    nameSelect.onchange = onStudentChange;
-  } catch(e) {
-    nameSelect.innerHTML = '<option value="">Failed to load — try again</option>';
-  }
-}
-
-function onStudentChange() {
-  const no  = document.getElementById('nameSelect').value;
-  const cls = selectedClass;
-  if (!no) { selectedStudent = null; checkStartReady(); return; }
-  const s = studentList[cls].find(x => String(x.no) === String(no));
-  selectedStudent = s;
-  checkAttempt();
-}
-
-async function checkAttempt() {
-  if (!selectedStudent || !selectedChapter) { checkStartReady(); return; }
-  try {
-    const res = await apiGet({ action:'getQuizAttempt', className:selectedClass, studentNo:selectedStudent.no, chapter:selectedChapter });
-    if (res.attempted) {
-      document.getElementById('attemptedScore').textContent = res.score;
-      document.getElementById('attemptedWarning').classList.remove('hidden');
-      document.getElementById('startBtn').disabled = true;
-    } else {
-      document.getElementById('attemptedWarning').classList.add('hidden');
-      checkStartReady();
-    }
-  } catch(e) { checkStartReady(); }
-}
-
-function selectChapter(ch) {
-  selectedChapter = ch;
-  document.getElementById('ch4card').classList.toggle('selected', ch === 4);
-  document.getElementById('ch5card').classList.toggle('selected', ch === 5);
-  document.getElementById('attemptedWarning').classList.add('hidden');
-  checkAttempt();
-}
-
-function checkStartReady() {
-  const ready = selectedClass && selectedStudent && selectedChapter;
-  document.getElementById('startBtn').disabled = !ready;
-}
-
-// ── GENERATE QUIZ ────────────────────────────────────────────
-async function startQuiz() {
-  const main = document.getElementById('mainArea');
-  main.innerHTML = `
-    <div class="step-card gen-state">
-      <div class="gen-icon">🤖</div>
-      <div class="gen-title">Generating your quiz<span class="gen-dots"><span>.</span><span>.</span><span>.</span></span></div>
-      <div class="gen-sub">Creating 10 unique questions just for ${selectedStudent.nickname || selectedStudent.name.split(' ')[0]}.<br/>This takes about 10–15 seconds.</div>
-    </div>`;
-
-  try {
-    // Step 1: Get Gemini key from Apps Script
-    const keyRes = await apiGet({ action: 'getGeminiKey' });
-    if (keyRes.error) throw new Error(keyRes.error);
-    const geminiKey = keyRes.key;
-
-    // Step 2: Call Gemini directly from browser (no CORS issue with Gemini)
-    const chapterInfo = selectedChapter === 4
-      ? 'Chapter 4: Analytical Exposition Text. Topics: text structure (Thesis, Arguments, Reiteration), purpose of analytical exposition, language features (present tense, logical connectives like furthermore, therefore, in addition), vocabulary related to argumentation, identifying thesis and arguments in a passage.'
-      : 'Chapter 5: Narrative Text. Topics: text structure (Orientation, Complication, Resolution, Coda), purpose of narrative text, language features (past tense, time connectives like once upon a time, suddenly, finally), vocabulary related to storytelling, identifying story elements.';
-
-    const prompt = `You are an English teacher at an Indonesian high school. Generate exactly 10 multiple choice quiz questions for a 10th grade student about ${chapterInfo}
-
-Mix of question types:
-- Text structure identification
-- Grammar in context
-- Vocabulary meaning
-- Short reading comprehension (3-4 sentence passage)
-- Purpose/function of text elements
-
-Rules:
-- Each question has exactly 5 options labeled A, B, C, D, E
-- Only ONE correct answer per question
-- Make questions varied
-- Use clear English for 10th graders
-
-Respond ONLY with a valid JSON array, no markdown, no backticks, no extra text:
-[{"q":"...","options":["A. ...","B. ...","C. ...","D. ...","E. ..."],"answer":"A","explanation":"..."}]`;
-
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.9, maxOutputTokens: 4000 }
-        })
-      }
-    );
-
-    const geminiData = await geminiRes.json();
-    if (geminiData.error) throw new Error(geminiData.error.message);
-    const raw   = geminiData.candidates[0].content.parts[0].text;
-    const clean = raw.replace(/```json|```/g, '').trim();
-    questions   = JSON.parse(clean);
-    if (!Array.isArray(questions) || questions.length === 0) throw new Error('Invalid response');
-    renderQuiz();
-  } catch(e) {
-    main.innerHTML = `
-      <div class="step-card" style="text-align:center;padding:40px 20px;">
-        <div style="font-size:2.5rem;margin-bottom:16px;">😕</div>
-        <div style="font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;margin-bottom:8px;">Generation Failed</div>
-        <div style="font-size:0.85rem;color:var(--text-muted);margin-bottom:24px;">${e.message || 'Something went wrong. Please try again.'}</div>
-        <a href="quiz.html" class="btn-primary" style="display:block;text-decoration:none;text-align:center;">Try Again</a>
-      </div>`;
-  }
-}
-
-// ── RENDER QUIZ ──────────────────────────────────────────────
-function renderQuiz() {
-  const main = document.getElementById('mainArea');
-  const name = selectedStudent.nickname || selectedStudent.name.split(' ')[0];
-  const chLabel = selectedChapter === 4 ? 'Chapter 4 · Analytical Exposition' : 'Chapter 5 · Narrative Text';
-
-  const questionsHtml = questions.map((q, qi) => {
-    const letters = ['A','B','C','D','E'];
-    const optHtml  = q.options.map((opt, oi) => `
-      <div class="q-option" id="opt_${qi}_${oi}" onclick="selectAnswer(${qi}, ${oi})">
-        <div class="q-option-letter">${letters[oi]}</div>
-        <div class="q-option-text">${opt.replace(/^[A-E]\.\s*/,'')}</div>
-      </div>`).join('');
-    return `
-      <div class="question-card" id="qcard_${qi}">
-        <div class="q-num">Question ${qi+1} of ${questions.length}</div>
-        <div class="q-text">${q.q}</div>
-        <div class="q-options">${optHtml}</div>
-        <div class="q-explanation" id="exp_${qi}">${q.explanation || ''}</div>
-      </div>`;
-  }).join('');
-
-  main.innerHTML = `
-    <div style="margin-bottom:16px;">
-      <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--text-dark);margin-bottom:4px;">Hey ${name}! 👋</div>
-      <div style="font-size:0.82rem;color:var(--text-muted);">${chLabel} · 10 questions · 1 pt each</div>
-    </div>
-    <div class="quiz-progress">
-      <div class="quiz-progress-bar-wrap"><div class="quiz-progress-bar" id="progressBar" style="width:0%"></div></div>
-      <div class="quiz-progress-label" id="progressLabel">0 / ${questions.length}</div>
-    </div>
-    ${questionsHtml}
-    <button class="btn-primary" id="submitBtn" onclick="submitQuiz()" disabled style="margin-top:8px;">
-      Submit Quiz
-    </button>`;
-}
-
-function selectAnswer(qi, oi) {
-  if (submitted) return;
-  // Deselect previous
-  const prev = answers[qi];
-  if (prev !== undefined) {
-    document.getElementById(`opt_${qi}_${prev}`).classList.remove('selected');
-    document.getElementById(`opt_${qi}_${prev}`).querySelector('.q-option-letter').style.background = '';
-    document.getElementById(`opt_${qi}_${prev}`).querySelector('.q-option-letter').style.color = '';
-  }
-  answers[qi] = oi;
-  document.getElementById(`opt_${qi}_${oi}`).classList.add('selected');
-
-  // Update progress
-  const answered = Object.keys(answers).length;
-  const pct = Math.round((answered / questions.length) * 100);
-  document.getElementById('progressBar').style.width = pct + '%';
-  document.getElementById('progressLabel').textContent = answered + ' / ' + questions.length;
-  document.getElementById('submitBtn').disabled = answered < questions.length;
-}
-
-// ── SUBMIT ───────────────────────────────────────────────────
-async function submitQuiz() {
-  submitted = true;
-  document.getElementById('submitBtn').disabled = true;
-
-  let score = 0;
-  const letters = ['A','B','C','D','E'];
-
-  questions.forEach((q, qi) => {
-    const chosen     = answers[qi];
-    const chosenLetter = letters[chosen];
-    const correct    = q.answer.toUpperCase().replace('.','').trim();
-    const isCorrect  = chosenLetter === correct;
-    if (isCorrect) score++;
-
-    // Color all options
-    q.options.forEach((_, oi) => {
-      const el = document.getElementById(`opt_${qi}_${oi}`);
-      el.style.pointerEvents = 'none';
-      if (letters[oi] === correct) {
-        el.classList.remove('selected'); el.classList.add('correct');
-      } else if (oi === chosen && !isCorrect) {
-        el.classList.remove('selected'); el.classList.add('wrong');
-      } else {
-        el.classList.remove('selected');
-        el.style.opacity = '0.5';
-      }
-    });
-    // Show explanation
-    document.getElementById(`exp_${qi}`).classList.add('show');
-  });
-
-  // Scroll to top of questions
-  window.scrollTo({top: document.querySelector('.quiz-progress').offsetTop - 20, behavior:'smooth'});
-
-  // Show result
-  showResult(score);
-}
-
-function showResult(score) {
-  const pct = score / questions.length;
-  const ringClass = pct >= 0.9 ? 'great' : pct >= 0.7 ? 'good' : pct >= 0.5 ? 'okay' : 'low';
-  const msg = pct >= 0.9 ? 'Outstanding! 🎉' : pct >= 0.7 ? 'Great job! 👏' : pct >= 0.5 ? 'Good effort! 💪' : 'Keep studying! 📚';
-
-  const resultDiv = document.createElement('div');
-  resultDiv.className = 'step-card';
-  resultDiv.id = 'resultCard';
-  resultDiv.innerHTML = `
-    <div class="result-header">
-      <div class="result-score-ring ${ringClass}">${score}/${questions.length}</div>
-      <div class="result-title">${msg}</div>
-      <div class="result-sub">${selectedStudent.nickname || selectedStudent.name.split(' ')[0]} · ${selectedChapter === 4 ? 'Chapter 4' : 'Chapter 5'}</div>
-      <div class="result-pts-badge">⚡ +${score} activeness points</div>
-    </div>
-    <div class="saving-box" id="savingBox">💾 Saving your score...</div>
-    <a href="quiz.html" style="display:block;text-decoration:none;margin-top:10px;">
-      <button class="btn-primary" style="background:var(--off-white);color:var(--purple);border:1.5px solid var(--border);">← Back to Quiz Menu</button>
-    </a>`;
-
-  document.getElementById('mainArea').prepend(resultDiv);
-  resultDiv.scrollIntoView({ behavior:'smooth', block:'start' });
-
-  saveScore(score);
-}
-
-// ── SAVE SCORE ───────────────────────────────────────────────
-async function saveScore(score) {
-  try {
-    // We need teacher credentials to save — use stored session
-    const u = sessionStorage.getItem('eq_tu') || '';
-    const p = sessionStorage.getItem('eq_tp') || '';
-
-    if (!u || !p) {
-      // No teacher session — show manual save instruction
-      document.getElementById('savingBox').className = 'saving-box err';
-      document.getElementById('savingBox').innerHTML = `⚠️ Score not auto-saved — no teacher session found. Please show this result to your teacher: <strong>${selectedStudent.name} scored ${score}/10 on Chapter ${selectedChapter} quiz.</strong>`;
-      return;
-    }
-
-    const res = await apiGet({
-      action: 'saveQuizScore',
-      username: u,
-      password: p,
-      className: selectedClass,
-      studentNo: selectedStudent.no,
-      chapter: selectedChapter,
-      score: score
-    });
-
-    if (res.success) {
-      document.getElementById('savingBox').className = 'saving-box saved';
-      document.getElementById('savingBox').innerHTML = `✅ Score saved! +${score} points added to your activeness record.`;
-    } else if (res.error === 'Already attempted') {
-      document.getElementById('savingBox').className = 'saving-box err';
-      document.getElementById('savingBox').innerHTML = `⚠️ Your previous attempt was already recorded. This result won't overwrite it.`;
-    } else {
-      throw new Error(res.error);
-    }
-  } catch(e) {
-    document.getElementById('savingBox').className = 'saving-box err';
-    document.getElementById('savingBox').innerHTML = `⚠️ Couldn't save automatically. Show this to your teacher: <strong>${selectedStudent.name} · Ch${selectedChapter} · Score: ${score}/10</strong>`;
-  }
-}
-
-// ── TEACHER RESULTS ──────────────────────────────────────────
-(function checkTeacherSession() {
-  const u = sessionStorage.getItem('eq_tu');
-  const p = sessionStorage.getItem('eq_tp');
-  if (u && p) {
-    apiGet({ action:'checkLogin', username:u, password:p })
-      .then(d => { if (d.ok) document.getElementById('teacherResultsBtn').style.display = 'block'; })
-      .catch(()=>{});
-  }
-})();
-
-async function showTeacherResults() {
-  const u = sessionStorage.getItem('eq_tu');
-  const p = sessionStorage.getItem('eq_tp');
-  const cls = document.getElementById('classSelect').value;
-  if (!cls) { alert('Please select a class first.'); return; }
-
-  const main = document.getElementById('mainArea');
-  main.innerHTML = `<div class="step-card gen-state"><div class="gen-icon">📊</div><div class="gen-title">Loading results...</div></div>`;
-
-  try {
-    const res = await apiGet({ action:'getQuizResults', username:u, password:p, className:cls });
-    if (!res.success) throw new Error(res.error);
-
-    const clsLabel = cls.replace('XE','X E-');
-    const chapters = res.quizCols.length > 0 ? res.quizCols : ['Quiz Ch4','Quiz Ch5'];
-
-    const colHeaders = chapters.map(c => `<th>${c.replace('Quiz ','')}</th>`).join('');
-    const rows = res.results.length === 0
-      ? `<tr><td colspan="${chapters.length + 2}" style="text-align:center;color:var(--text-muted);padding:24px;">No quiz attempts yet for ${clsLabel}</td></tr>`
-      : res.results.map((s, i) => {
-          const scoreCells = chapters.map(col => {
-            const sc = s.quizzes[col];
-            if (sc === undefined) return `<td><span class="score-chip score-none">—</span></td>`;
-            const cls2 = sc >= 9 ? 'score-great' : sc >= 7 ? 'score-good' : sc >= 5 ? 'score-okay' : 'score-low';
-            return `<td><span class="score-chip ${cls2}">${sc}/10</span></td>`;
-          }).join('');
-          return `<tr>
-            <td>${i+1}</td>
-            <td><strong>${s.nickname || s.name.split(' ').slice(0,2).join(' ')}</strong><br/><span style="font-size:0.75rem;color:var(--text-muted)">${s.name}</span></td>
-            ${scoreCells}
-          </tr>`;
-        }).join('');
-
-    main.innerHTML = `
-      <div class="step-card" style="padding:20px;">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
-          <div style="flex:1;">
-            <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:800;">📊 Quiz Results · ${clsLabel}</div>
-            <div style="font-size:0.78rem;color:var(--text-muted);margin-top:3px;">${res.results.length} student${res.results.length !== 1 ? 's' : ''} attempted</div>
-          </div>
-          <button onclick="location.reload()" style="padding:8px 16px;background:var(--off-white);border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-family:'IBM Plex Sans',sans-serif;color:var(--text-muted);">← Back</button>
-        </div>
-        <div class="results-table-wrap">
-          <table class="results-table">
-            <thead><tr><th>#</th><th>Student</th>${colHeaders}</tr></thead>
-            <tbody>${rows}</tbody>
-          </table>
-        </div>
-      </div>`;
-  } catch(e) {
-    main.innerHTML = `<div class="step-card" style="text-align:center;padding:40px;">
-      <div style="font-size:2rem;margin-bottom:12px;">😕</div>
-      <div style="font-size:0.95rem;color:var(--text-muted);">${e.message || 'Failed to load results'}</div>
-      <button onclick="location.reload()" style="margin-top:16px;padding:10px 20px;background:var(--purple);color:#fff;border:none;border-radius:10px;cursor:pointer;">Try Again</button>
-    </div>`;
-  }
-}
-</script>
-
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-<nav class="sidebar" id="sidebar">
-  <div class="sidebar-head">
-    <img class="sidebar-logo" src="logo.jpg" alt="Logo"/>
-    <div class="sidebar-head-text">
-      <div class="sidebar-head-title">English Quest</div>
-      <div class="sidebar-head-sub">SMA Negeri 6 Surakarta</div>
-    </div>
-    <button class="sidebar-close" onclick="closeSidebar()">&#x2715;</button>
-  </div>
-  <a href="index.html" class="sidebar-home-btn">
-    <div>
-      <div class="sidebar-home-btn-text">&#127968; Homepage</div>
-      <div class="sidebar-home-btn-sub">Back to main dashboard</div>
-    </div>
-  </a>
-  <div class="sidebar-divider"></div>
-  <div class="sidebar-section">
-    <div class="sidebar-section-label">&#128194; Documents</div>
-    <a href="lessons.html" class="sidebar-item" data-page="lessons">
-      <div class="sidebar-item-icon" style="background:rgba(124,58,237,0.2)">&#128209;</div>
-      <div class="sidebar-item-name">Lesson Materials</div>
-    </a>
-    <a href="session.html" class="sidebar-item" data-page="session">
-      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#127916;</div>
-      <div class="sidebar-item-name">Class Session</div>
-    </a>
-    <a href="assignments.html" class="sidebar-item" data-page="assignments">
-      <div class="sidebar-item-icon" style="background:rgba(59,130,246,0.2)">&#128203;</div>
-      <div class="sidebar-item-name">Assignments</div>
-    </a>
-    <a href="submission.html" class="sidebar-item" style="opacity:0.5;pointer-events:none;">
-      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#128221;</div>
-      <div class="sidebar-item-name">Submission</div>
-      <span class="sidebar-item-badge">SOON</span>
-    </a>
-  </div>
-  <div class="sidebar-divider"></div>
-  <div class="sidebar-section">
-    <div class="sidebar-section-label">&#128101; Student Data</div>
-    <a href="students.html" class="sidebar-item" data-page="students">
-      <div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">&#127891;</div>
-      <div class="sidebar-item-name">Student List</div>
-    </a>
-    <a href="attendance.html" class="sidebar-item" data-page="attendance">
-      <div class="sidebar-item-icon" style="background:rgba(20,184,166,0.2)">&#9989;</div>
-      <div class="sidebar-item-name">Attendance</div>
-    </a>
-    <a href="scores.html" class="sidebar-item" data-page="scores">
-      <div class="sidebar-item-icon" style="background:rgba(249,115,22,0.2)">&#127942;</div>
-      <div class="sidebar-item-name">Student Scores</div>
-    </a>
-    <a href="tasks.html" class="sidebar-item" data-page="tasks">
-      <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#128204;</div>
-      <div class="sidebar-item-name">Task Status</div>
-    </a>
-    <a href="activeness.html" class="sidebar-item" data-page="activeness">
-      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#9889;</div>
-      <div class="sidebar-item-name">Activeness</div>
-    </a>
-    <a href="strikes.html" class="sidebar-item" data-page="strikes">
-      <div class="sidebar-item-icon" style="background:rgba(220,38,38,0.2)">&#9888;&#65039;</div>
-      <div class="sidebar-item-name">Strikes</div>
-    </a>
-  </div>
-  <div class="sidebar-divider"></div>
-  <div class="sidebar-section">
-    <div class="sidebar-section-label">&#128226; Info</div>
-    <a href="summative.html" class="sidebar-item" data-page="summative">
-      <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#127919;</div>
-      <div class="sidebar-item-name">Summative</div>
-    </a>
-  </div>
-  <div class="sidebar-teacher">
-    <div class="sidebar-teacher-label">&#128273; Teacher Access</div>
-    <div id="sbTeacherLoggedOut">
-      <button style="width:100%;padding:10px;background:linear-gradient(135deg,#7C3AED,#5B21B6);color:#fff;font-family:inherit;font-weight:700;font-size:0.85rem;border:none;border-radius:10px;cursor:pointer;" onclick="closeSidebar();window.location.href='index.html';">Login as Teacher</button>
-    </div>
-    <div id="sbTeacherLoggedIn" style="display:none;">
-      <div class="sidebar-teacher-logged">&#127891; Logged in as Teacher
-        <span onclick="localStorage.removeItem('eq_tu');localStorage.removeItem('eq_tp');location.reload();">Logout</span>
-      </div>
-    </div>
-  </div>
-</nav>
 
 
 <script>
