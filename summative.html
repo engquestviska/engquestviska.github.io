@@ -81,6 +81,8 @@
     .btn-disagree.selected { outline:3px solid #7F1D1D; outline-offset:2px; }
     .stance-saved { margin-top:14px; padding:12px 16px; background:var(--green-soft); border:1.5px solid #6EE7B7; border-radius:12px; font-size:0.85rem; font-weight:600; color:#065F46; display:none; align-items:center; gap:8px; }
     .stance-saved.show { display:flex; }
+    .topic-from { font-size:0.78rem; color:var(--purple-light); font-family:'IBM Plex Mono',monospace; font-weight:600; margin-bottom:20px; padding:8px 12px; background:var(--purple-soft); border-radius:8px; }
+    .topic-from strong { color:var(--purple); }
     .btn-change { margin-top:10px; background:none; border:1.5px solid var(--border); color:var(--text-muted); padding:8px 16px; border-radius:10px; font-size:0.82rem; font-weight:600; cursor:pointer; font-family:inherit; }
     .btn-change:hover { border-color:var(--purple-mid); color:var(--purple); }
 
@@ -289,16 +291,22 @@
 
 <script>
 // ── CONFIG ───────────────────────────────────────────────────
-var SHEET_ID  = '1hzFDt3RyW1JuK3JJE7nuXAtVjiKG6btXD6RxEcHDYbk';
-var SHEET_TAB = 'Summative Topic';   // the shuffled sheet
-var API       = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+var SHEET_ID   = '1hzFDt3RyW1JuK3JJE7nuXAtVjiKG6btXD6RxEcHDYbk';
+var SHEET_TAB  = 'Summative Topic';
+var INNATE_TAB = 'InnateTopic';
+var API        = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+// Using gid= is more reliable than sheet name (avoids encoding issues)
+var SHEET_GID  = '710068729';   // Summative Topic tab
 var GSHEET_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID +
-                 '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_TAB);
+                 '/gviz/tq?tqx=out:json&gid=' + SHEET_GID;
+var INNATE_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID +
+                 '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(INNATE_TAB);
 
-var savedUser = localStorage.getItem('eq_tu') || '';
-var savedPass = localStorage.getItem('eq_tp') || '';
-var isTeacher = !!savedUser;
-var allData   = [];   // full sheet data loaded once
+var savedUser  = localStorage.getItem('eq_tu') || '';
+var savedPass  = localStorage.getItem('eq_tp') || '';
+var isTeacher  = !!savedUser;
+var allData    = [];   // Summative Topic sheet (shuffled topics)
+var innateData = [];   // InnateTopic sheet (original owners)
 var currentCls = 'XE1';
 
 if (isTeacher) { document.body.classList.add('teacher-active'); }
@@ -332,27 +340,58 @@ function apiGet(params) {
 }
 
 // ── LOAD SHEET DATA via GViz ─────────────────────────────────
+function parseGviz(text) {
+  var json = JSON.parse(text.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, ''));
+  return json.table.rows;
+}
+
 function loadSheetData() {
   return fetch(GSHEET_URL)
     .then(function(r){ return r.text(); })
     .then(function(text){
-      var json = JSON.parse(text.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, ''));
-      var rows = json.table.rows;
+      var rows = parseGviz(text);
       allData = [];
-      rows.forEach(function(row, idx){
+      rows.forEach(function(row){
         var c = row.c;
         if (!c || !c[0] || !c[0].v) return;
         allData.push({
-          cls:      (c[0] && c[0].v) ? c[0].v.toString().trim() : '',
+          cls:      c[0].v.toString().trim(),
           name:     (c[1] && c[1].v) ? c[1].v.toString().trim() : '',
           topic:    (c[2] && c[2].v) ? c[2].v.toString().trim() : '',
           stance:   (c[3] && c[3].v) ? c[3].v.toString().trim() : '',
-          revealed: (c[4] && c[4].v) ? c[4].v.toString().trim().toUpperCase() : 'FALSE',
-          rowIndex: idx + 2  // 1-indexed, +1 for header
+          revealed: (c[4] && c[4].v) ? c[4].v.toString().trim().toUpperCase() : 'FALSE'
         });
       });
       return allData;
     });
+}
+
+function loadInnateData() {
+  return fetch(INNATE_URL)
+    .then(function(r){ return r.text(); })
+    .then(function(text){
+      var rows = parseGviz(text);
+      innateData = [];
+      rows.forEach(function(row){
+        var c = row.c;
+        if (!c || !c[0] || !c[0].v) return;
+        innateData.push({
+          cls:   c[0].v.toString().trim(),
+          name:  (c[1] && c[1].v) ? c[1].v.toString().trim() : '',
+          topic: (c[2] && c[2].v) ? c[2].v.toString().trim() : ''
+        });
+      });
+      return innateData;
+    });
+}
+
+// Find who originally owns a topic sentence (for "topic from X" label)
+function findTopicOwner(cls, topicSentence) {
+  if (!topicSentence) return '';
+  var match = innateData.find(function(r){
+    return r.cls === cls && r.topic.trim() === topicSentence.trim();
+  });
+  return match ? match.name : '';
 }
 
 // ── POPULATE NAME DROPDOWN ───────────────────────────────────
@@ -428,6 +467,9 @@ function showTopicView(student, attNum) {
   // Clean topic — remove trailing (XX) number for display
   var displayTopic = student.topic;
 
+  // Find original owner from InnateTopic
+  var topicOwner = findTopicOwner(student.cls, student.topic);
+
   var stanceHtml = '';
   if (student.stance === 'Agree' || student.stance === 'Disagree') {
     var isAgree = student.stance === 'Agree';
@@ -457,6 +499,7 @@ function showTopicView(student, attNum) {
   body.innerHTML =
     '<div class="topic-revealed">' +
       '<div class="topic-sentence">' + displayTopic + '</div>' +
+      (topicOwner ? '<div class="topic-from">&#128100; Topic originally written by <strong>' + topicOwner + '</strong></div>' : '') +
       stanceHtml +
     '</div>';
 }
@@ -575,7 +618,7 @@ function renderTeacherTable() {
       '<tr>' +
         '<td class="td-num">' + String(attNum).padStart(2,'0') + '</td>' +
         '<td class="td-name">' + s.name + '</td>' +
-        '<td class="td-topic">' + (s.topic || '<em style="color:var(--text-muted)">No topic</em>') + '</td>' +
+        '<td class="td-topic">' + (s.topic || '<em style="color:var(--text-muted)">No topic</em>') + (findTopicOwner(s.cls, s.topic) ? '<div style="font-size:0.7rem;color:var(--purple-light);margin-top:3px;font-family:IBM Plex Mono,monospace;">from: ' + findTopicOwner(s.cls, s.topic) + '</div>' : '') + '</td>' +
         '<td>' + stance + '</td>' +
         '<td>' + reveal + '</td>' +
       '</tr>';
@@ -588,7 +631,7 @@ function toggleReveal(cls, attNum, revealed) {
                   ?.closest('.reveal-toggle')?.querySelector('.toggle-label');
   if (labelEl) labelEl.textContent = revealed ? 'On' : 'Off';
 
-  apiGet({ action: 'setReveal', cls: cls, attNum: attNum, revealed: revealed ? 'TRUE' : 'FALSE', sheetId: SHEET_ID, sheetTab: SHEET_TAB })
+  apiGet({ action: 'setReveal', username: savedUser, password: savedPass, cls: cls, attNum: attNum, revealed: revealed ? 'TRUE' : 'FALSE', sheetId: SHEET_ID, sheetTab: SHEET_TAB })
     .then(function(res){
       if (res.success) {
         showToast(revealed ? 'Topic revealed!' : 'Topic hidden.');
@@ -601,7 +644,7 @@ function toggleReveal(cls, attNum, revealed) {
 }
 
 // ── INIT ─────────────────────────────────────────────────────
-loadSheetData().then(function(){
+Promise.all([loadSheetData(), loadInnateData()]).then(function(){
   initTeacherPanel();
 }).catch(function(){
   initTeacherPanel(); // still show panel, will retry on refresh
