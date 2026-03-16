@@ -3,110 +3,157 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Summative · English Quest</title>
+  <title>Summative Topic · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --purple:#7C3AED; --purple-light:#A78BFA; --purple-soft:#EDE9FE;
-      --white:#fff; --off-white:#F9F7FF; --text-dark:#1E1040;
-      --text-muted:#6B5B95; --border:#E5DEFF; --accent:#F59E0B;
-      --red:#DC2626; --red-soft:#FEE2E2; --green:#10B981;
+      --purple:#7C3AED; --purple-light:#A78BFA; --purple-soft:#EDE9FE; --purple-mid:#C4B5FD;
+      --white:#fff; --off-white:#F9F7FF; --text-dark:#1E1040; --text-muted:#6B5B95; --border:#E5DEFF;
+      --accent:#F59E0B; --green:#10B981; --green-soft:#D1FAE5; --red:#DC2626; --red-soft:#FEE2E2;
     }
-    body { font-family:'IBM Plex Sans',sans-serif; background:var(--off-white); color:var(--text-dark); min-height:100vh; display:flex; flex-direction:column; }
+    body { font-family:'IBM Plex Sans',sans-serif; background:var(--off-white); color:var(--text-dark); min-height:100vh; }
 
     /* HEADER */
-    header { background:linear-gradient(135deg,#DC2626 0%,#991B1B 50%,#7F1D1D 100%); padding:40px 20px 56px; text-align:center; position:relative; overflow:hidden; }
-    header::before { content:''; position:absolute; inset:0; background-image:radial-gradient(circle,rgba(255,255,255,0.07) 1px,transparent 1px); background-size:28px 28px; pointer-events:none; }
-    .back-btn { position:absolute; top:20px; left:20px; z-index:2; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); color:#fff; font-family:'IBM Plex Sans',sans-serif; font-size:0.88rem; font-weight:600; padding:8px 18px; border-radius:999px; cursor:pointer; text-decoration:none; }
-    .pulse-dot { display:inline-block; width:10px; height:10px; background:#FCA5A5; border-radius:50%; margin-right:8px; animation:pulse 1.4s ease-in-out infinite; }
-    @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(252,165,165,0.7)} 50%{box-shadow:0 0 0 10px rgba(252,165,165,0)} }
-    header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.8rem,5vw,2.8rem); font-weight:800; color:#fff; position:relative; z-index:1; margin-bottom:8px; }
-    header h1 span { color:#FCA5A5; font-style:italic; }
-    .header-sub { color:rgba(255,255,255,0.7); font-size:0.95rem; position:relative; z-index:1; }
+    header { background:linear-gradient(135deg,#7C3AED 0%,#5B21B6 50%,#4C1D95 100%); padding:36px 24px 52px; text-align:center; position:relative; overflow:hidden; }
+    header::before { content:''; position:absolute; inset:0; background-image:radial-gradient(circle,rgba(255,255,255,0.08) 1px,transparent 1px); background-size:28px 28px; pointer-events:none; }
+    .back-btn { position:absolute; top:20px; left:20px; z-index:2; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); color:#fff; font-size:0.88rem; font-weight:600; padding:8px 18px; border-radius:999px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:6px; font-family:inherit; }
+    .back-btn:hover { background:rgba(255,255,255,0.25); }
+    .logout-btn { position:absolute; top:20px; right:68px; z-index:2; background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.25); color:rgba(255,255,255,0.85); font-size:0.78rem; font-weight:600; padding:6px 14px; border-radius:999px; cursor:pointer; font-family:inherit; display:none; align-items:center; gap:5px; }
+    .logout-btn:hover { background:rgba(255,255,255,0.22); }
+    .teacher-active .logout-btn { display:flex; }
+    header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.8rem,5vw,2.8rem); font-weight:800; color:#fff; position:relative; z-index:1; }
+    header h1 span { color:var(--accent); font-style:italic; }
+    .header-sub { color:rgba(255,255,255,0.75); font-size:0.95rem; margin-top:8px; position:relative; z-index:1; }
     .wave { display:block; width:100%; margin-top:-2px; }
 
     /* MAIN */
-    main { flex:1; max-width:680px; margin:0 auto; padding:28px 16px 80px; width:100%; }
+    main { max-width:720px; margin:0 auto; padding:32px 16px 80px; }
 
-    /* LOADING / EMPTY */
-    .state-box { background:var(--white); border:1.5px solid var(--border); border-radius:20px; padding:48px 24px; text-align:center; }
-    .state-icon { font-size:3rem; margin-bottom:16px; }
-    .state-title { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; margin-bottom:8px; }
-    .state-sub { font-size:0.88rem; color:var(--text-muted); line-height:1.5; }
-    .spinner { display:inline-block; width:28px; height:28px; border:3px solid var(--border); border-top-color:var(--red); border-radius:50%; animation:spin 0.8s linear infinite; margin-bottom:12px; }
+    /* ── LOGIN WALL ────────────────────────────────────────────── */
+    #loginWall { background:var(--white); border:1.5px solid var(--border); border-radius:24px; padding:40px 32px; text-align:center; }
+    .lw-icon { font-size:3rem; margin-bottom:16px; }
+    .lw-title { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:800; margin-bottom:8px; }
+    .lw-sub { font-size:0.9rem; color:var(--text-muted); margin-bottom:28px; line-height:1.6; }
+    .lw-form { display:flex; flex-direction:column; gap:12px; max-width:360px; margin:0 auto; }
+    .lw-label { font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; display:block; text-align:left; margin-bottom:5px; }
+    .lw-select, .lw-input { width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:12px; font-family:'IBM Plex Sans',sans-serif; font-size:0.95rem; color:var(--text-dark); background:var(--off-white); outline:none; }
+    .lw-select:focus, .lw-input:focus { border-color:var(--purple-light); background:#fff; }
+    .lw-btn { width:100%; padding:14px; background:linear-gradient(135deg,#7C3AED,#5B21B6); color:#fff; border:none; border-radius:14px; font-family:'IBM Plex Sans',sans-serif; font-size:1rem; font-weight:700; cursor:pointer; transition:opacity 0.2s; margin-top:4px; }
+    .lw-btn:hover { opacity:0.88; }
+    .lw-btn:disabled { opacity:0.5; cursor:not-allowed; }
+    .lw-err { background:var(--red-soft); border:1.5px solid #FCA5A5; border-radius:10px; padding:10px 14px; font-size:0.82rem; color:#991B1B; display:none; text-align:left; }
+    .lw-err.show { display:block; }
+    .lw-hint { font-size:0.78rem; color:var(--text-muted); margin-top:6px; text-align:left; }
+
+    /* ── TOPIC CARD ────────────────────────────────────────────── */
+    #topicView { display:none; }
+    .student-greeting { margin-bottom:20px; }
+    .greeting-label { font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:4px; }
+    .greeting-name { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:800; }
+    .greeting-class { font-size:0.85rem; color:var(--purple-light); font-family:'IBM Plex Mono',monospace; font-weight:600; }
+
+    .topic-card { background:var(--white); border:1.5px solid var(--border); border-radius:24px; overflow:hidden; }
+    .topic-card-header { background:linear-gradient(135deg,#7C3AED,#4C1D95); padding:20px 24px; }
+    .topic-card-label { font-size:0.7rem; font-weight:700; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:0.1em; font-family:'IBM Plex Mono',monospace; margin-bottom:6px; }
+    .topic-card-title { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:800; color:#fff; }
+
+    /* LOCKED STATE */
+    .topic-locked { padding:40px 24px; text-align:center; }
+    .lock-icon { font-size:3rem; margin-bottom:14px; }
+    .lock-title { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; color:var(--text-muted); margin-bottom:6px; }
+    .lock-sub { font-size:0.85rem; color:var(--purple-light); }
+
+    /* REVEALED STATE */
+    .topic-revealed { padding:28px 24px; }
+    .topic-sentence { font-size:1.05rem; font-weight:600; line-height:1.6; color:var(--text-dark); margin-bottom:8px; }
+    .topic-number { font-size:0.75rem; font-family:'IBM Plex Mono',monospace; color:var(--purple-light); font-weight:600; margin-bottom:24px; }
+    .stance-section { border-top:1.5px solid var(--border); padding-top:20px; }
+    .stance-label { font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:12px; }
+    .stance-question { font-size:0.95rem; font-weight:600; margin-bottom:16px; line-height:1.5; }
+    .stance-btns { display:flex; gap:10px; }
+    .btn-agree { flex:1; padding:14px; background:var(--green); color:#fff; border:none; border-radius:14px; font-family:'IBM Plex Sans',sans-serif; font-size:0.95rem; font-weight:700; cursor:pointer; transition:opacity 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .btn-agree:hover { opacity:0.88; }
+    .btn-disagree { flex:1; padding:14px; background:var(--red); color:#fff; border:none; border-radius:14px; font-family:'IBM Plex Sans',sans-serif; font-size:0.95rem; font-weight:700; cursor:pointer; transition:opacity 0.2s; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .btn-disagree:hover { opacity:0.88; }
+    .btn-agree.selected { outline:3px solid #065F46; outline-offset:2px; }
+    .btn-disagree.selected { outline:3px solid #7F1D1D; outline-offset:2px; }
+    .stance-saved { margin-top:14px; padding:12px 16px; background:var(--green-soft); border:1.5px solid #6EE7B7; border-radius:12px; font-size:0.85rem; font-weight:600; color:#065F46; display:none; align-items:center; gap:8px; }
+    .stance-saved.show { display:flex; }
+    .btn-change { margin-top:10px; background:none; border:1.5px solid var(--border); color:var(--text-muted); padding:8px 16px; border-radius:10px; font-size:0.82rem; font-weight:600; cursor:pointer; font-family:inherit; }
+    .btn-change:hover { border-color:var(--purple-mid); color:var(--purple); }
+
+    /* SPINNER */
+    .spinner-sm { width:16px; height:16px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; display:inline-block; vertical-align:middle; }
     @keyframes spin { to{transform:rotate(360deg)} }
 
-    /* EXAM CARD */
-    .exam-card { background:var(--white); border:1.5px solid var(--border); border-radius:24px; overflow:hidden; margin-bottom:20px; animation:slideUp 0.4s cubic-bezier(0.34,1.2,0.64,1); }
-    @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+    /* ── TEACHER PANEL ─────────────────────────────────────────── */
+    #teacherPanel { display:none; margin-bottom:32px; }
+    #teacherPanel.visible { display:block; }
+    .tp-header { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+    .tp-badge { background:linear-gradient(135deg,#7C3AED,#5B21B6); color:#fff; font-family:'IBM Plex Mono',monospace; font-size:0.75rem; font-weight:700; padding:5px 14px; border-radius:999px; letter-spacing:0.05em; }
+    .tp-title { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:800; }
+    .tp-line { flex:1; height:1.5px; background:var(--border); }
 
-    .exam-header { background:linear-gradient(135deg,#DC2626,#991B1B); padding:24px 24px 20px; }
-    .exam-header-top { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
-    .exam-live-badge { font-size:0.68rem; font-weight:800; color:#FCA5A5; background:rgba(0,0,0,0.2); padding:3px 10px; border-radius:999px; text-transform:uppercase; letter-spacing:0.1em; font-family:'IBM Plex Mono',monospace; display:flex; align-items:center; gap:5px; }
-    .exam-title { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:800; color:#fff; line-height:1.2; margin-bottom:6px; }
-    .exam-classes { display:flex; flex-wrap:wrap; gap:6px; }
-    .exam-cls-chip { font-size:0.72rem; font-weight:700; background:rgba(255,255,255,0.2); color:#fff; padding:3px 10px; border-radius:999px; font-family:'IBM Plex Mono',monospace; border:1px solid rgba(255,255,255,0.2); }
+    /* Class tabs */
+    .cls-tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; }
+    .cls-tab { padding:7px 16px; border-radius:999px; border:1.5px solid var(--border); background:var(--white); font-size:0.8rem; font-weight:700; font-family:'IBM Plex Mono',monospace; color:var(--text-muted); cursor:pointer; transition:all 0.15s; }
+    .cls-tab:hover { border-color:var(--purple-mid); color:var(--purple); }
+    .cls-tab.active { background:var(--purple); border-color:var(--purple); color:#fff; }
 
-    /* Countdown big */
-    .countdown-box { background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.15); border-radius:16px; padding:16px 20px; margin-top:16px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
-    .countdown-label { font-size:0.72rem; font-weight:700; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; }
-    .countdown-val { font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:800; color:#fff; }
-    .countdown-val.urgent { color:#FCA5A5; animation:blink 1s ease-in-out infinite; }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.6} }
-    .countdown-date { text-align:right; }
-    .countdown-date-val { font-size:0.9rem; font-weight:700; color:rgba(255,255,255,0.9); }
-    .countdown-date-day { font-size:0.75rem; color:rgba(255,255,255,0.6); margin-top:2px; }
+    /* Stats row */
+    .tp-stats { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+    .tp-stat { background:var(--white); border:1.5px solid var(--border); border-radius:14px; padding:12px 18px; flex:1; min-width:100px; }
+    .tp-stat-num { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:800; }
+    .tp-stat-label { font-size:0.72rem; color:var(--text-muted); font-family:'IBM Plex Mono',monospace; font-weight:600; margin-top:2px; }
+    .tp-stat.green .tp-stat-num { color:var(--green); }
+    .tp-stat.red .tp-stat-num { color:var(--red); }
+    .tp-stat.purple .tp-stat-num { color:var(--purple); }
 
-    /* Info sections */
-    .info-section { padding:20px 24px; border-bottom:1.5px solid var(--border); }
-    .info-section:last-child { border-bottom:none; }
-    .info-label { font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:10px; display:flex; align-items:center; gap:6px; }
-    .info-content { font-size:0.95rem; color:var(--text-dark); line-height:1.6; font-weight:500; }
+    /* Table */
+    .tp-table-wrap { background:var(--white); border:1.5px solid var(--border); border-radius:20px; overflow:hidden; }
+    table { width:100%; border-collapse:collapse; }
+    th { background:var(--off-white); padding:11px 16px; text-align:left; font-size:0.7rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; border-bottom:1.5px solid var(--border); }
+    td { padding:12px 16px; font-size:0.88rem; border-bottom:1px solid var(--border); vertical-align:top; }
+    tr:last-child td { border-bottom:none; }
+    tr:hover td { background:var(--off-white); }
+    .td-num { color:var(--text-muted); font-family:'IBM Plex Mono',monospace; font-size:0.78rem; font-weight:600; width:36px; }
+    .td-name { font-weight:600; }
+    .td-topic { color:var(--text-muted); font-size:0.82rem; line-height:1.4; max-width:280px; }
+    .badge-agree { background:var(--green-soft); color:#065F46; font-size:0.72rem; font-weight:700; padding:3px 10px; border-radius:999px; font-family:'IBM Plex Mono',monospace; white-space:nowrap; }
+    .badge-disagree { background:var(--red-soft); color:#991B1B; font-size:0.72rem; font-weight:700; padding:3px 10px; border-radius:999px; font-family:'IBM Plex Mono',monospace; white-space:nowrap; }
+    .badge-pending { background:var(--off-white); color:var(--text-muted); font-size:0.72rem; font-weight:700; padding:3px 10px; border-radius:999px; font-family:'IBM Plex Mono',monospace; white-space:nowrap; border:1px solid var(--border); }
 
-    /* Study tips formatting */
-    .study-item { display:flex; gap:10px; align-items:flex-start; padding:8px 0; border-bottom:1px solid var(--border); }
-    .study-item:last-child { border-bottom:none; }
-    .study-bullet { width:6px; height:6px; border-radius:50%; background:var(--red); flex-shrink:0; margin-top:7px; }
+    /* Reveal toggle */
+    .reveal-toggle { display:flex; align-items:center; gap:8px; }
+    .toggle-switch { position:relative; width:36px; height:20px; flex-shrink:0; }
+    .toggle-switch input { opacity:0; width:0; height:0; }
+    .toggle-slider { position:absolute; inset:0; background:#CBD5E1; border-radius:999px; cursor:pointer; transition:background 0.2s; }
+    .toggle-slider::before { content:''; position:absolute; width:14px; height:14px; left:3px; top:3px; background:#fff; border-radius:50%; transition:transform 0.2s; }
+    .toggle-switch input:checked + .toggle-slider { background:var(--green); }
+    .toggle-switch input:checked + .toggle-slider::before { transform:translateX(16px); }
+    .toggle-label { font-size:0.72rem; color:var(--text-muted); font-weight:600; font-family:'IBM Plex Mono',monospace; }
 
-    /* Tip box */
-    .tip-box { background:linear-gradient(135deg,rgba(124,58,237,0.06),rgba(124,58,237,0.02)); border:1.5px solid var(--purple-soft); border-radius:16px; padding:16px 20px; margin-top:16px; display:flex; gap:12px; align-items:flex-start; }
-    .tip-box-icon { font-size:1.3rem; flex-shrink:0; }
-    .tip-box-text { font-size:0.85rem; color:var(--text-muted); line-height:1.5; }
-    .tip-box-text strong { color:var(--purple); }
+    /* Refresh btn */
+    .tp-refresh { background:none; border:1.5px solid var(--border); color:var(--text-muted); padding:8px 14px; border-radius:10px; font-size:0.82rem; font-weight:600; cursor:pointer; font-family:inherit; display:flex; align-items:center; gap:6px; margin-bottom:16px; }
+    .tp-refresh:hover { border-color:var(--purple-mid); color:var(--purple); }
 
-    /* Teacher panel */
-    .teacher-panel { background:var(--white); border:1.5px solid var(--border); border-radius:20px; padding:24px; margin-bottom:20px; display:none; }
-    .teacher-panel.visible { display:block; animation:slideUp 0.3s ease; }
-    .tp-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; margin-bottom:4px; }
-    .tp-sub { font-size:0.78rem; color:var(--text-muted); margin-bottom:20px; }
-    .field { margin-bottom:14px; }
-    .field label { display:block; font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:7px; }
-    .field input, .field textarea { width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:12px; font-family:'IBM Plex Sans',sans-serif; font-size:0.95rem; outline:none; background:var(--off-white); color:var(--text-dark); }
-    .field input:focus, .field textarea:focus { border-color:var(--purple-light); }
-    .field textarea { resize:none; height:100px; }
-    .cls-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; }
-    .cls-btn { padding:8px 6px; border:1.5px solid var(--border); border-radius:10px; font-size:0.78rem; font-weight:700; cursor:pointer; background:var(--off-white); color:var(--text-muted); font-family:'IBM Plex Mono',monospace; text-align:center; transition:all 0.15s; }
-    .cls-btn.selected { background:var(--red-soft); border-color:#FCA5A5; color:var(--red); }
-    .tp-btns { display:flex; gap:8px; flex-wrap:wrap; margin-top:18px; }
-    .btn-publish { flex:1; padding:13px; background:linear-gradient(135deg,var(--red),#991B1B); color:#fff; font-family:'IBM Plex Sans',sans-serif; font-weight:700; font-size:0.92rem; border:none; border-radius:12px; cursor:pointer; }
-    .btn-clear { padding:13px 16px; background:var(--off-white); border:1.5px solid var(--border); border-radius:12px; font-family:'IBM Plex Sans',sans-serif; cursor:pointer; color:var(--text-muted); font-size:0.92rem; }
+    /* TOAST */
+    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:#1E1040; color:#fff; padding:10px 22px; border-radius:999px; font-size:0.88rem; font-weight:600; z-index:999; opacity:0; transition:all 0.3s; pointer-events:none; white-space:nowrap; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-    /* Toast */
-    .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--text-dark); color:#fff; padding:12px 24px; border-radius:999px; font-size:0.9rem; font-weight:500; transition:transform 0.3s; z-index:999; white-space:nowrap; pointer-events:none; }
-    .toast.show { transform:translateX(-50%) translateY(0); }
-    .toast.ok { background:#059669; }
-    .toast.err { background:var(--red); }
+    footer { background:#1E1040; color:rgba(255,255,255,0.5); text-align:center; padding:20px; font-size:0.85rem; }
+    footer strong { color:#A78BFA; }
 
-    footer { background:var(--text-dark); color:rgba(255,255,255,0.5); text-align:center; padding:20px; font-size:0.85rem; }
-    footer strong { color:var(--purple-light); }
+    @media(max-width:600px) {
+      .stance-btns { flex-direction:column; }
+      .tp-stats { flex-direction:column; }
+      td, th { padding:10px 12px; }
+      .td-topic { max-width:160px; }
+    }
 
-    .logout-btn { position: absolute; top: 20px; right: 20px; z-index: 2; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.85); font-size: 0.78rem; font-weight: 600; padding: 6px 14px; border-radius: 999px; cursor: pointer; font-family: inherit; display: none; align-items: center; gap: 5px; }
-    .logout-btn:hover { background: rgba(255,255,255,0.22); }
-    .teacher-active .logout-btn { display: flex; }
-
-    /* ── SIDEBAR (shared) ───────────────────────────────────── */
+    /* ── SIDEBAR ──────────────────────────────────────────────── */
     .hamburger { position:absolute; top:20px; right:20px; z-index:10; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); border-radius:10px; width:40px; height:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; cursor:pointer; padding:0; }
     .hamburger span { display:block; width:18px; height:2px; background:#fff; border-radius:999px; transition:all 0.3s; }
     .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
@@ -125,11 +172,10 @@
     .sidebar-section { padding:14px 16px 4px; }
     .sidebar-section-label { font-size:0.65rem; font-weight:700; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.12em; font-family:'IBM Plex Mono',monospace; padding:0 4px; margin-bottom:6px; }
     .sidebar-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; text-decoration:none; transition:background 0.15s; margin-bottom:2px; }
-    .sidebar-item:hover, .sidebar-item:active { background:rgba(255,255,255,0.08); }
+    .sidebar-item:hover { background:rgba(255,255,255,0.08); }
     .sidebar-item.active { background:rgba(255,255,255,0.12); border-left:3px solid #A78BFA; padding-left:9px; }
     .sidebar-item-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0; }
     .sidebar-item-name { font-size:0.88rem; font-weight:600; color:#fff; flex:1; }
-    .sidebar-item-badge { font-size:0.6rem; font-weight:800; padding:2px 7px; border-radius:999px; font-family:'IBM Plex Mono',monospace; background:#F59E0B; color:#fff; }
     .sidebar-divider { height:1px; background:rgba(255,255,255,0.07); margin:8px 16px; }
     .sidebar-teacher { margin:12px 16px 20px; background:rgba(124,58,237,0.2); border:1px solid rgba(124,58,237,0.35); border-radius:14px; padding:12px 14px; }
     .sidebar-teacher-label { font-size:0.68rem; font-weight:700; color:#A78BFA; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
@@ -139,255 +185,430 @@
     .sidebar-home-btn:hover { background:rgba(255,255,255,0.1); }
     .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
     .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
-
   </style>
 </head>
 <body data-page="summative">
 
+<div class="toast" id="toast"></div>
+
+<!-- HEADER -->
 <header>
   <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
-  
+  <a class="back-btn" href="index.html">&#8592; Back</a>
   <button class="logout-btn" onclick="doLogout()">&#128274; Logout</button>
-  <a class="back-btn" href="index.html">← Back</a>
-  <h1><span class="pulse-dot"></span>Summative <span>Assessments</span></h1>
-  <p class="header-sub">Exam schedule, topics & what to study · English Quest</p>
+  <h1>Summative <span>Topic</span></h1>
+  <p class="header-sub">English Quest · SMA Negeri 6 Surakarta</p>
 </header>
 
 <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
-  <path fill="#7F1D1D" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
+  <path fill="#4C1D95" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
   <path fill="#F9F7FF" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
 </svg>
 
 <main>
 
   <!-- TEACHER PANEL -->
-  <div class="teacher-panel" id="teacherPanel">
-    <div class="tp-title">📝 Manage Summative Info</div>
-    <div class="tp-sub">Set the exam details. Students will see this on this page and as a sticky banner on the homepage.</div>
-    <div class="field">
-      <label>Exam Date</label>
-      <input type="date" id="tpDate"/>
+  <div id="teacherPanel">
+    <div class="tp-header">
+      <div class="tp-badge">TEACHER</div>
+      <div class="tp-title">Topic Overview</div>
+      <div class="tp-line"></div>
     </div>
-    <div class="field">
-      <label>Exam Title / Topic</label>
-      <input type="text" id="tpTitle" placeholder="e.g. Chapter 4 & 5 — Present Perfect"/>
-    </div>
-    <div class="field">
-      <label>What to Study (one item per line)</label>
-      <textarea id="tpStudy" placeholder="Grammar: Present Perfect Tense&#10;Vocabulary Box words (Chapter 4 & 5)&#10;Reading text: The Journey&#10;Writing: Recount text structure"></textarea>
-    </div>
-    <div class="field">
-      <label>Which Classes</label>
-      <div class="cls-grid">
-        <div class="cls-btn" data-cls="XE1"  onclick="toggleCls(this)">X E-1</div>
-        <div class="cls-btn" data-cls="XE4"  onclick="toggleCls(this)">X E-4</div>
-        <div class="cls-btn" data-cls="XE5"  onclick="toggleCls(this)">X E-5</div>
-        <div class="cls-btn" data-cls="XE6"  onclick="toggleCls(this)">X E-6</div>
-        <div class="cls-btn" data-cls="XE7"  onclick="toggleCls(this)">X E-7</div>
-        <div class="cls-btn" data-cls="XE8"  onclick="toggleCls(this)">X E-8</div>
-        <div class="cls-btn" data-cls="XE9"  onclick="toggleCls(this)">X E-9</div>
-        <div class="cls-btn" data-cls="XE10" onclick="toggleCls(this)">X E-10</div>
-        <div class="cls-btn" data-cls="XE11" onclick="toggleCls(this)">X E-11</div>
-      </div>
-    </div>
-    <div class="tp-btns">
-      <button class="btn-clear" onclick="clearSumm()">🗑 Clear</button>
-      <button class="btn-publish" onclick="saveSumm()">💾 Save & Publish</button>
+    <div class="cls-tabs" id="clsTabs"></div>
+    <div class="tp-stats" id="tpStats"></div>
+    <button class="tp-refresh" onclick="loadTeacherData()">&#8635; Refresh</button>
+    <div class="tp-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Topic</th>
+            <th>Stance</th>
+            <th>Reveal</th>
+          </tr>
+        </thead>
+        <tbody id="tpTableBody"></tbody>
+      </table>
     </div>
   </div>
 
-  <!-- EXAM DISPLAY -->
-  <div id="examContent">
-    <div class="state-box">
-      <div class="spinner"></div>
-      <div class="state-title">Loading exam info...</div>
+  <!-- LOGIN WALL -->
+  <div id="loginWall">
+    <div class="lw-icon">&#128274;</div>
+    <div class="lw-title">Check Your Summative Topic</div>
+    <div class="lw-sub">Select your class and name, then enter your student number to unlock your topic.</div>
+    <div class="lw-form">
+      <div>
+        <label class="lw-label">Class</label>
+        <select class="lw-select" id="lwClass" onchange="populateNames()">
+          <option value="">— Select class —</option>
+          <option>XE1</option><option>XE4</option><option>XE5</option>
+          <option>XE6</option><option>XE7</option><option>XE8</option>
+          <option>XE9</option><option>XE10</option><option>XE11</option>
+        </select>
+      </div>
+      <div>
+        <label class="lw-label">Your Name</label>
+        <select class="lw-select" id="lwName" disabled>
+          <option value="">— Select class first —</option>
+        </select>
+      </div>
+      <div>
+        <label class="lw-label">Student Number (Absen)</label>
+        <input class="lw-input" type="number" id="lwPin" placeholder="e.g. 7" min="1" max="36" onkeydown="if(event.key==='Enter')doStudentLogin()"/>
+        <div class="lw-hint">Your student number is your PIN. Check your class list if unsure.</div>
+      </div>
+      <div class="lw-err" id="lwErr"></div>
+      <button class="lw-btn" id="lwBtn" onclick="doStudentLogin()">&#128275; Unlock My Topic</button>
+    </div>
+  </div>
+
+  <!-- TOPIC VIEW -->
+  <div id="topicView">
+    <div class="student-greeting">
+      <div class="greeting-label">Welcome back</div>
+      <div class="greeting-name" id="greetName"></div>
+      <div class="greeting-class" id="greetClass"></div>
+    </div>
+    <div class="topic-card">
+      <div class="topic-card-header">
+        <div class="topic-card-label">&#127919; Your Summative Writing Topic</div>
+        <div class="topic-card-title">Analytical Exposition Text</div>
+      </div>
+      <div id="topicBody"></div>
+    </div>
+    <div style="margin-top:12px;">
+      <button class="btn-change" onclick="switchStudent()">&#8592; Look up a different student</button>
     </div>
   </div>
 
 </main>
 
 <footer>© 2025 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
-<div class="toast" id="toast"></div>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
-let isTeacher = false;
-let savedUser = localStorage.getItem('eq_tu') || '';
-let savedPass = localStorage.getItem('eq_tp') || '';
-let countdownInterval = null;
-let currentData = null;
+// ── CONFIG ───────────────────────────────────────────────────
+var SHEET_ID  = '1hzFDt3RyW1JuK3JJE7nuXAtVjiKG6btXD6RxEcHDYbk';
+var SHEET_TAB = 'Summative Topic';   // the shuffled sheet
+var API       = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+var GSHEET_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID +
+                 '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(SHEET_TAB);
 
-async function apiGet(params) {
-  const url = API + '?' + new URLSearchParams(params);
-  try { const r = await fetch(url); if (r.ok) return await r.json(); } catch(e) {}
-  return new Promise((resolve, reject) => {
-    const cb = 'cb_'+Date.now()+'_'+Math.random().toString(36).slice(2);
-    const p  = {...params, callback:cb, _t:Date.now()};
-    const s  = document.createElement('script'); s.async = true;
-    const t  = setTimeout(()=>{cleanup();reject(new Error('Timeout'));},15000);
-    function cleanup(){delete window[cb];try{if(s.parentNode)s.parentNode.removeChild(s);}catch(e){}clearTimeout(t);}
-    window[cb] = d=>{cleanup();resolve(d);};
-    s.onerror  = ()=>{cleanup();reject(new Error('Network error'));};
-    s.src = API+'?'+new URLSearchParams(p);
-    (document.head||document.body).appendChild(s);
+var savedUser = localStorage.getItem('eq_tu') || '';
+var savedPass = localStorage.getItem('eq_tp') || '';
+var isTeacher = !!savedUser;
+var allData   = [];   // full sheet data loaded once
+var currentCls = 'XE1';
+
+if (isTeacher) { document.body.classList.add('teacher-active'); }
+
+// ── UTILS ────────────────────────────────────────────────────
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+
+function doLogout() {
+  localStorage.removeItem('eq_tu'); localStorage.removeItem('eq_tp');
+  window.location.href = 'index.html';
+}
+
+function apiGet(params) {
+  var url = API + '?';
+  var parts = [];
+  for (var k in params) parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
+  url += parts.join('&');
+  return new Promise(function(resolve, reject) {
+    var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    var s = document.createElement('script');
+    var timer = setTimeout(function(){ delete window[cb]; try{document.head.removeChild(s);}catch(e){} reject(new Error('Timeout')); }, 12000);
+    window[cb] = function(d){ clearTimeout(timer); delete window[cb]; try{document.head.removeChild(s);}catch(e){} resolve(d); };
+    s.onerror = function(){ clearTimeout(timer); delete window[cb]; reject(new Error('Network error')); };
+    s.src = url + '&callback=' + cb;
+    document.head.appendChild(s);
   });
 }
 
-// Check teacher session
-if (savedUser && savedPass) {
-  apiGet({action:'checkLogin', username:savedUser, password:savedPass})
-    .then(d => { if (d.ok) { isTeacher=true; document.getElementById('teacherPanel').classList.add('visible'); } })
-    .catch(()=>{});
+// ── LOAD SHEET DATA via GViz ─────────────────────────────────
+function loadSheetData() {
+  return fetch(GSHEET_URL)
+    .then(function(r){ return r.text(); })
+    .then(function(text){
+      var json = JSON.parse(text.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, ''));
+      var rows = json.table.rows;
+      allData = [];
+      rows.forEach(function(row, idx){
+        var c = row.c;
+        if (!c || !c[0] || !c[0].v) return;
+        allData.push({
+          cls:      (c[0] && c[0].v) ? c[0].v.toString().trim() : '',
+          name:     (c[1] && c[1].v) ? c[1].v.toString().trim() : '',
+          topic:    (c[2] && c[2].v) ? c[2].v.toString().trim() : '',
+          stance:   (c[3] && c[3].v) ? c[3].v.toString().trim() : '',
+          revealed: (c[4] && c[4].v) ? c[4].v.toString().trim().toUpperCase() : 'FALSE',
+          rowIndex: idx + 2  // 1-indexed, +1 for header
+        });
+      });
+      return allData;
+    });
 }
 
-// Load summative
-async function loadSummative() {
-  try {
-    const res = await apiGet({action:'getSummative'});
-    if (res.exists && res.data) {
-      currentData = res.data;
-      renderExam(res.data);
-      prefillTeacherPanel(res.data);
-    } else {
-      renderEmpty();
-    }
-  } catch(e) { renderEmpty(); }
-}
-loadSummative();
+// ── POPULATE NAME DROPDOWN ───────────────────────────────────
+function populateNames() {
+  var cls = document.getElementById('lwClass').value;
+  var sel = document.getElementById('lwName');
+  sel.innerHTML = '<option value="">— Select your name —</option>';
+  if (!cls) { sel.disabled = true; return; }
 
-function renderExam(d) {
-  const date   = new Date(d.date + 'T00:00:00');
-  const clsHtml = (d.classes||[]).map(c =>
-    `<span class="exam-cls-chip">${c.replace('XE','X E-')}</span>`
-  ).join('');
-
-  // Study items — split by newline
-  const studyItems = (d.study||'').split('\n').filter(s => s.trim());
-  const studyHtml = studyItems.length > 0
-    ? studyItems.map(s => `<div class="study-item"><div class="study-bullet"></div><div>${s.trim()}</div></div>`).join('')
-    : '<div style="color:var(--text-muted);font-size:0.88rem;">No specific study notes added.</div>';
-
-  document.getElementById('examContent').innerHTML = `
-    <div class="exam-card">
-      <div class="exam-header">
-        <div class="exam-header-top">
-          <div class="exam-live-badge"><span class="pulse-dot" style="width:7px;height:7px;margin:0"></span> Upcoming Exam</div>
-        </div>
-        <div class="exam-title">${d.title}</div>
-        <div class="exam-classes">${clsHtml || '<span class="exam-cls-chip">All Classes</span>'}</div>
-        <div class="countdown-box">
-          <div>
-            <div class="countdown-label">Time Remaining</div>
-            <div class="countdown-val" id="cdVal">—</div>
-          </div>
-          <div class="countdown-date">
-            <div class="countdown-date-val">${date.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</div>
-            <div class="countdown-date-day">${date.toLocaleDateString('en-GB',{weekday:'long'})}</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="info-section">
-        <div class="info-label">📚 What to Study</div>
-        <div>${studyHtml}</div>
-      </div>
-
-      <div class="info-section">
-        <div class="tip-box">
-          <div class="tip-box-icon">💡</div>
-          <div class="tip-box-text">
-            <strong>Study tip:</strong> Focus on understanding concepts rather than memorizing.
-            Review your Vocabulary Box entries and make sure you understand the grammar rules — not just the examples!
-          </div>
-        </div>
-      </div>
-    </div>`;
-
-  startCountdown(d.date);
-}
-
-function renderEmpty() {
-  document.getElementById('examContent').innerHTML = `
-    <div class="state-box">
-      <div class="state-icon">🎯</div>
-      <div class="state-title">No Upcoming Exam</div>
-      <div class="state-sub">Your teacher hasn't scheduled a summative exam yet.<br/>Check back here closer to the exam period!</div>
-    </div>`;
-}
-
-function startCountdown(dateStr) {
-  if (countdownInterval) clearInterval(countdownInterval);
-  function update() {
-    const el   = document.getElementById('cdVal'); if (!el) return;
-    const now  = new Date();
-    const target = new Date(dateStr + 'T00:00:00');
-    const diff = target - now;
-    if (diff <= 0) {
-      el.textContent = '🔴 Exam Day!'; el.classList.add('urgent');
-      clearInterval(countdownInterval); return;
-    }
-    const days  = Math.floor(diff / 86400000);
-    const hours = Math.floor((diff % 86400000) / 3600000);
-    const mins  = Math.floor((diff % 3600000) / 60000);
-    if (days > 0)       { el.textContent = `${days} day${days>1?'s':''} ${hours}h left`; }
-    else if (hours > 0) { el.textContent = `${hours}h ${mins}m left`; el.classList.add('urgent'); }
-    else                { el.textContent = `${mins} min left`; el.classList.add('urgent'); }
+  if (allData.length === 0) {
+    loadSheetData().then(function(){ populateNames(); });
+    return;
   }
-  update();
-  countdownInterval = setInterval(update, 60000);
+
+  var students = allData.filter(function(r){ return r.cls === cls; });
+  students.forEach(function(s, i){
+    var opt = document.createElement('option');
+    opt.value = i + 1;  // attendance number = position in class
+    opt.textContent = s.name;
+    sel.appendChild(opt);
+  });
+  sel.disabled = false;
 }
 
-// Teacher panel
-function toggleCls(btn) { btn.classList.toggle('selected'); }
+// ── STUDENT LOGIN ─────────────────────────────────────────────
+function doStudentLogin() {
+  var cls    = document.getElementById('lwClass').value;
+  var nameIdx = parseInt(document.getElementById('lwName').value);
+  var pin    = parseInt(document.getElementById('lwPin').value);
+  var err    = document.getElementById('lwErr');
+  var btn    = document.getElementById('lwBtn');
 
-function prefillTeacherPanel(d) {
-  document.getElementById('tpDate').value  = d.date  || '';
-  document.getElementById('tpTitle').value = d.title || '';
-  document.getElementById('tpStudy').value = d.study || '';
-  document.querySelectorAll('.cls-btn').forEach(b => {
-    b.classList.toggle('selected', (d.classes||[]).includes(b.dataset.cls));
+  err.className = 'lw-err';
+
+  if (!cls)         { err.textContent = 'Please select your class.';         err.className = 'lw-err show'; return; }
+  if (!nameIdx)     { err.textContent = 'Please select your name.';          err.className = 'lw-err show'; return; }
+  if (!pin || isNaN(pin)) { err.textContent = 'Please enter your student number.'; err.className = 'lw-err show'; return; }
+
+  // PIN = attendance number (position in class list)
+  if (pin !== nameIdx) {
+    err.textContent = 'Incorrect student number. Your PIN is your class attendance number (absen).';
+    err.className = 'lw-err show';
+    return;
+  }
+
+  // Find the student record
+  var classStudents = allData.filter(function(r){ return r.cls === cls; });
+  var student = classStudents[nameIdx - 1];
+  if (!student) { err.textContent = 'Student not found. Please try again.'; err.className = 'lw-err show'; return; }
+
+  showTopicView(student, nameIdx);
+}
+
+// ── SHOW TOPIC VIEW ──────────────────────────────────────────
+function showTopicView(student, attNum) {
+  document.getElementById('loginWall').style.display = 'none';
+  document.getElementById('topicView').style.display = 'block';
+  document.getElementById('greetName').textContent  = student.name;
+  document.getElementById('greetClass').textContent = student.cls + ' · Student #' + String(attNum).padStart(2,'0');
+
+  var body = document.getElementById('topicBody');
+
+  if (student.revealed !== 'TRUE') {
+    body.innerHTML =
+      '<div class="topic-locked">' +
+        '<div class="lock-icon">&#128274;</div>' +
+        '<div class="lock-title">Topic Not Yet Revealed</div>' +
+        '<div class="lock-sub">Your teacher hasn\'t revealed your topic yet.<br/>Check back soon!</div>' +
+      '</div>';
+    return;
+  }
+
+  // Clean topic — remove trailing (XX) number for display
+  var displayTopic = student.topic;
+
+  var stanceHtml = '';
+  if (student.stance === 'Agree' || student.stance === 'Disagree') {
+    var isAgree = student.stance === 'Agree';
+    stanceHtml =
+      '<div class="stance-section">' +
+        '<div class="stance-label">Your Confirmation</div>' +
+        '<div class="stance-btns">' +
+          '<button class="btn-agree' + (isAgree ? ' selected' : '') + '" onclick="saveStance(\'' + student.cls + '\',' + (allData.filter(function(r){return r.cls===student.cls;}).indexOf(student)+1) + ',\'Agree\')">&#9989; Agree</button>' +
+          '<button class="btn-disagree' + (!isAgree ? ' selected' : '') + '" onclick="saveStance(\'' + student.cls + '\',' + (allData.filter(function(r){return r.cls===student.cls;}).indexOf(student)+1) + ',\'Disagree\')">&#10060; Disagree</button>' +
+        '</div>' +
+        '<div class="stance-saved show">&#10003; You chose: <strong>' + student.stance + '</strong> — saved successfully!</div>' +
+      '</div>';
+  } else {
+    var clsIdx = allData.filter(function(r){return r.cls===student.cls;}).indexOf(student) + 1;
+    stanceHtml =
+      '<div class="stance-section">' +
+        '<div class="stance-label">Confirm Your Stance</div>' +
+        '<div class="stance-question">Do you <strong>agree</strong> or <strong>disagree</strong> with the statement in your topic?</div>' +
+        '<div class="stance-btns">' +
+          '<button class="btn-agree" id="btnAgree" onclick="saveStance(\'' + student.cls + '\',' + clsIdx + ',\'Agree\')">&#9989; Agree</button>' +
+          '<button class="btn-disagree" id="btnDisagree" onclick="saveStance(\'' + student.cls + '\',' + clsIdx + ',\'Disagree\')">&#10060; Disagree</button>' +
+        '</div>' +
+        '<div class="stance-saved" id="stanceSaved"></div>' +
+      '</div>';
+  }
+
+  body.innerHTML =
+    '<div class="topic-revealed">' +
+      '<div class="topic-sentence">' + displayTopic + '</div>' +
+      stanceHtml +
+    '</div>';
+}
+
+// ── SAVE STANCE ──────────────────────────────────────────────
+function saveStance(cls, attNum, stance) {
+  var ba = document.getElementById('btnAgree');
+  var bd = document.getElementById('btnDisagree');
+  var sv = document.getElementById('stanceSaved');
+
+  if (ba) { ba.disabled = true; ba.innerHTML = '<span class="spinner-sm"></span>'; }
+  if (bd) { bd.disabled = true; }
+
+  apiGet({ action: 'setStance', cls: cls, attNum: attNum, stance: stance, sheetId: SHEET_ID, sheetTab: SHEET_TAB })
+    .then(function(res){
+      if (res.success) {
+        if (ba) { ba.disabled = false; ba.innerHTML = '&#9989; Agree'; ba.classList.toggle('selected', stance==='Agree'); }
+        if (bd) { bd.disabled = false; bd.classList.toggle('selected', stance==='Disagree'); }
+        if (sv) { sv.innerHTML = '&#10003; You chose: <strong>' + stance + '</strong> — saved!'; sv.classList.add('show'); }
+        showToast('Stance saved: ' + stance);
+        // Update local data
+        var classStudents = allData.filter(function(r){ return r.cls === cls; });
+        if (classStudents[attNum-1]) classStudents[attNum-1].stance = stance;
+      } else {
+        if (ba) { ba.disabled = false; ba.innerHTML = '&#9989; Agree'; }
+        if (bd) { bd.disabled = false; }
+        showToast('Failed to save. Try again.');
+      }
+    }).catch(function(){
+      if (ba) { ba.disabled = false; ba.innerHTML = '&#9989; Agree'; }
+      if (bd) { bd.disabled = false; }
+      showToast('Network error. Try again.');
+    });
+}
+
+// ── SWITCH STUDENT ───────────────────────────────────────────
+function switchStudent() {
+  document.getElementById('topicView').style.display = 'none';
+  document.getElementById('loginWall').style.display = 'block';
+  document.getElementById('lwPin').value = '';
+  document.getElementById('lwErr').className = 'lw-err';
+}
+
+// ── TEACHER PANEL ────────────────────────────────────────────
+var CLASSES = ['XE1','XE4','XE5','XE6','XE7','XE8','XE9','XE10','XE11'];
+
+function initTeacherPanel() {
+  if (!isTeacher) return;
+  document.getElementById('teacherPanel').classList.add('visible');
+
+  // Build class tabs
+  var tabs = document.getElementById('clsTabs');
+  CLASSES.forEach(function(cls){
+    var btn = document.createElement('button');
+    btn.className = 'cls-tab' + (cls === currentCls ? ' active' : '');
+    btn.textContent = cls;
+    btn.onclick = function(){
+      currentCls = cls;
+      document.querySelectorAll('.cls-tab').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      renderTeacherTable();
+    };
+    tabs.appendChild(btn);
+  });
+
+  loadTeacherData();
+}
+
+function loadTeacherData() {
+  document.getElementById('tpTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text-muted);">Loading...</td></tr>';
+  loadSheetData().then(function(){
+    renderTeacherTable();
+    showToast('Data refreshed');
+  }).catch(function(){
+    document.getElementById('tpTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--red);">Failed to load. Check connection.</td></tr>';
   });
 }
 
-async function saveSumm() {
-  const date    = document.getElementById('tpDate').value;
-  const title   = document.getElementById('tpTitle').value.trim();
-  const study   = document.getElementById('tpStudy').value.trim();
-  const classes = [...document.querySelectorAll('.cls-btn.selected')].map(b => b.dataset.cls);
-  if (!date)  { showToast('Please pick a date', 'err'); return; }
-  if (!title) { showToast('Please enter a title', 'err'); return; }
-  const data = { date, title, study, classes };
-  try {
-    const res = await apiGet({action:'setSummative', username:savedUser, password:savedPass, data:JSON.stringify(data)});
-    if (res.success) {
-      currentData = data; renderExam(data); showToast('✅ Published!', 'ok');
-    } else { showToast('Error: '+res.error, 'err'); }
-  } catch(e) { showToast('Failed to save', 'err'); }
+function renderTeacherTable() {
+  var students = allData.filter(function(r){ return r.cls === currentCls; });
+  var total    = students.length;
+  var agreed   = students.filter(function(s){ return s.stance === 'Agree'; }).length;
+  var disagreed= students.filter(function(s){ return s.stance === 'Disagree'; }).length;
+  var pending  = total - agreed - disagreed;
+
+  // Stats
+  document.getElementById('tpStats').innerHTML =
+    '<div class="tp-stat purple"><div class="tp-stat-num">' + total + '</div><div class="tp-stat-label">Total</div></div>' +
+    '<div class="tp-stat green"><div class="tp-stat-num">' + agreed + '</div><div class="tp-stat-label">Agree</div></div>' +
+    '<div class="tp-stat red"><div class="tp-stat-num">' + disagreed + '</div><div class="tp-stat-label">Disagree</div></div>' +
+    '<div class="tp-stat"><div class="tp-stat-num">' + pending + '</div><div class="tp-stat-label">Pending</div></div>';
+
+  // Table rows
+  var html = '';
+  students.forEach(function(s, i){
+    var attNum = i + 1;
+    var stance = s.stance === 'Agree'
+      ? '<span class="badge-agree">&#9989; Agree</span>'
+      : s.stance === 'Disagree'
+        ? '<span class="badge-disagree">&#10060; Disagree</span>'
+        : '<span class="badge-pending">Pending</span>';
+
+    var isRevealed = s.revealed === 'TRUE';
+    var toggleId = 'toggle_' + currentCls + '_' + attNum;
+    var reveal =
+      '<div class="reveal-toggle">' +
+        '<label class="toggle-switch">' +
+          '<input type="checkbox" id="' + toggleId + '"' + (isRevealed ? ' checked' : '') +
+          ' onchange="toggleReveal(\'' + s.cls + '\',' + attNum + ',this.checked)">' +
+          '<span class="toggle-slider"></span>' +
+        '</label>' +
+        '<span class="toggle-label">' + (isRevealed ? 'On' : 'Off') + '</span>' +
+      '</div>';
+
+    html +=
+      '<tr>' +
+        '<td class="td-num">' + String(attNum).padStart(2,'0') + '</td>' +
+        '<td class="td-name">' + s.name + '</td>' +
+        '<td class="td-topic">' + (s.topic || '<em style="color:var(--text-muted)">No topic</em>') + '</td>' +
+        '<td>' + stance + '</td>' +
+        '<td>' + reveal + '</td>' +
+      '</tr>';
+  });
+  document.getElementById('tpTableBody').innerHTML = html;
 }
 
-async function clearSumm() {
-  if (!confirm('Remove the summative info?')) return;
-  try {
-    const res = await apiGet({action:'clearSummative', username:savedUser, password:savedPass});
-    if (res.success) {
-      currentData = null; renderEmpty();
-      document.getElementById('tpDate').value  = '';
-      document.getElementById('tpTitle').value = '';
-      document.getElementById('tpStudy').value = '';
-      document.querySelectorAll('.cls-btn').forEach(b => b.classList.remove('selected'));
-      showToast('Cleared', 'ok');
-    } else { showToast('Error: '+res.error, 'err'); }
-  } catch(e) { showToast('Failed to clear', 'err'); }
+function toggleReveal(cls, attNum, revealed) {
+  var labelEl = document.querySelector('#toggle_' + cls + '_' + attNum)
+                  ?.closest('.reveal-toggle')?.querySelector('.toggle-label');
+  if (labelEl) labelEl.textContent = revealed ? 'On' : 'Off';
+
+  apiGet({ action: 'setReveal', cls: cls, attNum: attNum, revealed: revealed ? 'TRUE' : 'FALSE', sheetId: SHEET_ID, sheetTab: SHEET_TAB })
+    .then(function(res){
+      if (res.success) {
+        showToast(revealed ? 'Topic revealed!' : 'Topic hidden.');
+        var classStudents = allData.filter(function(r){ return r.cls === cls; });
+        if (classStudents[attNum-1]) classStudents[attNum-1].revealed = revealed ? 'TRUE' : 'FALSE';
+      } else {
+        showToast('Failed to update. Try again.');
+      }
+    }).catch(function(){ showToast('Network error.'); });
 }
 
-function showToast(msg, type) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast '+(type||'');
-  setTimeout(()=>t.classList.add('show'), 10);
-  setTimeout(()=>t.classList.remove('show'), 3000);
-}
+// ── INIT ─────────────────────────────────────────────────────
+loadSheetData().then(function(){
+  initTeacherPanel();
+}).catch(function(){
+  initTeacherPanel(); // still show panel, will retry on refresh
+});
 </script>
 
+<!-- SIDEBAR -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <nav class="sidebar" id="sidebar">
   <div class="sidebar-head">
@@ -407,59 +628,25 @@ function showToast(msg, type) {
   <div class="sidebar-divider"></div>
   <div class="sidebar-section">
     <div class="sidebar-section-label">&#128194; Documents</div>
-    <a href="lessons.html" class="sidebar-item" data-page="lessons">
-      <div class="sidebar-item-icon" style="background:rgba(124,58,237,0.2)">&#128209;</div>
-      <div class="sidebar-item-name">Lesson Materials</div>
-    </a>
-    <a href="session.html" class="sidebar-item" data-page="session">
-      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#127916;</div>
-      <div class="sidebar-item-name">Class Session</div>
-    </a>
-    <a href="assignments.html" class="sidebar-item" data-page="assignments">
-      <div class="sidebar-item-icon" style="background:rgba(59,130,246,0.2)">&#128203;</div>
-      <div class="sidebar-item-name">Assignments</div>
-    </a>
-    <a href="submission.html" class="sidebar-item" style="opacity:0.5;pointer-events:none;">
-      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#128221;</div>
-      <div class="sidebar-item-name">Submission</div>
-      <span class="sidebar-item-badge">SOON</span>
-    </a>
+    <a href="lessons.html" class="sidebar-item" data-page="lessons"><div class="sidebar-item-icon" style="background:rgba(124,58,237,0.2)">&#128209;</div><div class="sidebar-item-name">Lesson Materials</div></a>
+    <a href="session.html" class="sidebar-item" data-page="session"><div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#127916;</div><div class="sidebar-item-name">Class Session</div></a>
+    <a href="assignments.html" class="sidebar-item" data-page="assignments"><div class="sidebar-item-icon" style="background:rgba(59,130,246,0.2)">&#128203;</div><div class="sidebar-item-name">Assignments</div></a>
+    <a href="submission.html" class="sidebar-item" data-page="submission"><div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#128221;</div><div class="sidebar-item-name">Submission</div></a>
   </div>
   <div class="sidebar-divider"></div>
   <div class="sidebar-section">
     <div class="sidebar-section-label">&#128101; Student Data</div>
-    <a href="students.html" class="sidebar-item" data-page="students">
-      <div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">&#127891;</div>
-      <div class="sidebar-item-name">Student List</div>
-    </a>
-    <a href="attendance.html" class="sidebar-item" data-page="attendance">
-      <div class="sidebar-item-icon" style="background:rgba(20,184,166,0.2)">&#9989;</div>
-      <div class="sidebar-item-name">Attendance</div>
-    </a>
-    <a href="scores.html" class="sidebar-item" data-page="scores">
-      <div class="sidebar-item-icon" style="background:rgba(249,115,22,0.2)">&#127942;</div>
-      <div class="sidebar-item-name">Student Scores</div>
-    </a>
-    <a href="tasks.html" class="sidebar-item" data-page="tasks">
-      <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#128204;</div>
-      <div class="sidebar-item-name">Task Status</div>
-    </a>
-    <a href="activeness.html" class="sidebar-item" data-page="activeness">
-      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#9889;</div>
-      <div class="sidebar-item-name">Activeness</div>
-    </a>
-    <a href="strikes.html" class="sidebar-item" data-page="strikes">
-      <div class="sidebar-item-icon" style="background:rgba(220,38,38,0.2)">&#9888;&#65039;</div>
-      <div class="sidebar-item-name">Strikes</div>
-    </a>
+    <a href="students.html" class="sidebar-item" data-page="students"><div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">&#127891;</div><div class="sidebar-item-name">Student List</div></a>
+    <a href="attendance.html" class="sidebar-item" data-page="attendance"><div class="sidebar-item-icon" style="background:rgba(20,184,166,0.2)">&#9989;</div><div class="sidebar-item-name">Attendance</div></a>
+    <a href="scores.html" class="sidebar-item" data-page="scores"><div class="sidebar-item-icon" style="background:rgba(249,115,22,0.2)">&#127942;</div><div class="sidebar-item-name">Student Scores</div></a>
+    <a href="tasks.html" class="sidebar-item" data-page="tasks"><div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#128204;</div><div class="sidebar-item-name">Task Status</div></a>
+    <a href="activeness.html" class="sidebar-item" data-page="activeness"><div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#9889;</div><div class="sidebar-item-name">Activeness</div></a>
+    <a href="strikes.html" class="sidebar-item" data-page="strikes"><div class="sidebar-item-icon" style="background:rgba(220,38,38,0.2)">&#9888;&#65039;</div><div class="sidebar-item-name">Strikes</div></a>
   </div>
   <div class="sidebar-divider"></div>
   <div class="sidebar-section">
     <div class="sidebar-section-label">&#128226; Info</div>
-    <a href="summative.html" class="sidebar-item" data-page="summative">
-      <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#127919;</div>
-      <div class="sidebar-item-name">Summative</div>
-    </a>
+    <a href="summative.html" class="sidebar-item" data-page="summative"><div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#127919;</div><div class="sidebar-item-name">Summative Topic</div></a>
   </div>
   <div class="sidebar-teacher">
     <div class="sidebar-teacher-label">&#128273; Teacher Access</div>
@@ -474,19 +661,14 @@ function showToast(msg, type) {
   </div>
 </nav>
 
-
 <script>
 function toggleSidebar() {
   var open = document.getElementById('sidebar').classList.toggle('open');
   document.getElementById('sidebarOverlay').classList.toggle('open', open);
   document.getElementById('hamburgerBtn').classList.toggle('open', open);
   document.body.style.overflow = open ? 'hidden' : '';
-  // Highlight current page
   var page = document.body.getAttribute('data-page') || '';
-  document.querySelectorAll('.sidebar-item[data-page]').forEach(function(el) {
-    el.classList.toggle('active', el.getAttribute('data-page') === page);
-  });
-  // Teacher status
+  document.querySelectorAll('.sidebar-item[data-page]').forEach(function(el){ el.classList.toggle('active', el.getAttribute('data-page') === page); });
   var loggedIn = !!localStorage.getItem('eq_tu');
   document.getElementById('sbTeacherLoggedOut').style.display = loggedIn ? 'none' : 'block';
   document.getElementById('sbTeacherLoggedIn').style.display  = loggedIn ? 'block' : 'none';
@@ -494,11 +676,10 @@ function toggleSidebar() {
 function closeSidebar() {
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebarOverlay').classList.remove('open');
-  var hb = document.getElementById('hamburgerBtn');
-  if (hb) hb.classList.remove('open');
+  var hb = document.getElementById('hamburgerBtn'); if (hb) hb.classList.remove('open');
   document.body.style.overflow = '';
 }
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeSidebar(); });
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeSidebar(); });
 </script>
 
 </body>
