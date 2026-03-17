@@ -957,27 +957,31 @@
 
     /* ── BANNER SLIDER ──────────────────────────────────────── */
     .banner-wrap { margin-bottom:24px; position:relative; }
-    .banner-track-outer { border-radius:20px; overflow:hidden; position:relative; background:#1E1040; aspect-ratio:2.8/1; min-height:130px; }
+    .banner-track-outer { border-radius:20px; overflow:hidden; position:relative; background:#1E1040; height:180px; }
+    @media(min-width:480px) { .banner-track-outer { height:200px; } }
+    @media(min-width:700px) { .banner-track-outer { height:220px; } }
     .banner-track { display:flex; transition:transform 0.5s cubic-bezier(0.4,0,0.2,1); height:100%; }
-    .banner-slide { min-width:100%; height:100%; position:relative; display:flex; align-items:flex-end; padding:20px 24px; flex-shrink:0; text-decoration:none; cursor:pointer; }
-    .banner-slide-bg { position:absolute; inset:0; background-size:cover; background-position:center; }
-    .banner-slide-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(15,10,40,0.85) 0%, rgba(15,10,40,0.2) 60%, transparent 100%); }
-    .banner-slide-content { position:relative; z-index:2; flex:1; }
-    .banner-slide-tag { font-size:0.65rem; font-weight:800; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.12em; color:var(--accent); margin-bottom:5px; }
-    .banner-slide-title { font-family:'Playfair Display',serif; font-size:clamp(1rem,3vw,1.35rem); font-weight:800; color:#fff; line-height:1.2; margin-bottom:4px; }
-    .banner-slide-sub { font-size:0.78rem; color:rgba(255,255,255,0.7); line-height:1.4; }
-    .banner-slide-arrow { position:relative; z-index:2; width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; color:#fff; font-size:1rem; flex-shrink:0; margin-left:12px; align-self:center; }
+    .banner-slide { min-width:100%; height:100%; position:relative; display:flex; align-items:flex-end; padding:18px 20px; flex-shrink:0; text-decoration:none; cursor:pointer; overflow:hidden; }
+    .banner-slide-bg { position:absolute; inset:0; background-size:cover; background-position:center; transition:transform 0.6s ease; }
+    .banner-slide:hover .banner-slide-bg { transform:scale(1.03); }
+    .banner-slide-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; }
+    .banner-slide-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(15,10,40,0.9) 0%, rgba(15,10,40,0.4) 50%, rgba(15,10,40,0.1) 100%); }
+    .banner-slide-content { position:relative; z-index:2; flex:1; min-width:0; }
+    .banner-slide-tag { font-size:0.62rem; font-weight:800; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.14em; color:var(--accent); margin-bottom:5px; }
+    .banner-slide-title { font-family:'Playfair Display',serif; font-size:clamp(1.05rem,4vw,1.4rem); font-weight:800; color:#fff; line-height:1.2; margin-bottom:4px; }
+    .banner-slide-sub { font-size:0.78rem; color:rgba(255,255,255,0.72); line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .banner-slide-arrow { position:relative; z-index:2; width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); display:flex; align-items:center; justify-content:center; color:#fff; font-size:1rem; flex-shrink:0; margin-left:12px; align-self:flex-end; margin-bottom:2px; }
 
     /* nav buttons */
-    .banner-nav { position:absolute; top:50%; transform:translateY(-50%); z-index:5; width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.25); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:0.9rem; transition:background 0.2s; backdrop-filter:blur(4px); }
-    .banner-nav:hover { background:rgba(255,255,255,0.3); }
+    .banner-nav { position:absolute; top:50%; transform:translateY(-50%); z-index:5; width:30px; height:30px; border-radius:50%; background:rgba(0,0,0,0.3); border:1.5px solid rgba(255,255,255,0.2); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1rem; transition:background 0.2s; backdrop-filter:blur(6px); }
+    .banner-nav:hover { background:rgba(0,0,0,0.55); }
     .banner-nav.prev { left:10px; }
     .banner-nav.next { right:10px; }
 
-    /* dots */
-    .banner-dots { display:flex; justify-content:center; gap:6px; margin-top:10px; }
-    .banner-dot { width:6px; height:6px; border-radius:50%; background:var(--border); cursor:pointer; transition:all 0.2s; }
-    .banner-dot.active { background:var(--purple); width:18px; border-radius:999px; }
+    /* dots — inside banner bottom-right */
+    .banner-dots { position:absolute; bottom:10px; right:14px; display:flex; gap:5px; z-index:5; }
+    .banner-dot { width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,0.35); cursor:pointer; transition:all 0.25s; }
+    .banner-dot.active { background:#fff; width:16px; border-radius:999px; }
 
     /* teacher banner editor */
     .banner-editor { background:var(--white); border:1.5px solid var(--border); border-radius:20px; padding:20px 22px; margin-bottom:16px; }
@@ -1198,7 +1202,12 @@
         <input type="text" id="bnLink" placeholder="e.g. jeopardyquiz.html"/>
       </div>
       <div class="ann-field">
-        <label>Color Theme</label>
+        <label>Image URL (optional)</label>
+        <input type="text" id="bnImage" placeholder="Paste a direct image URL (Google Drive, imgbb, etc.)"/>
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;font-family:'IBM Plex Mono',monospace;">Tip: Upload to imgbb.com or use a public Google Drive image link</div>
+      </div>
+      <div class="ann-field">
+        <label>Color Theme (background fallback)</label>
         <select id="bnColor">
           <option value="purple">Purple (default)</option>
           <option value="red">Red</option>
@@ -1250,8 +1259,8 @@
       <div class="banner-track" id="bannerTrack"></div>
       <button class="banner-nav prev" id="bannerPrev" onclick="bannerNav(-1)">&#8249;</button>
       <button class="banner-nav next" id="bannerNext" onclick="bannerNav(1)">&#8250;</button>
+      <div class="banner-dots" id="bannerDots"></div>
     </div>
-    <div class="banner-dots" id="bannerDots"></div>
   </div>
 
   <!-- HALL OF FAME -->
@@ -2784,8 +2793,12 @@ function renderBanner() {
     var el = document.createElement(slide.link ? 'a' : 'div');
     el.className = 'banner-slide';
     if (slide.link) { el.href = slide.link; }
+    // Background: image if provided, else gradient
+    var bgLayer = slide.image
+      ? '<img class="banner-slide-img" src="' + slide.image + '" alt="" onerror="this.style.display='none'"/><div class="banner-slide-bg" style="background:' + bg + ';opacity:0.6"></div>'
+      : '<div class="banner-slide-bg" style="background:' + bg + '"></div>';
     el.innerHTML =
-      '<div class="banner-slide-bg" style="background:' + bg + '"></div>' +
+      bgLayer +
       '<div class="banner-slide-overlay"></div>' +
       '<div class="banner-slide-content">' +
         (slide.tag ? '<div class="banner-slide-tag">' + slide.tag + '</div>' : '') +
@@ -2857,10 +2870,11 @@ function addBannerSlide() {
   var title = document.getElementById('bnTitle').value.trim();
   var sub   = document.getElementById('bnSub').value.trim();
   var link  = document.getElementById('bnLink').value.trim();
+  var image = document.getElementById('bnImage').value.trim();
   var color = document.getElementById('bnColor').value;
   if (!title) { showToast && showToast('Please enter a title', 'warn'); return; }
   var u = localStorage.getItem('eq_tu'), p = localStorage.getItem('eq_tp');
-  var newSlides = bannerSlides.concat([{ tag:tag, title:title, sub:sub, link:link, color:color }]);
+  var newSlides = bannerSlides.concat([{ tag:tag, title:title, sub:sub, link:link, image:image, color:color }]);
   annApiGet({ action:'setBannerSlides', username:u, password:p, data: JSON.stringify(newSlides) })
     .then(function(res) {
       if (res.success) {
@@ -2869,6 +2883,7 @@ function addBannerSlide() {
         document.getElementById('bnTitle').value = '';
         document.getElementById('bnSub').value = '';
         document.getElementById('bnLink').value = '';
+        document.getElementById('bnImage').value = '';
         renderBanner();
         renderBannerEditor();
       }
