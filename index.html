@@ -957,30 +957,32 @@
 
     /* ── BANNER SLIDER ──────────────────────────────────────── */
     .banner-wrap { margin-bottom:24px; position:relative; }
-    .banner-track-outer { border-radius:20px; overflow:hidden; position:relative; background:#1E1040; height:180px; }
-    @media(min-width:480px) { .banner-track-outer { height:200px; } }
+    .banner-track-outer { border-radius:20px; overflow:hidden; position:relative; background:#1E1040; height:170px; }
+    @media(min-width:480px) { .banner-track-outer { height:195px; } }
     @media(min-width:700px) { .banner-track-outer { height:220px; } }
     .banner-track { display:flex; transition:transform 0.5s cubic-bezier(0.4,0,0.2,1); height:100%; }
-    .banner-slide { min-width:100%; height:100%; position:relative; display:flex; align-items:flex-end; padding:18px 20px; flex-shrink:0; text-decoration:none; cursor:pointer; overflow:hidden; }
-    .banner-slide-bg { position:absolute; inset:0; background-size:cover; background-position:center; transition:transform 0.6s ease; }
-    .banner-slide:hover .banner-slide-bg { transform:scale(1.03); }
-    .banner-slide-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; }
-    .banner-slide-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(15,10,40,0.9) 0%, rgba(15,10,40,0.4) 50%, rgba(15,10,40,0.1) 100%); }
-    .banner-slide-content { position:relative; z-index:2; flex:1; min-width:0; }
-    .banner-slide-tag { font-size:0.62rem; font-weight:800; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.14em; color:var(--accent); margin-bottom:5px; }
-    .banner-slide-title { font-family:'Playfair Display',serif; font-size:clamp(1.05rem,4vw,1.4rem); font-weight:800; color:#fff; line-height:1.2; margin-bottom:4px; }
-    .banner-slide-sub { font-size:0.78rem; color:rgba(255,255,255,0.72); line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .banner-slide-arrow { position:relative; z-index:2; width:34px; height:34px; border-radius:50%; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); display:flex; align-items:center; justify-content:center; color:#fff; font-size:1rem; flex-shrink:0; margin-left:12px; align-self:flex-end; margin-bottom:2px; }
+    .banner-slide { min-width:100%; height:100%; position:relative; display:flex; align-items:flex-end; padding:18px 20px 22px; flex-shrink:0; text-decoration:none; overflow:hidden; }
+    /* gradient background layer */
+    .banner-slide-bg { position:absolute; inset:0; background-size:cover; background-position:center; }
+    /* image layer — sits on top of gradient, semi-transparent so gradient color bleeds through */
+    .banner-slide-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center right; mix-blend-mode:luminosity; opacity:0.45; }
+    /* dark overlay for text readability */
+    .banner-slide-overlay { position:absolute; inset:0; background:linear-gradient(105deg, rgba(15,10,40,0.92) 0%, rgba(15,10,40,0.65) 50%, rgba(15,10,40,0.2) 100%); }
+    .banner-slide-content { position:relative; z-index:2; flex:1; min-width:0; max-width:75%; }
+    .banner-slide-tag { font-size:0.6rem; font-weight:800; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.16em; color:var(--accent); margin-bottom:6px; }
+    .banner-slide-title { font-family:'Playfair Display',serif; font-size:clamp(1rem,4.5vw,1.35rem); font-weight:800; color:#fff; line-height:1.25; margin-bottom:5px; }
+    .banner-slide-sub { font-size:0.76rem; color:rgba(255,255,255,0.68); line-height:1.45; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+    .banner-slide-cta { display:inline-flex; align-items:center; gap:6px; margin-top:10px; padding:6px 14px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); border-radius:999px; color:#fff; font-size:0.72rem; font-weight:700; font-family:'IBM Plex Mono',monospace; }
 
     /* nav buttons */
-    .banner-nav { position:absolute; top:50%; transform:translateY(-50%); z-index:5; width:30px; height:30px; border-radius:50%; background:rgba(0,0,0,0.3); border:1.5px solid rgba(255,255,255,0.2); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1rem; transition:background 0.2s; backdrop-filter:blur(6px); }
-    .banner-nav:hover { background:rgba(0,0,0,0.55); }
-    .banner-nav.prev { left:10px; }
-    .banner-nav.next { right:10px; }
+    .banner-nav { position:absolute; top:50%; transform:translateY(-50%); z-index:5; width:28px; height:28px; border-radius:50%; background:rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.2); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:0.9rem; transition:background 0.2s; backdrop-filter:blur(4px); }
+    .banner-nav:hover { background:rgba(0,0,0,0.6); }
+    .banner-nav.prev { left:8px; }
+    .banner-nav.next { right:8px; }
 
-    /* dots — inside banner bottom-right */
-    .banner-dots { position:absolute; bottom:10px; right:14px; display:flex; gap:5px; z-index:5; }
-    .banner-dot { width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,0.35); cursor:pointer; transition:all 0.25s; }
+    /* dots — inside banner bottom-center */
+    .banner-dots { position:absolute; bottom:8px; left:50%; transform:translateX(-50%); display:flex; gap:5px; z-index:5; }
+    .banner-dot { width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,0.3); cursor:pointer; transition:all 0.25s; }
     .banner-dot.active { background:#fff; width:16px; border-radius:999px; }
 
     /* teacher banner editor */
@@ -2794,18 +2796,18 @@ function renderBanner() {
     el.className = 'banner-slide';
     if (slide.link) { el.href = slide.link; }
     // Background: image if provided, else gradient
-    var bgLayer = slide.image
-      ? '<img class="banner-slide-img" src="' + slide.image + '" alt="" onerror="this.style.opacity=0"/><div class="banner-slide-bg" style="background:' + bg + ';opacity:0.6"></div>'
-      : '<div class="banner-slide-bg" style="background:' + bg + '"></div>';
+    // Always show gradient background
+    // If image provided: show image with blend mode so color shows through
     el.innerHTML =
-      bgLayer +
+      '<div class="banner-slide-bg" style="background:' + bg + '"></div>' +
+      (slide.image ? '<img class="banner-slide-img" src="' + slide.image + '" alt="" onerror="this.style.display=\'none\'"/>' : '') +
       '<div class="banner-slide-overlay"></div>' +
       '<div class="banner-slide-content">' +
         (slide.tag ? '<div class="banner-slide-tag">' + slide.tag + '</div>' : '') +
         '<div class="banner-slide-title">' + (slide.title || '') + '</div>' +
         (slide.sub ? '<div class="banner-slide-sub">' + slide.sub + '</div>' : '') +
-      '</div>' +
-      (slide.link ? '<div class="banner-slide-arrow">&#8594;</div>' : '');
+        (slide.link ? '<div class="banner-slide-cta">Open &#8594;</div>' : '') +
+      '</div>';
     track.appendChild(el);
 
     var dot = document.createElement('div');
