@@ -954,6 +954,50 @@
     .sg-strike-badge-text { font-size:0.75rem; font-weight:700; color:#FCA5A5; line-height:1.3; }
     .sg-strike-badge-arrow { font-size:0.7rem; color:rgba(255,100,100,0.6); margin-left:auto; }
 
+
+    /* ── BANNER SLIDER ──────────────────────────────────────── */
+    .banner-wrap { margin-bottom:24px; position:relative; }
+    .banner-track-outer { border-radius:20px; overflow:hidden; position:relative; background:#1E1040; aspect-ratio:2.8/1; min-height:130px; }
+    .banner-track { display:flex; transition:transform 0.5s cubic-bezier(0.4,0,0.2,1); height:100%; }
+    .banner-slide { min-width:100%; height:100%; position:relative; display:flex; align-items:flex-end; padding:20px 24px; flex-shrink:0; text-decoration:none; cursor:pointer; }
+    .banner-slide-bg { position:absolute; inset:0; background-size:cover; background-position:center; }
+    .banner-slide-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(15,10,40,0.85) 0%, rgba(15,10,40,0.2) 60%, transparent 100%); }
+    .banner-slide-content { position:relative; z-index:2; flex:1; }
+    .banner-slide-tag { font-size:0.65rem; font-weight:800; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.12em; color:var(--accent); margin-bottom:5px; }
+    .banner-slide-title { font-family:'Playfair Display',serif; font-size:clamp(1rem,3vw,1.35rem); font-weight:800; color:#fff; line-height:1.2; margin-bottom:4px; }
+    .banner-slide-sub { font-size:0.78rem; color:rgba(255,255,255,0.7); line-height:1.4; }
+    .banner-slide-arrow { position:relative; z-index:2; width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; color:#fff; font-size:1rem; flex-shrink:0; margin-left:12px; align-self:center; }
+
+    /* nav buttons */
+    .banner-nav { position:absolute; top:50%; transform:translateY(-50%); z-index:5; width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.25); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:0.9rem; transition:background 0.2s; backdrop-filter:blur(4px); }
+    .banner-nav:hover { background:rgba(255,255,255,0.3); }
+    .banner-nav.prev { left:10px; }
+    .banner-nav.next { right:10px; }
+
+    /* dots */
+    .banner-dots { display:flex; justify-content:center; gap:6px; margin-top:10px; }
+    .banner-dot { width:6px; height:6px; border-radius:50%; background:var(--border); cursor:pointer; transition:all 0.2s; }
+    .banner-dot.active { background:var(--purple); width:18px; border-radius:999px; }
+
+    /* teacher banner editor */
+    .banner-editor { background:var(--white); border:1.5px solid var(--border); border-radius:20px; padding:20px 22px; margin-bottom:16px; }
+    .banner-editor-title { font-size:0.78rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; }
+    .banner-slide-list { display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
+    .banner-slide-item { display:flex; align-items:center; gap:10px; background:var(--off-white); border:1.5px solid var(--border); border-radius:12px; padding:10px 14px; }
+    .banner-slide-item-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .banner-slide-item-info { flex:1; min-width:0; }
+    .banner-slide-item-title { font-size:0.88rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .banner-slide-item-tag { font-size:0.72rem; color:var(--text-muted); font-family:'IBM Plex Mono',monospace; }
+    .banner-slide-item-del { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1rem; padding:2px 6px; border-radius:6px; }
+    .banner-slide-item-del:hover { color:var(--red); background:var(--red-soft); }
+    .banner-add-form { background:var(--off-white); border:1.5px solid var(--border); border-radius:14px; padding:14px; }
+    .banner-add-form .ann-field { margin-bottom:10px; }
+    .banner-add-form .ann-field:last-child { margin-bottom:0; }
+    .banner-add-form label { display:block; font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:5px; font-family:'IBM Plex Mono',monospace; }
+    .banner-add-form input, .banner-add-form select, .banner-add-form textarea { width:100%; padding:9px 12px; border:1.5px solid var(--border); border-radius:10px; font-family:'IBM Plex Sans',sans-serif; font-size:0.88rem; color:var(--text-dark); background:#fff; outline:none; }
+    .banner-add-form input:focus, .banner-add-form select:focus, .banner-add-form textarea:focus { border-color:var(--purple-light); }
+    .banner-add-btn { width:100%; margin-top:10px; padding:10px; background:linear-gradient(135deg,#7C3AED,#5B21B6); color:#fff; border:none; border-radius:10px; font-family:'IBM Plex Sans',sans-serif; font-size:0.88rem; font-weight:700; cursor:pointer; }
+    .banner-add-btn:hover { opacity:0.88; }
   </style>
 </head>
 <body>
@@ -1127,6 +1171,47 @@
 </div>
 
 
+
+<!-- BANNER EDITOR (teacher) -->
+<div class="ann-editor teacher-only" id="bannerEditor" style="display:none;">
+  <div class="banner-editor">
+    <div class="banner-editor-title">
+      <span>&#127775; Banner Slides</span>
+      <span id="bannerSlideCount" style="font-weight:400;color:var(--text-muted);"></span>
+    </div>
+    <div class="banner-slide-list" id="bannerSlideList"></div>
+    <div class="banner-add-form">
+      <div class="ann-field">
+        <label>Tag (e.g. NEW · QUIZ)</label>
+        <input type="text" id="bnTag" placeholder="e.g. NEW · FEATURE"/>
+      </div>
+      <div class="ann-field">
+        <label>Title</label>
+        <input type="text" id="bnTitle" placeholder="e.g. Chapter 4 Jeopardy Quiz is Live!"/>
+      </div>
+      <div class="ann-field">
+        <label>Subtitle</label>
+        <input type="text" id="bnSub" placeholder="e.g. Play solo or challenge your friends"/>
+      </div>
+      <div class="ann-field">
+        <label>Link (optional)</label>
+        <input type="text" id="bnLink" placeholder="e.g. jeopardyquiz.html"/>
+      </div>
+      <div class="ann-field">
+        <label>Color Theme</label>
+        <select id="bnColor">
+          <option value="purple">Purple (default)</option>
+          <option value="red">Red</option>
+          <option value="green">Green</option>
+          <option value="amber">Amber / Gold</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
+      <button class="banner-add-btn" onclick="addBannerSlide()">&#65291; Add Slide</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function() {
   var cls  = localStorage.getItem('eq_student_class');
@@ -1157,6 +1242,17 @@
 
 
 
+
+
+  <!-- BANNER SLIDER -->
+  <div class="banner-wrap" id="bannerWrap" style="display:none;">
+    <div class="banner-track-outer">
+      <div class="banner-track" id="bannerTrack"></div>
+      <button class="banner-nav prev" id="bannerPrev" onclick="bannerNav(-1)">&#8249;</button>
+      <button class="banner-nav next" id="bannerNext" onclick="bannerNav(1)">&#8250;</button>
+    </div>
+    <div class="banner-dots" id="bannerDots"></div>
+  </div>
 
   <!-- HALL OF FAME -->
   <div class="hof-section" id="hofSection">
@@ -1235,10 +1331,10 @@
     <div class="section-label">Practice &amp; Games</div>
     <div class="section-title">Quiz &amp; Review</div>
     <div class="card-grid">
-      <a href="quiz.html" class="card">
+      <a href="jeopardyquiz.html" class="card">
         <div class="card-icon ic-yellow">🎮</div>
-        <div class="card-name">Quiz</div>
-        <div class="card-desc">Play the quiz solo or with friends</div>
+        <div class="card-name">Chapter 4 Quiz</div>
+        <div class="card-desc">Play the Jeopardy quiz solo or with friends</div>
       </a>
     </div>
   </div>
@@ -2199,9 +2295,9 @@ document.addEventListener('keydown', e => {
 
   <div class="sidebar-section">
     <div class="sidebar-section-label">📂 Documents</div>
-    <a href="quiz.html" class="sidebar-item" data-page="quiz">
+    <a href="jeopardyquiz.html" class="sidebar-item" data-page="jeopardyquiz">
       <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">🎮</div>
-      <div class="sidebar-item-name">Quiz</div>
+      <div class="sidebar-item-name">Chapter 4 Quiz</div>
     </a>
     <a href="lessons.html" class="sidebar-item">
       <div class="sidebar-item-icon" style="background:rgba(124,58,237,0.2)">📑</div>
@@ -2650,6 +2746,153 @@ if (document.readyState === 'loading') {
 } else {
   loadAnnouncement();
 }
+
+// ── BANNER SLIDER ─────────────────────────────────────────────
+var bannerSlides = [];
+var bannerCurrent = 0;
+var bannerTimer = null;
+
+var BANNER_COLORS = {
+  purple: 'linear-gradient(135deg,#4C1D95 0%,#7C3AED 60%,#A78BFA 100%)',
+  red:    'linear-gradient(135deg,#7F1D1D 0%,#DC2626 60%,#F87171 100%)',
+  green:  'linear-gradient(135deg,#064E3B 0%,#059669 60%,#34D399 100%)',
+  amber:  'linear-gradient(135deg,#78350F 0%,#D97706 60%,#FCD34D 100%)',
+  dark:   'linear-gradient(135deg,#0F0A28 0%,#1E1040 60%,#3B1F6B 100%)',
+};
+
+function loadBannerSlides() {
+  annApiGet({ action: 'getBannerSlides' }).then(function(res) {
+    if (res.slides && res.slides.length > 0) {
+      bannerSlides = res.slides;
+      renderBanner();
+      renderBannerEditor();
+    }
+  }).catch(function() {});
+}
+
+function renderBanner() {
+  if (!bannerSlides.length) return;
+  var wrap  = document.getElementById('bannerWrap');
+  var track = document.getElementById('bannerTrack');
+  var dots  = document.getElementById('bannerDots');
+  wrap.style.display = 'block';
+  track.innerHTML = '';
+  dots.innerHTML  = '';
+
+  bannerSlides.forEach(function(slide, i) {
+    var bg = BANNER_COLORS[slide.color] || BANNER_COLORS.purple;
+    var el = document.createElement(slide.link ? 'a' : 'div');
+    el.className = 'banner-slide';
+    if (slide.link) { el.href = slide.link; }
+    el.innerHTML =
+      '<div class="banner-slide-bg" style="background:' + bg + '"></div>' +
+      '<div class="banner-slide-overlay"></div>' +
+      '<div class="banner-slide-content">' +
+        (slide.tag ? '<div class="banner-slide-tag">' + slide.tag + '</div>' : '') +
+        '<div class="banner-slide-title">' + (slide.title || '') + '</div>' +
+        (slide.sub ? '<div class="banner-slide-sub">' + slide.sub + '</div>' : '') +
+      '</div>' +
+      (slide.link ? '<div class="banner-slide-arrow">&#8594;</div>' : '');
+    track.appendChild(el);
+
+    var dot = document.createElement('div');
+    dot.className = 'banner-dot' + (i === 0 ? ' active' : '');
+    dot.onclick = (function(idx) { return function() { bannerGoTo(idx); }; })(i);
+    dots.appendChild(dot);
+  });
+
+  // Hide nav if only 1 slide
+  document.getElementById('bannerPrev').style.display = bannerSlides.length < 2 ? 'none' : 'flex';
+  document.getElementById('bannerNext').style.display = bannerSlides.length < 2 ? 'none' : 'flex';
+
+  bannerGoTo(0);
+  bannerAutoPlay();
+}
+
+function bannerGoTo(idx) {
+  bannerCurrent = (idx + bannerSlides.length) % bannerSlides.length;
+  document.getElementById('bannerTrack').style.transform = 'translateX(-' + (bannerCurrent * 100) + '%)';
+  document.querySelectorAll('.banner-dot').forEach(function(d, i) {
+    d.classList.toggle('active', i === bannerCurrent);
+  });
+}
+
+function bannerNav(dir) {
+  bannerGoTo(bannerCurrent + dir);
+  bannerAutoPlay(); // reset timer on manual nav
+}
+
+function bannerAutoPlay() {
+  if (bannerTimer) clearInterval(bannerTimer);
+  if (bannerSlides.length < 2) return;
+  bannerTimer = setInterval(function() { bannerGoTo(bannerCurrent + 1); }, 4000);
+}
+
+// ── TEACHER: RENDER SLIDE LIST ────────────────────────────────
+function renderBannerEditor() {
+  if (!localStorage.getItem('eq_tu')) return;
+  document.getElementById('bannerEditor').style.display = 'block';
+  var list = document.getElementById('bannerSlideList');
+  var count = document.getElementById('bannerSlideCount');
+  count.textContent = bannerSlides.length + ' slide' + (bannerSlides.length !== 1 ? 's' : '');
+  if (!bannerSlides.length) {
+    list.innerHTML = '<div style="font-size:0.82rem;color:var(--text-muted);padding:8px 4px;">No slides yet. Add one below.</div>';
+    return;
+  }
+  list.innerHTML = bannerSlides.map(function(slide, i) {
+    var dotColor = { purple:'#7C3AED', red:'#DC2626', green:'#059669', amber:'#D97706', dark:'#1E1040' }[slide.color] || '#7C3AED';
+    return '<div class="banner-slide-item">' +
+      '<div class="banner-slide-item-dot" style="background:' + dotColor + '"></div>' +
+      '<div class="banner-slide-item-info">' +
+        '<div class="banner-slide-item-title">' + (slide.title || '—') + '</div>' +
+        '<div class="banner-slide-item-tag">' + (slide.tag || '') + (slide.link ? ' · ' + slide.link : '') + '</div>' +
+      '</div>' +
+      '<button class="banner-slide-item-del" onclick="deleteBannerSlide(' + i + ')">&#10005;</button>' +
+    '</div>';
+  }).join('');
+}
+
+function addBannerSlide() {
+  var tag   = document.getElementById('bnTag').value.trim();
+  var title = document.getElementById('bnTitle').value.trim();
+  var sub   = document.getElementById('bnSub').value.trim();
+  var link  = document.getElementById('bnLink').value.trim();
+  var color = document.getElementById('bnColor').value;
+  if (!title) { showToast && showToast('Please enter a title', 'warn'); return; }
+  var u = localStorage.getItem('eq_tu'), p = localStorage.getItem('eq_tp');
+  var newSlides = bannerSlides.concat([{ tag:tag, title:title, sub:sub, link:link, color:color }]);
+  annApiGet({ action:'setBannerSlides', username:u, password:p, data: JSON.stringify(newSlides) })
+    .then(function(res) {
+      if (res.success) {
+        bannerSlides = newSlides;
+        document.getElementById('bnTag').value = '';
+        document.getElementById('bnTitle').value = '';
+        document.getElementById('bnSub').value = '';
+        document.getElementById('bnLink').value = '';
+        renderBanner();
+        renderBannerEditor();
+      }
+    }).catch(function() {});
+}
+
+function deleteBannerSlide(idx) {
+  if (!confirm('Remove this slide?')) return;
+  var u = localStorage.getItem('eq_tu'), p = localStorage.getItem('eq_tp');
+  var newSlides = bannerSlides.filter(function(_, i) { return i !== idx; });
+  annApiGet({ action:'setBannerSlides', username:u, password:p, data: JSON.stringify(newSlides) })
+    .then(function(res) {
+      if (res.success) {
+        bannerSlides = newSlides;
+        if (!bannerSlides.length) document.getElementById('bannerWrap').style.display = 'none';
+        else renderBanner();
+        renderBannerEditor();
+      }
+    }).catch(function() {});
+}
+
+loadBannerSlides();
+if (localStorage.getItem('eq_tu')) renderBannerEditor();
+
 </script>
 
 
