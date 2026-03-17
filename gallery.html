@@ -339,7 +339,14 @@ function apiGet(url, params) {
   });
 }
 
-function toBase64(file) {
+function apiPost(url, params) {
+  return fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+    redirect: 'follow'
+  }).then(function(r) { return r.json(); });
+}
   return new Promise(function(resolve, reject) {
     var reader = new FileReader();
     reader.onload = function(e){ resolve(e.target.result.split(',')[1]); };
@@ -473,7 +480,7 @@ function teacherUpload() {
   btn.innerHTML = '<span class="spinner-sm"></span>Uploading...';
 
   toBase64(file).then(function(b64) {
-    return apiGet(API, {
+    return apiPost(API, {
       action: 'upload',
       username: savedUser, password: savedPass,
       cls: 'Teacher', name: 'Mr. Laksma',
@@ -587,7 +594,7 @@ function studentSubmit() {
   btn.innerHTML = '<span class="spinner-sm"></span>Submitting...';
 
   toBase64(file).then(function(b64) {
-    return apiGet(API, {
+    return apiPost(API, {
       action: 'upload',
       cls: cls, name: studentName, studentNo: no,
       caption: caption, fileName: file.name,
