@@ -624,13 +624,15 @@ function renderLeaderboard(cls) {
     var map = {};
     ch4Students.forEach(function(s) {
       if (!map[s.no]) map[s.no] = { name: s.name, nickname: s.nickname || '', avgs: [] };
-      if (s.average !== '' && s.average !== undefined && s.average !== null)
-        map[s.no].avgs.push(Number(s.average));
+      var v = Number(s.average);
+      if (s.average !== '' && s.average !== undefined && s.average !== null && !isNaN(v))
+        map[s.no].avgs.push(v);
     });
     ch5Students.forEach(function(s) {
       if (!map[s.no]) map[s.no] = { name: s.name, nickname: s.nickname || '', avgs: [] };
-      if (s.average !== '' && s.average !== undefined && s.average !== null)
-        map[s.no].avgs.push(Number(s.average));
+      var v = Number(s.average);
+      if (s.average !== '' && s.average !== undefined && s.average !== null && !isNaN(v))
+        map[s.no].avgs.push(v);
     });
 
     // Compute overall average per student
@@ -638,8 +640,12 @@ function renderLeaderboard(cls) {
     Object.keys(map).forEach(function(no) {
       var entry = map[no];
       if (!entry.avgs.length) return;
-      var total = entry.avgs.reduce(function(a, b) { return a + b; }, 0);
-      ranked.push({ name: entry.name, nickname: entry.nickname, avg: total / entry.avgs.length });
+      var validAvgs = entry.avgs.filter(function(v) { return !isNaN(v) && v !== null; });
+      if (!validAvgs.length) return;
+      var total = validAvgs.reduce(function(a, b) { return a + b; }, 0);
+      var overall = total / validAvgs.length;
+      if (isNaN(overall)) return;
+      ranked.push({ name: entry.name, nickname: entry.nickname, avg: overall });
     });
 
     ranked.sort(function(a, b) { return b.avg - a.avg; });
