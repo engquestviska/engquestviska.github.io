@@ -347,6 +347,8 @@ function apiPost(url, params) {
     redirect: 'follow'
   }).then(function(r) { return r.json(); });
 }
+
+function toBase64(file) {
   return new Promise(function(resolve, reject) {
     var reader = new FileReader();
     reader.onload = function(e){ resolve(e.target.result.split(',')[1]); };
