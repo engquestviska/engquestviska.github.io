@@ -121,6 +121,26 @@
       .score-grid { grid-template-columns: repeat(3, 1fr); }
     }
 
+    /* ── LEADERBOARD ─────────────────────────────────────────── */
+    .leaderboard { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; margin-top: 28px; }
+    .leaderboard-header { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); padding: 16px 24px; display: flex; align-items: center; gap: 10px; }
+    .leaderboard-header h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 800; color: #fff; margin: 0; }
+    .leaderboard-header .lb-sub { font-size: 0.78rem; color: rgba(255,255,255,0.8); margin-top: 2px; }
+    .leaderboard-body { padding: 16px 20px; }
+    .lb-row { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 14px; margin-bottom: 8px; background: var(--off-white); border: 1.5px solid var(--border); transition: background 0.15s; }
+    .lb-row:last-child { margin-bottom: 0; }
+    .lb-row.rank-1 { background: linear-gradient(135deg, #FFFBEB, #FEF3C7); border-color: #FCD34D; }
+    .lb-row.rank-2 { background: linear-gradient(135deg, #F8FAFC, #F1F5F9); border-color: #CBD5E1; }
+    .lb-row.rank-3 { background: linear-gradient(135deg, #FFF7ED, #FFEDD5); border-color: #FDBA74; }
+    .lb-medal { font-size: 1.4rem; width: 32px; text-align: center; flex-shrink: 0; }
+    .lb-rank-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); width: 20px; text-align: center; flex-shrink: 0; }
+    .lb-name { flex: 1; font-weight: 600; font-size: 0.92rem; color: var(--text-dark); }
+    .lb-name .lb-nick { font-size: 0.75rem; color: var(--text-muted); font-weight: 400; display: block; }
+    .lb-avg { font-family: 'IBM Plex Mono', monospace; font-size: 1.1rem; font-weight: 800; color: var(--purple); background: var(--purple-soft); border: 1.5px solid var(--purple-mid); padding: 4px 12px; border-radius: 999px; flex-shrink: 0; }
+    .lb-row.rank-1 .lb-avg { color: #92400E; background: #FEF3C7; border-color: #FCD34D; }
+    .lb-loading { text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.88rem; }
+    .lb-empty { text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.85rem; }
+
     .logout-btn { position: absolute; top: 20px; right: 20px; z-index: 2; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.85); font-size: 0.78rem; font-weight: 600; padding: 6px 14px; border-radius: 999px; cursor: pointer; font-family: inherit; display: none; align-items: center; gap: 5px; }
     .logout-btn:hover { background: rgba(255,255,255,0.22); }
     .teacher-active .logout-btn { display: flex; }
@@ -358,7 +378,9 @@ function autoLoadStudentScores(cls, no, name) {
           '<div id="sScoreCh4">' + ch4Html + '</div>' +
           '<div id="sScoreCh5" style="display:none">' + ch5Html + '</div>' +
         '</div>' +
-      '</div>';
+      '</div>' +
+      '<div id="leaderboardArea"></div>';
+    renderLeaderboard(cls);
   }).catch(function(e) {
     document.getElementById('sResult').innerHTML = '<div class="state-card"><div class="state-icon">&#9203;</div><div class="state-title">Connection problem</div><div class="state-sub">' + e.message + '</div></div>';
   });
@@ -416,7 +438,9 @@ function renderStudentScoreCard(student, ch4, ch5, cols4, cols5) {
   html += '<div id="sScoreCh5" style="display:none">' + buildStudentChapterHTML(ch5, cols5, 5) + '</div>';
 
   html += '</div></div>';
+  html += '<div id="leaderboardArea"></div>';
   result.innerHTML = html;
+  renderLeaderboard(currentClass);
 }
 
 function buildStudentChapterHTML(chData, cols, ch) {
@@ -520,7 +544,8 @@ function renderTeacherTable(students, inputCols) {
   });
   tbody += '</tbody>';
 
-  area.innerHTML = '<div class="table-wrap"><table>' + thead + tbody + '</table></div>';
+  area.innerHTML = '<div class="table-wrap"><table>' + thead + tbody + '</table></div><div id="leaderboardArea"></div>';
+  renderLeaderboard(currentClass);
 }
 
 function saveScore(input) {
@@ -569,6 +594,81 @@ function refreshRow(studentNo) {
       badge.textContent = ind;
       badge.className = 'ind-badge ' + (ind && ind !== '-' ? 'ind-' + ind.charAt(0).toUpperCase() : 'ind-X');
     }
+  });
+}
+
+// ── LEADERBOARD ───────────────────────────────────────────────
+function renderLeaderboard(cls) {
+  var container = document.getElementById('leaderboardArea');
+  if (!container) return;
+  var clsLabel = CLASS_LABELS[cls] || cls;
+  container.innerHTML =
+    '<div class="leaderboard">' +
+      '<div class="leaderboard-header">' +
+        '<div>' +
+          '<h3>&#127942; Class Leaderboard</h3>' +
+          '<div class="lb-sub">' + clsLabel + ' &mdash; Top 5 by Average Score</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="leaderboard-body"><div class="lb-loading"><div class="spinner" style="width:24px;height:24px;margin:0 auto 8px;"></div>Loading leaderboard...</div></div>' +
+    '</div>';
+
+  Promise.all([
+    cachedApiGet({ action: 'getChapterScores', className: cls, chapter: 4 }),
+    cachedApiGet({ action: 'getChapterScores', className: cls, chapter: 5 })
+  ]).then(function(responses) {
+    var ch4Students = (responses[0].students || []);
+    var ch5Students = (responses[1].students || []);
+
+    // Build map: studentNo -> { name, nickname, avgs[] }
+    var map = {};
+    ch4Students.forEach(function(s) {
+      if (!map[s.no]) map[s.no] = { name: s.name, nickname: s.nickname || '', avgs: [] };
+      if (s.average !== '' && s.average !== undefined && s.average !== null)
+        map[s.no].avgs.push(Number(s.average));
+    });
+    ch5Students.forEach(function(s) {
+      if (!map[s.no]) map[s.no] = { name: s.name, nickname: s.nickname || '', avgs: [] };
+      if (s.average !== '' && s.average !== undefined && s.average !== null)
+        map[s.no].avgs.push(Number(s.average));
+    });
+
+    // Compute overall average per student
+    var ranked = [];
+    Object.keys(map).forEach(function(no) {
+      var entry = map[no];
+      if (!entry.avgs.length) return;
+      var total = entry.avgs.reduce(function(a, b) { return a + b; }, 0);
+      ranked.push({ name: entry.name, nickname: entry.nickname, avg: total / entry.avgs.length });
+    });
+
+    ranked.sort(function(a, b) { return b.avg - a.avg; });
+    var top5 = ranked.slice(0, 5);
+
+    if (!top5.length) {
+      container.querySelector('.leaderboard-body').innerHTML = '<div class="lb-empty">No scores available yet for ' + clsLabel + '.</div>';
+      return;
+    }
+
+    var medals = ['&#129351;','&#129352;','&#129353;'];
+    var html = '';
+    var displayRank = 1;
+    top5.forEach(function(s, i) {
+      if (i > 0 && s.avg === top5[i - 1].avg) { /* tied — keep same rank */ }
+      else { displayRank = i + 1; }
+      var rankClass = displayRank <= 3 ? ' rank-' + displayRank : '';
+      var medal     = displayRank <= 3 ? medals[displayRank - 1] : '';
+      var rankNum   = displayRank > 3  ? '#' + displayRank : '';
+      html += '<div class="lb-row' + rankClass + '">';
+      html += '<div class="lb-medal">' + medal + '</div>';
+      html += '<div class="lb-rank-num">' + rankNum + '</div>';
+      html += '<div class="lb-name">' + s.name + (s.nickname ? '<span class="lb-nick">' + s.nickname + '</span>' : '') + '</div>';
+      html += '<div class="lb-avg">' + s.avg.toFixed(1) + '</div>';
+      html += '</div>';
+    });
+    container.querySelector('.leaderboard-body').innerHTML = html;
+  }).catch(function() {
+    container.querySelector('.leaderboard-body').innerHTML = '<div class="lb-empty">Could not load leaderboard.</div>';
   });
 }
 
