@@ -77,13 +77,6 @@
     .pending-warning { background:#FEF3C7; border:1.5px solid #FCD34D; border-radius:14px; padding:14px 18px; font-size:0.85rem; color:#92400E; display:none; line-height:1.5; }
     .pending-warning.show { display:block; }
 
-    /* PROGRESS BAR */
-    .upload-progress { margin-top: 12px; display: none; }
-    .upload-progress.show { display: block; }
-    .upload-progress-label { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin-bottom: 6px; font-family: 'IBM Plex Mono', monospace; }
-    .upload-progress-track { background: var(--border); border-radius: 999px; height: 8px; overflow: hidden; }
-    .upload-progress-bar { height: 8px; border-radius: 999px; background: linear-gradient(90deg, var(--purple), var(--purple-light)); width: 0%; transition: width 0.3s ease; }
-
     /* SUBMIT BTN */
     .btn-submit { width:100%; padding:14px; background:linear-gradient(135deg,#7C3AED,#5B21B6); color:#fff; border:none; border-radius:14px; font-family:'IBM Plex Sans',sans-serif; font-size:1rem; font-weight:700; cursor:pointer; transition:opacity 0.2s; margin-top:6px; }
     .btn-submit:hover { opacity:0.88; }
@@ -187,7 +180,7 @@
 <header>
   <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
   <a class="back-btn" href="index.html">&#8592; Back</a>
-  <button class="logout-btn" onclick="doLogout()">&#128274; Logout</button>
+  
   <h1>Photo <span>Gallery</span></h1>
   <p class="header-sub">English Quest · SMA Negeri 6 Surakarta</p>
 </header>
@@ -300,17 +293,13 @@
           </div>
         </div>
         <button class="btn-submit" id="sSubmitBtn" onclick="studentSubmit()">&#128228; Submit for Approval</button>
-        <div class="upload-progress" id="uploadProgress">
-          <div class="upload-progress-label" id="uploadProgressLabel">Uploading...</div>
-          <div class="upload-progress-track"><div class="upload-progress-bar" id="uploadProgressBar"></div></div>
-        </div>
       </div>
     </div>
   </div>
 
 </main>
 
-<footer>© 2025 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
+<footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
 
 <script>
 var API = 'https://script.google.com/macros/s/AKfycbxaH7GlkeJ_KsaegFEqNefOpQpTnxTVpC_cgfQJlLLA0c1fWu0qZTSNtNSAPGItpF6B-Q/exec';
@@ -351,16 +340,12 @@ function apiGet(url, params) {
 }
 
 function apiPost(url, params) {
-  // No Content-Type header — avoids CORS preflight which GAS doesn't support.
   return fetch(url, {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(params),
     redirect: 'follow'
-  }).then(function(r) { return r.text(); })
-    .then(function(text) {
-      try { return JSON.parse(text); }
-      catch(e) { return { error: 'Bad response: ' + text.slice(0, 100) }; }
-    });
+  }).then(function(r) { return r.json(); });
 }
 
 function toBase64(file) {
@@ -399,8 +384,7 @@ function loadGallery() {
     res.photos.forEach(function(p) {
       var item = document.createElement('div');
       item.className = 'gallery-item';
-      var imgUrl = p.thumbnail || ('https://drive.google.com/thumbnail?id=' + p.fileId + '&sz=w400');
-      var fullUrl = p.thumbnail || ('https://drive.google.com/thumbnail?id=' + p.fileId + '&sz=w800');
+      var imgUrl = 'https://drive.google.com/thumbnail?id=' + p.fileId + '&sz=w400';
       item.innerHTML =
         '<img class="gallery-img" src="' + imgUrl + '" alt="' + p.caption + '" loading="lazy"/>' +
         '<div class="gallery-info">' +
@@ -408,7 +392,7 @@ function loadGallery() {
           '<div class="gallery-meta">' + p.name + ' · ' + p.cls + '</div>' +
         '</div>';
       item.onclick = function() {
-        openLightbox(fullUrl, p.caption || 'Class moment', p.name + ' · ' + p.cls);
+        openLightbox('https://drive.google.com/thumbnail?id=' + p.fileId + '&sz=w800', p.caption || 'Class moment', p.name + ' · ' + p.cls);
       };
       grid.appendChild(item);
     });
@@ -421,7 +405,7 @@ function loadGallery() {
 function loadPending() {
   if (!isTeacher) return;
   document.getElementById('teacherPanel').classList.add('visible');
-  apiGet(API, { action: 'getPending', username: savedUser, password: savedPass }).then(function(res) {
+  apiGet(API, { action: 'getPending' }).then(function(res) {
     var grid = document.getElementById('pendingGrid');
     var badge = document.getElementById('pendingCount');
     grid.innerHTML = '';
@@ -436,7 +420,7 @@ function loadPending() {
       var card = document.createElement('div');
       card.className = 'pending-card';
       card.id = 'pending_' + p.rowIndex;
-      var imgUrl = p.thumbnail || ('https://drive.google.com/thumbnail?id=' + p.fileId + '&sz=w400');
+      var imgUrl = 'https://drive.google.com/thumbnail?id=' + p.fileId + '&sz=w400';
       card.innerHTML =
         '<img class="pending-img" src="' + imgUrl + '" alt=""/>' +
         '<div class="pending-info">' +
@@ -604,27 +588,12 @@ function studentSubmit() {
   if (!file)    { showToast('Please select a photo.'); return; }
   if (file.size > 5 * 1024 * 1024) { showToast('Photo too large. Max 5MB.'); return; }
 
+  // Get name from select
   var nameOpt = document.getElementById('sName');
   var studentName = nameOpt.options[nameOpt.selectedIndex].text;
 
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-sm"></span>Uploading...';
-
-  // Show progress bar and animate it
-  var progress  = document.getElementById('uploadProgress');
-  var bar       = document.getElementById('uploadProgressBar');
-  var label     = document.getElementById('uploadProgressLabel');
-  progress.classList.add('show');
-  bar.style.width = '0%';
-  label.textContent = 'Reading photo...';
-
-  // Fake progress to give visual feedback (real upload has no XHR progress)
-  var pct = 0;
-  var fakeTimer = setInterval(function() {
-    if (pct < 85) { pct += Math.random() * 12; bar.style.width = Math.min(pct, 85) + '%'; }
-    if (pct > 20) label.textContent = 'Uploading to server...';
-    if (pct > 60) label.textContent = 'Almost done...';
-  }, 400);
+  btn.innerHTML = '<span class="spinner-sm"></span>Submitting...';
 
   toBase64(file).then(function(b64) {
     return apiPost(API, {
@@ -635,11 +604,6 @@ function studentSubmit() {
       direct: 'false'
     });
   }).then(function(res) {
-    clearInterval(fakeTimer);
-    bar.style.width = '100%';
-    label.textContent = res.success ? '✅ Upload complete!' : '❌ Upload failed';
-    setTimeout(function() { progress.classList.remove('show'); bar.style.width = '0%'; }, 2000);
-
     if (res.success) {
       showToast('✅ Submitted! Waiting for Mr. Laksma\'s approval.');
       document.getElementById('sCaption').value = '';
@@ -654,11 +618,6 @@ function studentSubmit() {
       btn.innerHTML = '&#128228; Submit for Approval';
     }
   }).catch(function() {
-    clearInterval(fakeTimer);
-    bar.style.width = '100%';
-    bar.style.background = 'var(--red)';
-    label.textContent = '❌ Network error. Try again.';
-    setTimeout(function() { progress.classList.remove('show'); bar.style.width = '0%'; bar.style.background = ''; }, 2500);
     showToast('Network error. Try again.');
     btn.disabled = false;
     btn.innerHTML = '&#128228; Submit for Approval';
