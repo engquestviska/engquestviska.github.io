@@ -77,6 +77,13 @@
     .pending-warning { background:#FEF3C7; border:1.5px solid #FCD34D; border-radius:14px; padding:14px 18px; font-size:0.85rem; color:#92400E; display:none; line-height:1.5; }
     .pending-warning.show { display:block; }
 
+    /* PROGRESS BAR */
+    .upload-progress { margin-top: 12px; display: none; }
+    .upload-progress.show { display: block; }
+    .upload-progress-label { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; margin-bottom: 6px; font-family: 'IBM Plex Mono', monospace; }
+    .upload-progress-track { background: var(--border); border-radius: 999px; height: 8px; overflow: hidden; }
+    .upload-progress-bar { height: 8px; border-radius: 999px; background: linear-gradient(90deg, var(--purple), var(--purple-light)); width: 0%; transition: width 0.3s ease; }
+
     /* SUBMIT BTN */
     .btn-submit { width:100%; padding:14px; background:linear-gradient(135deg,#7C3AED,#5B21B6); color:#fff; border:none; border-radius:14px; font-family:'IBM Plex Sans',sans-serif; font-size:1rem; font-weight:700; cursor:pointer; transition:opacity 0.2s; margin-top:6px; }
     .btn-submit:hover { opacity:0.88; }
@@ -293,6 +300,10 @@
           </div>
         </div>
         <button class="btn-submit" id="sSubmitBtn" onclick="studentSubmit()">&#128228; Submit for Approval</button>
+        <div class="upload-progress" id="uploadProgress">
+          <div class="upload-progress-label" id="uploadProgressLabel">Uploading...</div>
+          <div class="upload-progress-track"><div class="upload-progress-bar" id="uploadProgressBar"></div></div>
+        </div>
       </div>
     </div>
   </div>
@@ -593,12 +604,27 @@ function studentSubmit() {
   if (!file)    { showToast('Please select a photo.'); return; }
   if (file.size > 5 * 1024 * 1024) { showToast('Photo too large. Max 5MB.'); return; }
 
-  // Get name from select
   var nameOpt = document.getElementById('sName');
   var studentName = nameOpt.options[nameOpt.selectedIndex].text;
 
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-sm"></span>Submitting...';
+  btn.innerHTML = '<span class="spinner-sm"></span>Uploading...';
+
+  // Show progress bar and animate it
+  var progress  = document.getElementById('uploadProgress');
+  var bar       = document.getElementById('uploadProgressBar');
+  var label     = document.getElementById('uploadProgressLabel');
+  progress.classList.add('show');
+  bar.style.width = '0%';
+  label.textContent = 'Reading photo...';
+
+  // Fake progress to give visual feedback (real upload has no XHR progress)
+  var pct = 0;
+  var fakeTimer = setInterval(function() {
+    if (pct < 85) { pct += Math.random() * 12; bar.style.width = Math.min(pct, 85) + '%'; }
+    if (pct > 20) label.textContent = 'Uploading to server...';
+    if (pct > 60) label.textContent = 'Almost done...';
+  }, 400);
 
   toBase64(file).then(function(b64) {
     return apiPost(API, {
@@ -609,6 +635,11 @@ function studentSubmit() {
       direct: 'false'
     });
   }).then(function(res) {
+    clearInterval(fakeTimer);
+    bar.style.width = '100%';
+    label.textContent = res.success ? '✅ Upload complete!' : '❌ Upload failed';
+    setTimeout(function() { progress.classList.remove('show'); bar.style.width = '0%'; }, 2000);
+
     if (res.success) {
       showToast('✅ Submitted! Waiting for Mr. Laksma\'s approval.');
       document.getElementById('sCaption').value = '';
@@ -623,6 +654,11 @@ function studentSubmit() {
       btn.innerHTML = '&#128228; Submit for Approval';
     }
   }).catch(function() {
+    clearInterval(fakeTimer);
+    bar.style.width = '100%';
+    bar.style.background = 'var(--red)';
+    label.textContent = '❌ Network error. Try again.';
+    setTimeout(function() { progress.classList.remove('show'); bar.style.width = '0%'; bar.style.background = ''; }, 2500);
     showToast('Network error. Try again.');
     btn.disabled = false;
     btn.innerHTML = '&#128228; Submit for Approval';
