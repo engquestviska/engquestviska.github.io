@@ -138,6 +138,9 @@
     .lb-name .lb-nick { font-size: 0.75rem; color: var(--text-muted); font-weight: 400; display: block; }
     .lb-avg { font-family: 'IBM Plex Mono', monospace; font-size: 1.1rem; font-weight: 800; color: var(--purple); background: var(--purple-soft); border: 1.5px solid var(--purple-mid); padding: 4px 12px; border-radius: 999px; flex-shrink: 0; }
     .lb-row.rank-1 .lb-avg { color: #92400E; background: #FEF3C7; border-color: #FCD34D; }
+    .lb-filters { display: flex; gap: 8px; margin-bottom: 14px; }
+    .lb-filter-btn { padding: 6px 16px; border-radius: 999px; border: 1.5px solid var(--border); background: var(--white); color: var(--text-muted); font-size: 0.78rem; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Mono', monospace; transition: all 0.15s; }
+    .lb-filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
     .lb-loading { text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.88rem; }
     .lb-empty { text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.85rem; }
 
@@ -407,6 +410,13 @@ function viewStudentScores() {
   var result = document.getElementById('sResult');
   result.innerHTML = '<div class="state-card"><div class="spinner"></div><div class="state-title">Loading scores...</div></div>';
 
+  // Save identity so tasks.html and strikes.html can auto-load
+  if (student) {
+    localStorage.setItem('eq_student_class', currentClass);
+    localStorage.setItem('eq_student_no', studentNo);
+    localStorage.setItem('eq_student_name', student.name);
+  }
+
   // Load both chapters in parallel
   Promise.all([
     cachedApiGet({ action: 'getChapterScores', className: currentClass, chapter: 4 }),
@@ -598,6 +608,8 @@ function refreshRow(studentNo) {
 }
 
 // ── LEADERBOARD ───────────────────────────────────────────────
+var lbChapter = 'overall'; // 'overall' | '4' | '5'
+
 function renderLeaderboard(cls) {
   var container = document.getElementById('leaderboardArea');
   if (!container) return;
@@ -610,9 +622,32 @@ function renderLeaderboard(cls) {
           '<div class="lb-sub">' + clsLabel + ' &mdash; Top 5 by Average Score</div>' +
         '</div>' +
       '</div>' +
-      '<div class="leaderboard-body"><div class="lb-loading"><div class="spinner" style="width:24px;height:24px;margin:0 auto 8px;"></div>Loading leaderboard...</div></div>' +
+      '<div class="leaderboard-body">' +
+        '<div class="lb-filters">' +
+          '<button class="lb-filter-btn' + (lbChapter === 'overall' ? ' active' : '') + '" onclick="switchLbFilter(\'' + cls + '\',\'overall\')">Overall</button>' +
+          '<button class="lb-filter-btn' + (lbChapter === '4' ? ' active' : '') + '" onclick="switchLbFilter(\'' + cls + '\',\'4\')">Chapter 4</button>' +
+          '<button class="lb-filter-btn' + (lbChapter === '5' ? ' active' : '') + '" onclick="switchLbFilter(\'' + cls + '\',\'5\')">Chapter 5</button>' +
+        '</div>' +
+        '<div id="lbRankings"><div class="lb-loading"><div class="spinner" style="width:24px;height:24px;margin:0 auto 8px;"></div>Loading leaderboard...</div></div>' +
+      '</div>' +
     '</div>';
 
+  loadLbRankings(cls);
+}
+
+function switchLbFilter(cls, chapter) {
+  lbChapter = chapter;
+  // Update button styles
+  document.querySelectorAll('.lb-filter-btn').forEach(function(btn) {
+    var isActive = (btn.textContent.toLowerCase().replace('chapter ','') === chapter) ||
+                   (chapter === 'overall' && btn.textContent === 'Overall');
+    btn.classList.toggle('active', isActive);
+  });
+  document.getElementById('lbRankings').innerHTML = '<div class="lb-loading"><div class="spinner" style="width:24px;height:24px;margin:0 auto 8px;"></div>Loading...</div>';
+  loadLbRankings(cls);
+}
+
+function loadLbRankings(cls) {
   Promise.all([
     cachedApiGet({ action: 'getChapterScores', className: cls, chapter: 4 }),
     cachedApiGet({ action: 'getChapterScores', className: cls, chapter: 5 })
@@ -623,36 +658,43 @@ function renderLeaderboard(cls) {
     // Build map: studentNo -> { name, nickname, avgs[] }
     var map = {};
     ch4Students.forEach(function(s) {
-      if (!map[s.no]) map[s.no] = { name: s.name, nickname: s.nickname || '', avgs: [] };
+      if (!map[s.no]) map[s.no] = { name: s.name, nickname: s.nickname || '', ch4: null, ch5: null };
       var v = Number(s.average);
       if (s.average !== '' && s.average !== undefined && s.average !== null && !isNaN(v))
-        map[s.no].avgs.push(v);
+        map[s.no].ch4 = v;
     });
     ch5Students.forEach(function(s) {
-      if (!map[s.no]) map[s.no] = { name: s.name, nickname: s.nickname || '', avgs: [] };
+      if (!map[s.no]) map[s.no] = { name: s.name, nickname: s.nickname || '', ch4: null, ch5: null };
       var v = Number(s.average);
       if (s.average !== '' && s.average !== undefined && s.average !== null && !isNaN(v))
-        map[s.no].avgs.push(v);
+        map[s.no].ch5 = v;
     });
 
-    // Compute overall average per student
+    // Compute score based on selected filter
     var ranked = [];
     Object.keys(map).forEach(function(no) {
       var entry = map[no];
-      if (!entry.avgs.length) return;
-      var validAvgs = entry.avgs.filter(function(v) { return !isNaN(v) && v !== null; });
-      if (!validAvgs.length) return;
-      var total = validAvgs.reduce(function(a, b) { return a + b; }, 0);
-      var overall = total / validAvgs.length;
-      if (isNaN(overall)) return;
-      ranked.push({ name: entry.name, nickname: entry.nickname, avg: overall });
+      var score = null;
+      if (lbChapter === '4') {
+        score = entry.ch4;
+      } else if (lbChapter === '5') {
+        score = entry.ch5;
+      } else {
+        // Overall: average of available chapters
+        var avgs = [entry.ch4, entry.ch5].filter(function(v) { return v !== null; });
+        if (avgs.length) score = avgs.reduce(function(a, b) { return a + b; }, 0) / avgs.length;
+      }
+      if (score === null || isNaN(score)) return;
+      ranked.push({ name: entry.name, nickname: entry.nickname, avg: score });
     });
 
     ranked.sort(function(a, b) { return b.avg - a.avg; });
     var top5 = ranked.slice(0, 5);
+    var rankings = document.getElementById('lbRankings');
+    if (!rankings) return;
 
     if (!top5.length) {
-      container.querySelector('.leaderboard-body').innerHTML = '<div class="lb-empty">No scores available yet for ' + clsLabel + '.</div>';
+      rankings.innerHTML = '<div class="lb-empty">No scores available yet.</div>';
       return;
     }
 
@@ -660,7 +702,7 @@ function renderLeaderboard(cls) {
     var html = '';
     var displayRank = 1;
     top5.forEach(function(s, i) {
-      if (i > 0 && s.avg === top5[i - 1].avg) { /* tied — keep same rank */ }
+      if (i > 0 && s.avg === top5[i - 1].avg) { /* tied */ }
       else { displayRank = i + 1; }
       var rankClass = displayRank <= 3 ? ' rank-' + displayRank : '';
       var medal     = displayRank <= 3 ? medals[displayRank - 1] : '';
@@ -672,9 +714,10 @@ function renderLeaderboard(cls) {
       html += '<div class="lb-avg">' + s.avg.toFixed(1) + '</div>';
       html += '</div>';
     });
-    container.querySelector('.leaderboard-body').innerHTML = html;
+    rankings.innerHTML = html;
   }).catch(function() {
-    container.querySelector('.leaderboard-body').innerHTML = '<div class="lb-empty">Could not load leaderboard.</div>';
+    var rankings = document.getElementById('lbRankings');
+    if (rankings) rankings.innerHTML = '<div class="lb-empty">Could not load leaderboard.</div>';
   });
 }
 
