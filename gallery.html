@@ -340,12 +340,16 @@ function apiGet(url, params) {
 }
 
 function apiPost(url, params) {
+  // No Content-Type header — avoids CORS preflight which GAS doesn't support.
   return fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(params),
     redirect: 'follow'
-  }).then(function(r) { return r.json(); });
+  }).then(function(r) { return r.text(); })
+    .then(function(text) {
+      try { return JSON.parse(text); }
+      catch(e) { return { error: 'Bad response: ' + text.slice(0, 100) }; }
+    });
 }
 
 function toBase64(file) {
