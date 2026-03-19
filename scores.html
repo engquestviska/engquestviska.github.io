@@ -355,15 +355,16 @@ function autoLoadStudentScores(cls, no, name) {
   Promise.all([
     cachedApiGet({ action: 'getChapterScores', className: cls, chapter: 4 }),
     cachedApiGet({ action: 'getChapterScores', className: cls, chapter: 5 }),
-    cachedApiGet({ action: 'getFinalScores', className: cls })
+    cachedApiGet({ action: 'getFinalScores', className: cls }).catch(function() { return {}; })
   ]).then(function(responses) {
     var ch4 = responses[0].students ? responses[0].students.find(function(s) { return String(s.no) === String(no); }) : null;
     var ch5 = responses[1].students ? responses[1].students.find(function(s) { return String(s.no) === String(no); }) : null;
-    var fin = responses[2].students ? responses[2].students.find(function(s) { return String(s.no) === String(no); }) : null;
+    var finRes = responses[2] || {};
+    var fin = finRes.students ? finRes.students.find(function(s) { return String(s.no) === String(no); }) : null;
 
     var ch4Html = buildStudentChapterHTML(ch4, responses[0].inputCols, 4);
     var ch5Html = buildStudentChapterHTML(ch5, responses[1].inputCols, 5);
-    var finHtml = buildStudentFinalHTML(fin, responses[2].inputCols, responses[2].calcCols);
+    var finHtml = buildStudentFinalHTML(fin, finRes.inputCols, finRes.calcCols);
 
     var result = document.getElementById('sResult');
     result.innerHTML =
@@ -416,11 +417,11 @@ function viewStudentScores() {
     localStorage.setItem('eq_student_name', student.name);
   }
 
-  // Load chapters + final in parallel
+  // Load chapters + final in parallel (final gracefully degrades if GS not yet deployed)
   Promise.all([
     cachedApiGet({ action: 'getChapterScores', className: currentClass, chapter: 4 }),
     cachedApiGet({ action: 'getChapterScores', className: currentClass, chapter: 5 }),
-    cachedApiGet({ action: 'getFinalScores', className: currentClass })
+    cachedApiGet({ action: 'getFinalScores', className: currentClass }).catch(function() { return {}; })
   ]).then(function(responses) {
     var ch4Data = responses[0];
     var ch5Data = responses[1];
@@ -428,9 +429,10 @@ function viewStudentScores() {
 
     var ch4Student = ch4Data.students ? ch4Data.students.find(function(s) { return String(s.no) === String(studentNo); }) : null;
     var ch5Student = ch5Data.students ? ch5Data.students.find(function(s) { return String(s.no) === String(studentNo); }) : null;
-    var finStudent = finData.students ? finData.students.find(function(s) { return String(s.no) === String(studentNo); }) : null;
+    var finData2 = finData || {};
+    var finStudent = finData2.students ? finData2.students.find(function(s) { return String(s.no) === String(studentNo); }) : null;
 
-    renderStudentScoreCard(student, ch4Student, ch5Student, finStudent, ch4Data.inputCols, ch5Data.inputCols, finData.inputCols, finData.calcCols);
+    renderStudentScoreCard(student, ch4Student, ch5Student, finStudent, ch4Data.inputCols, ch5Data.inputCols, finData2.inputCols, finData2.calcCols);
   });
 }
 
@@ -561,7 +563,7 @@ function loadTeacherScores() {
   if (currentChapter === 'F') {
     apiGet({ action: 'getFinalScores', className: currentClass })
       .then(function(res) {
-        if (res.error) { area.innerHTML = '<div class="state-card"><div class="state-icon">&#128580;</div><div class="state-title">Error</div><div class="state-sub">' + res.error + '</div></div>'; return; }
+        if (res.error) { area.innerHTML = '<div class="state-card"><div class="state-icon">&#128580;</div><div class="state-title">Error: ' + res.error + '</div><div class="state-sub">Make sure ScoresAPI.gs is redeployed with the latest version.</div></div>'; return; }
         renderTeacherFinalTable(res.students, res.inputCols, res.calcCols);
       }).catch(function(e) {
         area.innerHTML = '<div class="state-card"><div class="state-icon">&#9203;</div><div class="state-title">Connection problem</div><div class="state-sub">' + e.message + '</div></div>';
