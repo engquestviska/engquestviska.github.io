@@ -377,7 +377,7 @@ function autoLoadStudentScores(cls, no, name) {
           '</div>' +
         '</div>' +
         '<div class="score-card-body">' +
-          '<div class="chapter-tabs"><button class="ch-tab active" id="stab4" onclick="switchStudentTab(4)">Chapter 4</button><button class="ch-tab" id="stab5" onclick="switchStudentTab(5)">Chapter 5</button><button class="ch-tab" id="stabF" onclick="switchStudentTab(\'F\')">&#127942; Final Score</button></div>' +
+          '<div class="chapter-tabs"><button class="ch-tab active" id="stab4" onclick="switchStudentTab(4)">Chapter 4</button><button class="ch-tab" id="stab5" onclick="switchStudentTab(5)">Chapter 5</button><button class="ch-tab" id="stabF" onclick="switchStudentTab(&apos;F&apos;)">&#127942; Final Score</button></div>' +
           '<div id="sScoreCh4">' + ch4Html + '</div>' +
           '<div id="sScoreCh5" style="display:none">' + ch5Html + '</div>' +
           '<div id="sScoreF" style="display:none">' + finHtml + '</div>' +
@@ -443,7 +443,7 @@ function renderStudentScoreCard(student, ch4, ch5, fin, cols4, cols5, colsF, cal
   var html = '<div class="student-score-card">';
   html += '<div class="score-card-header"><div class="score-card-avatar">' + initial + '</div><div class="score-card-name"><div class="name">' + (student ? student.name : '') + '</div><div class="meta">' + CLASS_LABELS[currentClass] + ' &middot; ' + (student && student.nickname ? student.nickname : '') + '</div></div></div>';
   html += '<div class="score-card-body">';
-  html += '<div class="chapter-tabs"><button class="ch-tab active" id="stab4" onclick="switchStudentTab(4)">Chapter 4</button><button class="ch-tab" id="stab5" onclick="switchStudentTab(5)">Chapter 5</button><button class="ch-tab" id="stabF" onclick="switchStudentTab(\'F\')">&#127942; Final Score</button></div>';
+  html += '<div class="chapter-tabs"><button class="ch-tab active" id="stab4" onclick="switchStudentTab(4)">Chapter 4</button><button class="ch-tab" id="stab5" onclick="switchStudentTab(5)">Chapter 5</button><button class="ch-tab" id="stabF" onclick="switchStudentTab(&apos;F&apos;)">&#127942; Final Score</button></div>';
   html += '<div id="sScoreCh4">' + buildStudentChapterHTML(ch4, cols4, 4) + '</div>';
   html += '<div id="sScoreCh5" style="display:none">' + buildStudentChapterHTML(ch5, cols5, 5) + '</div>';
   html += '<div id="sScoreF" style="display:none">' + buildStudentFinalHTML(fin, colsF, calcColsF) + '</div>';
@@ -536,7 +536,7 @@ function renderTeacherMode() {
   main.innerHTML =
     '<div class="mode-badge teacher">&#9997; Teacher Mode &mdash; Editable</div>' +
     '<div class="filters"><span class="filter-label">Class</span><select class="filter-select" id="tClassSelect">' + classOptions + '</select></div>' +
-    '<div class="chapter-tabs"><button class="ch-tab active" id="ttab4" onclick="switchTeacherChapter(4)">Chapter 4</button><button class="ch-tab" id="ttab5" onclick="switchTeacherChapter(5)">Chapter 5</button><button class="ch-tab" id="ttabF" onclick="switchTeacherChapter(\'F\')">&#127942; Final Score</button></div>' +
+    '<div class="chapter-tabs"><button class="ch-tab active" id="ttab4" onclick="switchTeacherChapter(4)">Chapter 4</button><button class="ch-tab" id="ttab5" onclick="switchTeacherChapter(5)">Chapter 5</button><button class="ch-tab" id="ttabF" onclick="switchTeacherChapter(&apos;F&apos;)">&#127942; Final Score</button></div>' +
     '<div id="tTableArea"><div class="state-card"><div class="spinner"></div><div class="state-title">Loading...</div></div></div>';
 
   document.getElementById('tClassSelect').addEventListener('change', function() {
@@ -757,16 +757,23 @@ function renderLeaderboard(cls) {
         '</div>' +
       '</div>' +
       '<div class="leaderboard-body">' +
-        '<div class="lb-filters">' +
-          '<button class="lb-filter-btn' + (lbChapter === 'overall' ? ' active' : '') + '" onclick="switchLbFilter(\'' + cls + '\',\'overall\')">Overall</button>' +
-          '<button class="lb-filter-btn' + (lbChapter === '4' ? ' active' : '') + '" onclick="switchLbFilter(\'' + cls + '\',\'4\')">Chapter 4</button>' +
-          '<button class="lb-filter-btn' + (lbChapter === '5' ? ' active' : '') + '" onclick="switchLbFilter(\'' + cls + '\',\'5\')">Chapter 5</button>' +
-        '</div>' +
+        '<div class="lb-filters" id="lbFilters"></div>' +
         '<div id="lbRankings"><div class="lb-loading"><div class="spinner" style="width:24px;height:24px;margin:0 auto 8px;"></div>Loading leaderboard...</div></div>' +
       '</div>' +
     '</div>';
 
   loadLbRankings(cls);
+  // Build filter buttons via JS (avoids string escaping issues)
+  var lbFilters = document.getElementById('lbFilters');
+  if (lbFilters) {
+    [['overall','Overall'],['4','Chapter 4'],['5','Chapter 5']].forEach(function(f) {
+      var btn = document.createElement('button');
+      btn.className = 'lb-filter-btn' + (lbChapter === f[0] ? ' active' : '');
+      btn.textContent = f[1];
+      btn.onclick = function() { switchLbFilter(cls, f[0]); };
+      lbFilters.appendChild(btn);
+    });
+  }
 }
 
 function switchLbFilter(cls, chapter) {
