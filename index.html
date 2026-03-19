@@ -1437,12 +1437,7 @@
         <div class="card-name">Photo Gallery</div>
         <div class="card-desc">Class moments & memories</div>
       </a>
-      <a href="#" class="card" style="opacity:0.6;pointer-events:none;position:relative;" onclick="return false;">
-        <div class="card-icon ic-yellow">🏅</div>
-        <div class="card-name">Achievements</div>
-        <div class="card-desc">Awards & recognition</div>
-        <div style="position:absolute;top:8px;right:8px;background:#F59E0B;color:#fff;font-size:0.6rem;font-weight:700;padding:2px 7px;border-radius:999px;font-family:'IBM Plex Mono',monospace;">SOON</div>
-      </a>
+
 
     </div>
   </div>
@@ -1450,7 +1445,7 @@
 </main>
 
 <!-- ── FOOTER ── -->
-<footer>© 2025 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
+<footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
 
 
 <script>
@@ -1918,11 +1913,6 @@ function closeHeaderLogin() {
   document.getElementById('hlError').style.display = 'none';
 }
 
-async function hashPass(plain) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(plain));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-}
-
 async function doHeaderLogin() {
   const u = document.getElementById('hlUser').value.trim();
   const p = document.getElementById('hlPass').value.trim();
@@ -1931,14 +1921,13 @@ async function doHeaderLogin() {
     const res = await fetch('https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec?action=checkLogin&username=' + encodeURIComponent(u) + '&password=' + encodeURIComponent(p));
     const data = await res.json();
     if (data.ok) {
-      const hashed = await hashPass(p);
       localStorage.setItem('eq_tu', u);
-      localStorage.setItem('eq_tp', hashed);
+      localStorage.setItem('eq_tp', p);
       closeHeaderLogin();
       showTeacherBadge();
       // Trigger summative float button if exists
       if (typeof summTeacher !== 'undefined') {
-        summTeacher = true; summUser = u; summPass = hashed;
+        summTeacher = true; summUser = u; summPass = p;
         document.getElementById('summFloatBtn').style.display = 'flex';
         document.getElementById('summEditBtn').classList.add('visible');
       }
@@ -2376,11 +2365,7 @@ document.addEventListener('keydown', e => {
       <div class="sidebar-item-icon" style="background:rgba(59,130,246,0.2)">🖼️</div>
       <div class="sidebar-item-name">Photo Gallery</div>
     </a>
-    <a href="#" class="sidebar-item" style="opacity:0.5;pointer-events:none;">
-      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">🏅</div>
-      <div class="sidebar-item-name">Achievements</div>
-      <span class="sidebar-item-badge badge-soon">SOON</span>
-    </a>
+
   </div>
 
 </nav>
