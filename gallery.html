@@ -388,7 +388,8 @@ function loadGallery() {
     res.photos.forEach(function(p) {
       var item = document.createElement('div');
       item.className = 'gallery-item';
-      var imgUrl = 'https://drive.google.com/thumbnail?id=' + p.fileId + '&sz=w400';
+      var imgUrl = p.thumbnail || ('https://drive.google.com/thumbnail?id=' + p.fileId + '&sz=w400');
+      var fullUrl = p.thumbnail || ('https://drive.google.com/thumbnail?id=' + p.fileId + '&sz=w800');
       item.innerHTML =
         '<img class="gallery-img" src="' + imgUrl + '" alt="' + p.caption + '" loading="lazy"/>' +
         '<div class="gallery-info">' +
@@ -396,7 +397,7 @@ function loadGallery() {
           '<div class="gallery-meta">' + p.name + ' · ' + p.cls + '</div>' +
         '</div>';
       item.onclick = function() {
-        openLightbox('https://drive.google.com/thumbnail?id=' + p.fileId + '&sz=w800', p.caption || 'Class moment', p.name + ' · ' + p.cls);
+        openLightbox(fullUrl, p.caption || 'Class moment', p.name + ' · ' + p.cls);
       };
       grid.appendChild(item);
     });
@@ -409,7 +410,7 @@ function loadGallery() {
 function loadPending() {
   if (!isTeacher) return;
   document.getElementById('teacherPanel').classList.add('visible');
-  apiGet(API, { action: 'getPending' }).then(function(res) {
+  apiGet(API, { action: 'getPending', username: savedUser, password: savedPass }).then(function(res) {
     var grid = document.getElementById('pendingGrid');
     var badge = document.getElementById('pendingCount');
     grid.innerHTML = '';
@@ -424,7 +425,7 @@ function loadPending() {
       var card = document.createElement('div');
       card.className = 'pending-card';
       card.id = 'pending_' + p.rowIndex;
-      var imgUrl = 'https://drive.google.com/thumbnail?id=' + p.fileId + '&sz=w400';
+      var imgUrl = p.thumbnail || ('https://drive.google.com/thumbnail?id=' + p.fileId + '&sz=w400');
       card.innerHTML =
         '<img class="pending-img" src="' + imgUrl + '" alt=""/>' +
         '<div class="pending-info">' +
