@@ -12,7 +12,7 @@
       --purple: #7C3AED; --purple-light: #A78BFA; --purple-soft: #EDE9FE;
       --purple-mid: #C4B5FD; --white: #FFFFFF; --off-white: #F9F7FF;
       --text-dark: #1E1040; --text-muted: #6B5B95; --border: #E5DEFF;
-      --accent: #F59E0B;
+      --accent: #F59E0B; --green: #10B981;
     }
     body { font-family: 'IBM Plex Sans', sans-serif; background: var(--off-white); color: var(--text-dark); min-height: 100vh; }
 
@@ -46,34 +46,35 @@
     .task-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
 
     /* TASK CARD */
-    .task-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
+    .task-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
     .task-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(124,58,237,0.12); }
     .task-top { padding: 20px 20px 16px; display: flex; align-items: flex-start; gap: 14px; }
     .task-number { width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0; background: linear-gradient(135deg, var(--purple), #5B21B6); display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 800; color: #fff; }
     .task-info { flex: 1; min-width: 0; }
     .task-name { font-size: 1rem; font-weight: 700; line-height: 1.3; margin-bottom: 4px; }
-    .task-topic { font-size: 0.78rem; font-family: 'IBM Plex Mono', monospace; color: var(--purple-light); font-weight: 600; }
-    .task-actions { display: flex; border-top: 1.5px solid var(--border); border-radius: 0 0 18px 18px; overflow: hidden; }
+    .task-tag { font-size: 0.78rem; font-family: 'IBM Plex Mono', monospace; color: var(--purple-light); font-weight: 600; }
+    .task-actions { display: flex; gap: 0; border-top: 1.5px solid var(--border); }
     .btn-task-view { flex: 1; padding: 13px; background: var(--purple-soft); color: var(--purple); border: none; border-right: 1px solid var(--border); font-size: 0.88rem; font-weight: 700; text-align: center; cursor: pointer; font-family: inherit; transition: background 0.15s; }
     .btn-task-view:hover { background: var(--purple-mid); }
-    .btn-task-download { padding: 13px 18px; background: var(--purple); color: #fff; border: none; font-size: 0.88rem; font-weight: 700; cursor: pointer; font-family: inherit; text-decoration: none; display: flex; align-items: center; transition: opacity 0.15s; }
-    .btn-task-download:hover { opacity: 0.85; }
-    .btn-delete { position: absolute; top: -10px; right: -10px; width: 28px; height: 28px; border-radius: 50%; background: #EF4444; border: 2px solid #fff; color: #fff; font-size: 0.75rem; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 5; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    .btn-task-dl { padding: 13px 18px; background: var(--purple); color: #fff; border: none; font-size: 0.88rem; font-weight: 700; cursor: pointer; font-family: inherit; text-decoration: none; display: flex; align-items: center; transition: opacity 0.15s; }
+    .btn-task-dl:hover { opacity: 0.85; }
+
+    /* DELETE BUTTON */
+    .btn-delete { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(239,68,68,0.9); color: #fff; border: none; font-size: 0.75rem; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 5; }
     .teacher-active .btn-delete { display: flex; }
 
     /* PDF VIEWER MODAL */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(15,10,40,0.88); backdrop-filter: blur(8px); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15,10,40,0.85); backdrop-filter: blur(8px); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
     .modal-overlay.hidden { display: none; }
     .modal-top { width: 100%; max-width: 900px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
     .modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: #fff; }
-    .modal-subtitle { font-size: 0.8rem; color: rgba(255,255,255,0.6); font-family: 'IBM Plex Mono', monospace; margin-top: 2px; }
     .modal-actions { display: flex; gap: 10px; align-items: center; }
     .btn-modal-dl { background: var(--accent); color: #fff; border: none; padding: 9px 18px; border-radius: 999px; font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: inherit; text-decoration: none; display: inline-block; }
     .btn-modal-close { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #fff; width: 38px; height: 38px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     .modal-frame { width: 100%; max-width: 900px; flex: 1; max-height: 80vh; border-radius: 16px; overflow: hidden; background: #fff; }
     .modal-frame iframe { width: 100%; height: 100%; border: none; min-height: 70vh; }
 
-    /* ADD SHEET */
+    /* ADD SHEET MODAL */
     .am-overlay { position: fixed; inset: 0; background: rgba(15,10,40,0.7); backdrop-filter: blur(8px); z-index: 300; display: flex; align-items: flex-end; justify-content: center; }
     .am-overlay.hidden { display: none; }
     .am-sheet { background: #fff; border-radius: 28px 28px 0 0; width: 100%; max-width: 540px; padding-bottom: 32px; }
@@ -94,13 +95,16 @@
     .spinner-sm { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* TOAST */
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: #1E1040; color: #fff; padding: 10px 22px; border-radius: 999px; font-size: 0.88rem; font-weight: 600; z-index: 999; opacity: 0; transition: all 0.3s; pointer-events: none; white-space: nowrap; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
     footer { background: #1E1040; color: rgba(255,255,255,0.5); text-align: center; padding: 20px; font-size: 0.85rem; }
     footer strong { color: #A78BFA; }
 
     @media (max-width: 600px) {
       .task-grid { grid-template-columns: 1fr; }
       .chapter-title { font-size: 1.2rem; }
-      .modal-title { font-size: 1rem; }
     }
 
     /* ── SIDEBAR ─────────────────────────────────────────────── */
@@ -142,10 +146,7 @@
 <!-- PDF VIEWER MODAL -->
 <div class="modal-overlay hidden" id="pdfModal">
   <div class="modal-top">
-    <div>
-      <div class="modal-title" id="pdfModalTitle">Assignment</div>
-      <div class="modal-subtitle" id="pdfModalSubtitle"></div>
-    </div>
+    <div class="modal-title" id="pdfModalTitle">Assignment</div>
     <div class="modal-actions">
       <a class="btn-modal-dl" id="pdfModalDl" href="#" target="_blank">&#8595; Download</a>
       <button class="btn-modal-close" onclick="closePdfModal()">&#10005;</button>
@@ -156,41 +157,45 @@
   </div>
 </div>
 
-<!-- ADD ASSIGNMENT SHEET -->
-<div class="am-overlay hidden" id="addAssignOverlay">
+<!-- ADD ASSIGNMENT MODAL -->
+<div class="am-overlay hidden" id="addOverlay">
   <div class="am-sheet">
     <div class="am-handle"></div>
     <div class="am-head">
-      <div class="am-head-title">&#128203; Add Assignment</div>
-      <button class="am-close-btn" onclick="closeAddAssign()">&#10005;</button>
+      <div class="am-head-title" id="amTitle">Add Assignment</div>
+      <button class="am-close-btn" onclick="closeAddModal()">&#10005;</button>
     </div>
     <div class="am-body">
       <div class="am-field">
         <label>Assignment Title</label>
-        <input type="text" id="aTitle" placeholder="e.g. Task 6 — Reading Comprehension"/>
+        <input type="text" id="amName" placeholder="e.g. Task 6 — Reading Comprehension"/>
       </div>
       <div class="am-field">
-        <label>Topic / Tag (optional)</label>
-        <input type="text" id="aTag" placeholder="e.g. GRAMMAR · PRESENT PERFECT"/>
+        <label>Topic / Tag</label>
+        <input type="text" id="amTag" placeholder="e.g. READING · COMPREHENSION"/>
       </div>
       <div class="am-field">
         <label>Google Drive File ID or URL</label>
-        <input type="text" id="aFileId" placeholder="Paste Drive link or file ID"/>
-        <div class="am-hint">From share link: <code>drive.google.com/file/d/<strong>COPY_THIS</strong>/view</code></div>
+        <input type="text" id="amFileId" placeholder="Paste Drive link or just the file ID"/>
+        <div class="am-hint">From your share link: <code>drive.google.com/file/d/COPY_THIS/view</code></div>
       </div>
-      <div class="am-err" id="aErr"></div>
-      <button class="am-submit" id="aSubmitBtn">&#65291; Add Assignment</button>
+      <div class="am-err" id="amErr"></div>
+      <button class="am-submit" id="amSubmitBtn">&#65291; Add Assignment</button>
     </div>
   </div>
 </div>
 
+<div class="toast" id="toast"></div>
+
+<!-- HEADER -->
 <header>
   <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
   <a class="back-btn" href="index.html">&#8592; Back</a>
-  <button class="logout-btn" onclick="doLogout()">&#128274; Logout</button>
+  
   <h1>Assign<span>ments</span></h1>
-  <p class="header-sub">English Quest &middot; SMA Negeri 6 Surakarta</p>
+  <p class="header-sub">English Quest · SMA Negeri 6 Surakarta</p>
 </header>
+
 <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
   <path fill="#4C1D95" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
   <path fill="#F9F7FF" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
@@ -202,22 +207,22 @@
       <div class="chapter-badge">CHAPTER 4</div>
       <div class="chapter-title">Analytical Exposition</div>
       <div class="chapter-line"></div>
-      <button class="add-btn" id="addAssignBtn">&#65291; Add</button>
+      <button class="add-btn" id="addBtn4" onclick="openAddModal(4)">&#65291; Add</button>
     </div>
-    <div class="task-grid" id="assignGrid">
+    <div class="task-grid" id="grid-ch4">
 
-      <div class="task-card" data-assign-id="1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8">
-        <button class="btn-delete" onclick="deleteAssign('1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8', this.closest('.task-card'))">&#10005;</button>
+      <div class="task-card" data-fileid="1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8">
+        <button class="btn-delete" onclick="deleteAssignment(4,'1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8',this)">&#10005;</button>
         <div class="task-top">
           <div class="task-number">5</div>
           <div class="task-info">
             <div class="task-name">Present Perfect Exercise</div>
-            <div class="task-topic">GRAMMAR · PRESENT PERFECT</div>
+            <div class="task-tag">GRAMMAR · PRESENT PERFECT</div>
           </div>
         </div>
         <div class="task-actions">
-          <button class="btn-task-view" onclick="openPdf('Present Perfect Exercise', 'GRAMMAR · PRESENT PERFECT', '1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8')">&#128065; View</button>
-          <a class="btn-task-download" href="https://drive.google.com/uc?export=download&id=1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8" target="_blank">&#11015;</a>
+          <button class="btn-task-view" onclick="openPDF('Present Perfect Exercise','https://drive.google.com/file/d/1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8/preview','https://drive.google.com/uc?export=download&id=1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8')">&#128065; View</button>
+          <a class="btn-task-dl" href="https://drive.google.com/uc?export=download&id=1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8" target="_blank">&#11015;</a>
         </div>
       </div>
 
@@ -225,60 +230,48 @@
   </div>
 </main>
 
-<footer>&#169; 2025 <strong>English Quest</strong> &middot; SMA Negeri 6 Surakarta &middot; Built with &#10084;&#65039; by <strong>LaksMedia</strong></footer>
+<footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
 
 <script>
-var SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+var SCORES_API = 'https://script.google.com/macros/s/AKfycbywgwhsyFfrle320PvoKK-r149Y5UWnCYPH0-JC_zH7LDfKr-Xdz_Y4gG-xtqPJKW4U/exec';
 var savedUser = localStorage.getItem('eq_tu') || '';
 var savedPass = localStorage.getItem('eq_tp') || '';
 var isTeacher = !!savedUser;
+var amChapter = 4;
 
-if (isTeacher) document.body.classList.add('teacher-active');
+if (isTeacher) { document.body.classList.add('teacher-active'); }
 
 function apiGet(params) {
   var url = SCORES_API + '?';
   var parts = [];
   for (var k in params) parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
   url += parts.join('&');
-  function attempt(retries) {
-    return new Promise(function(resolve, reject) {
-      var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-      var script = document.createElement('script');
-      var timer = setTimeout(function() {
-        cleanup();
-        if (retries > 0) attempt(retries - 1).then(resolve).catch(reject);
-        else reject(new Error('Timeout'));
-      }, 15000);
-      function cleanup() {
-        clearTimeout(timer); delete window[cb];
-        try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
-      }
-      window[cb] = function(d) { cleanup(); resolve(d); };
-      script.onerror = function() {
-        cleanup();
-        if (retries > 0) attempt(retries - 1).then(resolve).catch(reject);
-        else reject(new Error('Network error'));
-      };
-      script.src = url + '&callback=' + cb;
-      (document.body || document.head).appendChild(script);
-    });
-  }
-  return attempt(1);
+  return new Promise(function(resolve, reject) {
+    var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    var s = document.createElement('script');
+    var t = setTimeout(function() { delete window[cb]; try{document.head.removeChild(s);}catch(e){} reject(new Error('Timeout')); }, 12000);
+    window[cb] = function(d) { clearTimeout(t); delete window[cb]; try{document.head.removeChild(s);}catch(e){} resolve(d); };
+    s.onerror = function() { clearTimeout(t); delete window[cb]; reject(new Error('Network error')); };
+    s.src = url + '&callback=' + cb;
+    document.head.appendChild(s);
+  });
 }
 
 function showToast(msg) {
-  var t = document.createElement('div');
-  t.textContent = msg;
-  t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#1E1040;color:#fff;padding:12px 22px;border-radius:999px;font-size:0.85rem;font-weight:600;z-index:9999;white-space:nowrap;';
-  document.body.appendChild(t);
-  setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 3000);
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2500);
 }
 
-function openPdf(title, tag, fileId) {
+function doLogout() {
+  localStorage.removeItem('eq_tu'); localStorage.removeItem('eq_tp');
+  window.location.href = 'index.html';
+}
+
+function openPDF(title, previewUrl, downloadUrl) {
   document.getElementById('pdfModalTitle').textContent = title;
-  document.getElementById('pdfModalSubtitle').textContent = tag || '';
-  document.getElementById('pdfModalIframe').src = 'https://drive.google.com/file/d/' + fileId + '/preview';
-  document.getElementById('pdfModalDl').href = 'https://drive.google.com/uc?export=download&id=' + fileId;
+  document.getElementById('pdfModalIframe').src = previewUrl;
+  document.getElementById('pdfModalDl').href = downloadUrl;
   document.getElementById('pdfModal').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
 }
@@ -289,104 +282,88 @@ function closePdfModal() {
 }
 document.getElementById('pdfModal').addEventListener('click', function(e) { if (e.target === this) closePdfModal(); });
 
-function loadAssignments() {
-  apiGet({ action: 'getMaterials', chapter: 'assign4' }).then(function(res) {
-    if (res.materials && res.materials.length > 0) {
-      res.materials.forEach(function(m) { appendCard(m.title, m.fileId, m.fileType || '', false); });
-    }
-  }).catch(function() {});
-}
+function appendCard(ch, name, fileId, tag) {
+  if (document.querySelector('[data-fileid="' + fileId + '"]')) return;
+  var prev = 'https://drive.google.com/file/d/' + fileId + '/preview';
+  var dl   = 'https://drive.google.com/uc?export=download&id=' + fileId;
+  var num  = document.getElementById('grid-ch' + ch).querySelectorAll('.task-card').length + 1;
 
-function appendCard(title, fileId, tag, animate) {
-  if (document.querySelector('[data-assign-id="' + fileId + '"]')) return;
-  var num = document.getElementById('assignGrid').querySelectorAll('.task-card').length + 1;
   var card = document.createElement('div');
   card.className = 'task-card';
-  card.setAttribute('data-assign-id', fileId);
+  card.setAttribute('data-fileid', fileId);
 
-  var delBtn = document.createElement('button');
-  delBtn.className = 'btn-delete';
-  delBtn.innerHTML = '&#10005;';
-  delBtn.onclick = function() { deleteAssign(fileId, card); };
+  var db = document.createElement('button');
+  db.className = 'btn-delete'; db.innerHTML = '&#10005;';
+  db.onclick = function() { deleteAssignment(ch, fileId, card); };
 
   var top = document.createElement('div'); top.className = 'task-top';
-  var numEl = document.createElement('div'); numEl.className = 'task-number'; numEl.textContent = num;
-  var info = document.createElement('div'); info.className = 'task-info';
-  var nameEl = document.createElement('div'); nameEl.className = 'task-name'; nameEl.textContent = title;
-  info.appendChild(nameEl);
-  if (tag) { var tagEl = document.createElement('div'); tagEl.className = 'task-topic'; tagEl.textContent = tag; info.appendChild(tagEl); }
-  top.appendChild(numEl); top.appendChild(info);
+  top.innerHTML = '<div class="task-number">' + num + '</div><div class="task-info"><div class="task-name">' + name + '</div>' + (tag ? '<div class="task-tag">' + tag + '</div>' : '') + '</div>';
 
-  var actions = document.createElement('div'); actions.className = 'task-actions';
-  var btnView = document.createElement('button'); btnView.className = 'btn-task-view'; btnView.innerHTML = '&#128065; View';
-  btnView.onclick = function() { openPdf(title, tag, fileId); };
-  var btnDl = document.createElement('a'); btnDl.className = 'btn-task-download';
-  btnDl.href = 'https://drive.google.com/uc?export=download&id=' + fileId;
-  btnDl.target = '_blank'; btnDl.innerHTML = '&#11015;';
-  actions.appendChild(btnView); actions.appendChild(btnDl);
+  var acts = document.createElement('div'); acts.className = 'task-actions';
+  var bv = document.createElement('button'); bv.className = 'btn-task-view'; bv.innerHTML = '&#128065; View';
+  bv.onclick = function() { openPDF(name, prev, dl); };
+  var bd = document.createElement('a'); bd.className = 'btn-task-dl'; bd.href = dl; bd.target = '_blank'; bd.innerHTML = '&#11015;';
+  acts.appendChild(bv); acts.appendChild(bd);
 
-  card.appendChild(delBtn); card.appendChild(top); card.appendChild(actions);
-  document.getElementById('assignGrid').appendChild(card);
+  card.appendChild(db); card.appendChild(top); card.appendChild(acts);
+  document.getElementById('grid-ch' + ch).appendChild(card);
 }
 
-function deleteAssign(fileId, card) {
-  if (!confirm('Remove this assignment?')) return;
-  apiGet({ action: 'deleteMaterial', username: savedUser, password: savedPass, chapter: 'assign4', fileId: fileId })
-    .then(function(res) { if (res.success) { card.remove(); showToast('Removed!'); } });
+function loadSaved() {
+  apiGet({ action: 'getMaterials', chapter: 'assign4' }).then(function(res) {
+    if (res.materials) res.materials.forEach(function(m) { appendCard(4, m.title, m.fileId, m.fileType || ''); });
+  }).catch(function() {});
 }
+loadSaved();
 
-document.getElementById('addAssignBtn').onclick = function() {
-  document.getElementById('aTitle').value = '';
-  document.getElementById('aTag').value = '';
-  document.getElementById('aFileId').value = '';
-  document.getElementById('aErr').className = 'am-err';
-  document.getElementById('aSubmitBtn').disabled = false;
-  document.getElementById('aSubmitBtn').innerHTML = '&#65291; Add Assignment';
-  document.getElementById('addAssignOverlay').classList.remove('hidden');
+function openAddModal(ch) {
+  amChapter = ch;
+  document.getElementById('amTitle').textContent = 'Add Assignment — Chapter ' + ch;
+  document.getElementById('amName').value = '';
+  document.getElementById('amTag').value = '';
+  document.getElementById('amFileId').value = '';
+  document.getElementById('amErr').className = 'am-err';
+  document.getElementById('amSubmitBtn').disabled = false;
+  document.getElementById('amSubmitBtn').innerHTML = '&#65291; Add Assignment';
+  document.getElementById('addOverlay').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
-};
-function closeAddAssign() {
-  document.getElementById('addAssignOverlay').classList.add('hidden');
+}
+function closeAddModal() {
+  document.getElementById('addOverlay').classList.add('hidden');
   document.body.style.overflow = '';
 }
-document.getElementById('addAssignOverlay').onclick = function(e) { if (e.target === this) closeAddAssign(); };
+document.getElementById('addOverlay').addEventListener('click', function(e) { if (e.target === this) closeAddModal(); });
 
-document.getElementById('aSubmitBtn').onclick = function() {
-  var raw = document.getElementById('aFileId').value.trim();
-  var title = document.getElementById('aTitle').value.trim();
-  var tag = document.getElementById('aTag').value.trim();
-  var err = document.getElementById('aErr');
-  var btn = document.getElementById('aSubmitBtn');
+document.getElementById('amSubmitBtn').onclick = function() {
+  var raw  = document.getElementById('amFileId').value.trim();
+  var name = document.getElementById('amName').value.trim();
+  var tag  = document.getElementById('amTag').value.trim();
+  var err  = document.getElementById('amErr');
+  var btn  = document.getElementById('amSubmitBtn');
   var fileId = raw;
   var m = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
   if (m) fileId = m[1];
-  if (!title) { err.textContent = 'Please enter a title.'; err.className = 'am-err show'; return; }
+  if (!name) { err.textContent = 'Please enter a title.'; err.className = 'am-err show'; return; }
   if (!fileId || fileId.length < 10) { err.textContent = 'Please enter a valid Drive link or file ID.'; err.className = 'am-err show'; return; }
   err.className = 'am-err';
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner-sm"></span>Saving...';
-  apiGet({ action: 'addMaterial', username: savedUser, password: savedPass, chapter: 'assign4', title: title, fileId: fileId, fileType: tag })
+  apiGet({ action: 'addMaterial', username: savedUser, password: savedPass, chapter: 'assign' + amChapter, title: name, fileId: fileId, fileType: tag })
     .then(function(res) {
-      if (res.success) { appendCard(title, fileId, tag, true); closeAddAssign(); showToast('Added: ' + title); }
-      else { err.textContent = res.error || 'Failed to save.'; err.className = 'am-err show'; }
-    }).catch(function() { err.textContent = 'Network error. Please try again.'; err.className = 'am-err show'; })
-    .finally(function() { btn.disabled = false; btn.innerHTML = '&#65291; Add Assignment'; });
+      if (res.success) { appendCard(amChapter, name, fileId, tag); closeAddModal(); showToast('Added: ' + name); }
+      else { err.textContent = res.error || 'Failed to save.'; err.className = 'am-err show'; btn.disabled = false; btn.innerHTML = '&#65291; Add Assignment'; }
+    }).catch(function() { err.textContent = 'Network error. Please try again.'; err.className = 'am-err show'; btn.disabled = false; btn.innerHTML = '&#65291; Add Assignment'; });
 };
 
-function doLogout() {
-  localStorage.removeItem('eq_tu'); localStorage.removeItem('eq_tp');
-  window.location.href = 'index.html';
-}
-
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closePdfModal(); closeAddAssign(); } });
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', loadAssignments);
-} else {
-  loadAssignments();
+function deleteAssignment(ch, fileId, cardEl) {
+  if (!confirm('Remove this assignment?')) return;
+  apiGet({ action: 'deleteMaterial', username: savedUser, password: savedPass, chapter: 'assign' + ch, fileId: fileId })
+    .then(function(res) { if (res.success) { cardEl.remove(); showToast('Removed!'); } })
+    .catch(function() { showToast('Error removing.'); });
 }
 </script>
 
+<!-- SIDEBAR -->
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <nav class="sidebar" id="sidebar">
   <div class="sidebar-head">
@@ -446,9 +423,7 @@ function toggleSidebar() {
   document.getElementById('hamburgerBtn').classList.toggle('open', open);
   document.body.style.overflow = open ? 'hidden' : '';
   var page = document.body.getAttribute('data-page') || '';
-  document.querySelectorAll('.sidebar-item[data-page]').forEach(function(el) {
-    el.classList.toggle('active', el.getAttribute('data-page') === page);
-  });
+  document.querySelectorAll('.sidebar-item[data-page]').forEach(function(el) { el.classList.toggle('active', el.getAttribute('data-page') === page); });
   var loggedIn = !!localStorage.getItem('eq_tu');
   document.getElementById('sbTeacherLoggedOut').style.display = loggedIn ? 'none' : 'block';
   document.getElementById('sbTeacherLoggedIn').style.display  = loggedIn ? 'block' : 'none';
@@ -456,10 +431,10 @@ function toggleSidebar() {
 function closeSidebar() {
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebarOverlay').classList.remove('open');
-  var hb = document.getElementById('hamburgerBtn');
-  if (hb) hb.classList.remove('open');
+  var hb = document.getElementById('hamburgerBtn'); if (hb) hb.classList.remove('open');
   document.body.style.overflow = '';
 }
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeSidebar(); });
 </script>
 
 </body>
