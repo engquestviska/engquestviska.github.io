@@ -120,7 +120,7 @@
     footer strong { color: var(--purple-light); }
     @media (max-width: 600px) {
       .filters { flex-direction: column; align-items: stretch; }
-      .score-grid { grid-template-columns: repeat(3, 1fr); }
+      .score-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
     /* ── LEADERBOARD ─────────────────────────────────────────── */
@@ -266,7 +266,7 @@ function apiGet(params) {
       var timer = setTimeout(function() {
         cleanup();
         if (retries > 0) { attempt(retries - 1).then(resolve).catch(reject); }
-        else { reject(new Error('Request timed out. Please check your connection and try again.')); }
+        else { reject(new Error('Connection timed out. Please check your internet and try again 🙏')); }
       }, 15000);
       function cleanup() {
         clearTimeout(timer); delete window[cb];
@@ -276,7 +276,7 @@ function apiGet(params) {
       script.onerror = function() {
         cleanup();
         if (retries > 0) { attempt(retries - 1).then(resolve).catch(reject); }
-        else { reject(new Error('Network error. Please try again.')); }
+        else { reject(new Error('Could not connect. Please check your internet and try again.')); }
       };
       script.src = url + '&callback=' + cb;
       (document.body || document.head).appendChild(script);
@@ -357,7 +357,7 @@ function autoLoadStudentScores(cls, no, name) {
   Promise.all([
     cachedApiGet({ action: 'getChapterScores', className: cls, chapter: 4 }),
     cachedApiGet({ action: 'getChapterScores', className: cls, chapter: 5 }),
-    cachedApiGet({ action: 'getFinalScores', className: cls }).catch(function() { return {}; })
+    cachedApiGet({ action: 'getFinalScores', className: cls }).then(function(r) { return r && !r.error ? r : {}; }).catch(function() { return {}; })
   ]).then(function(responses) {
     var ch4 = responses[0].students ? responses[0].students.find(function(s) { return String(s.no) === String(no); }) : null;
     var ch5 = responses[1].students ? responses[1].students.find(function(s) { return String(s.no) === String(no); }) : null;
@@ -423,7 +423,7 @@ function viewStudentScores() {
   Promise.all([
     cachedApiGet({ action: 'getChapterScores', className: currentClass, chapter: 4 }),
     cachedApiGet({ action: 'getChapterScores', className: currentClass, chapter: 5 }),
-    cachedApiGet({ action: 'getFinalScores', className: currentClass }).catch(function() { return {}; })
+    cachedApiGet({ action: 'getFinalScores', className: currentClass }).then(function(r) { return r && !r.error ? r : {}; }).catch(function() { return {}; })
   ]).then(function(responses) {
     var ch4Data = responses[0];
     var ch5Data = responses[1];
@@ -487,6 +487,8 @@ function buildStudentFinalHTML(finData, inputCols, calcCols) {
   if (!finData) return '<div class="state-card"><div class="state-icon">&#128203;</div><div class="state-title">No data yet</div><div class="state-sub">Final scores haven&#39;t been entered yet.</div></div>';
 
   var html = '<div class="score-grid">';
+
+  // Input cols — plain tiles
   if (inputCols) {
     inputCols.forEach(function(col) {
       var val = finData.scores ? finData.scores[col] : '';
@@ -494,11 +496,9 @@ function buildStudentFinalHTML(finData, inputCols, calcCols) {
       html += '<div class="score-tile"><div class="score-tile-label">' + col + '</div><div class="score-tile-val' + (isEmpty ? ' empty' : '') + '">' + (isEmpty ? '-' : val) + '</div></div>';
     });
   }
-  html += '</div>';
 
-  // Calculated cols (average, final, indicator etc.)
+  // Calc cols — highlighted purple tiles (same style as chapter summary)
   if (calcCols && calcCols.length && finData.calc) {
-    html += '<div class="final-summary">';
     calcCols.forEach(function(col) {
       var val = finData.calc[col];
       var isEmpty = val === '' || val === undefined || val === null;
@@ -506,14 +506,15 @@ function buildStudentFinalHTML(finData, inputCols, calcCols) {
       if (isGrade) {
         var ind = isEmpty ? '-' : String(val);
         var gradeClass = ind !== '-' ? 'grade-' + ind.charAt(0).toUpperCase() : '';
-        html += '<div class="summary-item grade"><div class="summary-label">' + col + '</div><div class="summary-val"><span class="grade-badge ' + gradeClass + '">' + ind + '</span></div></div>';
+        html += '<div class="score-tile highlight"><div class="score-tile-label">' + col + '</div><div class="score-tile-val"><span class="grade-badge ' + gradeClass + '">' + ind + '</span></div></div>';
       } else {
-        var num = isEmpty ? '-' : Number(val).toFixed(1);
-        html += '<div class="summary-item"><div class="summary-label">' + col + '</div><div class="summary-val">' + num + '</div></div>';
+        var num = isEmpty ? '-' : (isNaN(Number(val)) ? val : Number(val).toFixed(1));
+        html += '<div class="score-tile highlight"><div class="score-tile-label">' + col + '</div><div class="score-tile-val">' + (isEmpty ? '-' : num) + '</div></div>';
       }
     });
-    html += '</div>';
   }
+
+  html += '</div>';
   return html;
 }
 
@@ -537,6 +538,7 @@ function renderTeacherMode() {
 
   main.innerHTML =
     '<div class="mode-badge teacher">&#9997; Teacher Mode &mdash; Editable</div>' +
+    '<div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;">Having display issues? <span onclick="clearScoreCache()" style="color:var(--purple);cursor:pointer;font-weight:700;text-decoration:underline;">Clear cache</span></div>' +
     '<div class="filters"><span class="filter-label">Class</span><select class="filter-select" id="tClassSelect">' + classOptions + '</select></div>' +
     '<div class="chapter-tabs"><button class="ch-tab active" id="ttab4" onclick="switchTeacherChapter(4)">Chapter 4</button><button class="ch-tab" id="ttab5" onclick="switchTeacherChapter(5)">Chapter 5</button><button class="ch-tab" id="ttabF" onclick="switchTeacherChapter(&apos;F&apos;)">&#127942; Final Score</button></div>' +
     '<div id="tTableArea"><div class="state-card"><div class="spinner"></div><div class="state-title">Loading...</div></div></div>';
@@ -697,7 +699,7 @@ function saveFinalScoreCell(input) {
         input.className = 'score-input error';
         showBar('Error: ' + (res.error || 'Failed'), 'red');
       }
-    }).catch(function() { input.className = 'score-input error'; showBar('Network error', 'red'); });
+    }).catch(function() { input.className = 'score-input error'; showBar('Connection error', 'red'); });
 }
 
 function downloadCSV() {
@@ -760,7 +762,7 @@ function saveScore(input) {
         input.className = 'score-input error';
         showBar('Error: ' + (res.error || 'Failed'), 'red');
       }
-    }).catch(function() { input.className = 'score-input error'; showBar('Network error', 'red'); });
+    }).catch(function() { input.className = 'score-input error'; showBar('Connection error', 'red'); });
 }
 
 function refreshRow(studentNo) {
@@ -905,6 +907,17 @@ function loadLbRankings(cls) {
   });
 }
 
+function clearScoreCache() {
+  var keys = [];
+  for (var i = 0; i < localStorage.length; i++) {
+    var k = localStorage.key(i);
+    if (k && k.startsWith('eq_cache_')) keys.push(k);
+  }
+  keys.forEach(function(k) { localStorage.removeItem(k); });
+  showBar('Cache cleared! Reloading...', 'green');
+  setTimeout(function() { location.reload(); }, 1000);
+}
+
 var barTimer = null;
 function showBar(msg, type) {
   var bar = document.getElementById('saveBar');
@@ -993,6 +1006,7 @@ if (document.readyState === 'loading') {
       <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#127919;</div>
       <div class="sidebar-item-name">Summative</div>
     </a>
+    <a href="chapter5_guess_who.html" class="sidebar-item" data-page="guess_who" id="sbGuessWho" style="display:none"><div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">&#129300;</div><div class="sidebar-item-name">Guess Who? <span style="font-size:0.65rem;background:#7C3AED;color:#fff;padding:1px 6px;border-radius:999px;margin-left:4px;font-family:IBM Plex Mono,monospace;">Ch.5</span></div></a>
   </div>
   <div class="sidebar-teacher">
     <div class="sidebar-teacher-label">&#128273; Teacher Access</div>
@@ -1023,6 +1037,8 @@ function toggleSidebar() {
   var loggedIn = !!localStorage.getItem('eq_tu');
   document.getElementById('sbTeacherLoggedOut').style.display = loggedIn ? 'none' : 'block';
   document.getElementById('sbTeacherLoggedIn').style.display  = loggedIn ? 'block' : 'none';
+  var gwItem = document.getElementById('sbGuessWho');
+  if (gwItem) gwItem.style.display = loggedIn ? 'flex' : 'none';
 }
 function closeSidebar() {
   document.getElementById('sidebar').classList.remove('open');
