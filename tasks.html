@@ -366,7 +366,8 @@
     try {
       const data = await apiGet({ action: 'checkLogin', username: u, password: p });
       if (data.ok) {
-        const hashed = await hashPass(p);
+        // If silent (auto-login from localStorage), p is already a hash — don't re-hash
+        const hashed = silent ? p : await hashPass(p);
         isTeacher = true; savedUser = u; savedPass = hashed;
         localStorage.setItem('eq_tu', u); localStorage.setItem('eq_tp', hashed);
         closeLogin();
