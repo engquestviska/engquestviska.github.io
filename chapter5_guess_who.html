@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Guess Who? · Chapter 5 · English Quest</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --purple:#7C3AED; --purple-light:#A78BFA; --purple-soft:#EDE9FE; --purple-mid:#C4B5FD;
+      --white:#fff; --off-white:#F9F7FF; --text-dark:#1E1040; --text-muted:#6B5B95; --border:#E5DEFF;
+      --accent:#F59E0B; --green:#10B981; --green-soft:#D1FAE5; --red:#DC2626; --red-soft:#FEE2E2;
+      --gold:#F59E0B;
+    }
+    body { font-family:'IBM Plex Sans',sans-serif; background:var(--off-white); color:var(--text-dark); min-height:100vh; }
+    .screen { display:none; }
+    .screen.active { display:block; }
+
+    /* HEADER */
+    .page-header { background:linear-gradient(135deg,#7C3AED 0%,#5B21B6 50%,#4C1D95 100%); padding:36px 24px 52px; text-align:center; position:relative; overflow:hidden; }
+    .page-header::before { content:''; position:absolute; inset:0; background-image:radial-gradient(circle,rgba(255,255,255,0.08) 1px,transparent 1px); background-size:28px 28px; pointer-events:none; }
+    .back-btn { position:absolute; top:20px; left:20px; z-index:2; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); color:#fff; font-size:0.88rem; font-weight:600; padding:8px 18px; border-radius:999px; cursor:pointer; text-decoration:none; font-family:inherit; }
+    .back-btn:hover { background:rgba(255,255,255,0.25); }
+    .page-header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.8rem,5vw,2.8rem); font-weight:800; color:#fff; position:relative; z-index:1; }
+    .page-header h1 span { color:var(--accent); font-style:italic; }
+    .page-header-sub { color:rgba(255,255,255,0.75); font-size:0.95rem; margin-top:8px; position:relative; z-index:1; }
+    .wave { display:block; width:100%; margin-top:-2px; }
+
+    /* TOPBAR */
+    .topbar { background:linear-gradient(135deg,#7C3AED,#4C1D95); border-bottom:2px solid rgba(255,255,255,0.12); padding:10px 20px; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:50; flex-wrap:wrap; }
+    .topbar-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:800; color:#fff; white-space:nowrap; }
+    .topbar-sep { color:rgba(255,255,255,0.3); }
+    .score-chips { display:flex; gap:8px; flex-wrap:wrap; flex:1; }
+    .score-chip { padding:5px 14px; border-radius:999px; font-size:0.8rem; font-weight:700; background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.2); color:#fff; transition:all .15s; font-family:'IBM Plex Mono',monospace; }
+    .score-chip.leader { background:rgba(245,158,11,0.3); border-color:var(--gold); color:#FDE68A; }
+    .topbar-actions { display:flex; gap:8px; margin-left:auto; }
+    .btn-sm { padding:6px 14px; border-radius:8px; border:1.5px solid rgba(255,255,255,0.25); background:rgba(255,255,255,0.12); color:#fff; font-family:inherit; font-size:0.82rem; font-weight:600; cursor:pointer; }
+    .btn-sm:hover { background:rgba(255,255,255,0.22); }
+    .btn-sm.danger { border-color:rgba(239,68,68,0.4); color:#FCA5A5; }
+
+    /* SETUP */
+    #setup-screen main { max-width:520px; margin:0 auto; padding:32px 16px 80px; }
+    .setup-card { background:var(--white); border:1.5px solid var(--border); border-radius:24px; padding:28px; margin-bottom:20px; }
+    .setup-card h3 { font-family:'Playfair Display',serif; font-size:1.15rem; font-weight:800; margin-bottom:6px; }
+    .setup-card p { font-size:0.88rem; color:var(--text-muted); margin-bottom:18px; line-height:1.5; }
+    .name-input { width:100%; padding:14px 16px; border:1.5px solid var(--border); border-radius:14px; font-family:'IBM Plex Sans',sans-serif; font-size:0.95rem; color:var(--text-dark); background:var(--off-white); outline:none; resize:vertical; min-height:100px; }
+    .name-input:focus { border-color:var(--purple-light); background:#fff; }
+    .input-hint { font-size:0.75rem; color:var(--text-muted); margin-top:6px; font-family:'IBM Plex Mono',monospace; }
+    .preview-list { margin-top:14px; display:flex; flex-wrap:wrap; gap:8px; min-height:8px; }
+    .preview-chip { padding:5px 14px; background:var(--purple-soft); border:1.5px solid var(--purple-mid); border-radius:999px; font-size:0.82rem; font-weight:600; color:var(--purple); font-family:'IBM Plex Mono',monospace; }
+    .btn-primary { width:100%; padding:15px; background:linear-gradient(135deg,#7C3AED,#5B21B6); color:#fff; border:none; border-radius:14px; font-family:inherit; font-size:1rem; font-weight:700; cursor:pointer; transition:opacity 0.2s; }
+    .btn-primary:hover { opacity:0.88; }
+
+    /* ROUND SCREEN */
+    #round-screen > div { max-width:560px; margin:0 auto; padding:60px 20px; text-align:center; }
+    .round-badge { display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; padding:6px 18px; border-radius:999px; background:var(--purple-soft); border:1.5px solid var(--purple-mid); color:var(--purple); margin-bottom:16px; }
+    .round-title { font-family:'Playfair Display',serif; font-size:2.4rem; font-weight:800; margin-bottom:12px; }
+    .round-sub { font-size:0.95rem; color:var(--text-muted); margin-bottom:32px; line-height:1.6; }
+    .round-meta { display:flex; justify-content:center; gap:16px; margin-bottom:32px; flex-wrap:wrap; }
+    .round-meta-item { background:var(--white); border:1.5px solid var(--border); border-radius:16px; padding:14px 22px; text-align:center; }
+    .round-meta-item .val { font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:800; color:var(--purple); }
+    .round-meta-item .lbl { font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--text-muted); font-family:'IBM Plex Mono',monospace; margin-top:2px; }
+
+    /* GAME SCREEN */
+    #game-screen > div { max-width:760px; margin:0 auto; padding:32px 20px 80px; }
+    .game-progress { display:flex; align-items:center; gap:12px; margin-bottom:24px; flex-wrap:wrap; }
+    .progress-label { font-family:'IBM Plex Mono',monospace; font-size:0.78rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; }
+    .progress-dots { display:flex; gap:6px; }
+    .progress-dot { width:10px; height:10px; border-radius:50%; background:var(--border); transition:background 0.3s; }
+    .progress-dot.done { background:var(--green); }
+    .progress-dot.active { background:var(--purple); }
+
+    /* SILHOUETTE CARD */
+    .silhouette-card { background:var(--white); border:1.5px solid var(--border); border-radius:24px; padding:28px; margin-bottom:20px; text-align:center; }
+    .silhouette-wrap { width:100%; max-width:340px; height:260px; margin:0 auto 16px; border-radius:16px; overflow:hidden; background:#1E1040; display:flex; align-items:center; justify-content:center; position:relative; }
+    .silhouette-wrap img { width:100%; height:100%; object-fit:cover; filter:brightness(0); transition:filter 1s ease; }
+    .silhouette-wrap img.revealed { filter:brightness(1); }
+    .silhouette-placeholder { color:rgba(255,255,255,0.15); font-size:0.85rem; font-family:'IBM Plex Mono',monospace; text-align:center; padding:20px; }
+    .char-name-reveal { font-family:'Playfair Display',serif; font-size:2rem; font-weight:800; color:var(--purple); margin-top:8px; display:none; animation:fadeUp 0.5s ease; }
+    .char-name-reveal.show { display:block; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+    /* HINTS */
+    .hints-card { background:var(--white); border:1.5px solid var(--border); border-radius:24px; padding:28px; margin-bottom:20px; }
+    .hints-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:8px; }
+    .hints-title { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:800; }
+    .pts-badges { display:flex; gap:8px; }
+    .pts-badge { padding:5px 14px; border-radius:999px; font-size:0.78rem; font-weight:700; font-family:'IBM Plex Mono',monospace; border:1.5px solid; }
+    .pts-badge.h1 { background:#FEF3C7; border-color:#F59E0B; color:#92400E; }
+    .pts-badge.h2 { background:#DBEAFE; border-color:#3B82F6; color:#1E40AF; }
+    .pts-badge.h3 { background:var(--green-soft); border-color:#6EE7B7; color:#065F46; }
+    .pts-badge.inactive { opacity:0.35; }
+
+    .hint-row { display:flex; align-items:flex-start; gap:14px; padding:14px 0; border-bottom:1px solid var(--border); }
+    .hint-row:last-child { border-bottom:none; }
+    .hint-num { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; font-size:0.82rem; font-weight:700; flex-shrink:0; margin-top:2px; }
+    .hint-num.locked { background:var(--off-white); border:1.5px solid var(--border); color:var(--text-muted); }
+    .hint-num.h1 { background:#FEF3C7; border:1.5px solid #F59E0B; color:#92400E; }
+    .hint-num.h2 { background:#DBEAFE; border:1.5px solid #3B82F6; color:#1E40AF; }
+    .hint-num.h3 { background:var(--green-soft); border:1.5px solid #6EE7B7; color:#065F46; }
+    .hint-content { flex:1; }
+    .hint-pts-label { font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:4px; }
+    .hint-pts-label.h1 { color:#92400E; }
+    .hint-pts-label.h2 { color:#1E40AF; }
+    .hint-pts-label.h3 { color:#065F46; }
+    .hint-text { font-size:1rem; font-weight:600; line-height:1.5; color:var(--text-dark); }
+    .hint-text.locked { color:var(--border); user-select:none; }
+    .hint-locked-msg { font-size:0.82rem; color:var(--text-muted); font-style:italic; }
+
+    /* ACTIONS */
+    .game-actions { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
+    .btn-action { flex:1; padding:13px; border-radius:14px; border:none; font-family:inherit; font-size:0.92rem; font-weight:700; cursor:pointer; min-width:140px; transition:opacity 0.2s; }
+    .btn-action:hover { opacity:0.85; }
+    .btn-reveal-hint { background:linear-gradient(135deg,#7C3AED,#5B21B6); color:#fff; }
+    .btn-reveal-answer { background:linear-gradient(135deg,#F59E0B,#D97706); color:#fff; }
+    .btn-next { background:linear-gradient(135deg,#10B981,#059669); color:#fff; }
+    .btn-secondary { background:var(--off-white); border:1.5px solid var(--border) !important; color:var(--text-muted); }
+    .btn-action:disabled { opacity:0.4; cursor:not-allowed; }
+
+    /* AWARD */
+    .award-section { background:var(--white); border:1.5px solid var(--border); border-radius:24px; padding:24px; margin-bottom:20px; display:none; animation:fadeUp 0.3s ease; }
+    .award-section.show { display:block; }
+    .award-title { font-size:0.82rem; font-weight:700; color:var(--green); text-transform:uppercase; letter-spacing:0.06em; font-family:'IBM Plex Mono',monospace; margin-bottom:10px; }
+    .award-pts-display { font-family:'Playfair Display',serif; font-size:2.4rem; font-weight:800; color:var(--purple); margin-bottom:4px; }
+    .award-pts-which { font-size:0.78rem; color:var(--text-muted); font-family:'IBM Plex Mono',monospace; margin-bottom:16px; }
+    .player-award-grid { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+    .player-award-btn { padding:10px 18px; background:var(--green); color:#fff; border:none; border-radius:12px; font-family:inherit; font-size:0.88rem; font-weight:700; cursor:pointer; transition:opacity 0.2s; }
+    .player-award-btn:hover { opacity:0.85; }
+    .btn-nobody { padding:10px 20px; background:none; border:1.5px solid var(--border); color:var(--text-muted); border-radius:12px; font-family:inherit; font-size:0.88rem; font-weight:600; cursor:pointer; }
+    .btn-nobody:hover { border-color:var(--red); color:var(--red); }
+
+    /* FINISH */
+    #finish-screen > div { max-width:560px; margin:0 auto; padding:60px 20px; text-align:center; }
+    .finish-h { font-family:'Playfair Display',serif; font-size:2.4rem; font-weight:800; margin-bottom:8px; }
+    .finish-sub { font-size:0.95rem; color:var(--text-muted); margin-bottom:28px; }
+    .leaderboard { margin-bottom:28px; }
+    .lb-row { display:flex; align-items:center; gap:14px; padding:14px 18px; background:var(--white); border:1.5px solid var(--border); border-radius:16px; margin-bottom:10px; }
+    .lb-rank { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.1rem; background:var(--off-white); flex-shrink:0; }
+    .lb-rank.gold { background:#FEF3C7; }
+    .lb-rank.silver { background:#F1F5F9; }
+    .lb-rank.bronze { background:#FEF2E8; }
+    .lb-name { flex:1; font-weight:700; text-align:left; }
+    .lb-score { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:800; color:var(--purple); }
+
+    /* TOAST */
+    .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); padding:10px 22px; border-radius:999px; font-size:0.88rem; font-weight:700; z-index:999; opacity:0; transition:all 0.3s; pointer-events:none; white-space:nowrap; font-family:'IBM Plex Mono',monospace; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast.good { background:#065F46; color:#fff; }
+    .toast.bad { background:#991B1B; color:#fff; }
+    .toast:not(.good):not(.bad) { background:#1E1040; color:#fff; }
+
+    @media(max-width:600px) {
+      .game-actions { flex-direction:column; }
+      .silhouette-wrap { height:200px; }
+    }
+  
+    /* LOCK SCREEN */
+    #lock-screen { position:fixed; inset:0; background:linear-gradient(135deg,#1E1040 0%,#4C1D95 100%); display:flex; align-items:center; justify-content:center; z-index:9999; flex-direction:column; gap:0; }
+    .lock-card { background:rgba(255,255,255,0.07); border:1.5px solid rgba(255,255,255,0.15); border-radius:28px; padding:48px 40px; text-align:center; max-width:380px; width:90%; backdrop-filter:blur(12px); }
+    .lock-icon { font-size:3.5rem; margin-bottom:20px; }
+    .lock-title { font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:800; color:#fff; margin-bottom:8px; }
+    .lock-sub { font-size:0.9rem; color:rgba(255,255,255,0.55); margin-bottom:28px; line-height:1.6; }
+    .lock-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(239,68,68,0.2); border:1.5px solid rgba(239,68,68,0.4); border-radius:999px; padding:8px 20px; color:#FCA5A5; font-size:0.82rem; font-weight:700; font-family:'IBM Plex Mono',monospace; }
+
+  </style>
+</head>
+<body>
+
+<!-- LOCK SCREEN -->
+<div id="lock-screen">
+  <div class="lock-card">
+    <div class="lock-icon">&#128274;</div>
+    <div class="lock-title">Teacher Only</div>
+    <div class="lock-sub">This page is for Mr. Laksma's classroom use only. Students do not have access to this page.</div>
+    <div class="lock-badge">&#128683; Access Restricted</div>
+  </div>
+</div>
+
+
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen" class="screen active">
+  <div class="page-header">
+    <a class="back-btn" href="index.html">&#8592; Back</a>
+    <h1>Guess <span>Who?</span></h1>
+    <p class="page-header-sub">Chapter 5 · Narrative Text · English Quest · Mr. Laksma</p>
+  </div>
+  <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
+    <path fill="#4C1D95" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
+    <path fill="#F9F7FF" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
+  </svg>
+  <main>
+    <div class="setup-card">
+      <h3>Who's Playing?</h3>
+      <p>Type one name per line, or separate with commas. These are your students for today's session.</p>
+      <textarea class="name-input" id="manual-names" placeholder="e.g. Ahmad&#10;Budi, Citra&#10;Dewi"></textarea>
+      <div class="input-hint">Leave empty to play as "Player 1"</div>
+      <div class="preview-list" id="preview-list"></div>
+    </div>
+    <div class="setup-card">
+      <h3>How to Play</h3>
+      <p>A silhouette appears on screen. Reveal hints one by one. The earlier a student answers correctly, the more points they earn.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
+        <span class="pts-badge h1">Hint 1 = 15 pts</span>
+        <span class="pts-badge h2">Hint 2 = 10 pts</span>
+        <span class="pts-badge h3">Hint 3 = 5 pts</span>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="startGame()">Start Game</button>
+  </main>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar" id="topbar" style="display:none">
+  <span class="topbar-title">Guess Who?</span>
+  <span class="topbar-sep">&middot;</span>
+  <div class="score-chips" id="score-chips"></div>
+  <div class="topbar-actions">
+    <button class="btn-sm danger" onclick="endGame()">End Game</button>
+  </div>
+</div>
+
+<!-- ROUND INTRO SCREEN -->
+<div id="round-screen" class="screen">
+  <div>
+    <div class="round-badge" id="round-badge">Round 1</div>
+    <div class="round-title" id="round-title">Warm-Up</div>
+    <div class="round-sub" id="round-sub">Let's get started with 2 easy characters to warm up!</div>
+    <div class="round-meta">
+      <div class="round-meta-item">
+        <div class="val" id="round-char-count">2</div>
+        <div class="lbl">Characters</div>
+      </div>
+      <div class="round-meta-item">
+        <div class="val">15 / 10 / 5</div>
+        <div class="lbl">Points per Hint</div>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="startRound()">Let's Go!</button>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="game-screen" class="screen">
+  <div>
+    <!-- Progress -->
+    <div class="game-progress">
+      <span class="progress-label" id="progress-label">Round 1 · Character 1 of 2</span>
+      <div class="progress-dots" id="progress-dots"></div>
+    </div>
+
+    <!-- Silhouette -->
+    <div class="silhouette-card">
+      <div class="silhouette-wrap" id="silhouette-wrap">
+        <div class="silhouette-placeholder" id="silhouette-placeholder">
+          Upload an image for this character in the silhouette-wrap div
+        </div>
+        <img id="char-img" src="" alt="" style="display:none"/>
+      </div>
+      <div class="char-name-reveal" id="char-name-reveal"></div>
+    </div>
+
+    <!-- Hints -->
+    <div class="hints-card">
+      <div class="hints-header">
+        <div class="hints-title">Hints</div>
+        <div class="pts-badges">
+          <span class="pts-badge h1" id="badge-h1">H1 · 15 pts</span>
+          <span class="pts-badge h2" id="badge-h2">H2 · 10 pts</span>
+          <span class="pts-badge h3" id="badge-h3">H3 · 5 pts</span>
+        </div>
+      </div>
+
+      <!-- Hint 1 -->
+      <div class="hint-row">
+        <div class="hint-num h1" id="hnum-1">1</div>
+        <div class="hint-content">
+          <div class="hint-pts-label h1">Hint 1 — 15 points</div>
+          <div class="hint-text" id="hint-text-1"><span class="hint-locked-msg">Not revealed yet</span></div>
+        </div>
+      </div>
+      <!-- Hint 2 -->
+      <div class="hint-row">
+        <div class="hint-num locked" id="hnum-2">2</div>
+        <div class="hint-content">
+          <div class="hint-pts-label h2" id="hlabel-2" style="color:var(--text-muted)">Hint 2 — 10 points</div>
+          <div class="hint-text locked" id="hint-text-2"><span class="hint-locked-msg">Not revealed yet</span></div>
+        </div>
+      </div>
+      <!-- Hint 3 -->
+      <div class="hint-row">
+        <div class="hint-num locked" id="hnum-3">3</div>
+        <div class="hint-content">
+          <div class="hint-pts-label h3" id="hlabel-3" style="color:var(--text-muted)">Hint 3 — 5 points</div>
+          <div class="hint-text locked" id="hint-text-3"><span class="hint-locked-msg">Not revealed yet</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="game-actions">
+      <button class="btn-action btn-reveal-hint" id="btn-reveal-hint" onclick="revealNextHint()">Reveal Next Hint</button>
+      <button class="btn-action btn-reveal-answer" id="btn-reveal-answer" onclick="revealAnswer()" style="display:none">Reveal Answer</button>
+      <button class="btn-action btn-secondary" onclick="skipChar()">Skip Character</button>
+    </div>
+
+    <!-- Award Section -->
+    <div class="award-section" id="award-section">
+      <div class="award-title">Correct! Award points to:</div>
+      <div class="award-pts-display" id="award-pts-display">15</div>
+      <div class="award-pts-which" id="award-pts-which">answered on Hint 1</div>
+      <div class="player-award-grid" id="player-award-grid"></div>
+      <button class="btn-nobody" onclick="nobody()">Nobody got it right</button>
+    </div>
+
+    <!-- Next button (hidden until answer revealed) -->
+    <div id="next-wrap" style="display:none; margin-top:10px;">
+      <button class="btn-action btn-next" style="width:100%" onclick="nextChar()">Next Character &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- FINISH SCREEN -->
+<div id="finish-screen" class="screen">
+  <div>
+    <div class="finish-h">Game Over!</div>
+    <div class="finish-sub">Final Leaderboard &mdash; Chapter 5 Guess Who</div>
+    <div class="leaderboard" id="leaderboard"></div>
+    <button class="btn-primary" onclick="location.reload()">Play Again</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────────
+// DATA
+// ─────────────────────────────────────────────
+const rounds = [
+  {
+    id: 0,
+    label: 'Warm-Up',
+    title: 'Warm-Up Round',
+    sub: 'Two easy characters to get everyone warmed up. No pressure!',
+    characters: [
+      {
+        name: 'Woody',
+        image: 'images/warmup_woody.jpg',
+        hints: [
+          "This character is a natural leader who always puts others before themselves.",
+          "Their whole world was turned upside down when someone new arrived and took their place.",
+          "They are a cowboy toy who belongs to a boy named Andy."
+        ]
+      },
+      {
+        name: 'Nobita',
+        image: 'images/warmup_nobita.jpg',
+        hints: [
+          "This character is known for being lazy, clumsy, and not very good at school.",
+          "Despite their weaknesses, they have a very kind heart and care deeply for their friends.",
+          "A robot cat from the future was sent specifically to help improve this person's life."
+        ]
+      },
+    ]
+  },
+  {
+    id: 1,
+    label: 'Round 1',
+    title: 'Round 1',
+    sub: 'Five characters — folklore meets pop culture. Raise your hand when you know the answer!',
+    characters: [
+      {
+        name: 'Malin Kundang',
+        image: 'images/r1_malin_kundang.jpg',
+        hints: [
+          "This person left their hometown to seek a better life across the sea.",
+          "After becoming rich and successful, they refused to acknowledge someone who loved them deeply.",
+          "Their act of betrayal led to a curse — they were turned into stone on a beach in Sumatra."
+        ]
+      },
+      {
+        name: 'Moana',
+        image: 'images/r1_moana.jpg',
+        hints: [
+          "This young person felt a strong, unexplained calling toward the ocean.",
+          "They went on a dangerous voyage to save their island and its people.",
+          "They restored the heart of Te Fiti with the help of a demigod named Maui."
+        ]
+      },
+      {
+        name: 'Spongebob Squarepants',
+        image: 'images/r1_spongebob.jpg',
+        hints: [
+          "This character lives underwater and is always cheerful, even when things go wrong.",
+          "They work at a fast food restaurant and take their job extremely seriously.",
+          "Their best friend is a pink starfish, and they live in a pineapple house."
+        ]
+      },
+      {
+        name: 'Cinderella',
+        image: 'images/r1_cinderella.jpg',
+        hints: [
+          "This person lived with a family that treated them poorly and made them do all the chores.",
+          "With magical help, they attended a grand royal event but had to leave before midnight.",
+          "A lost shoe was the only clue that led a prince to find them again."
+        ]
+      },
+      {
+        name: 'Spider-Man',
+        image: 'images/r1_spiderman.jpg',
+        hints: [
+          "This ordinary teenager's life changed completely after a single unexpected accident.",
+          "They balance a normal school life while secretly protecting their city from danger.",
+          "They gained their powers from a bite, and their greatest lesson came from losing someone close."
+        ]
+      },
+    ]
+  },
+  {
+    id: 2,
+    label: 'Round 2',
+    title: 'Round 2',
+    sub: 'Getting harder — a mix of folklore heroes and famous characters.',
+    characters: [
+      {
+        name: 'Sangkuriang',
+        image: 'images/r2_sangkuriang.jpg',
+        hints: [
+          "This young man grew up without knowing the full truth about his own family.",
+          "He fell in love with a beautiful woman and was given an impossible task to marry her.",
+          "When he failed and discovered the truth, his rage created a mountain and a lake in West Java."
+        ]
+      },
+      {
+        name: 'Elsa',
+        image: 'images/r2_elsa.jpg',
+        hints: [
+          "This person had a powerful ability they were taught to hide from everyone around them.",
+          "After losing control, they isolated themselves to protect others from being hurt.",
+          "Their younger sister's love was ultimately what freed them from fear and isolation."
+        ]
+      },
+      {
+        name: 'Naruto Uzumaki',
+        image: 'images/r2_naruto.jpg',
+        hints: [
+          "This character grew up alone and was ignored or rejected by almost everyone in their village.",
+          "Despite this, they never gave up on their dream to become the most respected leader of their village.",
+          "They have a powerful creature sealed inside them, and their catchphrase involves never going back on their word."
+        ]
+      },
+      {
+        name: 'Doraemon',
+        image: 'images/r2_doraemon.jpg',
+        hints: [
+          "This character came from the future with a mission to help someone have a better life.",
+          "They carry an endless supply of incredible gadgets, all stored in a pocket on their stomach.",
+          "Despite being a robot, they have one major fear — and it involves small furry animals."
+        ]
+      },
+      {
+        name: 'Shrek',
+        image: 'images/r2_shrek.jpg',
+        hints: [
+          "This character just wanted to be left alone and live peacefully in their own space.",
+          "They were forced on an unexpected journey to rescue a princess they didn't particularly want to meet.",
+          "They live in a swamp, are covered in green skin, and their best friend never stops talking."
+        ]
+      },
+    ]
+  },
+  {
+    id: 3,
+    label: 'Round 3',
+    title: 'Round 3',
+    sub: 'Final round — the hardest set. Think carefully before raising your hand!',
+    characters: [
+      {
+        name: 'Timun Mas',
+        image: 'images/r3_timun_mas.jpg',
+        hints: [
+          "This character was born in an unusual way — not like any ordinary child.",
+          "They were chased by a terrifying giant creature that wanted to consume them.",
+          "They escaped using magical items — seeds, salt, and shrimp paste — given by their mother."
+        ]
+      },
+      {
+        name: 'Roro Jonggrang',
+        image: 'images/r3_roro_jonggrang.jpg',
+        hints: [
+          "This person used cleverness and deception to avoid an unwanted situation.",
+          "They set an impossible condition for someone who wanted to marry them.",
+          "When the trick was discovered, they were cursed and became the final stone statue in a famous temple complex in Java."
+        ]
+      },
+      {
+        name: 'Rapunzel',
+        image: 'images/r3_rapunzel.jpg',
+        hints: [
+          "This character spent most of their life locked away, never knowing the real reason why.",
+          "Their most distinctive feature was used as both a tool and a symbol of their captivity.",
+          "A thief who broke into their tower ended up changing their entire life and showing them the outside world."
+        ]
+      },
+      {
+        name: 'Harry Potter',
+        image: 'images/r3_harry_potter.jpg',
+        hints: [
+          "This person grew up not knowing who they truly were or the world they actually belonged to.",
+          "On their eleventh birthday, everything changed when they received an important letter.",
+          "They are famous for surviving an attack as a baby that no one else had ever survived before."
+        ]
+      },
+      {
+        name: 'Ipin',
+        image: 'images/r3_ipin.jpg',
+        hints: [
+          "This character is a young boy who is always seen together with someone who looks exactly like them.",
+          "They live with their older sister and grandmother in a small village in Malaysia.",
+          "They are known for their love of chicken and their very distinctive way of saying 'betul, betul, betul.'"
+        ]
+      },
+    ]
+  },
+];
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let players = [];
+let scores = {};
+let currentRoundIdx = 0;
+let currentCharIdx = 0;
+let hintsRevealed = 0; // 0 = none, 1 = hint1 shown, 2 = hint2 shown, 3 = hint3 shown
+let answerRevealed = false;
+let awardPending = false;
+
+// ─────────────────────────────────────────────
+// SETUP
+// ─────────────────────────────────────────────
+function startGame() {
+  const raw = document.getElementById('manual-names').value;
+  players = raw.split(/[\n,]+/).map(n => n.trim()).filter(Boolean);
+  if (!players.length) players = ['Player 1'];
+  players.forEach(p => scores[p] = 0);
+  document.getElementById('topbar').style.display = 'flex';
+  updateScoreBar();
+  showRoundIntro(0);
+}
+
+// ─────────────────────────────────────────────
+// ROUND INTRO
+// ─────────────────────────────────────────────
+function showRoundIntro(roundIdx) {
+  currentRoundIdx = roundIdx;
+  currentCharIdx = 0;
+  const r = rounds[roundIdx];
+  document.getElementById('round-badge').textContent = r.label;
+  document.getElementById('round-title').textContent = r.title;
+  document.getElementById('round-sub').textContent = r.sub;
+  document.getElementById('round-char-count').textContent = r.characters.length;
+  showScreen('round-screen');
+}
+
+function startRound() {
+  showScreen('game-screen');
+  loadCharacter();
+}
+
+// ─────────────────────────────────────────────
+// CHARACTER LOAD
+// ─────────────────────────────────────────────
+function loadCharacter() {
+  const r = rounds[currentRoundIdx];
+  const char = r.characters[currentCharIdx];
+  hintsRevealed = 0;
+  answerRevealed = false;
+  awardPending = false;
+
+  // Progress
+  document.getElementById('progress-label').textContent =
+    `${r.label} · Character ${currentCharIdx + 1} of ${r.characters.length}`;
+  buildProgressDots(r.characters.length, currentCharIdx);
+
+  // Silhouette
+  const img = document.getElementById('char-img');
+  const placeholder = document.getElementById('silhouette-placeholder');
+  if (char.image) {
+    img.src = char.image;
+    img.style.display = 'block';
+    img.classList.remove('revealed');
+    placeholder.style.display = 'none';
+  } else {
+    img.style.display = 'none';
+    placeholder.style.display = 'block';
+    placeholder.textContent = '[ Add image URL for ' + char.name + ' ]';
+  }
+
+  // Name reveal
+  const nameEl = document.getElementById('char-name-reveal');
+  nameEl.textContent = char.name;
+  nameEl.classList.remove('show');
+
+  // Reset hints
+  resetHints();
+
+  // Reveal hint 1 immediately
+  revealHint(1);
+
+  // Buttons
+  document.getElementById('btn-reveal-hint').style.display = 'inline-flex';
+  document.getElementById('btn-reveal-hint').disabled = false;
+  document.getElementById('btn-reveal-answer').style.display = 'none';
+  document.getElementById('award-section').classList.remove('show');
+  document.getElementById('next-wrap').style.display = 'none';
+
+  // Badge states
+  updateBadges(1);
+}
+
+function resetHints() {
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById('hint-text-' + i);
+    el.innerHTML = '<span class="hint-locked-msg">Not revealed yet</span>';
+    el.classList.add('locked');
+    const num = document.getElementById('hnum-' + i);
+    num.className = 'hint-num locked';
+  }
+}
+
+function revealHint(n) {
+  const char = rounds[currentRoundIdx].characters[currentCharIdx];
+  hintsRevealed = n;
+  const el = document.getElementById('hint-text-' + n);
+  el.textContent = char.hints[n - 1];
+  el.classList.remove('locked');
+  const num = document.getElementById('hnum-' + n);
+  num.className = 'hint-num h' + n;
+  updateBadges(n);
+}
+
+function revealNextHint() {
+  if (hintsRevealed >= 3) {
+    // All hints shown — show reveal answer button
+    document.getElementById('btn-reveal-hint').style.display = 'none';
+    document.getElementById('btn-reveal-answer').style.display = 'inline-flex';
+    return;
+  }
+  const next = hintsRevealed + 1;
+  revealHint(next);
+  showAwardForHint(next);
+  if (next === 3) {
+    document.getElementById('btn-reveal-hint').style.display = 'none';
+    document.getElementById('btn-reveal-answer').style.display = 'inline-flex';
+  }
+}
+
+function showAwardForHint(n) {
+  const pts = [15, 10, 5];
+  const labels = ['Hint 1', 'Hint 2', 'Hint 3'];
+  document.getElementById('award-pts-display').textContent = pts[n - 1];
+  document.getElementById('award-pts-which').textContent = 'answered on ' + labels[n - 1];
+  buildAwardPlayers(pts[n - 1]);
+  document.getElementById('award-section').classList.add('show');
+  awardPending = true;
+}
+
+function revealAnswer() {
+  answerRevealed = true;
+  const char = rounds[currentRoundIdx].characters[currentCharIdx];
+
+  // Reveal image filter
+  const img = document.getElementById('char-img');
+  if (img.src && char.image) img.classList.add('revealed');
+
+  // Show name
+  document.getElementById('char-name-reveal').classList.add('show');
+
+  // Show all hints
+  for (let i = hintsRevealed + 1; i <= 3; i++) revealHint(i);
+
+  document.getElementById('btn-reveal-answer').style.display = 'none';
+  document.getElementById('award-section').classList.remove('show');
+  document.getElementById('next-wrap').style.display = 'block';
+}
+
+function updateBadges(active) {
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById('badge-h' + i);
+    if (i <= active) el.classList.remove('inactive');
+    else el.classList.add('inactive');
+  }
+}
+
+function buildProgressDots(total, current) {
+  const wrap = document.getElementById('progress-dots');
+  wrap.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'progress-dot' + (i < current ? ' done' : i === current ? ' active' : '');
+    wrap.appendChild(d);
+  }
+}
+
+// ─────────────────────────────────────────────
+// AWARD
+// ─────────────────────────────────────────────
+function buildAwardPlayers(pts) {
+  const grid = document.getElementById('player-award-grid');
+  grid.innerHTML = '';
+  players.forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'player-award-btn';
+    btn.textContent = `${p}  (+${pts})`;
+    btn.onclick = () => awardPoints(p, pts);
+    grid.appendChild(btn);
+  });
+}
+
+function awardPoints(player, pts) {
+  scores[player] = (scores[player] || 0) + pts;
+  updateScoreBar();
+  showToast(`+${pts} pts → ${player}`, 'good');
+  document.getElementById('award-section').classList.remove('show');
+  document.getElementById('next-wrap').style.display = 'block';
+  document.getElementById('btn-reveal-answer').style.display = 'inline-flex';
+  awardPending = false;
+}
+
+function nobody() {
+  showToast('No points awarded.', 'bad');
+  document.getElementById('award-section').classList.remove('show');
+  document.getElementById('next-wrap').style.display = 'block';
+  document.getElementById('btn-reveal-answer').style.display = 'inline-flex';
+  awardPending = false;
+}
+
+function skipChar() {
+  document.getElementById('award-section').classList.remove('show');
+  nextChar();
+}
+
+// ─────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────
+function nextChar() {
+  const r = rounds[currentRoundIdx];
+  if (currentCharIdx + 1 < r.characters.length) {
+    currentCharIdx++;
+    loadCharacter();
+  } else {
+    // Round done
+    if (currentRoundIdx + 1 < rounds.length) {
+      showRoundIntro(currentRoundIdx + 1);
+    } else {
+      endGame();
+    }
+  }
+}
+
+// ─────────────────────────────────────────────
+// SCORE BAR
+// ─────────────────────────────────────────────
+function updateScoreBar() {
+  const container = document.getElementById('score-chips');
+  container.innerHTML = '';
+  const sorted = [...players].sort((a, b) => (scores[b] || 0) - (scores[a] || 0));
+  const maxScore = sorted.length ? (scores[sorted[0]] || 0) : -1;
+  sorted.forEach(p => {
+    const chip = document.createElement('span');
+    const isLeader = (scores[p] || 0) === maxScore && maxScore > 0;
+    chip.className = 'score-chip' + (isLeader ? ' leader' : '');
+    chip.textContent = `${p}: ${scores[p] || 0}`;
+    container.appendChild(chip);
+  });
+}
+
+// ─────────────────────────────────────────────
+// FINISH
+// ─────────────────────────────────────────────
+function endGame() {
+  document.getElementById('topbar').style.display = 'none';
+  const sorted = [...players].sort((a, b) => (scores[b] || 0) - (scores[a] || 0));
+  const board = document.getElementById('leaderboard');
+  board.innerHTML = '';
+  const rankClass = ['gold', 'silver', 'bronze'];
+  const rankEmoji = ['🥇', '🥈', '🥉'];
+  sorted.forEach((p, i) => {
+    const row = document.createElement('div');
+    row.className = 'lb-row';
+    row.innerHTML = `
+      <div class="lb-rank ${rankClass[i] || ''}">${rankEmoji[i] || i + 1}</div>
+      <div class="lb-name">${p}</div>
+      <div class="lb-score">${scores[p] || 0} pts</div>
+    `;
+    board.appendChild(row);
+  });
+  showScreen('finish-screen');
+}
+
+// ─────────────────────────────────────────────
+// UTILITIES
+// ─────────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+document.getElementById('manual-names').addEventListener('input', function() {
+  const names = this.value.split(/[\n,]+/).map(n => n.trim()).filter(Boolean);
+  const list = document.getElementById('preview-list');
+  list.innerHTML = names.map(n => '<span class="preview-chip">' + n + '</span>').join('');
+});
+
+// ── TEACHER LOCK ─────────────────────────────────────────────
+(function() {
+  var isTeacher = !!localStorage.getItem('eq_tu');
+  if (isTeacher) {
+    var lock = document.getElementById('lock-screen');
+    if (lock) lock.style.display = 'none';
+  }
+  // If not teacher, lock-screen stays visible and blocks everything
+})();
+
+</script>
+</body>
+</html>
