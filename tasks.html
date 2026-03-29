@@ -657,6 +657,7 @@
       <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#127919;</div>
       <div class="sidebar-item-name">Summative</div>
     </a>
+    <a href="chapter5_guess_who.html" class="sidebar-item" data-page="guess_who" id="sbGuessWho" style="display:none"><div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">&#129300;</div><div class="sidebar-item-name">Guess Who? <span style="font-size:0.65rem;background:#7C3AED;color:#fff;padding:1px 6px;border-radius:999px;margin-left:4px;font-family:IBM Plex Mono,monospace;">Ch.5</span></div></a>
   </div>
   <div class="sidebar-teacher">
     <div class="sidebar-teacher-label">&#128273; Teacher Access</div>
@@ -687,6 +688,8 @@ function toggleSidebar() {
   var loggedIn = !!localStorage.getItem('eq_tu');
   document.getElementById('sbTeacherLoggedOut').style.display = loggedIn ? 'none' : 'block';
   document.getElementById('sbTeacherLoggedIn').style.display  = loggedIn ? 'block' : 'none';
+  var gwItem = document.getElementById('sbGuessWho');
+  if (gwItem) gwItem.style.display = loggedIn ? 'flex' : 'none';
 }
 function closeSidebar() {
   document.getElementById('sidebar').classList.remove('open');
