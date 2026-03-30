@@ -74,10 +74,10 @@
 
     /* SILHOUETTE CARD */
     .silhouette-card { background:var(--white); border:1.5px solid var(--border); border-radius:24px; padding:28px; margin-bottom:20px; text-align:center; }
-    .silhouette-wrap { width:100%; max-width:340px; height:280px; margin:0 auto 16px; border-radius:16px; overflow:hidden; background:#ffffff; display:flex; align-items:center; justify-content:center; position:relative; border:1.5px solid var(--border); }
-    .silhouette-wrap img { width:100%; height:100%; object-fit:contain; filter:brightness(0); mix-blend-mode:multiply; transition:filter 1.2s ease, mix-blend-mode 0s; }
-    .silhouette-wrap img.revealed { filter:brightness(1) saturate(1.1); mix-blend-mode:normal; }
-    .silhouette-placeholder { color:rgba(255,255,255,0.15); font-size:0.85rem; font-family:'IBM Plex Mono',monospace; text-align:center; padding:20px; }
+    .silhouette-wrap { width:100%; max-width:340px; height:280px; margin:0 auto 16px; border-radius:16px; overflow:hidden; background:#f0f0f0; display:flex; align-items:center; justify-content:center; position:relative; border:1.5px solid var(--border); }
+    .silhouette-wrap img { display:none; }
+    .silhouette-canvas { width:100%; height:100%; object-fit:contain; }
+    .silhouette-placeholder { color:var(--text-muted); font-size:0.85rem; font-family:'IBM Plex Mono',monospace; text-align:center; padding:20px; }
     .char-name-reveal { font-family:'Playfair Display',serif; font-size:2rem; font-weight:800; color:var(--purple); margin-top:8px; display:none; animation:fadeUp 0.5s ease; }
     .char-name-reveal.show { display:block; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
@@ -258,7 +258,8 @@
         <div class="silhouette-placeholder" id="silhouette-placeholder">
           Upload an image for this character in the silhouette-wrap div
         </div>
-        <img id="char-img" src="" alt="" style="display:none"/>
+        <img id="char-img" src="" alt="" style="display:none" crossorigin="anonymous"/>
+        <canvas id="silhouette-canvas" class="silhouette-canvas" style="display:none"></canvas>
       </div>
       <div class="char-name-reveal" id="char-name-reveal"></div>
     </div>
@@ -585,29 +586,114 @@ function loadCharacter() {
     `${r.label} · Character ${currentCharIdx + 1} of ${r.characters.length}`;
   buildProgressDots(r.characters.length, currentCharIdx);
 
-  // Silhouette — preload image before showing
-  const img = document.getElementById('char-img');
+  // Silhouette — load image, process to silhouette on canvas
+  const img         = document.getElementById('char-img');
+  const canvas      = document.getElementById('silhouette-canvas');
   const placeholder = document.getElementById('silhouette-placeholder');
   img.classList.remove('revealed');
+  canvas.style.display = 'none';
+  img.style.display    = 'none';
 
   if (char.image) {
-    // Show spinner while loading
     placeholder.style.display = 'block';
-    placeholder.innerHTML = '<div style="width:28px;height:28px;border:3px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 8px;"></div><div>Loading image...</div>';
-    img.style.display = 'none';
+    placeholder.innerHTML = '<div style="width:28px;height:28px;border:3px solid rgba(0,0,0,0.15);border-top-color:#7C3AED;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 8px;"></div><div>Loading...</div>';
 
     const preload = new Image();
+    preload.crossOrigin = 'anonymous';
     preload.onload = function() {
-      img.src = char.image;
-      img.style.display = 'block';
+      // Draw to canvas and create silhouette
+      const wrap = canvas.parentElement;
+      const W = wrap.offsetWidth  || 340;
+      const H = wrap.offsetHeight || 280;
+
+      // Scale image to fit while keeping aspect ratio
+      const scale = Math.min(W / preload.width, H / preload.height);
+      const dw = Math.round(preload.width  * scale);
+      const dh = Math.round(preload.height * scale);
+      const dx = Math.round((W - dw) / 2);
+      const dy = Math.round((H - dh) / 2);
+
+      canvas.width  = W;
+      canvas.height = H;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, W, H);
+      ctx.drawImage(preload, dx, dy, dw, dh);
+
+      // Process pixels — detect background by sampling corners,
+      // then turn all non-background pixels black
+      try {
+        const imageData = ctx.getImageData(0, 0, W, H);
+        const d = imageData.data;
+
+        // Sample the 4 corners to get background color
+        function getPixel(x, y) {
+          const i = (y * W + x) * 4;
+          return [d[i], d[i+1], d[i+2], d[i+3]];
+        }
+        const corners = [
+          getPixel(dx + 2, dy + 2),
+          getPixel(dx + dw - 3, dy + 2),
+          getPixel(dx + 2, dy + dh - 3),
+          getPixel(dx + dw - 3, dy + dh - 3),
+        ].filter(c => c[3] > 0);
+
+        // Average background color
+        const bg = corners.length ? [
+          corners.reduce((s, c) => s + c[0], 0) / corners.length,
+          corners.reduce((s, c) => s + c[1], 0) / corners.length,
+          corners.reduce((s, c) => s + c[2], 0) / corners.length,
+        ] : [255, 255, 255];
+
+        // Tolerance — how similar a pixel must be to bg to count as background
+        const TOLERANCE = 55;
+
+        function colorDiff(r, g, b) {
+          return Math.sqrt(
+            (r - bg[0]) ** 2 +
+            (g - bg[1]) ** 2 +
+            (b - bg[2]) ** 2
+          );
+        }
+
+        // Outside the image area = transparent (already clear)
+        // Background-like pixels = transparent
+        // Everything else = black
+        for (let i = 0; i < d.length; i += 4) {
+          const a = d[i + 3];
+          if (a < 10) continue; // already transparent
+          const diff = colorDiff(d[i], d[i+1], d[i+2]);
+          if (diff < TOLERANCE) {
+            // Background pixel — make transparent
+            d[i + 3] = 0;
+          } else {
+            // Character pixel — make black
+            d[i]     = 0;
+            d[i + 1] = 0;
+            d[i + 2] = 0;
+            d[i + 3] = 255;
+          }
+        }
+        ctx.putImageData(imageData, 0, 0);
+      } catch(e) {
+        // CORS error — fall back to CSS brightness filter
+        ctx.clearRect(0, 0, W, H);
+        ctx.drawImage(preload, dx, dy, dw, dh);
+      }
+
+      // Store original for reveal
+      canvas._origImage  = preload;
+      canvas._origParams = { dx, dy, dw, dh, W, H };
+
       placeholder.style.display = 'none';
+      canvas.style.display      = 'block';
     };
     preload.onerror = function() {
       placeholder.innerHTML = '&#128247;<br><span style="font-size:0.75rem;margin-top:6px;display:block;">Image not found:<br>' + char.image + '</span>';
     };
     preload.src = char.image;
   } else {
-    img.style.display = 'none';
+    img.style.display    = 'none';
+    canvas.style.display = 'none';
     placeholder.style.display = 'block';
     placeholder.textContent = '[ No image set for ' + char.name + ' ]';
   }
@@ -693,18 +779,34 @@ function revealAnswer() {
   answerRevealed = true;
   const char = rounds[currentRoundIdx].characters[currentCharIdx];
 
-  // Reveal image filter
-  const img = document.getElementById('char-img');
-  if (char.image) {
-    if (img.complete && img.naturalWidth > 0) {
-      // Already loaded — reveal immediately
-      img.classList.add('revealed');
-    } else {
-      // Still loading — reveal once done
-      img.onload = function() { img.classList.add('revealed'); };
-      // Also set src in case preload failed
-      if (!img.src || img.src === window.location.href) img.src = char.image;
+  // Reveal — redraw original full-color image on canvas
+  const canvas = document.getElementById('silhouette-canvas');
+  if (char.image && canvas._origImage) {
+    const { dx, dy, dw, dh, W, H } = canvas._origParams;
+    const ctx = canvas.getContext('2d');
+    // Fade in color by animating alpha frames
+    let frame = 0;
+    const totalFrames = 30;
+    const orig = canvas._origImage;
+    function fadeIn() {
+      const alpha = frame / totalFrames;
+      ctx.clearRect(0, 0, W, H);
+      // Draw silhouette underneath
+      ctx.globalAlpha = 1 - alpha;
+      ctx.drawImage(canvas._silhouetteSnapshot || orig, 0, 0);
+      // Draw color on top
+      ctx.globalAlpha = alpha;
+      ctx.drawImage(orig, dx, dy, dw, dh);
+      ctx.globalAlpha = 1;
+      frame++;
+      if (frame <= totalFrames) requestAnimationFrame(fadeIn);
     }
+    // Take snapshot of current silhouette state for crossfade
+    canvas._silhouetteSnapshot = document.createElement('canvas');
+    canvas._silhouetteSnapshot.width  = W;
+    canvas._silhouetteSnapshot.height = H;
+    canvas._silhouetteSnapshot.getContext('2d').drawImage(canvas, 0, 0);
+    fadeIn();
   }
 
   // Show name
