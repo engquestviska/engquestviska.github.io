@@ -2336,6 +2336,7 @@ document.addEventListener('keydown', e => {
       <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">🎯</div>
       <div class="sidebar-item-name">Summative</div>
     </a>
+    <a href="chapter5_guess_who.html" class="sidebar-item" data-page="guess_who" id="sbGuessWho" style="display:none"><div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">&#129300;</div><div class="sidebar-item-name">Guess Who? <span style="font-size:0.65rem;background:#7C3AED;color:#fff;padding:1px 6px;border-radius:999px;margin-left:4px;font-family:IBM Plex Mono,monospace;">Ch.5</span></div></a>
     <a href="https://www.instagram.com/engquest.viska/" target="_blank" class="sidebar-item">
       <div class="sidebar-item-icon" style="background:rgba(124,58,237,0.2)">📸</div>
       <div class="sidebar-item-name">Instagram</div>
@@ -2368,6 +2369,8 @@ function updateSidebarTeacher() {
   const loggedIn = !!localStorage.getItem('eq_tu');
   document.getElementById('sbTeacherLoggedOut').style.display = loggedIn ? 'none' : 'block';
   document.getElementById('sbTeacherLoggedIn').style.display  = loggedIn ? 'block' : 'none';
+  var gwItem = document.getElementById('sbGuessWho');
+  if (gwItem) gwItem.style.display = loggedIn ? 'flex' : 'none';
 }
 updateSidebarTeacher();
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
