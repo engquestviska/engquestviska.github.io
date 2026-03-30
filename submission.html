@@ -427,7 +427,7 @@ function loadSubmissions() {
         (res.classes || []).forEach(function(cls) {
           var opt = document.createElement('option');
           opt.value = cls;
-          opt.textContent = cls;
+          opt.textContent = CLASS_LABELS[cls] || cls;
           stSel.appendChild(opt);
         });
         // Auto-select saved class
@@ -447,10 +447,11 @@ function loadSubmissions() {
         (res.classes || []).forEach(function(cls, i) {
           var opt = document.createElement('option');
           opt.value = cls;
-          opt.textContent = cls;
+          opt.textContent = CLASS_LABELS[cls] || cls;
           if (i === 0) opt.selected = true;
           tSel.appendChild(opt);
         });
+        loadTeacherStatus();
       }
     }
   }).catch(function() {});
