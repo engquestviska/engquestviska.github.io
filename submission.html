@@ -266,8 +266,8 @@
         <div class="status-picker-row">
           <div class="status-picker-field">
             <label>Class</label>
-            <select id="stClassSel" onchange="onStatusClassChange()">
-              <option value="">— Select class —</option>
+            <select id="stClassSel" onchange="onStatusClassChange()" disabled>
+              <option value="">⏳ Loading classes...</option>
             </select>
           </div>
           <div class="status-picker-field">
@@ -426,17 +426,17 @@ function loadSubmissions() {
       // Populate student class dropdown
       var stSel = document.getElementById('stClassSel');
       if (stSel) {
-        stSel.innerHTML = '<option value="">— Select class —</option>';
+        stSel.innerHTML = '<option value="">— Select your class —</option>';
         (res.classes || []).forEach(function(cls) {
           var opt = document.createElement('option');
           opt.value = cls;
           opt.textContent = CLASS_LABELS[cls] || cls;
           stSel.appendChild(opt);
         });
+        stSel.disabled = false;
         // Auto-select saved class
         var savedCls = localStorage.getItem('eq_student_class');
         if (savedCls) {
-          // Try exact match first, then try stripping/adding dash
           var found = (res.classes || []).find(function(c) { return c === savedCls; });
           if (!found) found = (res.classes || []).find(function(c) { return c.replace('-','') === savedCls.replace('-',''); });
           if (found) stSel.value = found;
@@ -457,7 +457,13 @@ function loadSubmissions() {
         loadTeacherStatus();
       }
     }
-  }).catch(function() {});
+  }).catch(function() {
+    var stSel = document.getElementById('stClassSel');
+    if (stSel) {
+      stSel.innerHTML = '<option value="">⚠️ Failed to load — refresh page</option>';
+      stSel.disabled = false;
+    }
+  });
 }
 
 function onStatusClassChange() {
