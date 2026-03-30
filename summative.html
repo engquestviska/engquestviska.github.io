@@ -234,6 +234,7 @@
         <button class="tp-refresh" onclick="loadTeacherData()">&#8635; Refresh</button>
         <button class="btn-reveal-all" id="btnRevealAll" onclick="revealAll(true)">&#128275; Reveal All</button>
         <button class="btn-hide-all" id="btnHideAll" onclick="revealAll(false)">&#128274; Hide All</button>
+        <button class="btn-reveal-all" id="btnSyncReveal" onclick="syncRevealByTasks()" style="background:linear-gradient(135deg,#7C3AED,#5B21B6);">&#9889; Sync by Tasks</button>
       </div>
 
     </div>
@@ -775,6 +776,98 @@ function revealAll(reveal) {
       });
   }
   next(0);
+}
+
+// ── SYNC REVEAL BY TASK COMPLETION ──────────────────────────
+async function syncRevealByTasks() {
+  if (!savedUser || !savedPass) { showToast('Not logged in as teacher.'); return; }
+
+  var classStudents = allData.filter(function(r) { return r.cls === currentCls; });
+  if (!classStudents.length) { showToast('No students found for ' + currentCls); return; }
+
+  var btn = document.getElementById('btnSyncReveal');
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ Checking tasks...'; }
+
+  try {
+    // Load task status for the current class
+    // currentCls is 'XE1' format, ScoresAPI expects the same
+    var taskData = await new Promise(function(resolve, reject) {
+      apiGet({ action: 'getAllTasks', className: currentCls })
+        .then(resolve).catch(reject);
+    });
+
+    if (taskData.error || !taskData.students) {
+      showToast('Could not load task data for ' + currentCls);
+      if (btn) { btn.disabled = false; btn.textContent = '⚡ Sync by Tasks'; }
+      return;
+    }
+
+    // Find Ch4 task keys
+    var ch4Keys = taskData.taskKeys.filter(function(k) { return k.match(/^C4T/i); });
+    if (!ch4Keys.length) { showToast('No Chapter 4 task keys found.'); if (btn) { btn.disabled = false; btn.textContent = '⚡ Sync by Tasks'; } return; }
+
+    // Build map: studentName (lowercase) → allCh4Done
+    var taskMap = {};
+    taskData.students.forEach(function(s) {
+      var allDone = ch4Keys.every(function(k) { return !!s.tasks[k]; });
+      taskMap[s.name.toLowerCase()] = allDone;
+    });
+
+    // Find students to reveal — all Ch4 tasks done AND not yet revealed
+    var toReveal = [];
+    classStudents.forEach(function(s, idx) {
+      var isDone     = !!taskMap[s.name.toLowerCase()];
+      var isRevealed = s.revealed === 'TRUE';
+      if (isDone && !isRevealed) toReveal.push({ s: s, attNum: idx + 1 });
+    });
+
+    if (!toReveal.length) {
+      showToast('All eligible students already revealed ✅');
+      if (btn) { btn.disabled = false; btn.textContent = '⚡ Sync by Tasks'; }
+      return;
+    }
+
+    if (btn) btn.textContent = '⏳ Revealing 0/' + toReveal.length + '...';
+
+    // Reveal sequentially
+    var done = 0, failed = 0;
+    function next(idx) {
+      if (idx >= toReveal.length) {
+        showToast('✅ Revealed ' + done + ' student(s)' + (failed ? ', ' + failed + ' failed' : ''));
+        if (btn) { btn.disabled = false; btn.textContent = '⚡ Sync by Tasks'; }
+        loadTeacherData();
+        return;
+      }
+      var item   = toReveal[idx];
+      var attNum = item.attNum;
+      if (btn) btn.textContent = '⏳ Revealing ' + (idx + 1) + '/' + toReveal.length + '...';
+
+      apiGet({ action: 'setReveal', username: savedUser, password: savedPass,
+               cls: currentCls, attNum: attNum, revealed: 'TRUE' })
+        .then(function(res) {
+          if (res.success) {
+            done++;
+            item.s.revealed = 'TRUE';
+            // Update toggle in table if visible
+            var toggle = document.getElementById('toggle_' + currentCls + '_' + attNum);
+            if (toggle) {
+              toggle.checked = true;
+              var lbl = toggle.closest('.reveal-toggle') && toggle.closest('.reveal-toggle').querySelector('.toggle-label');
+              if (lbl) lbl.textContent = 'On';
+            }
+          } else { failed++; }
+          setTimeout(function() { next(idx + 1); }, 200);
+        }).catch(function() {
+          failed++;
+          setTimeout(function() { next(idx + 1); }, 200);
+        });
+    }
+    next(0);
+
+  } catch(e) {
+    showToast('Sync failed: ' + e.message);
+    if (btn) { btn.disabled = false; btn.textContent = '⚡ Sync by Tasks'; }
+  }
 }
 
 // ── INIT ─────────────────────────────────────────────────────
