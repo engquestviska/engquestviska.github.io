@@ -594,35 +594,36 @@
       if (taskData.error || !taskData.students) { showToast('Could not load task data', 'err'); return; }
 
       const submitted = subData.students[cls] || [];
-      const ch4Keys   = taskData.taskKeys.filter(k => k.match(/^C4T/i));
+      const totalTasks = subData.totalTasks || 5;
+      const ch4Keys    = taskData.taskKeys.filter(k => k.match(/^C4T/i));
 
       if (!ch4Keys.length) { showToast('No Chapter 4 task keys found', 'err'); return; }
 
-      // Build tasks object with all Ch4 keys = true
+      // Only sync students who have submitted ALL tasks (submitted === true)
+      // Students who haven't submitted or partially submitted are completely ignored
       const tasksToSet = {};
       ch4Keys.forEach(k => { tasksToSet[k] = true; });
 
-      // Find students who submitted and need updating
-      const toUpdate = taskData.students.filter(function(s) {
+      const toUpdate = [];
+      taskData.students.forEach(function(s) {
         var sub = submitted.find(function(r) {
-          return r.name.toLowerCase() === s.name.toLowerCase() && r.submitted;
+          return r.name.toLowerCase() === s.name.toLowerCase() && r.submitted === true;
         });
-        if (!sub) return false;
-        // Only update if not already all done
-        return ch4Keys.some(k => !s.tasks[k]);
+        if (!sub) return; // not fully submitted — skip entirely
+        toUpdate.push({ s: s, tasksToSet: tasksToSet });
       });
 
-      if (!toUpdate.length) { showToast('All submitted students already up to date ✅', 'ok'); return; }
+      if (!toUpdate.length) { showToast('Nothing to sync ✅', 'ok'); return; }
 
       // Save one by one
       let done = 0;
-      for (const s of toUpdate) {
+      for (const item of toUpdate) {
         try {
           await apiGet({
             action: 'saveTaskStatus',
             username: savedUser, password: savedPass,
-            className: cls, studentNo: String(s.no),
-            tasks: JSON.stringify(tasksToSet)
+            className: cls, studentNo: String(item.s.no),
+            tasks: JSON.stringify(item.tasksToSet)
           });
           done++;
         } catch(e) {}
