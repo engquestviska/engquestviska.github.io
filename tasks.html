@@ -581,7 +581,11 @@
   // ── SYNC SUBMISSIONS → TASK STATUS ──────────────────────────
   async function syncSubmissionsToTasks(cls) {
     if (!savedUser || !savedPass) { showToast('Not logged in as teacher', 'err'); return; }
-    showToast('Syncing submissions...', 'ok');
+
+    // Find and disable the sync button, show progress
+    const syncBtn = document.querySelector('[onclick*="syncSubmissionsToTasks"]');
+    const origText = syncBtn ? syncBtn.textContent : '';
+    if (syncBtn) { syncBtn.disabled = true; syncBtn.textContent = '⏳ Loading data...'; }
 
     try {
       // Get submissions and all tasks in parallel
@@ -590,34 +594,49 @@
         apiGet({ action: 'getAllTasks', className: cls })
       ]);
 
-      if (subData.error || !subData.students) { showToast('Could not load submissions', 'err'); return; }
-      if (taskData.error || !taskData.students) { showToast('Could not load task data', 'err'); return; }
+      if (subData.error || !subData.students) {
+        showToast('Could not load submissions', 'err');
+        if (syncBtn) { syncBtn.disabled = false; syncBtn.textContent = origText; }
+        return;
+      }
+      if (taskData.error || !taskData.students) {
+        showToast('Could not load task data', 'err');
+        if (syncBtn) { syncBtn.disabled = false; syncBtn.textContent = origText; }
+        return;
+      }
 
       const submitted = subData.students[cls] || [];
-      const totalTasks = subData.totalTasks || 5;
-      const ch4Keys    = taskData.taskKeys.filter(k => k.match(/^C4T/i));
+      const ch4Keys   = taskData.taskKeys.filter(k => k.match(/^C4T/i));
 
-      if (!ch4Keys.length) { showToast('No Chapter 4 task keys found', 'err'); return; }
+      if (!ch4Keys.length) {
+        showToast('No Chapter 4 task keys found', 'err');
+        if (syncBtn) { syncBtn.disabled = false; syncBtn.textContent = origText; }
+        return;
+      }
 
-      // Only sync students who have submitted ALL tasks (submitted === true)
-      // Students who haven't submitted or partially submitted are completely ignored
       const tasksToSet = {};
       ch4Keys.forEach(k => { tasksToSet[k] = true; });
 
+      // Only include students who fully submitted (submitted === true)
       const toUpdate = [];
       taskData.students.forEach(function(s) {
         var sub = submitted.find(function(r) {
           return r.name.toLowerCase() === s.name.toLowerCase() && r.submitted === true;
         });
-        if (!sub) return; // not fully submitted — skip entirely
+        if (!sub) return;
         toUpdate.push({ s: s, tasksToSet: tasksToSet });
       });
 
-      if (!toUpdate.length) { showToast('Nothing to sync ✅', 'ok'); return; }
+      if (!toUpdate.length) {
+        showToast('Nothing to sync — no fully submitted students yet', 'ok');
+        if (syncBtn) { syncBtn.disabled = false; syncBtn.textContent = origText; }
+        return;
+      }
 
-      // Save one by one
+      // Save one by one with live progress on button
       let done = 0;
       for (const item of toUpdate) {
+        if (syncBtn) syncBtn.textContent = '⏳ Saving ' + (done + 1) + '/' + toUpdate.length + '...';
         try {
           await apiGet({
             action: 'saveTaskStatus',
@@ -629,11 +648,19 @@
         } catch(e) {}
       }
 
-      showToast('✅ Updated ' + done + ' student(s) in ' + cls, 'ok');
-      // Reload teacher panel to reflect changes
-      setTimeout(function() { loadTeacherClass(); }, 1200);
+      if (syncBtn) { syncBtn.textContent = '✅ Done! Reloading...'; }
+      showToast('✅ Synced ' + done + ' student(s) in ' + cls, 'ok');
 
-    } catch(e) { showToast('Sync failed: ' + e.message, 'err'); }
+      // Reload to show updated state
+      setTimeout(function() {
+        loadTeacherClass();
+        if (syncBtn) { syncBtn.disabled = false; syncBtn.textContent = origText; }
+      }, 1000);
+
+    } catch(e) {
+      showToast('Sync failed: ' + e.message, 'err');
+      if (syncBtn) { syncBtn.disabled = false; syncBtn.textContent = origText; }
+    }
   }
 
   // ── TOAST ─────────────────────────────────────────────────────
