@@ -424,14 +424,31 @@
     document.getElementById('sViewBtn').disabled = true;
     document.getElementById('sViewBtn').textContent = '⏳ Loading...';
     try {
-      const data = await cachedApiGet({ action: 'getTaskStatus', className: cls, studentNo: no });
+      // Load task status and submission status in parallel
+      const [data, subData] = await Promise.all([
+        cachedApiGet({ action: 'getTaskStatus', className: cls, studentNo: no }),
+        cachedApiGet({ action: 'getSubmissions' }).catch(function() { return null; })
+      ]);
       if (data.error) { showToast(data.error, 'err'); document.getElementById('studentResult').innerHTML = ''; return; }
-      renderStudentTasks(data, clsLabel);
+
+      // Check if this student has submitted Chapter 4
+      var hasSubmitted = false;
+      if (subData && subData.students && subData.students[cls]) {
+        var studentName = data.name || '';
+        var match = subData.students[cls].find(function(s) {
+          return s.name.toLowerCase() === studentName.toLowerCase() && s.submitted;
+        });
+        if (match) {
+          hasSubmitted = true;
+        }
+      }
+
+      renderStudentTasks(data, clsLabel, hasSubmitted);
     } catch(e) { showToast('Failed to load tasks', 'err'); document.getElementById('studentResult').innerHTML = ''; }
     finally { document.getElementById('sViewBtn').disabled = false; document.getElementById('sViewBtn').textContent = 'View My Tasks'; }
   }
 
-  function renderStudentTasks(data, clsLabel) {
+  function renderStudentTasks(data, clsLabel, hasSubmitted) {
     const tasks    = data.tasks;
     const keys     = Object.keys(tasks);
     const done     = keys.filter(k => tasks[k]).length;
@@ -482,6 +499,7 @@
             <div class="progress-bar-fill ${barClass}" style="width:${pct}%"></div>
           </div>
         </div>
+        ${hasSubmitted ? '<div style=\"background:#D1FAE5;border:1.5px solid #6EE7B7;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:0.85rem;color:#065F46;font-weight:600;\">&#10003; You have submitted Chapter 4 tasks — all Chapter 4 tasks marked as done.</div>' : ''}
         <div class="tasks-section">${chapHtml}</div>
       </div>`;
   }
@@ -522,6 +540,7 @@
         <div class="panel-header">
           <div class="panel-header-title">${cls} · Task Status</div>
           <div class="panel-header-sub">Tap to toggle ✓ / ✗</div>
+          <button onclick="syncSubmissionsToTasks('${cls}')" style="padding:7px 16px;background:linear-gradient(135deg,#10B981,#059669);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:0.8rem;font-weight:700;cursor:pointer;margin-left:auto;">&#9889; Sync Submissions</button>
         </div>
         ${rows}
       </div>`;
@@ -557,6 +576,63 @@
       btn.textContent = taskKey;
     }
     btn.classList.remove('saving');
+  }
+
+  // ── SYNC SUBMISSIONS → TASK STATUS ──────────────────────────
+  async function syncSubmissionsToTasks(cls) {
+    if (!savedUser || !savedPass) { showToast('Not logged in as teacher', 'err'); return; }
+    showToast('Syncing submissions...', 'ok');
+
+    try {
+      // Get submissions and all tasks in parallel
+      const [subData, taskData] = await Promise.all([
+        apiGet({ action: 'getSubmissions' }),
+        apiGet({ action: 'getAllTasks', className: cls })
+      ]);
+
+      if (subData.error || !subData.students) { showToast('Could not load submissions', 'err'); return; }
+      if (taskData.error || !taskData.students) { showToast('Could not load task data', 'err'); return; }
+
+      const submitted = subData.students[cls] || [];
+      const ch4Keys   = taskData.taskKeys.filter(k => k.match(/^C4T/i));
+
+      if (!ch4Keys.length) { showToast('No Chapter 4 task keys found', 'err'); return; }
+
+      // Build tasks object with all Ch4 keys = true
+      const tasksToSet = {};
+      ch4Keys.forEach(k => { tasksToSet[k] = true; });
+
+      // Find students who submitted and need updating
+      const toUpdate = taskData.students.filter(function(s) {
+        var sub = submitted.find(function(r) {
+          return r.name.toLowerCase() === s.name.toLowerCase() && r.submitted;
+        });
+        if (!sub) return false;
+        // Only update if not already all done
+        return ch4Keys.some(k => !s.tasks[k]);
+      });
+
+      if (!toUpdate.length) { showToast('All submitted students already up to date ✅', 'ok'); return; }
+
+      // Save one by one
+      let done = 0;
+      for (const s of toUpdate) {
+        try {
+          await apiGet({
+            action: 'saveTaskStatus',
+            username: savedUser, password: savedPass,
+            className: cls, studentNo: String(s.no),
+            tasks: JSON.stringify(tasksToSet)
+          });
+          done++;
+        } catch(e) {}
+      }
+
+      showToast('✅ Updated ' + done + ' student(s) in ' + cls, 'ok');
+      // Reload teacher panel to reflect changes
+      setTimeout(function() { loadTeacherClass(); }, 1200);
+
+    } catch(e) { showToast('Sync failed: ' + e.message, 'err'); }
   }
 
   // ── TOAST ─────────────────────────────────────────────────────
