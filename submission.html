@@ -76,6 +76,53 @@
     .task-card.formative .task-arrow { color:var(--accent); }
     .task-card.disabled .task-arrow { color:var(--text-muted); }
 
+    
+    /* SUBMISSION STATUS SECTION */
+    .status-section { margin-top: 48px; }
+    .status-section-header { display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+    .status-section-badge { background:linear-gradient(135deg,#10B981,#059669); color:#fff; font-family:'IBM Plex Mono',monospace; font-size:0.75rem; font-weight:600; padding:5px 14px; border-radius:999px; flex-shrink:0; }
+    .status-section-title { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:700; }
+    .status-section-line { flex:1; height:1.5px; background:var(--border); }
+
+    .status-picker { background:var(--white); border:1.5px solid var(--border); border-radius:16px; padding:20px 24px; margin-bottom:16px; }
+    .status-picker-row { display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; }
+    .status-picker-field { display:flex; flex-direction:column; gap:6px; flex:1; min-width:150px; }
+    .status-picker-field label { font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; }
+    .status-picker-field select { padding:10px 14px; border:1.5px solid var(--border); border-radius:12px; font-family:'IBM Plex Sans',sans-serif; font-size:0.9rem; color:var(--text-dark); background:var(--off-white); outline:none; }
+    .status-picker-field select:focus { border-color:var(--purple-light); background:#fff; }
+
+    .status-result { background:var(--white); border:1.5px solid var(--border); border-radius:16px; padding:22px 24px; display:none; }
+    .status-result.show { display:block; }
+    .status-student-name { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:800; margin-bottom:14px; color:var(--text-dark); }
+    .status-badge-big { display:inline-flex; align-items:center; gap:10px; padding:12px 22px; border-radius:14px; font-size:1rem; font-weight:700; font-family:'IBM Plex Mono',monospace; }
+    .status-submitted { background:var(--green-soft); color:#065F46; border:1.5px solid #6EE7B7; }
+    .status-missing    { background:var(--red-soft); color:#991B1B; border:1.5px solid #FCA5A5; }
+    .status-sub-note { font-size:0.82rem; color:var(--text-muted); margin-top:10px; line-height:1.55; }
+    .status-loading { text-align:center; padding:28px; color:var(--text-muted); font-size:0.88rem; }
+    .status-spinner { width:28px; height:28px; border:3px solid var(--border); border-top-color:var(--purple); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 10px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* TEACHER TABLE */
+    .status-teacher-wrap { background:var(--white); border:1.5px solid var(--border); border-radius:16px; overflow:hidden; overflow-x:auto; margin-top:16px; }
+    .status-teacher-filters { padding:14px 18px; display:flex; gap:10px; flex-wrap:wrap; border-bottom:1px solid var(--border); align-items:center; }
+    .status-teacher-label { font-size:0.75rem; font-weight:700; color:var(--text-muted); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; }
+    .status-teacher-sel { padding:7px 12px; border:1.5px solid var(--border); border-radius:10px; font-family:'IBM Plex Sans',sans-serif; font-size:0.85rem; color:var(--text-dark); background:var(--off-white); outline:none; }
+    .status-summary { display:flex; gap:10px; padding:14px 18px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+    .status-sum-item { flex:1; min-width:80px; text-align:center; }
+    .status-sum-num { font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:800; }
+    .status-sum-lbl { font-size:0.68rem; font-weight:700; color:var(--text-muted); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; margin-top:2px; }
+    .status-sum-item.green .status-sum-num { color:#065F46; }
+    .status-sum-item.red   .status-sum-num { color:#991B1B; }
+    .status-table { width:100%; border-collapse:collapse; min-width:280px; }
+    .status-table th { background:var(--purple-soft); color:var(--purple); padding:10px 14px; font-size:0.72rem; font-family:'IBM Plex Mono',monospace; font-weight:700; text-align:left; letter-spacing:0.04em; }
+    .status-table th:last-child { text-align:center; }
+    .status-table td { padding:10px 14px; font-size:0.88rem; border-bottom:1px solid var(--border); }
+    .status-table tr:last-child td { border-bottom:none; }
+    .status-table tr:hover td { background:var(--off-white); }
+    .status-table td:last-child { text-align:center; }
+    .badge-ok  { display:inline-flex; align-items:center; gap:4px; background:var(--green-soft); color:#065F46; border:1.5px solid #6EE7B7; border-radius:999px; padding:3px 10px; font-size:0.72rem; font-weight:700; font-family:'IBM Plex Mono',monospace; }
+    .badge-no  { display:inline-flex; align-items:center; gap:4px; background:var(--red-soft); color:#991B1B; border:1.5px solid #FCA5A5; border-radius:999px; padding:3px 10px; font-size:0.72rem; font-weight:700; font-family:'IBM Plex Mono',monospace; }
+
     footer { background:#1E1040; color:rgba(255,255,255,0.5); text-align:center; padding:20px; font-size:0.85rem; }
     footer strong { color:#A78BFA; }
 
@@ -144,38 +191,40 @@
 
   <!-- HOW TO SUBMIT GUIDE -->
   <div class="pdf-guide">
-  <div class="pdf-guide-title">&#128196; Submission Format Guide</div>
-  <div class="pdf-guide-sub">All tasks must be submitted as a <strong>PDF file</strong>. No photos, screenshots, or image files.</div>
-  <div class="pdf-guide-req">&#9940; Do NOT submit JPG, PNG, or photo files &mdash; only PDF is accepted.</div>
-  <div class="pdf-steps">
-    <div class="pdf-step">
-      <div class="pdf-step-num">1</div>
-      <div class="pdf-step-title">&#128247; Take a clear photo</div>
-      <div class="pdf-step-desc">Use your phone camera. Make sure the text is readable, well-lit, and not blurry or cropped.</div>
+    <div class="pdf-guide-title">&#128196; Submission Format Guide</div>
+    <div class="pdf-guide-sub">All tasks must be submitted as a <strong>PDF file</strong>. No photos, screenshots, or image files.</div>
+    <div class="pdf-guide-req">&#9940; Do NOT submit JPG, PNG, or photo files &mdash; only PDF is accepted.</div>
+    <div class="pdf-steps">
+      <div class="pdf-step">
+        <div class="pdf-step-num">1</div>
+        <div class="pdf-step-title">&#128247; Take a clear photo</div>
+        <div class="pdf-step-desc">Use your phone camera. Make sure the text is readable, well-lit, and not blurry or cropped.</div>
+      </div>
+      <div class="pdf-step">
+        <div class="pdf-step-num">2</div>
+        <div class="pdf-step-title">&#128269; Scan &amp; extract text</div>
+        <div class="pdf-step-desc">Open <code>Google Lens</code> and tap on your photo. Select all the text, then copy it. Or use <code>Microsoft Lens</code> to scan directly.</div>
+      </div>
+      <div class="pdf-step">
+        <div class="pdf-step-num">3</div>
+        <div class="pdf-step-title">&#128203; Paste into Google Docs</div>
+        <div class="pdf-step-desc">Go to <code>docs.google.com</code>, create a new document, paste your text and tidy up the formatting.</div>
+      </div>
+      <div class="pdf-step">
+        <div class="pdf-step-num">4</div>
+        <div class="pdf-step-title">&#128229; Download as PDF</div>
+        <div class="pdf-step-desc">In Google Docs: <code>File</code> &#8594; <code>Download</code> &#8594; <code>PDF Document (.pdf)</code>. Your file is ready!</div>
+      </div>
     </div>
-    <div class="pdf-step">
-      <div class="pdf-step-num">2</div>
-      <div class="pdf-step-title">&#127760; Convert JPG to text</div>
-      <div class="pdf-step-desc">Open <code>freeconvert.com/jpg-to-txt</code>, upload your image, then download or copy the TXT result.</div>
-    </div>
-    <div class="pdf-step">
-      <div class="pdf-step-num">3</div>
-      <div class="pdf-step-title">&#128257; Convert to PDF</div>
-      <div class="pdf-step-desc">Take the generated <code>.txt</code> file, open it, then convert/export it to <code>.pdf</code>.</div>
-    </div>
-    <div class="pdf-step">
-      <div class="pdf-step-num">4</div>
-      <div class="pdf-step-title">&#9989; Upload your PDF</div>
-      <div class="pdf-step-desc">Make sure the file opens correctly, then upload it here for the right task.</div>
+    <div class="pdf-tools-label">&#128241; Recommended free tools</div>
+    <div class="pdf-tools">
+      <a href="https://lens.google/" target="_blank" class="pdf-tool-chip">&#128269; Google Lens</a>
+      <a href="https://play.google.com/store/apps/details?id=com.microsoft.office.officelens" target="_blank" class="pdf-tool-chip">&#128247; Microsoft Lens</a>
+      <a href="https://docs.google.com" target="_blank" class="pdf-tool-chip">&#128203; Google Docs</a>
+      <a href="https://www.ilovepdf.com/jpg_to_pdf" target="_blank" class="pdf-tool-chip">&#128257; iLovePDF</a>
+      <a href="https://smallpdf.com/jpg-to-pdf" target="_blank" class="pdf-tool-chip">&#9889; SmallPDF</a>
     </div>
   </div>
-  <div class="pdf-tools-label">&#128241; Recommended free tools</div>
-  <div class="pdf-tools">
-    <a href="https://www.freeconvert.com/jpg-to-txt" target="_blank" class="pdf-tool-chip">&#127760; FreeConvert JPG to TXT</a>
-    <a href="https://www.ilovepdf.com/jpg_to_pdf" target="_blank" class="pdf-tool-chip">&#128257; iLovePDF</a>
-    <a href="https://smallpdf.com/jpg-to-pdf" target="_blank" class="pdf-tool-chip">&#9889; SmallPDF</a>
-  </div>
-</div>
 
   <!-- CHAPTER CARDS -->
   <div class="chapter-grid">
@@ -196,15 +245,72 @@
         <span class="status-badge status-open">Open</span>
       </div>
       <div class="chapter-title">Chapter 5</div>
-      <div class="chapter-desc">Submit Task 1–5 as PDF files. One PDF per task.</div>
+      <div class="chapter-desc">Submit Task 1–7 as PDF files. One PDF per task.</div>
       <div class="card-arrow">Submit now &#8594;</div>
     </a>
 
   </div>
 
+
+  <!-- SUBMISSION STATUS -->
+  <div class="status-section">
+    <div class="status-section-header">
+      <div class="status-section-badge">&#9989; STATUS</div>
+      <div class="status-section-title">Chapter 4 Submission Status</div>
+      <div class="status-section-line"></div>
+    </div>
+
+    <!-- Student view: picker + result -->
+    <div id="statusStudentArea">
+      <div class="status-picker" id="statusPicker">
+        <div class="status-picker-row">
+          <div class="status-picker-field">
+            <label>Class</label>
+            <select id="stClassSel" onchange="onStatusClassChange()">
+              <option value="">— Select class —</option>
+              <option>XE1</option><option>XE4</option><option>XE5</option>
+              <option>XE6</option><option>XE7</option><option>XE8</option>
+              <option>XE9</option><option>XE10</option><option>XE11</option>
+            </select>
+          </div>
+          <div class="status-picker-field">
+            <label>Your Name</label>
+            <select id="stNameSel" onchange="checkMyStatus()" disabled>
+              <option value="">— Select class first —</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="status-result" id="statusResult"></div>
+    </div>
+
+    <!-- Teacher view: full class table -->
+    <div id="statusTeacherArea" style="display:none">
+      <div class="status-teacher-wrap">
+        <div class="status-teacher-filters">
+          <span class="status-teacher-label">Class</span>
+          <select class="status-teacher-sel" id="tClassSel" onchange="loadTeacherStatus()">
+            <option value="XE1">X E-1</option><option value="XE4">X E-4</option>
+            <option value="XE5">X E-5</option><option value="XE6">X E-6</option>
+            <option value="XE7">X E-7</option><option value="XE8" selected>X E-8</option>
+            <option value="XE9">X E-9</option><option value="XE10">X E-10</option>
+            <option value="XE11">X E-11</option>
+          </select>
+          <select class="status-teacher-sel" id="tStatusSel" onchange="renderTeacherTable()">
+            <option value="all">All Students</option>
+            <option value="submitted">Submitted Only</option>
+            <option value="missing">Not Submitted Only</option>
+          </select>
+        </div>
+        <div class="status-summary" id="tSummary"></div>
+        <div id="tTableWrap"></div>
+      </div>
+    </div>
+  </div>
+
 </main>
 
-<footer>&#169; 2025 <strong>English Quest</strong> &middot; SMA Negeri 6 Surakarta &middot; Built with &#10084;&#65039; by <strong>LaksMedia</strong></footer>
+<footer>&#169; 2026 <strong>English Quest</strong> &middot; SMA Negeri 6 Surakarta &middot; Built with &#10084;&#65039; by <strong>LaksMedia</strong></footer>
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 <nav class="sidebar" id="sidebar">
@@ -267,6 +373,180 @@ function closeSidebar() {
   document.body.style.overflow = '';
 }
 document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeSidebar(); });
+
+// ── SUBMISSION STATUS ─────────────────────────────────────────
+var SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+var CLASS_LABELS = { XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
+var allSubmissions = null;
+var allStudentsData = {};
+
+function statusApiGet(params) {
+  var url = SCORES_API + '?';
+  var parts = [];
+  for (var k in params) parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
+  url += parts.join('&');
+  return new Promise(function(resolve, reject) {
+    var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    var s  = document.createElement('script');
+    var timer = setTimeout(function() { delete window[cb]; reject(new Error('Timeout')); }, 20000);
+    window[cb] = function(data) { clearTimeout(timer); delete window[cb]; resolve(data); };
+    s.onerror = function() { clearTimeout(timer); delete window[cb]; reject(new Error('Network error')); };
+    s.src = url + '&callback=' + cb;
+    document.head.appendChild(s);
+  });
+}
+
+function initStatus() {
+  var isTeacher = !!localStorage.getItem('eq_tu');
+  if (isTeacher) {
+    document.getElementById('statusStudentArea').style.display = 'none';
+    document.getElementById('statusTeacherArea').style.display = 'block';
+    loadSubmissions().then(function() { loadTeacherStatus(); });
+  } else {
+    // Auto-fill if student identity is saved
+    var savedCls  = localStorage.getItem('eq_student_class');
+    var savedName = localStorage.getItem('eq_student_name');
+    if (savedCls) {
+      document.getElementById('stClassSel').value = savedCls;
+      onStatusClassChange().then(function() {
+        if (savedName) {
+          var sel = document.getElementById('stNameSel');
+          for (var i = 0; i < sel.options.length; i++) {
+            if (sel.options[i].text === savedName) { sel.value = sel.options[i].value; break; }
+          }
+          checkMyStatus();
+        }
+      });
+    }
+    loadSubmissions();
+  }
+}
+
+function loadSubmissions() {
+  return statusApiGet({ action: 'getSubmissions' }).then(function(res) {
+    if (!res.error) allSubmissions = res;
+  }).catch(function() {});
+}
+
+function onStatusClassChange() {
+  var cls = document.getElementById('stClassSel').value;
+  var sel = document.getElementById('stNameSel');
+  sel.innerHTML = '<option value="">Loading...</option>';
+  sel.disabled = true;
+  document.getElementById('statusResult').classList.remove('show');
+  if (!cls) { sel.innerHTML = '<option value="">— Select class first —</option>'; return Promise.resolve(); }
+  return statusApiGet({ action: 'getStudents', className: cls }).then(function(res) {
+    allStudentsData[cls] = res.students || [];
+    sel.innerHTML = '<option value="">— Select your name —</option>';
+    (res.students || []).forEach(function(s) {
+      var opt = document.createElement('option');
+      opt.value = s.no;
+      opt.text  = s.name;
+      sel.appendChild(opt);
+    });
+    sel.disabled = false;
+  }).catch(function() {
+    sel.innerHTML = '<option value="">Error loading</option>';
+  });
+}
+
+function checkMyStatus() {
+  var cls = document.getElementById('stClassSel').value;
+  var no  = document.getElementById('stNameSel').value;
+  if (!cls || !no) return;
+  var sel = document.getElementById('stNameSel');
+  var name = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : '';
+
+  // Save identity
+  localStorage.setItem('eq_student_class', cls);
+  localStorage.setItem('eq_student_name', name);
+
+  var result = document.getElementById('statusResult');
+  result.innerHTML = '<div class="status-loading"><div class="status-spinner"></div>Checking your submission...</div>';
+  result.classList.add('show');
+
+  // If submissions not loaded yet, load first
+  var promise = allSubmissions ? Promise.resolve() : loadSubmissions();
+  promise.then(function() {
+    if (!allSubmissions || !allSubmissions.students) {
+      result.innerHTML = '<div class="status-loading">Could not load submission data. Please try again.</div>';
+      return;
+    }
+    var classStudents = allSubmissions.students[cls] || [];
+    var found = classStudents.find(function(s) { return s.name === name; });
+    var submitted = found ? found.submitted : false;
+
+    if (submitted) {
+      result.innerHTML =
+        '<div class="status-student-name">' + name + ' &mdash; ' + (CLASS_LABELS[cls] || cls) + '</div>' +
+        '<div class="status-badge-big status-submitted">&#10003; Chapter 4 Submitted</div>' +
+        '<div class="status-sub-note">Your submission has been received. You can still re-submit to update your files.</div>';
+    } else {
+      result.innerHTML =
+        '<div class="status-student-name">' + name + ' &mdash; ' + (CLASS_LABELS[cls] || cls) + '</div>' +
+        '<div class="status-badge-big status-missing">&#10005; Not Submitted Yet</div>' +
+        '<div class="status-sub-note">You have not submitted Chapter 4 tasks yet. Click the Chapter 4 card above to submit.</div>';
+    }
+  });
+}
+
+// Teacher view
+var tSubmissionData = [];
+function loadTeacherStatus() {
+  var cls = document.getElementById('tClassSel').value;
+  document.getElementById('tSummary').innerHTML = '<div style="font-size:0.85rem;color:var(--text-muted);padding:4px 0;">Loading...</div>';
+  document.getElementById('tTableWrap').innerHTML = '';
+
+  var promise = allSubmissions ? Promise.resolve() : loadSubmissions();
+  promise.then(function() {
+    if (!allSubmissions || !allSubmissions.students) {
+      document.getElementById('tSummary').innerHTML = '<div style="font-size:0.85rem;color:var(--red)">Could not load data. Make sure ScoresAPI is redeployed.</div>';
+      return;
+    }
+    tSubmissionData = allSubmissions.students[cls] || [];
+    renderTeacherTable();
+  });
+}
+
+function renderTeacherTable() {
+  var filter = document.getElementById('tStatusSel').value;
+  var rows = tSubmissionData.slice();
+  if (filter === 'submitted') rows = rows.filter(function(r) { return r.submitted; });
+  if (filter === 'missing')   rows = rows.filter(function(r) { return !r.submitted; });
+
+  var total     = tSubmissionData.length;
+  var submitted = tSubmissionData.filter(function(r) { return r.submitted; }).length;
+  var missing   = total - submitted;
+  var pct       = total ? Math.round(submitted / total * 100) : 0;
+
+  document.getElementById('tSummary').innerHTML =
+    '<div class="status-sum-item"><div class="status-sum-num">' + total + '</div><div class="status-sum-lbl">Total</div></div>' +
+    '<div class="status-sum-item green"><div class="status-sum-num">' + submitted + '</div><div class="status-sum-lbl">Submitted</div></div>' +
+    '<div class="status-sum-item red"><div class="status-sum-num">' + missing + '</div><div class="status-sum-lbl">Missing</div></div>' +
+    '<div class="status-sum-item"><div class="status-sum-num">' + pct + '%</div><div class="status-sum-lbl">Done</div></div>';
+
+  if (!rows.length) {
+    document.getElementById('tTableWrap').innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:0.88rem;">No students match this filter.</div>';
+    return;
+  }
+
+  var html = '<table class="status-table"><thead><tr><th>#</th><th>Student Name</th><th>Chapter 4</th></tr></thead><tbody>';
+  rows.forEach(function(s, i) {
+    html += '<tr><td style="color:var(--text-muted);font-size:0.78rem;font-family:IBM Plex Mono,monospace">' + (i+1) + '</td>';
+    html += '<td>' + s.name + '</td>';
+    html += '<td>' + (s.submitted ? '<span class="badge-ok">&#10003; Submitted</span>' : '<span class="badge-no">&#10005; Missing</span>') + '</td></tr>';
+  });
+  html += '</tbody></table>';
+  document.getElementById('tTableWrap').innerHTML = html;
+}
+
+// Init on load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initStatus);
+} else {
+  initStatus();
+}
+
 </script>
 </body>
 </html>
