@@ -268,9 +268,6 @@
             <label>Class</label>
             <select id="stClassSel" onchange="onStatusClassChange()">
               <option value="">— Select class —</option>
-              <option>XE1</option><option>XE4</option><option>XE5</option>
-              <option>XE6</option><option>XE7</option><option>XE8</option>
-              <option>XE9</option><option>XE10</option><option>XE11</option>
             </select>
           </div>
           <div class="status-picker-field">
@@ -290,11 +287,7 @@
         <div class="status-teacher-filters">
           <span class="status-teacher-label">Class</span>
           <select class="status-teacher-sel" id="tClassSel" onchange="loadTeacherStatus()">
-            <option value="XE1">X E-1</option><option value="XE4">X E-4</option>
-            <option value="XE5">X E-5</option><option value="XE6">X E-6</option>
-            <option value="XE7">X E-7</option><option value="XE8" selected>X E-8</option>
-            <option value="XE9">X E-9</option><option value="XE10">X E-10</option>
-            <option value="XE11">X E-11</option>
+            <option value="">Loading...</option>
           </select>
           <select class="status-teacher-sel" id="tStatusSel" onchange="renderTeacherTable()">
             <option value="all">All Students</option>
@@ -424,7 +417,42 @@ function initStatus() {
 
 function loadSubmissions() {
   return statusApiGet({ action: 'getSubmissions' }).then(function(res) {
-    if (!res.error) allSubmissions = res;
+    if (!res.error) {
+      allSubmissions = res;
+
+      // Populate student class dropdown
+      var stSel = document.getElementById('stClassSel');
+      if (stSel) {
+        stSel.innerHTML = '<option value="">— Select class —</option>';
+        (res.classes || []).forEach(function(cls) {
+          var opt = document.createElement('option');
+          opt.value = cls;
+          opt.textContent = cls;
+          stSel.appendChild(opt);
+        });
+        // Auto-select saved class
+        var savedCls = localStorage.getItem('eq_student_class');
+        if (savedCls) {
+          // Try exact match first, then try stripping/adding dash
+          var found = (res.classes || []).find(function(c) { return c === savedCls; });
+          if (!found) found = (res.classes || []).find(function(c) { return c.replace('-','') === savedCls.replace('-',''); });
+          if (found) stSel.value = found;
+        }
+      }
+
+      // Populate teacher class dropdown
+      var tSel = document.getElementById('tClassSel');
+      if (tSel) {
+        tSel.innerHTML = '';
+        (res.classes || []).forEach(function(cls, i) {
+          var opt = document.createElement('option');
+          opt.value = cls;
+          opt.textContent = cls;
+          if (i === 0) opt.selected = true;
+          tSel.appendChild(opt);
+        });
+      }
+    }
   }).catch(function() {});
 }
 
