@@ -164,6 +164,7 @@
     .lock-sub { font-size:0.9rem; color:rgba(255,255,255,0.55); margin-bottom:28px; line-height:1.6; }
     .lock-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(239,68,68,0.2); border:1.5px solid rgba(239,68,68,0.4); border-radius:999px; padding:8px 20px; color:#FCA5A5; font-size:0.82rem; font-weight:700; font-family:'IBM Plex Mono',monospace; }
 
+      @keyframes spin { to { transform:rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -584,18 +585,39 @@ function loadCharacter() {
     `${r.label} · Character ${currentCharIdx + 1} of ${r.characters.length}`;
   buildProgressDots(r.characters.length, currentCharIdx);
 
-  // Silhouette
+  // Silhouette — preload image before showing
   const img = document.getElementById('char-img');
   const placeholder = document.getElementById('silhouette-placeholder');
+  img.classList.remove('revealed');
+
   if (char.image) {
-    img.src = char.image;
-    img.style.display = 'block';
-    img.classList.remove('revealed');
-    placeholder.style.display = 'none';
+    // Show spinner while loading
+    placeholder.style.display = 'block';
+    placeholder.innerHTML = '<div style="width:28px;height:28px;border:3px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 8px;"></div><div>Loading image...</div>';
+    img.style.display = 'none';
+
+    const preload = new Image();
+    preload.onload = function() {
+      img.src = char.image;
+      img.style.display = 'block';
+      placeholder.style.display = 'none';
+    };
+    preload.onerror = function() {
+      placeholder.innerHTML = '&#128247;<br><span style="font-size:0.75rem;margin-top:6px;display:block;">Image not found:<br>' + char.image + '</span>';
+    };
+    preload.src = char.image;
   } else {
     img.style.display = 'none';
     placeholder.style.display = 'block';
-    placeholder.textContent = '[ Add image URL for ' + char.name + ' ]';
+    placeholder.textContent = '[ No image set for ' + char.name + ' ]';
+  }
+
+  // Preload next character image in background
+  const nextIdx = currentCharIdx + 1;
+  const nextChars = r.characters;
+  if (nextIdx < nextChars.length && nextChars[nextIdx].image) {
+    const nextPreload = new Image();
+    nextPreload.src = nextChars[nextIdx].image;
   }
 
   // Name reveal
@@ -673,7 +695,17 @@ function revealAnswer() {
 
   // Reveal image filter
   const img = document.getElementById('char-img');
-  if (img.src && char.image) img.classList.add('revealed');
+  if (char.image) {
+    if (img.complete && img.naturalWidth > 0) {
+      // Already loaded — reveal immediately
+      img.classList.add('revealed');
+    } else {
+      // Still loading — reveal once done
+      img.onload = function() { img.classList.add('revealed'); };
+      // Also set src in case preload failed
+      if (!img.src || img.src === window.location.href) img.src = char.image;
+    }
+  }
 
   // Show name
   document.getElementById('char-name-reveal').classList.add('show');
