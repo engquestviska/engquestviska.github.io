@@ -74,9 +74,9 @@
 
     /* SILHOUETTE CARD */
     .silhouette-card { background:var(--white); border:1.5px solid var(--border); border-radius:24px; padding:28px; margin-bottom:20px; text-align:center; }
-    .silhouette-wrap { width:100%; max-width:340px; height:260px; margin:0 auto 16px; border-radius:16px; overflow:hidden; background:#F3F0FF; display:flex; align-items:center; justify-content:center; position:relative; border:1.5px solid var(--border); }
-    .silhouette-wrap img { width:100%; height:100%; object-fit:contain; filter:brightness(0); transition:filter 1.2s ease; }
-    .silhouette-wrap img.revealed { filter:brightness(1) saturate(1.1); }
+    .silhouette-wrap { width:100%; max-width:340px; height:280px; margin:0 auto 16px; border-radius:16px; overflow:hidden; background:#ffffff; display:flex; align-items:center; justify-content:center; position:relative; border:1.5px solid var(--border); }
+    .silhouette-wrap img { width:100%; height:100%; object-fit:contain; filter:brightness(0); mix-blend-mode:multiply; transition:filter 1.2s ease, mix-blend-mode 0s; }
+    .silhouette-wrap img.revealed { filter:brightness(1) saturate(1.1); mix-blend-mode:normal; }
     .silhouette-placeholder { color:rgba(255,255,255,0.15); font-size:0.85rem; font-family:'IBM Plex Mono',monospace; text-align:center; padding:20px; }
     .char-name-reveal { font-family:'Playfair Display',serif; font-size:2rem; font-weight:800; color:var(--purple); margin-top:8px; display:none; animation:fadeUp 0.5s ease; }
     .char-name-reveal.show { display:block; }
@@ -352,7 +352,7 @@ const rounds = [
         hints: [
           "This character is a natural leader who always puts others before themselves.",
           "Their whole world was turned upside down when someone new arrived and took their place.",
-          "🎯 DEAD GIVEAWAY: Cowboy hat, pull-string toy, says \"There\'s a snake in my boot!\" — the main character of Toy Story."
+          "He wears a cowboy hat, has a pull-string on his back, and one of his famous lines is \"There's a snake in my boot!\" He is the main character of Toy Story."
         ]
       },
       {
@@ -361,7 +361,7 @@ const rounds = [
         hints: [
           "This character is known for being lazy, clumsy, and not very good at school.",
           "Despite their weaknesses, they have a very kind heart and care deeply for their friends.",
-          "🎯 DEAD GIVEAWAY: A blue robot cat named Doraemon comes from the future specifically to help this boy — Nobi Nobita."
+          "A blue robot cat named Doraemon travels from the future to help him. His full name is Nobi Nobita."
         ]
       },
     ]
@@ -378,7 +378,7 @@ const rounds = [
         hints: [
           "This person left their hometown to seek a better life across the sea.",
           "After becoming rich and successful, they refused to acknowledge someone who loved them deeply.",
-          "🎯 DEAD GIVEAWAY: He denied his own poor mother when she ran to hug him at the harbour — and was cursed into a stone. His stone statue is on Air Manis beach, Padang."
+          "He denied his own mother when she ran to embrace him at the harbour. The curse turned him to stone, and his statue can still be found on Air Manis beach in Padang."
         ]
       },
       {
@@ -387,7 +387,7 @@ const rounds = [
         hints: [
           "This young person felt a strong, unexplained calling toward the ocean.",
           "They went on a dangerous voyage to save their island and its people.",
-          "🎯 DEAD GIVEAWAY: Daughter of the chief of Motunui, she sails across the ocean with the demigod Maui to return the glowing heart of Te Fiti."
+          "She is the daughter of the chief of Motunui. She sails with the demigod Maui to return the glowing heart of Te Fiti and save her island."
         ]
       },
       {
@@ -396,7 +396,7 @@ const rounds = [
         hints: [
           "This character lives underwater and is always cheerful, even when things go wrong.",
           "They work at a fast food restaurant and take their job extremely seriously.",
-          "🎯 DEAD GIVEAWAY: A square yellow sponge who lives in a pineapple under the sea in Bikini Bottom, works at the Krusty Krab, and best friends with a pink starfish named Patrick."
+          "He is a square yellow sponge who lives in a pineapple in Bikini Bottom, works at the Krusty Krab, and his best friend is a pink starfish named Patrick."
         ]
       },
       {
@@ -405,7 +405,7 @@ const rounds = [
         hints: [
           "This person lived with a family that treated them poorly and made them do all the chores.",
           "With magical help, they attended a grand royal event but had to leave before midnight.",
-          "🎯 DEAD GIVEAWAY: She ran down the palace stairs at midnight, lost one glass slipper — and the prince searched the entire kingdom to find whose foot it fit."
+          "She ran down the palace stairs as the clock struck midnight and lost one glass slipper. The prince searched the entire kingdom to find the girl whose foot it fit."
         ]
       },
       {
@@ -414,7 +414,7 @@ const rounds = [
         hints: [
           "This ordinary teenager's life changed completely after a single unexpected accident.",
           "They balance a normal school life while secretly protecting their city from danger.",
-          "🎯 DEAD GIVEAWAY: Bitten by a radioactive spider, Peter Parker can shoot webs and swing between skyscrapers in New York City. \"With great power comes great responsibility.\""
+          "His name is Peter Parker. Bitten by a radioactive spider, he swings between skyscrapers in New York. His uncle taught him: \"With great power comes great responsibility.\""
         ]
       },
     ]
@@ -431,7 +431,7 @@ const rounds = [
         hints: [
           "This young man grew up without knowing the full truth about his own family.",
           "He fell in love with a beautiful woman and was given an impossible task to marry her.",
-          "🎯 DEAD GIVEAWAY: He had to build a lake and a boat in one night — he almost did it, but Dayang Sumbi tricked him by making fake dawn. He kicked the boat, and it became Tangkuban Perahu (upside-down boat mountain in Bandung)."
+          "He was given one night to build a lake and a boat. She tricked him by making a fake dawn. In his rage, he kicked the boat — it became Tangkuban Perahu, the upside-down boat mountain near Bandung."
         ]
       },
       {
@@ -440,7 +440,7 @@ const rounds = [
         hints: [
           "This person had a powerful ability they were taught to hide from everyone around them.",
           "After losing control, they isolated themselves to protect others from being hurt.",
-          "🎯 DEAD GIVEAWAY: Queen of Arendelle, she runs away to build an ice palace alone and sings \"Let It Go\" — her younger sister Anna is the one who eventually saves her."
+          "She is the Queen of Arendelle who can create ice and snow. She builds an ice palace alone to protect others, while her younger sister Anna is the one who eventually brings her back."
         ]
       },
       {
@@ -449,7 +449,7 @@ const rounds = [
         hints: [
           "This character grew up alone and was ignored or rejected by almost everyone in their village.",
           "Despite this, they never gave up on their dream to become the most respected leader of their village.",
-          "🎯 DEAD GIVEAWAY: Blonde spiky hair, orange jumpsuit, whisker marks on his cheeks — he has the Nine-Tails Fox sealed inside him and his dream is to become Hokage of Konoha."
+          "He has blonde spiky hair, whisker marks on his cheeks, and wears an orange jumpsuit. The Nine-Tails Fox is sealed inside him, and he dreams of becoming Hokage of the Hidden Leaf Village."
         ]
       },
       {
@@ -458,7 +458,7 @@ const rounds = [
         hints: [
           "This character came from the future with a mission to help someone have a better life.",
           "They carry an endless supply of incredible gadgets, all stored in a pocket on their stomach.",
-          "🎯 DEAD GIVEAWAY: Round blue robot cat with no ears (a mouse chewed them off), a 4D magic pocket on his tummy, and his most famous gadget is the Dokodemo Door (\"Anywhere Door\")."
+          "He is a round blue robot cat with no ears — a mouse chewed them off. He carries gadgets in a 4D pocket on his stomach, and his most famous tool is the Dokodemo Door — the Anywhere Door."
         ]
       },
       {
@@ -467,7 +467,7 @@ const rounds = [
         hints: [
           "This character just wanted to be left alone and live peacefully in their own space.",
           "They were forced on an unexpected journey to rescue a princess they didn\'t particularly want to meet.",
-          "🎯 DEAD GIVEAWAY: A big green ogre who lives in a swamp. His best friend is Donkey. He rescues Princess Fiona from a castle guarded by a dragon — and it turns out Fiona is also an ogre."
+          "He is a big green ogre who just wants to live in his swamp. His best friend is a talking Donkey, and he rescues Princess Fiona — only to discover that Fiona is also an ogre."
         ]
       },
     ]
@@ -484,7 +484,7 @@ const rounds = [
         hints: [
           "This character was born in an unusual way — not like any ordinary child.",
           "They were chased by a terrifying giant creature that wanted to consume them.",
-          "🎯 DEAD GIVEAWAY: Born from a golden cucumber (timun = cucumber, mas = gold), given magic items by a hermit — she threw salt (became sea), cucumber seeds (became jungle), and shrimp paste (became boiling mud) to stop Buta Ijo the green giant."
+          "She was born from a golden cucumber — timun means cucumber, mas means gold. A hermit gave her salt that became a sea, cucumber seeds that became a forest, and shrimp paste that became boiling mud — all to stop the giant Buta Ijo."
         ]
       },
       {
@@ -493,7 +493,7 @@ const rounds = [
         hints: [
           "This person used cleverness and deception to avoid an unwanted situation.",
           "They set an impossible condition for someone who wanted to marry them.",
-          "🎯 DEAD GIVEAWAY: She told Bandung Bondowoso to build 1,000 temples in one night. He almost finished — so she tricked the roosters into crowing early. He found out and cursed her into becoming the 1,000th statue at Prambanan temple."
+          "She challenged Bandung Bondowoso to build 1,000 temples in one night. When he was almost done, she tricked the roosters into crowing early. He found out and cursed her to become the 1,000th statue at Prambanan temple."
         ]
       },
       {
@@ -502,7 +502,7 @@ const rounds = [
         hints: [
           "This character spent most of their life locked away, never knowing the real reason why.",
           "Their most distinctive feature was used as both a tool and a symbol of their captivity.",
-          "🎯 DEAD GIVEAWAY: Locked in a tower by Mother Gothel, she has magical 70-foot golden hair. A thief named Flynn Rider climbs up using her hair — and eventually she discovers she\'s the lost princess of Corona."
+          "She spent her life locked in a tower by Mother Gothel. Her magical golden hair glows when she sings. A thief named Flynn Rider climbed her tower, and together they discovered she is the lost princess of Corona."
         ]
       },
       {
@@ -511,7 +511,7 @@ const rounds = [
         hints: [
           "This person grew up not knowing who they truly were or the world they actually belonged to.",
           "On their eleventh birthday, everything changed when they received an important letter.",
-          "🎯 DEAD GIVEAWAY: Round glasses, lightning bolt scar on his forehead, lives under the stairs at the Dursleys — he gets a letter saying \"YOU ARE A WIZARD\" and goes to Hogwarts School of Witchcraft and Wizardry."
+          "He has round glasses and a lightning bolt scar on his forehead. He grew up under the stairs at his relatives house, until a letter arrived saying he was a wizard and had been accepted into Hogwarts."
         ]
       },
       {
@@ -520,7 +520,7 @@ const rounds = [
         hints: [
           "This character is a young boy who is always seen together with someone who looks exactly like them.",
           "They live with their older sister and grandmother in a small village in Malaysia.",
-          "🎯 DEAD GIVEAWAY: Identical twin brothers from Kampung Durian Runtuh, Malaysia — one always says \"Betul! Betul! Betul!\" (Correct! Correct! Correct!) and loves chicken — that\'s Ipin. His twin is Upin."
+          "He lives in Kampung Durian Runtuh, Malaysia with his twin brother Upin. He loves chicken and his catchphrase is \"Betul! Betul! Betul!\" which means Correct! Correct! Correct!"
         ]
       },
     ]
