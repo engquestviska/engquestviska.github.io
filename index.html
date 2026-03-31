@@ -1466,7 +1466,7 @@ async function loadHallOfFame() {
     const all = [];
     results.forEach(({ cls, students }) => {
       students.forEach(s => {
-        const total = (s.VocabularyBox||0)*1 + (s.Answering||0)*2 + (s.Presenting||0)*5 + (s.DoingTaskOnTime||0)*2 + (s.HelpingHand||0)*1;
+        const total = (s.Total || 0);
         all.push({ ...s, cls, total });
       });
     });
@@ -2141,6 +2141,7 @@ const HOF_ACT_DEFS = [
   { key:'Presenting',      label:'Presenting',   color:'#10B981', pts:5 },
   { key:'DoingTaskOnTime', label:'Task On Time', color:'#F59E0B', pts:2 },
   { key:'HelpingHand',     label:'Helping Hand', color:'#EC4899', pts:1 },
+  { key:'Quiz',            label:'Quiz',         color:'#14B8A6', pts:1 },
 ];
 const HOF_AVATAR_COLORS = ['#7C3AED','#2563EB','#059669','#D97706','#DC2626','#7C3AED','#0891B2','#9333EA','#16A34A'];
 const HOF_CLS_LIST = ['XE1','XE4','XE5','XE6','XE7','XE8','XE9','XE10','XE11'];
