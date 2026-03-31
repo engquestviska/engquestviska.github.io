@@ -714,8 +714,9 @@ function loadCharacter() {
   // Reset hints
   resetHints();
 
-  // Reveal hint 1 immediately
+  // Reveal hint 1 immediately and show 15pt award
   revealHint(1);
+  showAwardForHint(1);
 
   // Buttons
   document.getElementById('btn-reveal-hint').style.display = 'inline-flex';
