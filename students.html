@@ -640,6 +640,7 @@ const ACTS = [
   { key: 'Presenting',       label: 'Presenting',        color: '#10B981' },
   { key: 'DoingTaskOnTime',  label: 'Doing Task On Time',color: '#F59E0B' },
   { key: 'HelpingHand',      label: 'Helping Hand',      color: '#EC4899' },
+  { key: 'Quiz',             label: 'Quiz',              color: '#14B8A6' },
 ];
 
 // Class key mapping: XE-1 → XE1 for API
@@ -696,7 +697,7 @@ async function openActModal(name, cls) {
     // Update avatar with nickname if available
     if (student.nickname) document.getElementById('actAvatar').textContent = student.nickname[0].toUpperCase();
 
-    const total   = (student.VocabularyBox||0)*1 + (student.Answering||0)*2 + (student.Presenting||0)*5 + (student.DoingTaskOnTime||0)*2 + (student.HelpingHand||0)*1 + (student.QuizCh4||0) + (student.QuizCh5||0);
+    const total   = (student.VocabularyBox||0) + (student.Answering||0) + (student.Presenting||0) + (student.DoingTaskOnTime||0) + (student.HelpingHand||0) + (student.Quiz||0);
     const indClass = student.Indicator.includes('Pro Maxxing') ? 'ind-promax' :
       student.Indicator.includes('Ultra Pro') ? 'ind-ultrapro' :
       student.Indicator.includes('Plus Ultra') ? 'ind-ultra' :
@@ -708,13 +709,12 @@ async function openActModal(name, cls) {
 
     // Point rules per activity
     const pointRules = {
-      VocabularyBox:    { pts: 1,  unit: 'pt each',  info: 'Each vocab box submission' },
-      Answering:        { pts: 2,  unit: 'pts each',  info: 'Each question answered' },
-      Presenting:       { pts: 5,  unit: 'pts each',  info: 'Each presentation done' },
-      DoingTaskOnTime:  { pts: 2,  unit: 'pts each',  info: 'Tasks submitted on time' },
-      HelpingHand:      { pts: 1,  unit: 'pt each',  info: 'Helping classmates' },
-      QuizCh4:          { pts: 1,  unit: 'pts total', info: 'Quiz score out of 10' },
-      QuizCh5:          { pts: 1,  unit: 'pts total', info: 'Quiz score out of 10' },
+      VocabularyBox:    { pts: 1, unit: 'pt each', info: 'Each vocab box submission' },
+      Answering:        { pts: 1, unit: 'pt each', info: 'Each question answered' },
+      Presenting:       { pts: 1, unit: 'pt each', info: 'Each presentation done' },
+      DoingTaskOnTime:  { pts: 1, unit: 'pt each', info: 'Tasks submitted on time' },
+      HelpingHand:      { pts: 1, unit: 'pt each', info: 'Helping classmates' },
+      Quiz:             { pts: 1, unit: 'pt each', info: 'Quiz activeness score' },
     };
 
     const statsHtml = ACTS.map(a => {
@@ -824,6 +824,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') { document.g
       <div class="sidebar-item-name">Submission</div>
       <span class="sidebar-item-badge">SOON</span>
     </a>
+    <a href="submission_status.html" class="sidebar-item" data-page="submission_status"><div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#9989;</div><div class="sidebar-item-name">Submission Status</div></a>
   </div>
   <div class="sidebar-divider"></div>
   <div class="sidebar-section">
