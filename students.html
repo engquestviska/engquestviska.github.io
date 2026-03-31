@@ -697,7 +697,7 @@ async function openActModal(name, cls) {
     // Update avatar with nickname if available
     if (student.nickname) document.getElementById('actAvatar').textContent = student.nickname[0].toUpperCase();
 
-    const total   = (student.VocabularyBox||0) + (student.Answering||0) + (student.Presenting||0) + (student.DoingTaskOnTime||0) + (student.HelpingHand||0) + (student.Quiz||0);
+    const total   = (student.Total || 0);
     const indClass = student.Indicator.includes('Pro Maxxing') ? 'ind-promax' :
       student.Indicator.includes('Ultra Pro') ? 'ind-ultrapro' :
       student.Indicator.includes('Plus Ultra') ? 'ind-ultra' :
@@ -709,12 +709,12 @@ async function openActModal(name, cls) {
 
     // Point rules per activity
     const pointRules = {
-      VocabularyBox:    { pts: 1, unit: 'pt each', info: 'Each vocab box submission' },
-      Answering:        { pts: 1, unit: 'pt each', info: 'Each question answered' },
-      Presenting:       { pts: 1, unit: 'pt each', info: 'Each presentation done' },
-      DoingTaskOnTime:  { pts: 1, unit: 'pt each', info: 'Tasks submitted on time' },
-      HelpingHand:      { pts: 1, unit: 'pt each', info: 'Helping classmates' },
-      Quiz:             { pts: 1, unit: 'pt each', info: 'Quiz activeness score' },
+      VocabularyBox:    { pts: 1, unit: 'pt each',  info: 'Each vocab box submission' },
+      Answering:        { pts: 2, unit: 'pts each', info: 'Each question answered' },
+      Presenting:       { pts: 5, unit: 'pts each', info: 'Each presentation done' },
+      DoingTaskOnTime:  { pts: 2, unit: 'pts each', info: 'Tasks submitted on time' },
+      HelpingHand:      { pts: 1, unit: 'pt each',  info: 'Helping classmates' },
+      Quiz:             { pts: 1, unit: 'pt each',  info: 'Quiz activeness score' },
     };
 
     const statsHtml = ACTS.map(a => {
