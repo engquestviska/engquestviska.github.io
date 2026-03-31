@@ -327,13 +327,7 @@
     grid.className = 'students-grid';
 
     studentsData.forEach(s => {
-      // Total = sum of I+J+K+L+M+N (weights applied by spreadsheet formulas in those columns)
-      const total = (s.VocabularyBox    || 0)
-                  + (s.Answering        || 0)
-                  + (s.Presenting       || 0)
-                  + (s.DoingTaskOnTime  || 0)
-                  + (s.HelpingHand      || 0)
-                  + (s.Quiz             || 0);
+      const total = (s.Total || 0);
       const totalClass = total >= 100 ? 'high' : total >= 25 ? 'mid' : 'low';
       const indClass   = s.Indicator.includes('Pro Maxxing') ? 'ind-promax' :
         s.Indicator.includes('Ultra Pro') ? 'ind-ultrapro' :
@@ -434,7 +428,8 @@
     });
   }
 
-  const ACT_PTS = { 'Vocabulary Box': 1, 'Answering': 1, 'Presenting': 1, 'Doing Task On Time': 1, 'Helping Hand': 1, 'Quiz': 1 };
+  // Weights match spreadsheet: VB×1, ANS×2, PRE×5, DTO×2, HH×1, Quiz×1
+  const ACT_PTS = { 'Vocabulary Box': 1, 'Answering': 2, 'Presenting': 5, 'Doing Task On Time': 2, 'Helping Hand': 1, 'Quiz': 1 };
 
   function recalcTotal(studentNo) {
     const totalEl = document.getElementById('total-' + studentNo);
