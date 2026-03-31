@@ -217,7 +217,6 @@
         <option value="XE11">X E-11</option>
       </select>
       <span class="class-info" id="classInfo"></span>
-      <button id="setupQuizBtn" onclick="setupQuizColumn()" style="padding:8px 14px;background:rgba(20,184,166,0.15);border:1px solid #14B8A6;color:#14B8A6;border-radius:10px;font-family:inherit;font-size:0.78rem;font-weight:700;cursor:pointer;white-space:nowrap;" title="Add Quiz column to all Activeness sheets (run once)">&#9965; Setup Quiz Column</button>
     </div>
 
     <!-- Activity legend -->
@@ -247,6 +246,7 @@
     { key: 'Presenting',         short: 'PRE', col: '#10B981' },
     { key: 'Doing Task On Time', short: 'DTO', col: '#F59E0B' },
     { key: 'Helping Hand',       short: 'HH',  col: '#EC4899' },
+    { key: 'Quiz',               short: 'QZ',  col: '#14B8A6' },
   ];
 
   let savedUser = '', savedPass = '', currentClass = '';
@@ -327,12 +327,13 @@
     grid.className = 'students-grid';
 
     studentsData.forEach(s => {
-      // Points: VB×1, ANS×2, PRE×5, DTO×2, HH×1
+      // Points: VB×1, ANS×2, PRE×5, DTO×2, HH×1, QZ×1
       const total = (s.VocabularyBox    || 0) * 1
                   + (s.Answering        || 0) * 2
                   + (s.Presenting       || 0) * 5
                   + (s.DoingTaskOnTime  || 0) * 2
-                  + (s.HelpingHand      || 0) * 1;
+                  + (s.HelpingHand      || 0) * 1
+                  + (s.Quiz             || 0) * 1;
       const totalClass = total >= 100 ? 'high' : total >= 25 ? 'mid' : 'low';
       const indClass   = s.Indicator.includes('Pro Maxxing') ? 'ind-promax' :
         s.Indicator.includes('Ultra Pro') ? 'ind-ultrapro' :
@@ -348,6 +349,7 @@
         'Presenting':         s.Presenting       || 0,
         'Doing Task On Time': s.DoingTaskOnTime  || 0,
         'Helping Hand':       s.HelpingHand      || 0,
+        'Quiz':               s.Quiz             || 0,
       };
 
       const actRows = ACTS.map(a => `
@@ -432,7 +434,7 @@
     });
   }
 
-  const ACT_PTS = { VocabularyBox: 1, Answering: 2, Presenting: 5, DoingTaskOnTime: 2, HelpingHand: 1 };
+  const ACT_PTS = { 'Vocabulary Box': 1, 'Answering': 2, 'Presenting': 5, 'Doing Task On Time': 2, 'Helping Hand': 1, 'Quiz': 1 };
 
   function recalcTotal(studentNo) {
     const totalEl = document.getElementById('total-' + studentNo);
