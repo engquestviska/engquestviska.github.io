@@ -171,7 +171,7 @@
   <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
   <div class="header-row">
     
-  
+  <button class="logout-btn" onclick="doLogout()">&#128274; Logout</button>
   <a class="back-btn" href="index.html">← Back</a>
     <div class="header-center">
       <div class="header-title">Activeness</div>
@@ -226,7 +226,6 @@
       <div class="legend-item"><div class="legend-dot" style="background:#10B981"></div>PRE · Presenting</div>
       <div class="legend-item"><div class="legend-dot" style="background:#F59E0B"></div>DTO · Task On Time</div>
       <div class="legend-item"><div class="legend-dot" style="background:#EC4899"></div>HH · Helping Hand</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#14B8A6"></div>QZ · Quiz</div>
     </div>
 
     <div id="studentsList"></div>
@@ -234,7 +233,7 @@
 
 </main>
 
-<footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
+<footer>© 2025 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -246,7 +245,6 @@
     { key: 'Presenting',         short: 'PRE', col: '#10B981' },
     { key: 'Doing Task On Time', short: 'DTO', col: '#F59E0B' },
     { key: 'Helping Hand',       short: 'HH',  col: '#EC4899' },
-    { key: 'Quiz',               short: 'QZ',  col: '#14B8A6' },
   ];
 
   let savedUser = '', savedPass = '', currentClass = '';
@@ -276,11 +274,6 @@
   }
 
   // ── LOGIN ─────────────────────────────────────────────────
-  async function hashPass(plain) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(plain));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-  }
-
   async function doLogin() {
     const u = document.getElementById('loginUser').value.trim();
     const p = document.getElementById('loginPass').value.trim();
@@ -291,10 +284,8 @@
     try {
       const data = await apiGet({ action: 'checkLogin', username: u, password: p });
       if (data.ok) {
-        // If silent (auto-login from localStorage), p is already a hash — don't re-hash
-        const hashed = silent ? p : await hashPass(p);
-        savedUser = u; savedPass = hashed;
-        localStorage.setItem('eq_tu', u); localStorage.setItem('eq_tp', hashed);
+        savedUser = u; savedPass = p;
+        localStorage.setItem('eq_tu', u); localStorage.setItem('eq_tp', p);
         document.getElementById('loginWall').classList.add('hidden');
         document.getElementById('mainPanel').classList.remove('hidden');
         document.getElementById('headerRight').innerHTML = `<div class="teacher-badge">🎓 Teacher <span class="logout-x" onclick="logout()">✕</span></div>`;
@@ -334,13 +325,12 @@
     grid.className = 'students-grid';
 
     studentsData.forEach(s => {
-      // Points: VB×1, ANS×2, PRE×5, DTO×2, HH×1, QZ×1
+      // Points: VB×1, ANS×2, PRE×5, DTO×2, HH×1
       const total = (s.VocabularyBox    || 0) * 1
                   + (s.Answering        || 0) * 2
                   + (s.Presenting       || 0) * 5
                   + (s.DoingTaskOnTime  || 0) * 2
-                  + (s.HelpingHand      || 0) * 1
-                  + (s.Quiz             || 0) * 1;
+                  + (s.HelpingHand      || 0) * 1;
       const totalClass = total >= 100 ? 'high' : total >= 25 ? 'mid' : 'low';
       const indClass   = s.Indicator.includes('Pro Maxxing') ? 'ind-promax' :
         s.Indicator.includes('Ultra Pro') ? 'ind-ultrapro' :
@@ -356,7 +346,6 @@
         'Presenting':         s.Presenting       || 0,
         'Doing Task On Time': s.DoingTaskOnTime  || 0,
         'Helping Hand':       s.HelpingHand      || 0,
-        'Quiz':               s.Quiz             || 0,
       };
 
       const actRows = ACTS.map(a => `
@@ -441,14 +430,7 @@
     });
   }
 
-  const ACT_PTS = {
-    'Vocabulary Box': 1,
-    'Answering': 2,
-    'Presenting': 5,
-    'Doing Task On Time': 2,
-    'Helping Hand': 1,
-    'Quiz': 1
-  };
+  const ACT_PTS = { VocabularyBox: 1, Answering: 2, Presenting: 5, DoingTaskOnTime: 2, HelpingHand: 1 };
 
   function recalcTotal(studentNo) {
     const totalEl = document.getElementById('total-' + studentNo);
@@ -519,6 +501,31 @@
   }
 
   // ── TOAST ─────────────────────────────────────────────────
+  // ── SETUP QUIZ COLUMN ────────────────────────────────────────
+  async function setupQuizColumn() {
+    if (!savedUser || !savedPass) { showToast('Not logged in', 'err'); return; }
+    const btn = document.getElementById('setupQuizBtn');
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Setting up...'; }
+    try {
+      const res = await apiGet({ action: 'setupQuizColumn', username: savedUser, password: savedPass });
+      if (res.success) {
+        const results = res.results || {};
+        const done    = Object.values(results).filter(v => v === 'done').length;
+        const already = Object.values(results).filter(v => v === 'already exists').length;
+        let msg = '✅ Quiz column: ' + done + ' updated, ' + already + ' already had it';
+        showToast(msg, 'ok');
+        if (btn) btn.textContent = '✅ Done';
+        if (currentClass) setTimeout(loadClass, 1000);
+      } else {
+        showToast('Error: ' + (res.error || 'Unknown'), 'err');
+        if (btn) { btn.disabled = false; btn.textContent = '⚙️ Setup Quiz Column'; }
+      }
+    } catch(e) {
+      showToast('Failed: ' + e.message, 'err');
+      if (btn) { btn.disabled = false; btn.textContent = '⚙️ Setup Quiz Column'; }
+    }
+  }
+
   function showToast(msg, type) {
     const t = document.getElementById('toast');
     t.textContent = msg; t.className = 'toast ' + (type || '');
@@ -559,12 +566,11 @@
       <div class="sidebar-item-icon" style="background:rgba(59,130,246,0.2)">&#128203;</div>
       <div class="sidebar-item-name">Assignments</div>
     </a>
-    <a href="submission.html" class="sidebar-item" data-page="submission">
+    <a href="submission.html" class="sidebar-item" style="opacity:0.5;pointer-events:none;">
       <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#128221;</div>
       <div class="sidebar-item-name">Submission</div>
-      
+      <span class="sidebar-item-badge">SOON</span>
     </a>
-    <a href="submission_status.html" class="sidebar-item" data-page="submission_status"><div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#9989;</div><div class="sidebar-item-name">Submission Status</div></a>
   </div>
   <div class="sidebar-divider"></div>
   <div class="sidebar-section">
@@ -601,7 +607,6 @@
       <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#127919;</div>
       <div class="sidebar-item-name">Summative</div>
     </a>
-    <a href="chapter5_guess_who.html" class="sidebar-item" data-page="guess_who" id="sbGuessWho" style="display:none"><div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">&#129300;</div><div class="sidebar-item-name">Guess Who? <span style="font-size:0.65rem;background:#7C3AED;color:#fff;padding:1px 6px;border-radius:999px;margin-left:4px;font-family:IBM Plex Mono,monospace;">Ch.5</span></div></a>
   </div>
   <div class="sidebar-teacher">
     <div class="sidebar-teacher-label">&#128273; Teacher Access</div>
@@ -632,8 +637,6 @@ function toggleSidebar() {
   var loggedIn = !!localStorage.getItem('eq_tu');
   document.getElementById('sbTeacherLoggedOut').style.display = loggedIn ? 'none' : 'block';
   document.getElementById('sbTeacherLoggedIn').style.display  = loggedIn ? 'block' : 'none';
-  var gwItem = document.getElementById('sbGuessWho');
-  if (gwItem) gwItem.style.display = loggedIn ? 'flex' : 'none';
 }
 function closeSidebar() {
   document.getElementById('sidebar').classList.remove('open');
