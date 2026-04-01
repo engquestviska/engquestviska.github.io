@@ -856,10 +856,10 @@ async function syncRevealByTasks() {
               if (lbl) lbl.textContent = 'On';
             }
           } else { failed++; }
-          setTimeout(function() { next(idx + 1); }, 200);
+          setTimeout(function() { next(idx + 1); }, 100);
         }).catch(function() {
           failed++;
-          setTimeout(function() { next(idx + 1); }, 200);
+          setTimeout(function() { next(idx + 1); }, 100);
         });
     }
     next(0);
