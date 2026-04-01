@@ -617,18 +617,21 @@
       const tasksToSet = {};
       ch4Keys.forEach(k => { tasksToSet[k] = true; });
 
-      // Only include students who fully submitted (submitted === true)
+      // Only include students who fully submitted AND still have unchecked Ch4 tasks
       const toUpdate = [];
       taskData.students.forEach(function(s) {
         var sub = submitted.find(function(r) {
           return r.name.toLowerCase() === s.name.toLowerCase() && r.submitted === true;
         });
-        if (!sub) return;
+        if (!sub) return; // not submitted — skip
+        // Skip if all Ch4 tasks already done
+        var alreadyDone = ch4Keys.every(function(k) { return !!s.tasks[k]; });
+        if (alreadyDone) return;
         toUpdate.push({ s: s, tasksToSet: tasksToSet });
       });
 
       if (!toUpdate.length) {
-        showToast('Nothing to sync — no fully submitted students yet', 'ok');
+        showToast('All submitted students already up to date ✅', 'ok');
         if (syncBtn) { syncBtn.disabled = false; syncBtn.textContent = origText; }
         return;
       }
