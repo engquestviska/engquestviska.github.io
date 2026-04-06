@@ -74,10 +74,10 @@
 
     /* SILHOUETTE CARD */
     .silhouette-card { background:var(--white); border:1.5px solid var(--border); border-radius:24px; padding:28px; margin-bottom:20px; text-align:center; }
-    .silhouette-wrap { width:100%; max-width:340px; height:280px; margin:0 auto 16px; border-radius:16px; overflow:hidden; background:#f0f0f0; display:flex; align-items:center; justify-content:center; position:relative; border:1.5px solid var(--border); }
-    .silhouette-wrap img { display:none; }
-    .silhouette-canvas { width:100%; height:100%; object-fit:contain; }
-    .silhouette-placeholder { color:var(--text-muted); font-size:0.85rem; font-family:'IBM Plex Mono',monospace; text-align:center; padding:20px; }
+    .silhouette-wrap { width:100%; max-width:340px; height:260px; margin:0 auto 16px; border-radius:16px; overflow:hidden; background:#1E1040; display:flex; align-items:center; justify-content:center; position:relative; }
+    .silhouette-wrap img { width:100%; height:100%; object-fit:cover; filter:brightness(0); transition:filter 1s ease; }
+    .silhouette-wrap img.revealed { filter:brightness(1); }
+    .silhouette-placeholder { color:rgba(255,255,255,0.15); font-size:0.85rem; font-family:'IBM Plex Mono',monospace; text-align:center; padding:20px; }
     .char-name-reveal { font-family:'Playfair Display',serif; font-size:2rem; font-weight:800; color:var(--purple); margin-top:8px; display:none; animation:fadeUp 0.5s ease; }
     .char-name-reveal.show { display:block; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
@@ -155,31 +155,9 @@
       .game-actions { flex-direction:column; }
       .silhouette-wrap { height:200px; }
     }
-  
-    /* LOCK SCREEN */
-    #lock-screen { position:fixed; inset:0; background:linear-gradient(135deg,#1E1040 0%,#4C1D95 100%); display:flex; align-items:center; justify-content:center; z-index:9999; flex-direction:column; gap:0; }
-    .lock-card { background:rgba(255,255,255,0.07); border:1.5px solid rgba(255,255,255,0.15); border-radius:28px; padding:48px 40px; text-align:center; max-width:380px; width:90%; backdrop-filter:blur(12px); }
-    .lock-icon { font-size:3.5rem; margin-bottom:20px; }
-    .lock-title { font-family:'Playfair Display',serif; font-size:1.8rem; font-weight:800; color:#fff; margin-bottom:8px; }
-    .lock-sub { font-size:0.9rem; color:rgba(255,255,255,0.55); margin-bottom:28px; line-height:1.6; }
-    .lock-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(239,68,68,0.2); border:1.5px solid rgba(239,68,68,0.4); border-radius:999px; padding:8px 20px; color:#FCA5A5; font-size:0.82rem; font-weight:700; font-family:'IBM Plex Mono',monospace; }
-
-      @keyframes spin { to { transform:rotate(360deg); } }
   </style>
 </head>
 <body>
-
-<!-- LOCK SCREEN -->
-<div id="lock-screen">
-  <div class="lock-card">
-    <div class="lock-icon">&#128274;</div>
-    <div class="lock-title">Teacher Only</div>
-    <div class="lock-sub">This page is for Mr. Laksma's classroom use only. Students do not have access to this page.</div>
-    <div class="lock-badge">&#128683; Access Restricted</div>
-  </div>
-</div>
-
-
 
 <!-- SETUP SCREEN -->
 <div id="setup-screen" class="screen active">
@@ -258,8 +236,7 @@
         <div class="silhouette-placeholder" id="silhouette-placeholder">
           Upload an image for this character in the silhouette-wrap div
         </div>
-        <img id="char-img" src="" alt="" style="display:none" crossorigin="anonymous"/>
-        <canvas id="silhouette-canvas" class="silhouette-canvas" style="display:none"></canvas>
+        <img id="char-img" src="" alt="" style="display:none"/>
       </div>
       <div class="char-name-reveal" id="char-name-reveal"></div>
     </div>
@@ -353,7 +330,7 @@ const rounds = [
         hints: [
           "This character is a natural leader who always puts others before themselves.",
           "Their whole world was turned upside down when someone new arrived and took their place.",
-          "He wears a cowboy hat, has a pull-string on his back, and one of his famous lines is \"There's a snake in my boot!\" He is the main character of Toy Story."
+          "They are a cowboy toy who belongs to a boy named Andy."
         ]
       },
       {
@@ -362,7 +339,7 @@ const rounds = [
         hints: [
           "This character is known for being lazy, clumsy, and not very good at school.",
           "Despite their weaknesses, they have a very kind heart and care deeply for their friends.",
-          "A blue robot cat named Doraemon travels from the future to help him. His full name is Nobi Nobita."
+          "A robot cat from the future was sent specifically to help improve this person's life."
         ]
       },
     ]
@@ -379,7 +356,7 @@ const rounds = [
         hints: [
           "This person left their hometown to seek a better life across the sea.",
           "After becoming rich and successful, they refused to acknowledge someone who loved them deeply.",
-          "He denied his own mother when she ran to embrace him at the harbour. The curse turned him to stone, and his statue can still be found on Air Manis beach in Padang."
+          "Their act of betrayal led to a curse — they were turned into stone on a beach in Sumatra."
         ]
       },
       {
@@ -388,7 +365,7 @@ const rounds = [
         hints: [
           "This young person felt a strong, unexplained calling toward the ocean.",
           "They went on a dangerous voyage to save their island and its people.",
-          "She is the daughter of the chief of Motunui. She sails with the demigod Maui to return the glowing heart of Te Fiti and save her island."
+          "They restored the heart of Te Fiti with the help of a demigod named Maui."
         ]
       },
       {
@@ -397,7 +374,7 @@ const rounds = [
         hints: [
           "This character lives underwater and is always cheerful, even when things go wrong.",
           "They work at a fast food restaurant and take their job extremely seriously.",
-          "He is a square yellow sponge who lives in a pineapple in Bikini Bottom, works at the Krusty Krab, and his best friend is a pink starfish named Patrick."
+          "Their best friend is a pink starfish, and they live in a pineapple house."
         ]
       },
       {
@@ -406,7 +383,7 @@ const rounds = [
         hints: [
           "This person lived with a family that treated them poorly and made them do all the chores.",
           "With magical help, they attended a grand royal event but had to leave before midnight.",
-          "She ran down the palace stairs as the clock struck midnight and lost one glass slipper. The prince searched the entire kingdom to find the girl whose foot it fit."
+          "A lost shoe was the only clue that led a prince to find them again."
         ]
       },
       {
@@ -415,7 +392,7 @@ const rounds = [
         hints: [
           "This ordinary teenager's life changed completely after a single unexpected accident.",
           "They balance a normal school life while secretly protecting their city from danger.",
-          "His name is Peter Parker. Bitten by a radioactive spider, he swings between skyscrapers in New York. His uncle taught him: \"With great power comes great responsibility.\""
+          "They gained their powers from a bite, and their greatest lesson came from losing someone close."
         ]
       },
     ]
@@ -432,7 +409,7 @@ const rounds = [
         hints: [
           "This young man grew up without knowing the full truth about his own family.",
           "He fell in love with a beautiful woman and was given an impossible task to marry her.",
-          "He was given one night to build a lake and a boat. She tricked him by making a fake dawn. In his rage, he kicked the boat — it became Tangkuban Perahu, the upside-down boat mountain near Bandung."
+          "When he failed and discovered the truth, his rage created a mountain and a lake in West Java."
         ]
       },
       {
@@ -441,7 +418,7 @@ const rounds = [
         hints: [
           "This person had a powerful ability they were taught to hide from everyone around them.",
           "After losing control, they isolated themselves to protect others from being hurt.",
-          "She is the Queen of Arendelle who can create ice and snow. She builds an ice palace alone to protect others, while her younger sister Anna is the one who eventually brings her back."
+          "Their younger sister's love was ultimately what freed them from fear and isolation."
         ]
       },
       {
@@ -450,7 +427,7 @@ const rounds = [
         hints: [
           "This character grew up alone and was ignored or rejected by almost everyone in their village.",
           "Despite this, they never gave up on their dream to become the most respected leader of their village.",
-          "He has blonde spiky hair, whisker marks on his cheeks, and wears an orange jumpsuit. The Nine-Tails Fox is sealed inside him, and he dreams of becoming Hokage of the Hidden Leaf Village."
+          "They have a powerful creature sealed inside them, and their catchphrase involves never going back on their word."
         ]
       },
       {
@@ -459,7 +436,7 @@ const rounds = [
         hints: [
           "This character came from the future with a mission to help someone have a better life.",
           "They carry an endless supply of incredible gadgets, all stored in a pocket on their stomach.",
-          "He is a round blue robot cat with no ears — a mouse chewed them off. He carries gadgets in a 4D pocket on his stomach, and his most famous tool is the Dokodemo Door — the Anywhere Door."
+          "Despite being a robot, they have one major fear — and it involves small furry animals."
         ]
       },
       {
@@ -467,8 +444,8 @@ const rounds = [
         image: 'images/r2_shrek.jpg',
         hints: [
           "This character just wanted to be left alone and live peacefully in their own space.",
-          "They were forced on an unexpected journey to rescue a princess they didn\'t particularly want to meet.",
-          "He is a big green ogre who just wants to live in his swamp. His best friend is a talking Donkey, and he rescues Princess Fiona — only to discover that Fiona is also an ogre."
+          "They were forced on an unexpected journey to rescue a princess they didn't particularly want to meet.",
+          "They live in a swamp, are covered in green skin, and their best friend never stops talking."
         ]
       },
     ]
@@ -485,7 +462,7 @@ const rounds = [
         hints: [
           "This character was born in an unusual way — not like any ordinary child.",
           "They were chased by a terrifying giant creature that wanted to consume them.",
-          "She was born from a golden cucumber — timun means cucumber, mas means gold. A hermit gave her salt that became a sea, cucumber seeds that became a forest, and shrimp paste that became boiling mud — all to stop the giant Buta Ijo."
+          "They escaped using magical items — seeds, salt, and shrimp paste — given by their mother."
         ]
       },
       {
@@ -494,7 +471,7 @@ const rounds = [
         hints: [
           "This person used cleverness and deception to avoid an unwanted situation.",
           "They set an impossible condition for someone who wanted to marry them.",
-          "She challenged Bandung Bondowoso to build 1,000 temples in one night. When he was almost done, she tricked the roosters into crowing early. He found out and cursed her to become the 1,000th statue at Prambanan temple."
+          "When the trick was discovered, they were cursed and became the final stone statue in a famous temple complex in Java."
         ]
       },
       {
@@ -503,7 +480,7 @@ const rounds = [
         hints: [
           "This character spent most of their life locked away, never knowing the real reason why.",
           "Their most distinctive feature was used as both a tool and a symbol of their captivity.",
-          "She spent her life locked in a tower by Mother Gothel. Her magical golden hair glows when she sings. A thief named Flynn Rider climbed her tower, and together they discovered she is the lost princess of Corona."
+          "A thief who broke into their tower ended up changing their entire life and showing them the outside world."
         ]
       },
       {
@@ -512,7 +489,7 @@ const rounds = [
         hints: [
           "This person grew up not knowing who they truly were or the world they actually belonged to.",
           "On their eleventh birthday, everything changed when they received an important letter.",
-          "He has round glasses and a lightning bolt scar on his forehead. He grew up under the stairs at his relatives house, until a letter arrived saying he was a wizard and had been accepted into Hogwarts."
+          "They are famous for surviving an attack as a baby that no one else had ever survived before."
         ]
       },
       {
@@ -521,7 +498,7 @@ const rounds = [
         hints: [
           "This character is a young boy who is always seen together with someone who looks exactly like them.",
           "They live with their older sister and grandmother in a small village in Malaysia.",
-          "He lives in Kampung Durian Runtuh, Malaysia with his twin brother Upin. He loves chicken and his catchphrase is \"Betul! Betul! Betul!\" which means Correct! Correct! Correct!"
+          "They are known for their love of chicken and their very distinctive way of saying 'betul, betul, betul.'"
         ]
       },
     ]
@@ -586,124 +563,18 @@ function loadCharacter() {
     `${r.label} · Character ${currentCharIdx + 1} of ${r.characters.length}`;
   buildProgressDots(r.characters.length, currentCharIdx);
 
-  // Silhouette — load image, process to silhouette on canvas
-  const img         = document.getElementById('char-img');
-  const canvas      = document.getElementById('silhouette-canvas');
+  // Silhouette
+  const img = document.getElementById('char-img');
   const placeholder = document.getElementById('silhouette-placeholder');
-  img.classList.remove('revealed');
-  canvas.style.display = 'none';
-  img.style.display    = 'none';
-
   if (char.image) {
-    placeholder.style.display = 'block';
-    placeholder.innerHTML = '<div style="width:28px;height:28px;border:3px solid rgba(0,0,0,0.15);border-top-color:#7C3AED;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 8px;"></div><div>Loading...</div>';
-
-    const preload = new Image();
-    preload.crossOrigin = 'anonymous';
-    preload.onload = function() {
-      // Draw to canvas and create silhouette
-      const wrap = canvas.parentElement;
-      const W = wrap.offsetWidth  || 340;
-      const H = wrap.offsetHeight || 280;
-
-      // Scale image to fit while keeping aspect ratio
-      const scale = Math.min(W / preload.width, H / preload.height);
-      const dw = Math.round(preload.width  * scale);
-      const dh = Math.round(preload.height * scale);
-      const dx = Math.round((W - dw) / 2);
-      const dy = Math.round((H - dh) / 2);
-
-      canvas.width  = W;
-      canvas.height = H;
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, W, H);
-      ctx.drawImage(preload, dx, dy, dw, dh);
-
-      // Process pixels — detect background by sampling corners,
-      // then turn all non-background pixels black
-      try {
-        const imageData = ctx.getImageData(0, 0, W, H);
-        const d = imageData.data;
-
-        // Sample the 4 corners to get background color
-        function getPixel(x, y) {
-          const i = (y * W + x) * 4;
-          return [d[i], d[i+1], d[i+2], d[i+3]];
-        }
-        const corners = [
-          getPixel(dx + 2, dy + 2),
-          getPixel(dx + dw - 3, dy + 2),
-          getPixel(dx + 2, dy + dh - 3),
-          getPixel(dx + dw - 3, dy + dh - 3),
-        ].filter(c => c[3] > 0);
-
-        // Average background color
-        const bg = corners.length ? [
-          corners.reduce((s, c) => s + c[0], 0) / corners.length,
-          corners.reduce((s, c) => s + c[1], 0) / corners.length,
-          corners.reduce((s, c) => s + c[2], 0) / corners.length,
-        ] : [255, 255, 255];
-
-        // Tolerance — how similar a pixel must be to bg to count as background
-        const TOLERANCE = 55;
-
-        function colorDiff(r, g, b) {
-          return Math.sqrt(
-            (r - bg[0]) ** 2 +
-            (g - bg[1]) ** 2 +
-            (b - bg[2]) ** 2
-          );
-        }
-
-        // Outside the image area = transparent (already clear)
-        // Background-like pixels = transparent
-        // Everything else = black
-        for (let i = 0; i < d.length; i += 4) {
-          const a = d[i + 3];
-          if (a < 10) continue; // already transparent
-          const diff = colorDiff(d[i], d[i+1], d[i+2]);
-          if (diff < TOLERANCE) {
-            // Background pixel — make transparent
-            d[i + 3] = 0;
-          } else {
-            // Character pixel — make black
-            d[i]     = 0;
-            d[i + 1] = 0;
-            d[i + 2] = 0;
-            d[i + 3] = 255;
-          }
-        }
-        ctx.putImageData(imageData, 0, 0);
-      } catch(e) {
-        // CORS error — fall back to CSS brightness filter
-        ctx.clearRect(0, 0, W, H);
-        ctx.drawImage(preload, dx, dy, dw, dh);
-      }
-
-      // Store original for reveal
-      canvas._origImage  = preload;
-      canvas._origParams = { dx, dy, dw, dh, W, H };
-
-      placeholder.style.display = 'none';
-      canvas.style.display      = 'block';
-    };
-    preload.onerror = function() {
-      placeholder.innerHTML = '&#128247;<br><span style="font-size:0.75rem;margin-top:6px;display:block;">Image not found:<br>' + char.image + '</span>';
-    };
-    preload.src = char.image;
+    img.src = char.image;
+    img.style.display = 'block';
+    img.classList.remove('revealed');
+    placeholder.style.display = 'none';
   } else {
-    img.style.display    = 'none';
-    canvas.style.display = 'none';
+    img.style.display = 'none';
     placeholder.style.display = 'block';
-    placeholder.textContent = '[ No image set for ' + char.name + ' ]';
-  }
-
-  // Preload next character image in background
-  const nextIdx = currentCharIdx + 1;
-  const nextChars = r.characters;
-  if (nextIdx < nextChars.length && nextChars[nextIdx].image) {
-    const nextPreload = new Image();
-    nextPreload.src = nextChars[nextIdx].image;
+    placeholder.textContent = '[ Add image URL for ' + char.name + ' ]';
   }
 
   // Name reveal
@@ -714,7 +585,7 @@ function loadCharacter() {
   // Reset hints
   resetHints();
 
-  // Reveal hint 1 immediately and show 15pt award
+  // Reveal hint 1 immediately
   revealHint(1);
   showAwardForHint(1);
 
@@ -722,7 +593,7 @@ function loadCharacter() {
   document.getElementById('btn-reveal-hint').style.display = 'inline-flex';
   document.getElementById('btn-reveal-hint').disabled = false;
   document.getElementById('btn-reveal-answer').style.display = 'none';
-  document.getElementById('award-section').classList.remove('show');
+  // Don't hide award-section — it's already shown by showAwardForHint(1)
   document.getElementById('next-wrap').style.display = 'none';
 
   // Badge states
@@ -780,35 +651,9 @@ function revealAnswer() {
   answerRevealed = true;
   const char = rounds[currentRoundIdx].characters[currentCharIdx];
 
-  // Reveal — redraw original full-color image on canvas
-  const canvas = document.getElementById('silhouette-canvas');
-  if (char.image && canvas._origImage) {
-    const { dx, dy, dw, dh, W, H } = canvas._origParams;
-    const ctx = canvas.getContext('2d');
-    // Fade in color by animating alpha frames
-    let frame = 0;
-    const totalFrames = 30;
-    const orig = canvas._origImage;
-    function fadeIn() {
-      const alpha = frame / totalFrames;
-      ctx.clearRect(0, 0, W, H);
-      // Draw silhouette underneath
-      ctx.globalAlpha = 1 - alpha;
-      ctx.drawImage(canvas._silhouetteSnapshot || orig, 0, 0);
-      // Draw color on top
-      ctx.globalAlpha = alpha;
-      ctx.drawImage(orig, dx, dy, dw, dh);
-      ctx.globalAlpha = 1;
-      frame++;
-      if (frame <= totalFrames) requestAnimationFrame(fadeIn);
-    }
-    // Take snapshot of current silhouette state for crossfade
-    canvas._silhouetteSnapshot = document.createElement('canvas');
-    canvas._silhouetteSnapshot.width  = W;
-    canvas._silhouetteSnapshot.height = H;
-    canvas._silhouetteSnapshot.getContext('2d').drawImage(canvas, 0, 0);
-    fadeIn();
-  }
+  // Reveal image filter
+  const img = document.getElementById('char-img');
+  if (img.src && char.image) img.classList.add('revealed');
 
   // Show name
   document.getElementById('char-name-reveal').classList.add('show');
@@ -955,17 +800,6 @@ document.getElementById('manual-names').addEventListener('input', function() {
   const list = document.getElementById('preview-list');
   list.innerHTML = names.map(n => '<span class="preview-chip">' + n + '</span>').join('');
 });
-
-// ── TEACHER LOCK ─────────────────────────────────────────────
-(function() {
-  var isTeacher = !!localStorage.getItem('eq_tu');
-  if (isTeacher) {
-    var lock = document.getElementById('lock-screen');
-    if (lock) lock.style.display = 'none';
-  }
-  // If not teacher, lock-screen stays visible and blocks everything
-})();
-
 </script>
 </body>
 </html>
