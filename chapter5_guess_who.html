@@ -74,10 +74,10 @@
 
     /* SILHOUETTE CARD */
     .silhouette-card { background:var(--white); border:1.5px solid var(--border); border-radius:24px; padding:28px; margin-bottom:20px; text-align:center; }
-    .silhouette-wrap { width:100%; max-width:340px; height:260px; margin:0 auto 16px; border-radius:16px; overflow:hidden; background:#ffffff; display:flex; align-items:center; justify-content:center; position:relative; border:1.5px solid var(--border); }
-    .silhouette-wrap img { width:100%; height:100%; object-fit:contain; filter:brightness(0); transition:filter 1.2s ease; }
-    .silhouette-wrap img.revealed { filter:brightness(1) saturate(1.05); }
-    .silhouette-placeholder { color:var(--text-muted); font-size:0.85rem; font-family:'IBM Plex Mono',monospace; text-align:center; padding:20px; }
+    .silhouette-wrap { width:100%; max-width:340px; height:260px; margin:0 auto 16px; border-radius:16px; overflow:hidden; background:#1a1a2e; display:flex; align-items:center; justify-content:center; position:relative; border:1.5px solid var(--border); }
+    .silhouette-wrap img { display:none; }
+    .silhouette-canvas { max-width:100%; max-height:100%; display:none; }
+    .silhouette-placeholder { color:rgba(255,255,255,0.4); font-size:0.85rem; font-family:'IBM Plex Mono',monospace; text-align:center; padding:20px; }
     .char-name-reveal { font-family:'Playfair Display',serif; font-size:2rem; font-weight:800; color:var(--purple); margin-top:8px; display:none; animation:fadeUp 0.5s ease; }
     .char-name-reveal.show { display:block; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
@@ -237,6 +237,7 @@
           Upload an image for this character in the silhouette-wrap div
         </div>
         <img id="char-img" src="" alt="" style="display:none"/>
+        <canvas id="silhouette-canvas" class="silhouette-canvas"></canvas>
       </div>
       <div class="char-name-reveal" id="char-name-reveal"></div>
     </div>
@@ -564,17 +565,86 @@ function loadCharacter() {
   buildProgressDots(r.characters.length, currentCharIdx);
 
   // Silhouette
-  const img = document.getElementById('char-img');
+  const img         = document.getElementById('char-img');
+  const canvas      = document.getElementById('silhouette-canvas');
   const placeholder = document.getElementById('silhouette-placeholder');
+  canvas.style.display = 'none';
+  img.style.display    = 'none';
+
   if (char.image) {
-    img.src = char.image;
-    img.style.display = 'block';
-    img.classList.remove('revealed');
-    placeholder.style.display = 'none';
-  } else {
-    img.style.display = 'none';
     placeholder.style.display = 'block';
-    placeholder.textContent = '[ Add image URL for ' + char.name + ' ]';
+    placeholder.innerHTML = '<div style="width:24px;height:24px;border:3px solid rgba(255,255,255,0.15);border-top-color:rgba(255,255,255,0.6);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 8px;"></div><div style="font-size:0.75rem">Loading...</div>';
+
+    const preload = new Image();
+    // No crossOrigin — avoids CORS block on GitHub Pages
+    preload.onload = function() {
+      const wrap = canvas.parentElement;
+      const W = wrap.offsetWidth  || 340;
+      const H = wrap.offsetHeight || 260;
+
+      // Scale to fit
+      const scale = Math.min(W / preload.width, H / preload.height);
+      const dw = Math.round(preload.width  * scale);
+      const dh = Math.round(preload.height * scale);
+      const dx = Math.round((W - dw) / 2);
+      const dy = Math.round((H - dh) / 2);
+
+      canvas.width  = W;
+      canvas.height = H;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, W, H);
+      ctx.drawImage(preload, dx, dy, dw, dh);
+
+      try {
+        // Try pixel manipulation (works if same-origin CORS is available)
+        const imageData = ctx.getImageData(0, 0, W, H);
+        const d = imageData.data;
+
+        // Sample corners to detect background color
+        function px(x, y) { const i=(y*W+x)*4; return [d[i],d[i+1],d[i+2],d[i+3]]; }
+        const corners = [px(dx+2,dy+2), px(dx+dw-3,dy+2), px(dx+2,dy+dh-3), px(dx+dw-3,dy+dh-3)].filter(c=>c[3]>10);
+        const bg = corners.length ? [
+          corners.reduce((s,c)=>s+c[0],0)/corners.length,
+          corners.reduce((s,c)=>s+c[1],0)/corners.length,
+          corners.reduce((s,c)=>s+c[2],0)/corners.length,
+        ] : [200,200,200];
+
+        const TOL = 60;
+        for (let i = 0; i < d.length; i += 4) {
+          if (d[i+3] < 10) continue;
+          const diff = Math.sqrt((d[i]-bg[0])**2+(d[i+1]-bg[1])**2+(d[i+2]-bg[2])**2);
+          if (diff < TOL) { d[i+3] = 0; }
+          else { d[i]=0; d[i+1]=0; d[i+2]=0; d[i+3]=255; }
+        }
+        ctx.putImageData(imageData, 0, 0);
+      } catch(e) {
+        // CORS blocked — draw solid black silhouette using composite operation
+        // This makes the character shape black regardless of background
+        ctx.globalCompositeOperation = 'source-atop';
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, W, H);
+        ctx.globalCompositeOperation = 'source-over';
+      }
+
+      canvas._origImage  = preload;
+      canvas._origParams = { dx, dy, dw, dh, W, H };
+      placeholder.style.display = 'none';
+      canvas.style.display      = 'block';
+    };
+    preload.onerror = function() {
+      placeholder.style.display = 'block';
+      placeholder.innerHTML = '&#128247;<br><span style="font-size:0.72rem;margin-top:6px;display:block;opacity:0.6">Image not found:<br>' + char.image + '</span>';
+    };
+    preload.src = char.image;
+
+    // Preload next in background
+    const nextIdx = currentCharIdx + 1;
+    if (nextIdx < r.characters.length && r.characters[nextIdx].image) {
+      const np = new Image(); np.src = r.characters[nextIdx].image;
+    }
+  } else {
+    placeholder.style.display = 'block';
+    placeholder.textContent = '[ No image set for ' + char.name + ' ]';
   }
 
   // Name reveal
@@ -651,9 +721,26 @@ function revealAnswer() {
   answerRevealed = true;
   const char = rounds[currentRoundIdx].characters[currentCharIdx];
 
-  // Reveal image filter
-  const img = document.getElementById('char-img');
-  if (img.src && char.image) img.classList.add('revealed');
+  // Reveal image — redraw original color image on canvas with crossfade
+  const canvas = document.getElementById('silhouette-canvas');
+  if (char.image && canvas._origImage) {
+    const { dx, dy, dw, dh, W, H } = canvas._origParams;
+    const ctx = canvas.getContext('2d');
+    // Snapshot current silhouette
+    const snap = document.createElement('canvas');
+    snap.width = W; snap.height = H;
+    snap.getContext('2d').drawImage(canvas, 0, 0);
+    let frame = 0, total = 25;
+    function fadeIn() {
+      const a = frame / total;
+      ctx.clearRect(0, 0, W, H);
+      ctx.globalAlpha = 1 - a; ctx.drawImage(snap, 0, 0);
+      ctx.globalAlpha = a;     ctx.drawImage(canvas._origImage, dx, dy, dw, dh);
+      ctx.globalAlpha = 1;
+      if (++frame <= total) requestAnimationFrame(fadeIn);
+    }
+    fadeIn();
+  }
 
   // Show name
   document.getElementById('char-name-reveal').classList.add('show');
