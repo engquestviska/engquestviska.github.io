@@ -74,10 +74,10 @@
 
     /* SILHOUETTE CARD */
     .silhouette-card { background:var(--white); border:1.5px solid var(--border); border-radius:24px; padding:28px; margin-bottom:20px; text-align:center; }
-    .silhouette-wrap { width:100%; max-width:340px; height:260px; margin:0 auto 16px; border-radius:16px; overflow:hidden; background:#1a1a2e; display:flex; align-items:center; justify-content:center; position:relative; border:1.5px solid var(--border); }
+    .silhouette-wrap { width:100%; max-width:340px; height:260px; margin:0 auto 16px; border-radius:16px; overflow:hidden; background:#e8e8f0; display:flex; align-items:center; justify-content:center; position:relative; border:1.5px solid var(--border); }
     .silhouette-wrap img { display:none; }
     .silhouette-canvas { max-width:100%; max-height:100%; display:none; }
-    .silhouette-placeholder { color:rgba(255,255,255,0.4); font-size:0.85rem; font-family:'IBM Plex Mono',monospace; text-align:center; padding:20px; }
+    .silhouette-placeholder { color:var(--text-muted); font-size:0.85rem; font-family:'IBM Plex Mono',monospace; text-align:center; padding:20px; }
     .char-name-reveal { font-family:'Playfair Display',serif; font-size:2rem; font-weight:800; color:var(--purple); margin-top:8px; display:none; animation:fadeUp 0.5s ease; }
     .char-name-reveal.show { display:block; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
@@ -592,11 +592,15 @@ function loadCharacter() {
       canvas.width  = W;
       canvas.height = H;
       const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, W, H);
+
+      // Always fill white background first
+      ctx.fillStyle = '#e8e8f0';
+      ctx.fillRect(0, 0, W, H);
       ctx.drawImage(preload, dx, dy, dw, dh);
 
       try {
-        // Try pixel manipulation (works if same-origin CORS is available)
+        // Pixel manipulation — detect background and make it match container bg,
+        // turn everything else black
         const imageData = ctx.getImageData(0, 0, W, H);
         const d = imageData.data;
 
@@ -609,19 +613,39 @@ function loadCharacter() {
           corners.reduce((s,c)=>s+c[2],0)/corners.length,
         ] : [200,200,200];
 
-        const TOL = 60;
+        const TOL = 55;
+        const BG_R = 232, BG_G = 232, BG_B = 240; // match container bg #e8e8f0
         for (let i = 0; i < d.length; i += 4) {
-          if (d[i+3] < 10) continue;
+          if (d[i+3] < 10) { d[i]=BG_R; d[i+1]=BG_G; d[i+2]=BG_B; d[i+3]=255; continue; }
           const diff = Math.sqrt((d[i]-bg[0])**2+(d[i+1]-bg[1])**2+(d[i+2]-bg[2])**2);
-          if (diff < TOL) { d[i+3] = 0; }
-          else { d[i]=0; d[i+1]=0; d[i+2]=0; d[i+3]=255; }
+          if (diff < TOL) {
+            // Background pixel — replace with container color
+            d[i]=BG_R; d[i+1]=BG_G; d[i+2]=BG_B; d[i+3]=255;
+          } else {
+            // Character pixel — make pure black
+            d[i]=0; d[i+1]=0; d[i+2]=0; d[i+3]=255;
+          }
         }
         ctx.putImageData(imageData, 0, 0);
       } catch(e) {
-        // CORS blocked — draw solid black silhouette using composite operation
-        // This makes the character shape black regardless of background
+        // CORS fallback — draw image, then overlay black using destination-in
+        // This preserves the shape but fills it black
+        ctx.fillStyle = '#e8e8f0';
+        ctx.fillRect(0, 0, W, H);
+        // Draw image shape as black using multiply blend
+        ctx.globalCompositeOperation = 'multiply';
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(dx, dy, dw, dh);
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.drawImage(preload, dx, dy, dw, dh);
+        // Now convert to silhouette: darken to black
         ctx.globalCompositeOperation = 'source-atop';
         ctx.fillStyle = '#000000';
+        ctx.fillRect(dx, dy, dw, dh);
+        ctx.globalCompositeOperation = 'source-over';
+        // Re-fill background
+        ctx.globalCompositeOperation = 'destination-over';
+        ctx.fillStyle = '#e8e8f0';
         ctx.fillRect(0, 0, W, H);
         ctx.globalCompositeOperation = 'source-over';
       }
