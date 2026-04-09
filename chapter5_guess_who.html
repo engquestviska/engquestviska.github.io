@@ -74,10 +74,10 @@
 
     /* SILHOUETTE CARD */
     .silhouette-card { background:var(--white); border:1.5px solid var(--border); border-radius:24px; padding:28px; margin-bottom:20px; text-align:center; }
-    .silhouette-wrap { width:100%; max-width:340px; height:260px; margin:0 auto 16px; border-radius:16px; overflow:hidden; background:#1E1040; display:flex; align-items:center; justify-content:center; position:relative; }
-    .silhouette-wrap img { width:100%; height:100%; object-fit:cover; filter:brightness(0); transition:filter 1s ease; }
-    .silhouette-wrap img.revealed { filter:brightness(1); }
-    .silhouette-placeholder { color:rgba(255,255,255,0.15); font-size:0.85rem; font-family:'IBM Plex Mono',monospace; text-align:center; padding:20px; }
+    .silhouette-wrap { width:100%; max-width:340px; height:260px; margin:0 auto 16px; border-radius:16px; overflow:hidden; background:#ffffff; display:flex; align-items:center; justify-content:center; position:relative; border:1.5px solid var(--border); }
+    .silhouette-wrap img { width:100%; height:100%; object-fit:contain; filter:brightness(0); transition:filter 1.2s ease; }
+    .silhouette-wrap img.revealed { filter:brightness(1) saturate(1.05); }
+    .silhouette-placeholder { color:var(--text-muted); font-size:0.85rem; font-family:'IBM Plex Mono',monospace; text-align:center; padding:20px; }
     .char-name-reveal { font-family:'Playfair Display',serif; font-size:2rem; font-weight:800; color:var(--purple); margin-top:8px; display:none; animation:fadeUp 0.5s ease; }
     .char-name-reveal.show { display:block; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
