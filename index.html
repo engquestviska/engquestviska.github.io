@@ -1272,6 +1272,7 @@
         <div class="hof-title">🏆 Hall of Fame</div>
         <div class="hof-subtitle">Most active students across all classes</div>
       </div>
+      <button id="hofRefreshBtn" onclick="refreshHallOfFame()" style="padding:7px 14px;background:rgba(124,58,237,0.12);border:1.5px solid rgba(124,58,237,0.3);color:#7C3AED;border-radius:999px;font-family:inherit;font-size:0.78rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;">&#8635; Refresh</button>
     </div>
     <div id="hofContent">
       <div class="hof-loading"><div class="hof-spinner"></div><br/>Loading hall of fame...</div>
@@ -1431,6 +1432,7 @@ const HOF_ACTS = [
   { key: 'Presenting',       label: 'Presenting',   icon: '🎤', color: '#10B981', bg: '#D1FAE5', pts: 5 },
   { key: 'DoingTaskOnTime',  label: 'Task On Time', icon: '✅', color: '#F59E0B', bg: '#FEF3C7', pts: 2 },
   { key: 'HelpingHand',      label: 'Helping Hand', icon: '🤝', color: '#EC4899', bg: '#FCE7F3', pts: 1 },
+  { key: 'Quiz',             label: 'Quiz',         icon: '🎯', color: '#14B8A6', bg: '#CCFBF1', pts: 1 },
 ];
 const AVATAR_COLORS = ['#7C3AED','#2563EB','#059669','#D97706','#DC2626','#7C3AED','#0891B2','#9333EA','#16A34A'];
 
@@ -1541,6 +1543,14 @@ async function loadHallOfFame() {
 }
 
 loadHallOfFame();
+
+async function refreshHallOfFame() {
+  const btn = document.getElementById('hofRefreshBtn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '⏳ Loading...'; }
+  document.getElementById('hofContent').innerHTML = '<div class="hof-loading"><div class="hof-spinner"></div><br/>Refreshing...</div>';
+  await loadHallOfFame();
+  if (btn) { btn.disabled = false; btn.innerHTML = '&#8635; Refresh'; }
+}
 </script>
 
 
