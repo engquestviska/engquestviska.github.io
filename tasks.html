@@ -102,6 +102,7 @@
     .str-no { font-size: 0.8rem; font-weight: 700; color: var(--purple-light); width: 24px; flex-shrink: 0; }
     .str-name { font-size: 0.95rem; font-weight: 600; flex: 1; }
     .str-progress { font-size: 0.78rem; font-family: 'IBM Plex Mono', monospace; color: var(--text-muted); }
+    .str-chapter-label { font-size: 0.7rem; font-weight: 700; color: var(--purple-light); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'IBM Plex Mono', monospace; margin-bottom: 6px; }
     .str-tasks { display: flex; flex-wrap: wrap; gap: 8px; }
     .task-toggle {
       padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--border);
@@ -537,19 +538,34 @@
 
   function renderTeacherPanel(data, cls) {
     const { students, taskKeys } = data;
+    const ch4Keys = taskKeys.filter(k => /^C4T/i.test(k));
+    const ch5Keys = taskKeys.filter(k => /^C5T/i.test(k));
+
+    const makeBtns = (s, keys) => keys.map(k => `
+      <button class="task-toggle ${s.tasks[k] ? 'on' : ''}" id="toggle-${s.no}-${k}"
+        data-no="${s.no}" data-key="${k}" data-cls="${cls}">${k}</button>`).join('');
+
     const rows = students.map(s => {
-      const done  = taskKeys.filter(k => s.tasks[k]).length;
-      const btns  = taskKeys.map(k => `
-        <button class="task-toggle ${s.tasks[k] ? 'on' : ''}" id="toggle-${s.no}-${k}"
-          data-no="${s.no}" data-key="${k}" data-cls="${cls}">${k}</button>`).join('');
+      const done = taskKeys.filter(k => s.tasks[k]).length;
+      const ch4done = ch4Keys.filter(k => s.tasks[k]).length;
+      const ch5done = ch5Keys.filter(k => s.tasks[k]).length;
+
+      const ch4Section = ch4Keys.length ? `
+        <div class="str-chapter-label">Chapter 4</div>
+        <div class="str-tasks">${makeBtns(s, ch4Keys)}</div>` : '';
+
+      const ch5Section = ch5Keys.length ? `
+        <div class="str-chapter-label" style="margin-top:8px">Chapter 5</div>
+        <div class="str-tasks">${makeBtns(s, ch5Keys)}</div>` : '';
+
       return `
         <div class="student-task-row">
           <div class="str-top">
             <span class="str-no">${s.no}</span>
             <span class="str-name">${s.nickname || s.name}</span>
-            <span class="str-progress">${done}/${taskKeys.length}</span>
+            <span class="str-progress">${ch4done}/${ch4Keys.length} &nbsp;|&nbsp; ${ch5done}/${ch5Keys.length}</span>
           </div>
-          <div class="str-tasks">${btns}</div>
+          ${ch4Section}${ch5Section}
         </div>`;
     }).join('');
 
