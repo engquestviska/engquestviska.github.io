@@ -61,7 +61,11 @@
   var style = document.createElement('style');
   style.textContent =
     '.sidebar { display:flex !important; flex-direction:column !important; overflow-y:auto !important; }' +
-    '.sidebar-teacher { margin-top:auto; border-top:1px solid rgba(255,255,255,0.1); padding:16px; }';
+    '.sidebar-teacher { margin-top:auto; border-top:1px solid rgba(255,255,255,0.1); padding:16px; }' +
+    /* Push teacher badge / login button left of the hamburger (40px wide at right:20px) */
+    'header .header-right { right:70px !important; }' +
+    'header .teacher-badge { right:70px !important; }' +
+    'header .teacher-btn { right:70px !important; }';
   document.head.appendChild(style);
 
   document.addEventListener('DOMContentLoaded', function () {
