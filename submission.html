@@ -253,56 +253,211 @@
   </div>
 
 
-  <!-- SUBMISSION STATUS -->
+  <!-- CH4 SUBMISSION STATUS -->
   <div class="status-section">
     <div class="status-section-header">
       <div class="status-section-badge">&#9989; STATUS</div>
       <div class="status-section-title">Chapter 4 Submission Status</div>
       <div class="status-section-line"></div>
     </div>
-
-    <!-- Student view: picker + result -->
-    <div id="statusStudentArea">
-      <div class="status-picker" id="statusPicker">
-        <div class="status-picker-row">
-          <div class="status-picker-field">
-            <label>Class</label>
-            <select id="stClassSel" onchange="onStatusClassChange()" disabled>
-              <option value="">⏳ Loading classes...</option>
-            </select>
-          </div>
-          <div class="status-picker-field">
-            <label>Your Name</label>
-            <select id="stNameSel" onchange="checkMyStatus()" disabled>
-              <option value="">— Select class first —</option>
-            </select>
-          </div>
-        </div>
-      </div>
-      <div class="status-result" id="statusResult"></div>
-    </div>
-
-    <!-- Teacher view: full class table -->
-    <div id="statusTeacherArea" style="display:none">
-      <div class="status-teacher-wrap">
-        <div class="status-teacher-filters">
-          <span class="status-teacher-label">Class</span>
-          <select class="status-teacher-sel" id="tClassSel" onchange="loadTeacherStatus()">
-            <option value="">Loading...</option>
-          </select>
-          <select class="status-teacher-sel" id="tStatusSel" onchange="renderTeacherTable()">
-            <option value="all">All Students</option>
-            <option value="submitted">Submitted Only</option>
-            <option value="missing">Not Submitted Only</option>
+    <div class="status-picker">
+      <div class="status-picker-row">
+        <div class="status-picker-field">
+          <label>Class</label>
+          <select id="stClassSel" onchange="onStatusClassChange()" disabled>
+            <option value="">&#9203; Loading classes...</option>
           </select>
         </div>
-        <div class="status-summary" id="tSummary"></div>
-        <div id="tTableWrap"></div>
+        <div class="status-picker-field">
+          <label>Your Name</label>
+          <select id="stNameSel" onchange="checkMyStatus()" disabled>
+            <option value="">&#8212; Select class first &#8212;</option>
+          </select>
+        </div>
       </div>
     </div>
+    <div class="status-result" id="statusResult"></div>
+  </div>
+
+  <!-- CH5 SUBMISSION STATUS & SYNC -->
+  <div class="status-section" style="margin-top:48px">
+    <div class="status-section-header">
+      <div class="status-section-badge" style="background:linear-gradient(135deg,#0EA5E9,#0369A1)">&#128203; CH5</div>
+      <div class="status-section-title">Chapter 5 Submission Status</div>
+      <div class="status-section-line"></div>
+    </div>
+    <div class="status-picker">
+      <div class="status-picker-row">
+        <div class="status-picker-field">
+          <label>Class</label>
+          <select id="ch5ClassSel" onchange="onCh5ClassChange()">
+            <option value="">&#8212; Select your class &#8212;</option>
+            <option value="XE1">X E-1</option><option value="XE4">X E-4</option>
+            <option value="XE5">X E-5</option><option value="XE6">X E-6</option>
+            <option value="XE7">X E-7</option><option value="XE8">X E-8</option>
+            <option value="XE9">X E-9</option><option value="XE10">X E-10</option>
+            <option value="XE11">X E-11</option>
+          </select>
+        </div>
+        <div class="status-picker-field">
+          <label>Your Name</label>
+          <select id="ch5NameSel" disabled>
+            <option value="">&#8212; Select class first &#8212;</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px">
+        <button id="ch5SyncBtn" onclick="checkAndSyncCh5()" style="width:100%;padding:13px;background:linear-gradient(135deg,#0EA5E9,#0369A1);color:#fff;font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:0.95rem;border:none;border-radius:12px;cursor:pointer;transition:opacity 0.2s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">&#128260; Check &amp; Sync Task Status</button>
+        <div style="font-size:0.75rem;color:var(--text-muted);text-align:center">Checks your Ch5 submission and automatically updates your task status.</div>
+      </div>
+    </div>
+    <div class="status-result" id="ch5Result"></div>
   </div>
 
 </main>
+
+<script>
+  const API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+
+  async function apiGet(params) {
+    try {
+      const res = await fetch(API + '?' + new URLSearchParams(params));
+      if (res.ok) return await res.json();
+    } catch(e) {}
+    return new Promise((resolve, reject) => {
+      const cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+      const p  = { ...params, callback: cb, _t: Date.now() };
+      const script = document.createElement('script');
+      const timer = setTimeout(() => { cleanup(); reject(new Error('Timeout')); }, 15000);
+      function cleanup() { delete window[cb]; try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e){} clearTimeout(timer); }
+      window[cb]     = d => { cleanup(); resolve(d); };
+      script.onerror = () => { cleanup(); reject(new Error('Network error')); };
+      script.src = API + '?' + new URLSearchParams(p);
+      document.body.appendChild(script);
+    });
+  }
+
+  // ── CHAPTER 4 STATUS ────────────────────────────────────────
+  let subData = null;
+
+  async function initCh4Status() {
+    try {
+      const data = await apiGet({ action: 'getSubmissions' });
+      subData = data;
+      const classes = Object.keys(data.students || {}).filter(Boolean).sort();
+      const sel = document.getElementById('stClassSel');
+      sel.innerHTML = '<option value="">&#8212; Select your class &#8212;</option>';
+      classes.forEach(c => sel.options.add(new Option(c.replace(/^XE(\d+)$/, 'X E-$1'), c)));
+      sel.disabled = false;
+    } catch(e) {}
+  }
+
+  function onStatusClassChange() {
+    const cls = document.getElementById('stClassSel').value;
+    const nameSel = document.getElementById('stNameSel');
+    document.getElementById('statusResult').className = 'status-result';
+    if (!cls || !subData) {
+      nameSel.disabled = true;
+      nameSel.innerHTML = '<option>&#8212; Select class first &#8212;</option>';
+      return;
+    }
+    const students = (subData.students[cls] || []).slice().sort((a, b) => a.name.localeCompare(b.name));
+    nameSel.innerHTML = '<option value="">&#8212; Select your name &#8212;</option>';
+    students.forEach(s => nameSel.options.add(new Option(s.name, s.name)));
+    nameSel.disabled = false;
+  }
+
+  function checkMyStatus() {
+    const cls  = document.getElementById('stClassSel').value;
+    const name = document.getElementById('stNameSel').value;
+    const result = document.getElementById('statusResult');
+    if (!cls || !name || !subData) { result.className = 'status-result'; return; }
+    const student = (subData.students[cls] || []).find(s => s.name === name);
+    if (!student) { result.className = 'status-result'; return; }
+    result.innerHTML = `
+      <div class="status-student-name">${student.name}</div>
+      <div class="status-badge-big ${student.submitted ? 'status-submitted' : 'status-missing'}">
+        ${student.submitted ? '&#9989; Submitted' : '&#10060; Not Yet Submitted'}
+      </div>
+      <div class="status-sub-note">${student.submitted
+        ? 'Your Chapter 4 tasks have been received. ✓'
+        : "We haven't received your Chapter 4 submission yet. Please submit via the form above."
+      }</div>`;
+    result.classList.add('show');
+  }
+
+  // ── CHAPTER 5 STATUS & SYNC ──────────────────────────────────
+  let ch5Students = {};
+
+  async function onCh5ClassChange() {
+    const cls = document.getElementById('ch5ClassSel').value;
+    const nameSel = document.getElementById('ch5NameSel');
+    document.getElementById('ch5Result').className = 'status-result';
+    if (!cls) { nameSel.disabled = true; nameSel.innerHTML = '<option>&#8212; Select class first &#8212;</option>'; return; }
+    nameSel.innerHTML = '<option>&#9203; Loading...</option>';
+    nameSel.disabled = true;
+    try {
+      if (!ch5Students[cls]) {
+        const data = await apiGet({ action: 'getStudents', className: cls });
+        ch5Students[cls] = data.students || [];
+      }
+      nameSel.innerHTML = '<option value="">&#8212; Select your name &#8212;</option>';
+      ch5Students[cls].forEach(s => nameSel.options.add(new Option(s.nickname || s.name, s.no)));
+      nameSel.disabled = false;
+    } catch(e) { nameSel.innerHTML = '<option>Failed to load</option>'; }
+  }
+
+  async function checkAndSyncCh5() {
+    const cls = document.getElementById('ch5ClassSel').value;
+    const no  = document.getElementById('ch5NameSel').value;
+    const result = document.getElementById('ch5Result');
+    if (!cls || !no) {
+      result.innerHTML = '<div style="color:var(--red);font-size:0.88rem;padding:12px 0">Please select your class and name first.</div>';
+      result.classList.add('show');
+      return;
+    }
+    const btn = document.getElementById('ch5SyncBtn');
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Checking...'; }
+    result.innerHTML = '<div class="status-loading"><div class="status-spinner"></div><div>Checking your submission...</div></div>';
+    result.classList.add('show');
+    try {
+      const data = await apiGet({ action: 'syncCh5Student', className: cls, studentNo: no });
+      if (data.error || !data.tasks) {
+        const students = ch5Students[cls] || [];
+        const s = students.find(st => String(st.no) === String(no));
+        const displayName = s ? (s.nickname || s.name) : 'Student';
+        result.innerHTML = `
+          <div class="status-student-name">${displayName}</div>
+          <div class="status-badge-big status-missing">&#10060; No Submission Found</div>
+          <div class="status-sub-note">${data.error || 'No submission found.'}<br/>Please submit via the Chapter 5 form above first.</div>`;
+      } else {
+        const ch5Keys = Object.keys(data.tasks).filter(k => /^C5T/i.test(k)).sort();
+        const doneCount = ch5Keys.filter(k => data.tasks[k]).length;
+        const chips = ch5Keys.map(k => {
+          const done = data.tasks[k];
+          const num  = k.replace(/^C5T/i, '');
+          return `<span style="display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:999px;font-size:0.78rem;font-weight:700;font-family:'IBM Plex Mono',monospace;${
+            done
+              ? 'background:#D1FAE5;color:#065F46;border:1.5px solid #6EE7B7'
+              : 'background:#F3F4F6;color:#9CA3AF;border:1.5px solid #E5E7EB'
+          }">
+            ${done ? '&#9989;' : '&#9675;'} Task ${num}
+          </span>`;
+        }).join('');
+        result.innerHTML = `
+          <div class="status-student-name">${data.nickname || data.name}</div>
+          <div class="status-badge-big status-submitted">&#9989; Submission Synced</div>
+          <div class="status-sub-note" style="margin-bottom:14px">${doneCount} of ${ch5Keys.length} tasks marked as done in your task status.</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">${chips}</div>`;
+      }
+    } catch(e) {
+      result.innerHTML = '<div style="color:var(--red);font-size:0.88rem;padding:12px 0">Connection failed. Please try again.</div>';
+    }
+    if (btn) { btn.disabled = false; btn.textContent = '&#128260; Check & Sync Task Status'; }
+  }
+
+  initCh4Status();
+</script>
 
 <footer>&#169; 2026 <strong>English Quest</strong> &middot; SMA Negeri 6 Surakarta &middot; Built with &#10084;&#65039; by <strong>LaksMedia</strong></footer>
 
