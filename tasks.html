@@ -82,6 +82,11 @@
     .task-chip.done    .task-chip-label { color: #065F46; }
     .task-chip.missing .task-chip-label { color: #991B1B; }
 
+    /* ── CHAPTER TABS (inside student card) ── */
+    .ch-tabs-inner { display:flex; border-bottom:1.5px solid var(--border); }
+    .ch-tab-inner { flex:1; padding:12px 8px; font-family:'IBM Plex Sans',sans-serif; font-size:0.88rem; font-weight:700; border:none; background:none; cursor:pointer; color:var(--text-muted); border-bottom:3px solid transparent; margin-bottom:-2px; transition:all 0.2s; }
+    .ch-tab-inner.active { color:var(--purple); border-bottom-color:var(--purple); }
+
     /* ── TEACHER PANEL ── */
     .teacher-selector { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; padding: 24px 20px; margin-bottom: 20px; }
     .teacher-selector-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 18px; }
@@ -181,6 +186,7 @@
     .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
 
   </style>
+  <script src="sidebar.js"></script>
 </head>
 <body data-page="tasks">
 
@@ -449,37 +455,47 @@
   }
 
   function renderStudentTasks(data, clsLabel, hasSubmitted) {
-    const tasks    = data.tasks;
-    const keys     = Object.keys(tasks);
-    const done     = keys.filter(k => tasks[k]).length;
-    const total    = keys.length;
-    const pct      = total > 0 ? Math.round((done / total) * 100) : 0;
-    const barClass = pct >= 80 ? '' : pct >= 50 ? 'warn' : 'bad';
-    const initial  = data.nickname ? data.nickname[0].toUpperCase() : data.name[0].toUpperCase();
+    const tasks   = data.tasks;
+    const keys    = Object.keys(tasks);
+    const initial = data.nickname ? data.nickname[0].toUpperCase() : data.name[0].toUpperCase();
 
-    // Group tasks by chapter (C4T1 → Chapter 4, C5T1 → Chapter 5)
-    const chapters = {};
-    keys.forEach(k => {
-      const match = k.match(/^C(\d+)T(\d+)$/i);
-      const chapter = match ? 'Chapter ' + match[1] : 'Tasks';
-      if (!chapters[chapter]) chapters[chapter] = [];
-      chapters[chapter].push(k);
-    });
+    const ch4Keys = keys.filter(k => /^C4T/i.test(k));
+    const ch5Keys = keys.filter(k => /^C5T/i.test(k));
 
-    const chapHtml = Object.entries(chapters).map(([ch, ckeys]) => `
-      <div class="tasks-chapter-label">${ch}</div>
-      <div class="tasks-grid" style="margin-bottom:${Object.keys(chapters).length > 1 ? '20px' : '0'}">
-        ${ckeys.map(k => {
-          const isDone = tasks[k];
-          const match  = k.match(/^C(\d+)T(\d+)$/i);
-          const label  = match ? 'Task ' + match[2] : k;
-          return `<div class="task-chip ${isDone ? 'done' : 'missing'}">
-            <div class="task-chip-icon">${isDone ? '✅' : '❌'}</div>
-            <div class="task-chip-name">${k}</div>
-            <div class="task-chip-label">${isDone ? 'Done' : 'Missing'}</div>
-          </div>`;
-        }).join('')}
-      </div>`).join('');
+    const makeProgress = (ckeys, label) => {
+      const done  = ckeys.filter(k => tasks[k]).length;
+      const total = ckeys.length;
+      const pct   = total > 0 ? Math.round((done / total) * 100) : 0;
+      const bar   = pct >= 80 ? '' : pct >= 50 ? 'warn' : 'bad';
+      return `<div class="progress-section">
+        <div class="progress-label">
+          <div class="progress-title">${label} Progress</div>
+          <div class="progress-count">${done} / ${total} Done</div>
+        </div>
+        <div class="progress-bar-wrap"><div class="progress-bar-fill ${bar}" style="width:${pct}%"></div></div>
+      </div>`;
+    };
+
+    const makeChips = ckeys => ckeys.map(k => {
+      const isDone = tasks[k];
+      const m = k.match(/^C\d+T(\d+)$/i);
+      return `<div class="task-chip ${isDone ? 'done' : 'missing'}">
+        <div class="task-chip-icon">${isDone ? '✅' : '❌'}</div>
+        <div class="task-chip-name">${m ? 'Task ' + m[1] : k}</div>
+        <div class="task-chip-label">${isDone ? 'Done' : 'Missing'}</div>
+      </div>`;
+    }).join('');
+
+    const ch4Panel = ch4Keys.length
+      ? makeProgress(ch4Keys, 'Chapter 4') +
+        (hasSubmitted ? '<div style="background:#D1FAE5;border:1.5px solid #6EE7B7;border-radius:12px;padding:12px 16px;margin:0 24px 16px;font-size:0.85rem;color:#065F46;font-weight:600;">&#10003; You submitted Chapter 4 — all tasks marked done.</div>' : '') +
+        `<div class="tasks-section"><div class="tasks-grid">${makeChips(ch4Keys)}</div></div>`
+      : '<div style="padding:32px;text-align:center;color:var(--text-muted)">No Chapter 4 tasks found.</div>';
+
+    const ch5Panel = ch5Keys.length
+      ? makeProgress(ch5Keys, 'Chapter 5') +
+        `<div class="tasks-section"><div class="tasks-grid">${makeChips(ch5Keys)}</div></div>`
+      : '<div style="padding:32px;text-align:center;"><div style="font-size:2rem;margin-bottom:8px;">🔄</div><div style="font-weight:700;margin-bottom:4px;">Chapter 5 Tasks Coming Soon</div><div style="font-size:0.85rem;color:var(--text-muted);">Check back when Chapter 5 begins.</div></div>';
 
     document.getElementById('studentResult').innerHTML = `
       <div class="status-card">
@@ -490,18 +506,20 @@
             <div class="profile-meta">${data.name} · ${clsLabel}</div>
           </div>
         </div>
-        <div class="progress-section">
-          <div class="progress-label">
-            <div class="progress-title">Overall Progress</div>
-            <div class="progress-count">${done} / ${total} Done</div>
-          </div>
-          <div class="progress-bar-wrap">
-            <div class="progress-bar-fill ${barClass}" style="width:${pct}%"></div>
-          </div>
+        <div class="ch-tabs-inner">
+          <button class="ch-tab-inner active" id="ctab4" onclick="switchChapterTab(4)">Chapter 4</button>
+          <button class="ch-tab-inner" id="ctab5" onclick="switchChapterTab(5)">Chapter 5</button>
         </div>
-        ${hasSubmitted ? '<div style=\"background:#D1FAE5;border:1.5px solid #6EE7B7;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:0.85rem;color:#065F46;font-weight:600;\">&#10003; You have submitted Chapter 4 tasks — all Chapter 4 tasks marked as done.</div>' : ''}
-        <div class="tasks-section">${chapHtml}</div>
+        <div id="ctabPanel4">${ch4Panel}</div>
+        <div id="ctabPanel5" style="display:none">${ch5Panel}</div>
       </div>`;
+  }
+
+  function switchChapterTab(ch) {
+    document.getElementById('ctab4').className = 'ch-tab-inner' + (ch === 4 ? ' active' : '');
+    document.getElementById('ctab5').className = 'ch-tab-inner' + (ch === 5 ? ' active' : '');
+    document.getElementById('ctabPanel4').style.display = ch === 4 ? '' : 'none';
+    document.getElementById('ctabPanel5').style.display = ch === 5 ? '' : 'none';
   }
 
   // ── TEACHER — LOAD CLASS ──────────────────────────────────────
@@ -697,125 +715,6 @@
     }).catch(function(){});
   });
 
-</script>
-
-<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
-<nav class="sidebar" id="sidebar">
-  <div class="sidebar-head">
-    <img class="sidebar-logo" src="logo.jpg" alt="Logo"/>
-    <div class="sidebar-head-text">
-      <div class="sidebar-head-title">English Quest</div>
-      <div class="sidebar-head-sub">SMA Negeri 6 Surakarta</div>
-    </div>
-    <button class="sidebar-close" onclick="closeSidebar()">&#x2715;</button>
-  </div>
-  <a href="index.html" class="sidebar-home-btn">
-    <div>
-      <div class="sidebar-home-btn-text">&#127968; Homepage</div>
-      <div class="sidebar-home-btn-sub">Back to main dashboard</div>
-    </div>
-  </a>
-  <div class="sidebar-divider"></div>
-  <div class="sidebar-section">
-    <div class="sidebar-section-label">&#128194; Documents</div>
-    <a href="lessons.html" class="sidebar-item" data-page="lessons">
-      <div class="sidebar-item-icon" style="background:rgba(124,58,237,0.2)">&#128209;</div>
-      <div class="sidebar-item-name">Lesson Materials</div>
-    </a>
-    <a href="session.html" class="sidebar-item" data-page="session">
-      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#127916;</div>
-      <div class="sidebar-item-name">Class Session</div>
-    </a>
-    <a href="assignments.html" class="sidebar-item" data-page="assignments">
-      <div class="sidebar-item-icon" style="background:rgba(59,130,246,0.2)">&#128203;</div>
-      <div class="sidebar-item-name">Assignments</div>
-    </a>
-    <a href="submission.html" class="sidebar-item" data-page="submission">
-      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#128221;</div>
-      <div class="sidebar-item-name">Submission</div>
-      
-    </a>
-    <a href="submission_status.html" class="sidebar-item" data-page="submission_status"><div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#9989;</div><div class="sidebar-item-name">Submission Status</div></a>
-  </div>
-  <div class="sidebar-divider"></div>
-  <div class="sidebar-section">
-    <div class="sidebar-section-label">&#128101; Student Data</div>
-    <a href="students.html" class="sidebar-item" data-page="students">
-      <div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">&#127891;</div>
-      <div class="sidebar-item-name">Student List</div>
-    </a>
-    <a href="attendance.html" class="sidebar-item" data-page="attendance">
-      <div class="sidebar-item-icon" style="background:rgba(20,184,166,0.2)">&#9989;</div>
-      <div class="sidebar-item-name">Attendance</div>
-    </a>
-    <a href="scores.html" class="sidebar-item" data-page="scores">
-      <div class="sidebar-item-icon" style="background:rgba(249,115,22,0.2)">&#127942;</div>
-      <div class="sidebar-item-name">Student Scores</div>
-    </a>
-    <a href="tasks.html" class="sidebar-item" data-page="tasks">
-      <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#128204;</div>
-      <div class="sidebar-item-name">Task Status</div>
-    </a>
-    <a href="activeness.html" class="sidebar-item" data-page="activeness">
-      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#9889;</div>
-      <div class="sidebar-item-name">Activeness</div>
-    </a>
-    <a href="strikes.html" class="sidebar-item" data-page="strikes">
-      <div class="sidebar-item-icon" style="background:rgba(220,38,38,0.2)">&#9888;&#65039;</div>
-      <div class="sidebar-item-name">Strikes</div>
-    </a>
-  </div>
-  <div class="sidebar-divider"></div>
-  <div class="sidebar-section">
-    <div class="sidebar-section-label">&#128226; Info &amp; Games</div>
-    <a href="summative.html" class="sidebar-item" data-page="summative">
-      <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#127919;</div>
-      <div class="sidebar-item-name">Summative</div>
-    </a>
-    <a href="jeopardyquiz.html" class="sidebar-item" data-page="jeopardyquiz"><div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#127918;</div><div class="sidebar-item-name">Chapter 4 Quiz</div></a>
-    <a href="gallery.html" class="sidebar-item" data-page="gallery"><div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">&#128247;</div><div class="sidebar-item-name">Photo Gallery</div></a>
-    <a href="chapter5_guess_who.html" class="sidebar-item" data-page="guess_who" id="sbGuessWho" style="display:none"><div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">&#129300;</div><div class="sidebar-item-name">Guess Who? <span style="font-size:0.65rem;background:#7C3AED;color:#fff;padding:1px 6px;border-radius:999px;margin-left:4px;font-family:IBM Plex Mono,monospace;">Ch.5</span></div></a>
-  </div>
-  <div class="sidebar-teacher">
-    <div class="sidebar-teacher-label">&#128273; Teacher Access</div>
-    <div id="sbTeacherLoggedOut">
-      <button style="width:100%;padding:10px;background:linear-gradient(135deg,#7C3AED,#5B21B6);color:#fff;font-family:inherit;font-weight:700;font-size:0.85rem;border:none;border-radius:10px;cursor:pointer;" onclick="closeSidebar();window.location.href='index.html';">Login as Teacher</button>
-    </div>
-    <div id="sbTeacherLoggedIn" style="display:none;">
-      <div class="sidebar-teacher-logged">&#127891; Logged in as Teacher
-        <span onclick="localStorage.removeItem('eq_tu');localStorage.removeItem('eq_tp');location.reload();">Logout</span>
-      </div>
-    </div>
-  </div>
-</nav>
-
-
-<script>
-function toggleSidebar() {
-  var open = document.getElementById('sidebar').classList.toggle('open');
-  document.getElementById('sidebarOverlay').classList.toggle('open', open);
-  document.getElementById('hamburgerBtn').classList.toggle('open', open);
-  document.body.style.overflow = open ? 'hidden' : '';
-  // Highlight current page
-  var page = document.body.getAttribute('data-page') || '';
-  document.querySelectorAll('.sidebar-item[data-page]').forEach(function(el) {
-    el.classList.toggle('active', el.getAttribute('data-page') === page);
-  });
-  // Teacher status
-  var loggedIn = !!localStorage.getItem('eq_tu');
-  document.getElementById('sbTeacherLoggedOut').style.display = loggedIn ? 'none' : 'block';
-  document.getElementById('sbTeacherLoggedIn').style.display  = loggedIn ? 'block' : 'none';
-  var gwItem = document.getElementById('sbGuessWho');
-  if (gwItem) gwItem.style.display = loggedIn ? 'flex' : 'none';
-}
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarOverlay').classList.remove('open');
-  var hb = document.getElementById('hamburgerBtn');
-  if (hb) hb.classList.remove('open');
-  document.body.style.overflow = '';
-}
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeSidebar(); });
 </script>
 
 </body>
