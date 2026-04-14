@@ -350,11 +350,11 @@
         <div class="act-row">
           <span class="act-label" style="color:${a.col}">${a.short}</span>
           <div class="act-controls">
-            <button class="act-btn minus" onclick="changeVal(${s.no},'${a.key}',-1,this)" ${vals[a.key] <= 0 ? 'disabled' : ''}>−</button>
+            <button class="act-btn minus" data-no="${s.no}" data-key="${a.key}" data-delta="-1" ${vals[a.key] <= 0 ? 'disabled' : ''}>−</button>
             <span class="act-val" id="val-${s.no}-${a.key.replace(/\s/g,'_')}">${vals[a.key]}</span>
-            <button class="act-btn plus" onclick="changeVal(${s.no},'${a.key}',1,this)">+</button>
+            <button class="act-btn plus" data-no="${s.no}" data-key="${a.key}" data-delta="1">+</button>
             <input type="number" class="act-input" min="0" placeholder="set"
-              onchange="setVal(${s.no},'${a.key}',this)"
+              data-no="${s.no}" data-key="${a.key}"
               onfocus="this.select()"
               title="Type a number to set directly"/>
           </div>
@@ -531,6 +531,17 @@
     setTimeout(() => t.classList.add('show'), 10);
     setTimeout(() => t.classList.remove('show'), 2500);
   }
+
+  document.getElementById('studentsList').addEventListener('click', function(e) {
+    const btn = e.target.closest('.act-btn');
+    if (!btn) return;
+    changeVal(+btn.dataset.no, btn.dataset.key, +btn.dataset.delta, btn);
+  });
+  document.getElementById('studentsList').addEventListener('change', function(e) {
+    const inp = e.target.closest('.act-input');
+    if (!inp) return;
+    setVal(+inp.dataset.no, inp.dataset.key, inp);
+  });
 
 </script>
 

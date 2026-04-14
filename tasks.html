@@ -523,7 +523,7 @@
       const done  = taskKeys.filter(k => s.tasks[k]).length;
       const btns  = taskKeys.map(k => `
         <button class="task-toggle ${s.tasks[k] ? 'on' : ''}" id="toggle-${s.no}-${k}"
-          onclick="toggleTask(${s.no}, '${k}', '${cls}')">${k}</button>`).join('');
+          data-no="${s.no}" data-key="${k}" data-cls="${cls}">${k}</button>`).join('');
       return `
         <div class="student-task-row">
           <div class="str-top">
@@ -675,6 +675,12 @@
   }
 
   // Auto-select saved student — waits for page to be fully ready
+  document.getElementById('teacherList').addEventListener('click', function(e) {
+    const btn = e.target.closest('.task-toggle');
+    if (!btn) return;
+    toggleTask(+btn.dataset.no, btn.dataset.key, btn.dataset.cls);
+  });
+
   document.addEventListener('DOMContentLoaded', function() {
     var cls = localStorage.getItem('eq_student_class');
     var no  = localStorage.getItem('eq_student_no');

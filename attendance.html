@@ -585,7 +585,7 @@
         html.push(`  <div class="s-btns" id="btns-${s.no}">`);
         ['Present','Absent','Sick','Permission','Dispen'].forEach(btn => {
           const on = st === btn ? ' on-' + btn : '';
-          html.push(`    <button class="s-btn${on}" onclick="setStatus(${s.no},'${btn}')">${btn}</button>`);
+          html.push(`    <button class="s-btn${on}" data-no="${s.no}" data-status="${btn}">${btn}</button>`);
         });
         html.push(`  </div>`);
       } else {
@@ -688,6 +688,12 @@
     setTimeout(() => t.classList.add('show'), 10);
     setTimeout(() => t.classList.remove('show'), 3500);
   }
+
+  document.getElementById('studentRows').addEventListener('click', function(e) {
+    const btn = e.target.closest('.s-btn');
+    if (!btn) return;
+    setStatus(+btn.dataset.no, btn.dataset.status);
+  });
 </script>
 
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
