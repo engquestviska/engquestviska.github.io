@@ -1,0 +1,18 @@
+{
+  "timeZone": "Asia/Bangkok",
+  "dependencies": {
+    "enabledAdvancedServices": [
+      {
+        "userSymbol": "VertexAI",
+        "version": "v1",
+        "serviceId": "aiplatform"
+      }
+    ]
+  },
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "webapp": {
+    "executeAs": "USER_DEPLOYING",
+    "access": "ANYONE_ANONYMOUS"
+  }
+}
