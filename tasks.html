@@ -493,10 +493,17 @@
         `<div class="tasks-section"><div class="tasks-grid">${makeChips(ch4Keys)}</div></div>`
       : '<div style="padding:32px;text-align:center;color:var(--text-muted)">No Chapter 4 tasks found.</div>';
 
+    const syncBtnHtml = `<div style="padding:12px 24px 20px;text-align:center;border-top:1.5px solid var(--border);margin-top:4px">
+      <button id="syncCh5Btn" onclick="syncCh5()" style="background:linear-gradient(135deg,#7C3AED,#5B21B6);color:#fff;border:none;border-radius:10px;padding:10px 22px;font-family:inherit;font-size:0.85rem;font-weight:700;cursor:pointer;">🔄 Sync from submission</button>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:7px;">Already submitted Ch5? Click to update your task status.</div>
+    </div>`;
+
     const ch5Panel = ch5Keys.length
       ? makeProgress(ch5Keys, 'Chapter 5') +
-        `<div class="tasks-section"><div class="tasks-grid">${makeChips(ch5Keys)}</div></div>`
-      : '<div style="padding:32px;text-align:center;"><div style="font-size:2rem;margin-bottom:8px;">🔄</div><div style="font-weight:700;margin-bottom:4px;">Chapter 5 Tasks Coming Soon</div><div style="font-size:0.85rem;color:var(--text-muted);">Check back when Chapter 5 begins.</div></div>';
+        `<div class="tasks-section"><div class="tasks-grid">${makeChips(ch5Keys)}</div></div>` +
+        syncBtnHtml
+      : '<div style="padding:32px 24px 16px;text-align:center;"><div style="font-size:2rem;margin-bottom:8px;">🔄</div><div style="font-weight:700;margin-bottom:4px;">Chapter 5 Tasks Coming Soon</div><div style="font-size:0.85rem;color:var(--text-muted);">Check back when Chapter 5 begins.</div></div>' +
+        syncBtnHtml;
 
     document.getElementById('studentResult').innerHTML = `
       <div class="status-card">
@@ -697,6 +704,30 @@
     } catch(e) {
       showToast('Sync failed: ' + e.message, 'err');
       if (syncBtn) { syncBtn.disabled = false; syncBtn.textContent = origText; }
+    }
+  }
+
+  // ── SYNC CH5 SUBMISSION → TASK STATUS ────────────────────────
+  async function syncCh5() {
+    const cls = document.getElementById('sClassSelect').value;
+    const no  = document.getElementById('sNameSelect').value;
+    if (!cls || !no) { showToast('Select your class and name first', 'err'); return; }
+    const btn = document.getElementById('syncCh5Btn');
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Syncing...'; }
+    try {
+      const data = await apiGet({ action: 'syncCh5Student', className: cls, studentNo: no });
+      if (data.error) {
+        showToast(data.error, 'err');
+        if (btn) { btn.disabled = false; btn.textContent = '🔄 Sync from submission'; }
+      } else {
+        showToast('✅ Synced! Refreshing...', 'ok');
+        // Bust getTaskStatus cache so viewTaskStatus fetches fresh data
+        try { localStorage.removeItem(cacheKey({ action: 'getTaskStatus', className: cls, studentNo: no })); } catch(e) {}
+        setTimeout(viewTaskStatus, 800);
+      }
+    } catch(e) {
+      showToast('Sync failed', 'err');
+      if (btn) { btn.disabled = false; btn.textContent = '🔄 Sync from submission'; }
     }
   }
 
