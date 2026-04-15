@@ -200,9 +200,10 @@ function syncCh5Student(className, studentNo) {
   const respData = respSheet.getDataRange().getValues();
   // Columns: [Timestamp, Class, Student Name, Task 1 File, Task 2 File, Task 3 File, Task 4 File, Task 5 File]
   const norm = s => String(s).toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+  const normCls = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, ''); // "X E-1" → "xe1"
   let submissionRow = null;
   for (let r = 1; r < respData.length; r++) {
-    if (String(respData[r][1]) === className && norm(respData[r][2]) === norm(studentName)) {
+    if (normCls(respData[r][1]) === normCls(className) && norm(respData[r][2]) === norm(studentName)) {
       submissionRow = respData[r];
     }
   }
