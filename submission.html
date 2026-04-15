@@ -426,10 +426,28 @@
         const students = ch5Students[cls] || [];
         const s = students.find(st => String(st.no) === String(no));
         const displayName = s ? (s.nickname || s.name) : 'Student';
+        const err = data.error || '';
+        let friendlyMsg, friendlyNote;
+        if (err.includes('No Ch5 submission') || err.includes('no submission')) {
+          friendlyMsg = '&#10060; Not Submitted Yet';
+          friendlyNote = 'We couldn\'t find a Chapter 5 submission for you. Make sure you\'ve used the submission form above and uploaded at least one file.';
+        } else if (err.includes('Student not found')) {
+          friendlyMsg = '&#10060; Name Not Found';
+          friendlyNote = 'Your name wasn\'t found in the task list. Please contact your teacher.';
+        } else if (err.includes('Class not found')) {
+          friendlyMsg = '&#10060; Class Not Found';
+          friendlyNote = 'Your class couldn\'t be found. Please contact your teacher.';
+        } else if (err.includes('no files')) {
+          friendlyMsg = '&#9888;&#65039; Submission Empty';
+          friendlyNote = 'Your submission was recorded but had no files attached. Please re-submit with at least one PDF.';
+        } else {
+          friendlyMsg = '&#10060; Could Not Check';
+          friendlyNote = 'Something went wrong on our end. Please try again in a moment, or contact your teacher.';
+        }
         result.innerHTML = `
           <div class="status-student-name">${displayName}</div>
-          <div class="status-badge-big status-missing">&#10060; No Submission Found</div>
-          <div class="status-sub-note">${data.error || 'No submission found.'}<br/>Please submit via the Chapter 5 form above first.</div>`;
+          <div class="status-badge-big status-missing">${friendlyMsg}</div>
+          <div class="status-sub-note">${friendlyNote}</div>`;
       } else {
         const ch5Keys = Object.keys(data.tasks).filter(k => /^C5T/i.test(k)).sort();
         const doneCount = ch5Keys.filter(k => data.tasks[k]).length;
@@ -451,7 +469,7 @@
           <div style="display:flex;flex-wrap:wrap;gap:8px">${chips}</div>`;
       }
     } catch(e) {
-      result.innerHTML = '<div style="color:var(--red);font-size:0.88rem;padding:12px 0">Connection failed. Please try again.</div>';
+      result.innerHTML = '<div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:12px;padding:14px 16px;font-size:0.88rem;color:#991B1B"><strong>&#127757; Connection failed.</strong> Check your internet connection and try again. If it keeps happening, contact your teacher.</div>';
     }
     if (btn) { btn.disabled = false; btn.textContent = '&#128260; Check & Sync Task Status'; }
   }
