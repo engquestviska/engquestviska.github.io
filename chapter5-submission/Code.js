@@ -66,6 +66,27 @@ function uploadFile(base64Data, fileName, mimeType, className, studentName, task
   }
 }
 
+// Returns { submitted: false } or { submitted: true, tasks: [bool x5], timestamp: Date }
+function checkSubmission(className, studentName) {
+  try {
+    var sheet = getSpreadsheet().getSheetByName(RESPONSES_SHEET);
+    if (!sheet) return { submitted: false };
+    var data = sheet.getDataRange().getValues();
+    for (var r = 1; r < data.length; r++) {
+      if (data[r][1] === className && data[r][2] === studentName) {
+        var tasks = [];
+        for (var t = 0; t < 5; t++) {
+          tasks.push(!!String(data[r][3 + t] || '').trim());
+        }
+        return { submitted: true, tasks: tasks, timestamp: String(data[r][0]) };
+      }
+    }
+    return { submitted: false };
+  } catch(e) {
+    return { submitted: false };
+  }
+}
+
 // taskFileIds: array of 5 items (Task 1-5), each is an array of fileIds
 function submitForm(className, studentName, taskFileIds) {
   try {
@@ -106,6 +127,27 @@ function submitForm(className, studentName, taskFileIds) {
     } else {
       sheet.appendRow(row);
     }
+
+    // Send email notification if teacher_email property is set
+    try {
+      var notifyEmail = PropertiesService.getScriptProperties().getProperty('teacher_email');
+      if (notifyEmail) {
+        var submittedLabels = [];
+        for (var n = 0; n < taskFileIds.length; n++) {
+          if (taskFileIds[n] && taskFileIds[n][0]) submittedLabels.push('Task ' + (n + 1));
+        }
+        MailApp.sendEmail({
+          to: notifyEmail,
+          subject: '[English Quest] Ch5 Submission — ' + studentName + ' (' + className + ')',
+          body: 'A Chapter 5 submission has been received.\n\n' +
+                'Class: ' + className + '\n' +
+                'Student: ' + studentName + '\n' +
+                'Tasks submitted: ' + (submittedLabels.length ? submittedLabels.join(', ') : 'none') + '\n' +
+                'Time: ' + new Date().toLocaleString('id-ID') + '\n\n' +
+                'View responses: https://docs.google.com/spreadsheets/d/1WqvB1SkFEh-lnZ3mLAFzArCuHWqnuxXDbGz_gLZ3zyQ'
+        });
+      }
+    } catch(mailErr) { /* email is optional — never fail the submission */ }
 
     return { success: true };
   } catch(e) {

@@ -43,7 +43,8 @@ function doGet(e) {
     else if (action === 'saveTaskStatus') result = saveTaskStatus(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.studentNo, JSON.parse(e.parameter.tasks || '{}'));
     else if (action === 'syncCh5Student') result = syncCh5Student(e.parameter.className, e.parameter.studentNo);
     else if (action === 'syncCh5Class')   result = syncCh5Class(e.parameter.className, e.parameter.username, e.parameter.password);
-    else if (action === 'getCh5Submissions') result = getCh5Submissions();
+    else if (action === 'getCh5Submissions')   result = getCh5Submissions();
+    else if (action === 'getCh5StudentFiles') result = getCh5StudentFiles(e.parameter.className, e.parameter.studentNo);
     else if (action === 'checkLogin')       result = { ok: authOk(e.parameter.username, e.parameter.password) };
     else if (action === 'getSummative')     result = getSummative();
     else if (action === 'getQuizAttempt')   result = getQuizAttempt(e.parameter.className, e.parameter.studentNo, e.parameter.chapter);
@@ -285,6 +286,48 @@ function syncCh5Class(className, username, password) {
   }
   SpreadsheetApp.flush();
   return { success: true, synced, notFound };
+}
+
+// ── CH5 FILE URLS FOR A SPECIFIC STUDENT (teacher viewer) ────
+function getCh5StudentFiles(className, studentNo) {
+  const CH5_SS_ID = '1WqvB1SkFEh-lnZ3mLAFzArCuHWqnuxXDbGz_gLZ3zyQ';
+  const sheetId = SCORE_SHEETS[className];
+  if (!sheetId) return { success: false, error: 'Class not found' };
+
+  const taskSheet = SpreadsheetApp.openById(sheetId).getSheetByName(TASK_SHEET_NAME);
+  if (!taskSheet) return { success: false, error: 'Task_Status sheet not found' };
+  const taskData = taskSheet.getDataRange().getValues();
+
+  let studentName = '';
+  for (let r = 1; r < taskData.length; r++) {
+    if (String(taskData[r][0]) === String(studentNo)) {
+      studentName = String(taskData[r][1]).trim();
+      break;
+    }
+  }
+  if (!studentName) return { success: false, error: 'Student not found' };
+
+  const respSheet = SpreadsheetApp.openById(CH5_SS_ID).getSheetByName('Responses');
+  if (!respSheet) return { success: true, submitted: false, files: {}, studentName };
+  const respData = respSheet.getDataRange().getValues();
+
+  const normCls  = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
+  const normName = s => String(s).toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+
+  let submissionRow = null;
+  for (let r = 1; r < respData.length; r++) {
+    if (normCls(respData[r][1]) === normCls(className) && normName(respData[r][2]) === normName(studentName)) {
+      submissionRow = respData[r];
+    }
+  }
+  if (!submissionRow) return { success: true, submitted: false, files: {}, studentName };
+
+  const files = {};
+  for (let t = 1; t <= 5; t++) {
+    const val = String(submissionRow[2 + t] || '').trim();
+    if (val) files['C5T' + t] = val;
+  }
+  return { success: true, submitted: true, files, studentName, timestamp: String(submissionRow[0]) };
 }
 
 // ── CH5 SUBMISSION OVERVIEW (teacher dashboard) ───────────────

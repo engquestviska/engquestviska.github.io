@@ -282,6 +282,20 @@
 <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
 <div class="toast" id="toast"></div>
 
+<!-- Ch5 Files Modal -->
+<div id="ch5FilesOverlay" style="display:none;position:fixed;inset:0;background:rgba(30,16,64,0.6);backdrop-filter:blur(6px);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:20px;padding:28px 24px;width:100%;max-width:420px;box-shadow:0 8px 40px rgba(124,58,237,0.18)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div>
+        <div style="font-size:0.7rem;font-weight:700;color:var(--purple-light);text-transform:uppercase;letter-spacing:0.1em;font-family:'IBM Plex Mono',monospace">Chapter 5 Files</div>
+        <div id="ch5FilesName" style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:800;color:var(--text-dark)"></div>
+      </div>
+      <button onclick="closeFilesModal()" style="background:var(--off-white);border:1.5px solid var(--border);border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:1rem;color:var(--text-muted)">✕</button>
+    </div>
+    <div id="ch5FilesList"></div>
+  </div>
+</div>
+
 <script>
   const API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
 
@@ -560,7 +574,9 @@
         <div class="str-tasks">${makeBtns(s, ch4Keys)}</div>` : '';
 
       const ch5Section = ch5Keys.length ? `
-        <div class="str-chapter-label" style="margin-top:8px">Chapter 5</div>
+        <div class="str-chapter-label" style="margin-top:8px;display:flex;align-items:center;gap:8px">Chapter 5
+          <button onclick="viewCh5Files(${s.no},'${cls}')" style="background:none;border:1px solid rgba(124,58,237,0.35);border-radius:6px;padding:1px 8px;cursor:pointer;font-size:0.65rem;color:var(--purple);font-family:inherit;font-weight:700;line-height:1.6">&#128196; Files</button>
+        </div>
         <div class="str-tasks">${makeBtns(s, ch5Keys)}</div>` : '';
 
       return `
@@ -739,6 +755,48 @@
       if (btn) { btn.disabled = false; btn.textContent = '🔄 Sync Ch5 All'; }
     }
   }
+
+  // ── CH5 FILE VIEWER ───────────────────────────────────────────
+  async function viewCh5Files(studentNo, cls) {
+    const overlay = document.getElementById('ch5FilesOverlay');
+    const nameEl  = document.getElementById('ch5FilesName');
+    const listEl  = document.getElementById('ch5FilesList');
+    nameEl.textContent = 'Loading...';
+    listEl.innerHTML   = '<div style="text-align:center;padding:20px;color:var(--text-muted)">⏳ Fetching files...</div>';
+    overlay.style.display = 'flex';
+    try {
+      const res = await apiGet({ action: 'getCh5StudentFiles', className: cls, studentNo: String(studentNo) });
+      nameEl.textContent = res.studentName || 'Student';
+      if (!res.success || !res.submitted) {
+        listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.88rem">No Ch5 submission found for this student.</div>';
+        return;
+      }
+      const tasks = ['C5T1','C5T2','C5T3','C5T4','C5T5'];
+      const items = tasks.map(function(k) {
+        const url = (res.files || {})[k];
+        const num = k.replace('C5T','');
+        if (url) {
+          return '<a href="' + url + '" target="_blank" style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--off-white);border:1.5px solid var(--border);border-radius:12px;margin-bottom:8px;text-decoration:none;color:var(--text-dark);font-weight:600;font-size:0.88rem;transition:border-color 0.15s" onmouseover="this.style.borderColor=\'#A78BFA\'" onmouseout="this.style.borderColor=\'var(--border)\'">' +
+            '<span style="background:#D1FAE5;color:#065F46;border-radius:8px;padding:4px 10px;font-size:0.72rem;font-weight:700;font-family:\'IBM Plex Mono\',monospace;flex-shrink:0">Task ' + num + '</span>' +
+            '<span style="flex:1">View file ↗</span>' +
+            '</a>';
+        }
+        return '<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:#F9FAFB;border:1.5px solid #E5E7EB;border-radius:12px;margin-bottom:8px;color:#9CA3AF;font-size:0.88rem">' +
+          '<span style="background:#F3F4F6;color:#9CA3AF;border-radius:8px;padding:4px 10px;font-size:0.72rem;font-weight:700;font-family:\'IBM Plex Mono\',monospace;flex-shrink:0">Task ' + num + '</span>' +
+          '<span>Not submitted</span></div>';
+      }).join('');
+      listEl.innerHTML = items;
+    } catch(e) {
+      listEl.innerHTML = '<div style="color:var(--red);font-size:0.88rem;padding:12px 0">Failed to load files.</div>';
+    }
+  }
+
+  function closeFilesModal() {
+    document.getElementById('ch5FilesOverlay').style.display = 'none';
+  }
+  document.getElementById('ch5FilesOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeFilesModal();
+  });
 
   // ── TOAST ─────────────────────────────────────────────────────
   function showToast(msg, type) {
