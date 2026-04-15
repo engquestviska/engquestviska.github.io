@@ -51,12 +51,12 @@
     .table-wrap { background:var(--white); border:1.5px solid var(--border); border-radius:20px; overflow:hidden; overflow-x:auto; }
     table { width:100%; border-collapse:collapse; min-width:360px; }
     thead th { background:linear-gradient(135deg,var(--purple),#5B21B6); color:#fff; padding:12px 16px; font-size:0.78rem; font-family:'IBM Plex Mono',monospace; font-weight:600; letter-spacing:0.04em; text-align:left; }
-    thead th:last-child { text-align:center; }
+    thead th:nth-last-child(-n+2) { text-align:center; }
     tbody tr { border-bottom:1px solid var(--border); transition:background 0.12s; }
     tbody tr:last-child { border-bottom:none; }
     tbody tr:hover { background:var(--off-white); }
     tbody td { padding:11px 16px; font-size:0.9rem; }
-    tbody td:last-child { text-align:center; }
+    tbody td:nth-last-child(-n+2) { text-align:center; }
     .student-no { font-size:0.72rem; color:var(--text-muted); font-family:'IBM Plex Mono',monospace; margin-right:6px; }
     .badge-submitted { display:inline-flex; align-items:center; gap:5px; background:#D1FAE5; color:#065F46; border:1.5px solid #6EE7B7; border-radius:999px; padding:4px 12px; font-size:0.78rem; font-weight:700; font-family:'IBM Plex Mono',monospace; }
     .badge-missing   { display:inline-flex; align-items:center; gap:5px; background:#FEE2E2; color:#991B1B; border:1.5px solid #FCA5A5; border-radius:999px; padding:4px 12px; font-size:0.78rem; font-weight:700; font-family:'IBM Plex Mono',monospace; }
@@ -109,7 +109,7 @@
   <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
   <a class="back-btn" href="index.html">&#8592; Back</a>
   <h1>Submission <span>Status</span></h1>
-  <p class="header-sub">Chapter 4 &middot; English Quest &middot; SMA Negeri 6 Surakarta</p>
+  <p class="header-sub">Chapters 4 &amp; 5 &middot; English Quest &middot; SMA Negeri 6 Surakarta</p>
 </header>
 <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
   <path fill="#4C1D95" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
@@ -124,8 +124,10 @@
     </select>
     <select class="filter-select" id="statusFilter" onchange="renderTable()">
       <option value="all">All Students</option>
-      <option value="submitted">Submitted Only</option>
-      <option value="missing">Not Submitted Only</option>
+      <option value="ch4submitted">Ch4 Submitted</option>
+      <option value="ch4missing">Ch4 Not Submitted</option>
+      <option value="ch5submitted">Ch5 Submitted</option>
+      <option value="ch5missing">Ch5 Not Submitted</option>
     </select>
   </div>
 
@@ -141,7 +143,18 @@
 const SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
 const CLASS_LABELS = { XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
 
-var allData = null; // { classes: [], students: { ClassName: [{name, submitted}] } }
+var allData  = null; // Ch4: { classes, students: { ClassName: [{name, submitted}] } }
+var ch5Data  = null; // Ch5: { byKey: { 'normcls|normname': { tasks: [bool x5] } } }
+
+function normCls(s)  { return String(s).toLowerCase().replace(/[^a-z0-9]/g, ''); }
+function normName(s) { return String(s).toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim(); }
+
+function ch5Key(cls, name) { return normCls(cls) + '|' + normName(name); }
+
+function getCh5Entry(cls, name) {
+  if (!ch5Data || !ch5Data.byKey) return null;
+  return ch5Data.byKey[ch5Key(cls, name)] || null;
+}
 
 function apiGet(params) {
   var url = SCORES_API + '?';
@@ -168,25 +181,27 @@ function apiGet(params) {
 }
 
 function load() {
-  apiGet({ action: 'getSubmissions' }).then(function(res) {
-    if (res.error) {
-      document.getElementById('tableArea').innerHTML = '<div class="state-card"><div class="state-icon">&#128580;</div><div class="state-title">Error</div><div class="state-sub">' + res.error + '</div></div>';
+  document.getElementById('tableArea').innerHTML = '<div class="state-card"><div class="spinner"></div><div class="state-title">Loading submissions...</div></div>';
+  Promise.all([
+    apiGet({ action: 'getSubmissions' }),
+    apiGet({ action: 'getCh5Submissions' })
+  ]).then(function(results) {
+    var ch4Res = results[0], ch5Res = results[1];
+    if (ch4Res.error) {
+      document.getElementById('tableArea').innerHTML = '<div class="state-card"><div class="state-icon">&#128580;</div><div class="state-title">Error</div><div class="state-sub">' + ch4Res.error + '</div></div>';
       return;
     }
-    allData = res;
-    // Populate class dropdown
+    allData = ch4Res;
+    ch5Data = ch5Res;
     var sel = document.getElementById('classSelect');
-    (res.classes || []).forEach(function(cls) {
+    (ch4Res.classes || []).forEach(function(cls) {
       var opt = document.createElement('option');
       opt.value = cls;
       opt.textContent = CLASS_LABELS[cls] || cls;
       sel.appendChild(opt);
     });
-    // Auto-select student class if saved
     var savedCls = localStorage.getItem('eq_student_class');
-    if (savedCls && res.classes && res.classes.includes(savedCls)) {
-      sel.value = savedCls;
-    }
+    if (savedCls && ch4Res.classes && ch4Res.classes.includes(savedCls)) sel.value = savedCls;
     renderTable();
   }).catch(function(e) {
     document.getElementById('tableArea').innerHTML = '<div class="state-card"><div class="state-icon">&#9203;</div><div class="state-title">Could not connect</div><div class="state-sub">' + e.message + '</div></div>';
@@ -198,36 +213,35 @@ function renderTable() {
   var cls    = document.getElementById('classSelect').value;
   var filter = document.getElementById('statusFilter').value;
 
-  // Build flat list of students to show
   var rows = [];
   if (cls === 'all') {
     (allData.classes || []).forEach(function(c) {
       (allData.students[c] || []).forEach(function(s) {
-        rows.push({ cls: c, name: s.name, submitted: s.submitted });
+        rows.push({ cls: c, name: s.name, ch4: s.submitted, ch5: getCh5Entry(c, s.name) });
       });
     });
   } else {
     (allData.students[cls] || []).forEach(function(s) {
-      rows.push({ cls: cls, name: s.name, submitted: s.submitted });
+      rows.push({ cls: cls, name: s.name, ch4: s.submitted, ch5: getCh5Entry(cls, s.name) });
     });
   }
 
-  // Apply status filter
-  if (filter === 'submitted') rows = rows.filter(function(r) { return r.submitted; });
-  if (filter === 'missing')   rows = rows.filter(function(r) { return !r.submitted; });
+  if (filter === 'ch4submitted') rows = rows.filter(function(r) { return r.ch4; });
+  if (filter === 'ch4missing')   rows = rows.filter(function(r) { return !r.ch4; });
+  if (filter === 'ch5submitted') rows = rows.filter(function(r) { return !!r.ch5; });
+  if (filter === 'ch5missing')   rows = rows.filter(function(r) { return !r.ch5; });
 
-  // Summary
-  var total     = rows.length;
-  var submitted = rows.filter(function(r) { return r.submitted; }).length;
-  var missing   = total - submitted;
-  var pct       = total ? Math.round((submitted / total) * 100) : 0;
+  var total      = rows.length;
+  var ch4done    = rows.filter(function(r) { return r.ch4; }).length;
+  var ch5done    = rows.filter(function(r) { return !!r.ch5; }).length;
+  var ch4pct     = total ? Math.round((ch4done / total) * 100) : 0;
+  var ch5pct     = total ? Math.round((ch5done / total) * 100) : 0;
 
-  var summaryBar = document.getElementById('summaryBar');
-  summaryBar.innerHTML =
+  document.getElementById('summaryBar').innerHTML =
     '<div class="summary-card"><div class="summary-num">' + total + '</div><div class="summary-lbl">Total Students</div></div>' +
-    '<div class="summary-card green"><div class="summary-num">' + submitted + '</div><div class="summary-lbl">Submitted</div></div>' +
-    '<div class="summary-card red"><div class="summary-num">' + missing + '</div><div class="summary-lbl">Not Submitted</div></div>' +
-    '<div class="summary-card"><div class="summary-num">' + pct + '%</div><div class="summary-lbl">Completion</div></div>';
+    '<div class="summary-card green"><div class="summary-num">' + ch4done + '</div><div class="summary-lbl">Ch4 Submitted</div></div>' +
+    '<div class="summary-card" style="background:linear-gradient(135deg,#DBEAFE,#BFDBFE);border-color:#93C5FD"><div class="summary-num" style="color:#1E40AF">' + ch5done + '</div><div class="summary-lbl">Ch5 Submitted</div></div>' +
+    '<div class="summary-card red"><div class="summary-num">' + (total - ch4done) + '</div><div class="summary-lbl">Ch4 Missing</div></div>';
 
   if (!rows.length) {
     document.getElementById('tableArea').innerHTML = '<div class="state-card"><div class="state-icon">&#128203;</div><div class="state-title">No students found</div><div class="state-sub">Try changing the filter.</div></div>';
@@ -235,16 +249,25 @@ function renderTable() {
   }
 
   var showClass = cls === 'all';
-  var thead = '<thead><tr><th>#</th>' + (showClass ? '<th>Class</th>' : '') + '<th>Student Name</th><th>Status</th></tr></thead>';
+  var thead = '<thead><tr><th>#</th>' + (showClass ? '<th>Class</th>' : '') + '<th>Student Name</th><th style="text-align:center">Ch4</th><th style="text-align:center">Ch5 Tasks</th></tr></thead>';
   var tbody = '<tbody>';
   rows.forEach(function(r, i) {
+    var ch5chips = '—';
+    if (r.ch5) {
+      ch5chips = r.ch5.tasks.map(function(done, ti) {
+        return '<span style="display:inline-block;padding:1px 7px;border-radius:999px;font-size:0.68rem;font-weight:700;font-family:IBM Plex Mono,monospace;margin:1px;' +
+          (done ? 'background:#D1FAE5;color:#065F46;border:1px solid #6EE7B7' : 'background:#F3F4F6;color:#9CA3AF;border:1px solid #E5E7EB') +
+          '">T' + (ti + 1) + '</span>';
+      }).join('');
+    }
     tbody += '<tr>';
     tbody += '<td><span class="student-no">' + (i + 1) + '</span></td>';
     if (showClass) tbody += '<td><span style="font-size:0.8rem;font-weight:700;font-family:IBM Plex Mono,monospace;color:var(--purple)">' + (CLASS_LABELS[r.cls] || r.cls) + '</span></td>';
     tbody += '<td>' + r.name + '</td>';
-    tbody += '<td>' + (r.submitted
-      ? '<span class="badge-submitted">&#10003; Submitted</span>'
-      : '<span class="badge-missing">&#10005; Not Yet</span>') + '</td>';
+    tbody += '<td style="text-align:center">' + (r.ch4
+      ? '<span class="badge-submitted">&#10003; Done</span>'
+      : '<span class="badge-missing">&#10005; No</span>') + '</td>';
+    tbody += '<td style="text-align:center;white-space:nowrap">' + ch5chips + '</td>';
     tbody += '</tr>';
   });
   tbody += '</tbody>';

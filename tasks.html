@@ -579,7 +579,10 @@
         <div class="panel-header">
           <div class="panel-header-title">${cls} · Task Status</div>
           <div class="panel-header-sub">Tap to toggle ✓ / ✗</div>
-          <button onclick="syncSubmissionsToTasks('${cls}')" style="padding:7px 16px;background:linear-gradient(135deg,#10B981,#059669);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:0.8rem;font-weight:700;cursor:pointer;margin-left:auto;">&#9889; Sync Submissions</button>
+          <div style="display:flex;gap:8px;margin-left:auto;flex-wrap:wrap">
+            <button onclick="syncSubmissionsToTasks('${cls}')" style="padding:7px 16px;background:linear-gradient(135deg,#10B981,#059669);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:0.8rem;font-weight:700;cursor:pointer;">&#9889; Sync Ch4</button>
+            <button id="bulkCh5Btn" onclick="bulkSyncCh5('${cls}')" style="padding:7px 16px;background:linear-gradient(135deg,#0EA5E9,#0369A1);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:0.8rem;font-weight:700;cursor:pointer;">&#128260; Sync Ch5 All</button>
+          </div>
         </div>
         ${rows}
       </div>`;
@@ -711,6 +714,29 @@
     } catch(e) {
       showToast('Sync failed: ' + e.message, 'err');
       if (syncBtn) { syncBtn.disabled = false; syncBtn.textContent = origText; }
+    }
+  }
+
+  // ── BULK CH5 SYNC ─────────────────────────────────────────────
+  async function bulkSyncCh5(cls) {
+    if (!savedUser || !savedPass) { showToast('Not logged in as teacher', 'err'); return; }
+    const btn = document.getElementById('bulkCh5Btn');
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Syncing...'; }
+    try {
+      const res = await apiGet({ action: 'syncCh5Class', className: cls, username: savedUser, password: savedPass });
+      if (res.success) {
+        showToast('✅ Ch5 synced — ' + res.synced + ' updated, ' + res.notFound + ' no submission', 'ok');
+        setTimeout(function() {
+          loadTeacherClass();
+          if (btn) { btn.disabled = false; btn.textContent = '🔄 Sync Ch5 All'; }
+        }, 1000);
+      } else {
+        showToast('Ch5 sync failed: ' + (res.error || 'unknown error'), 'err');
+        if (btn) { btn.disabled = false; btn.textContent = '🔄 Sync Ch5 All'; }
+      }
+    } catch(e) {
+      showToast('Ch5 sync failed: ' + e.message, 'err');
+      if (btn) { btn.disabled = false; btn.textContent = '🔄 Sync Ch5 All'; }
     }
   }
 

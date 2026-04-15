@@ -42,6 +42,8 @@ function doGet(e) {
     else if (action === 'getAllTasks')    result = getAllTasks(e.parameter.className);
     else if (action === 'saveTaskStatus') result = saveTaskStatus(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.studentNo, JSON.parse(e.parameter.tasks || '{}'));
     else if (action === 'syncCh5Student') result = syncCh5Student(e.parameter.className, e.parameter.studentNo);
+    else if (action === 'syncCh5Class')   result = syncCh5Class(e.parameter.className, e.parameter.username, e.parameter.password);
+    else if (action === 'getCh5Submissions') result = getCh5Submissions();
     else if (action === 'checkLogin')       result = { ok: authOk(e.parameter.username, e.parameter.password) };
     else if (action === 'getSummative')     result = getSummative();
     else if (action === 'getQuizAttempt')   result = getQuizAttempt(e.parameter.className, e.parameter.studentNo, e.parameter.chapter);
@@ -226,6 +228,89 @@ function syncCh5Student(className, studentNo) {
   SpreadsheetApp.flush();
 
   return getTaskStatus(className, studentNo);
+}
+
+// ── BULK SYNC ALL CH5 STUDENTS IN A CLASS (teacher-triggered) ──
+function syncCh5Class(className, username, password) {
+  if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
+  const CH5_SS_ID = '1WqvB1SkFEh-lnZ3mLAFzArCuHWqnuxXDbGz_gLZ3zyQ';
+  const sheetId = SCORE_SHEETS[className];
+  if (!sheetId) return { success: false, error: 'Class not found' };
+
+  const taskSheet = SpreadsheetApp.openById(sheetId).getSheetByName(TASK_SHEET_NAME);
+  if (!taskSheet) return { success: false, error: 'Task_Status sheet not found' };
+  const taskData = taskSheet.getDataRange().getValues();
+  const headers  = taskData[0];
+
+  const ch5Cols = {};
+  for (let c = 3; c < headers.length; c++) {
+    const key = String(headers[c] || '').trim().toUpperCase();
+    if (/^C5T/.test(key)) ch5Cols[key] = c;
+  }
+  if (Object.keys(ch5Cols).length === 0) return { success: false, error: 'No Ch5 task columns in Task_Status' };
+
+  const respSheet = SpreadsheetApp.openById(CH5_SS_ID).getSheetByName('Responses');
+  if (!respSheet) return { success: false, error: 'Ch5 Responses sheet not found' };
+  const respData = respSheet.getDataRange().getValues();
+
+  const normCls  = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
+  const normName = s => String(s).toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+
+  const ch5Map = {};
+  for (let r = 1; r < respData.length; r++) {
+    if (normCls(respData[r][1]) !== normCls(className)) continue;
+    const name  = String(respData[r][2] || '').trim();
+    const tasks = [];
+    for (let t = 0; t < 5; t++) tasks.push(!!String(respData[r][3 + t] || '').trim());
+    const k = normName(name);
+    if (ch5Map[k]) { tasks.forEach((v, i) => { if (v) ch5Map[k][i] = true; }); }
+    else           { ch5Map[k] = tasks; }
+  }
+
+  let synced = 0, notFound = 0;
+  for (let r = 1; r < taskData.length; r++) {
+    const name = String(taskData[r][1] || '').trim();
+    if (!name) continue;
+    const tasks = ch5Map[normName(name)];
+    if (!tasks) { notFound++; continue; }
+    let wrote = false;
+    for (const [key, col] of Object.entries(ch5Cols)) {
+      const taskIdx = parseInt(key.replace('C5T', '')) - 1;
+      if (tasks[taskIdx] && !taskData[r][col]) {
+        taskSheet.getRange(r + 1, col + 1).setValue(true);
+        wrote = true;
+      }
+    }
+    if (wrote) synced++;
+  }
+  SpreadsheetApp.flush();
+  return { success: true, synced, notFound };
+}
+
+// ── CH5 SUBMISSION OVERVIEW (teacher dashboard) ───────────────
+function getCh5Submissions() {
+  const CH5_SS_ID = '1WqvB1SkFEh-lnZ3mLAFzArCuHWqnuxXDbGz_gLZ3zyQ';
+  const normCls  = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
+  const normName = s => String(s).toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+  try {
+    const respSheet = SpreadsheetApp.openById(CH5_SS_ID).getSheetByName('Responses');
+    if (!respSheet) return { byKey: {} };
+    const data  = respSheet.getDataRange().getValues();
+    const byKey = {};
+    for (let r = 1; r < data.length; r++) {
+      const cls  = String(data[r][1] || '').trim();
+      const name = String(data[r][2] || '').trim();
+      if (!cls || !name) continue;
+      const key   = normCls(cls) + '|' + normName(name);
+      const tasks = [];
+      for (let t = 0; t < 5; t++) tasks.push(!!String(data[r][3 + t] || '').trim());
+      if (byKey[key]) { tasks.forEach((v, i) => { if (v) byKey[key].tasks[i] = true; }); }
+      else            { byKey[key] = { tasks }; }
+    }
+    return { byKey };
+  } catch(e) {
+    return { byKey: {}, error: e.toString() };
+  }
 }
 
 // ── GET ACTIVENESS FOR ALL STUDENTS ──────────────────────────
