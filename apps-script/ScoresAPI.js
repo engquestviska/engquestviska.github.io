@@ -61,6 +61,7 @@ function doGet(e) {
     else if (action === 'getAllStrikes')       result = getAllStrikes(e.parameter.className);
     else if (action === 'addStrike')          result = addStrike(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.studentNo, e.parameter.reason || '');
     else if (action === 'removeStrike')       result = removeStrike(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.studentNo);
+    else if (action === 'debugCh5Names')   result = debugCh5Names(e.parameter.username, e.parameter.password);
     else if (action === 'getMaterials')    result = getMaterials(e.parameter.chapter);
     else if (action === 'addMaterial')     result = addMaterial(e.parameter.username, e.parameter.password, e.parameter.chapter, e.parameter.title, e.parameter.fileId, e.parameter.fileType);
     else if (action === 'deleteMaterial')  result = deleteMaterial(e.parameter.username, e.parameter.password, e.parameter.chapter, e.parameter.fileId);
@@ -202,7 +203,7 @@ function syncCh5Student(className, studentNo) {
   if (!respSheet) return { success: false, error: 'Ch5 Responses sheet not found' };
   const respData = respSheet.getDataRange().getValues();
   // Columns: [Timestamp, Class, Student Name, Task 1 File, Task 2 File, Task 3 File, Task 4 File, Task 5 File]
-  const norm = s => String(s).toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+  const norm = s => String(s).toLowerCase().replace(/[-]/g, ' ').replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
   const normCls = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, ''); // "X E-1" → "xe1"
   let submissionRow = null;
   for (let r = 1; r < respData.length; r++) {
@@ -255,7 +256,7 @@ function syncCh5Class(className, username, password) {
   const respData = respSheet.getDataRange().getValues();
 
   const normCls  = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
-  const normName = s => String(s).toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+  const normName = s => String(s).toLowerCase().replace(/[-]/g, ' ').replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
 
   const ch5Map = {};
   for (let r = 1; r < respData.length; r++) {
@@ -288,6 +289,55 @@ function syncCh5Class(className, username, password) {
   return { success: true, synced, notFound };
 }
 
+// ── DEBUG: Compare Ch5 Students sheet names vs Task_Status names (teacher-only) ──
+function debugCh5Names(username, password) {
+  if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
+  const CH5_SS_ID = '1WqvB1SkFEh-lnZ3mLAFzArCuHWqnuxXDbGz_gLZ3zyQ';
+  const normCls  = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
+  const normName = s => String(s).toLowerCase().replace(/[-]/g, ' ').replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+
+  // Load Ch5 Students sheet: headers = class names, rows = student names per class
+  const ch5Sheet = SpreadsheetApp.openById(CH5_SS_ID).getSheetByName('Students');
+  if (!ch5Sheet) return { success: false, error: 'Ch5 Students sheet not found' };
+  const ch5Data = ch5Sheet.getDataRange().getValues();
+  const ch5Headers = ch5Data[0];
+
+  // Build map: normCls(className) → Set of normName(studentName) → original name
+  const ch5NamesMap = {};
+  for (let c = 0; c < ch5Headers.length; c++) {
+    const cls = String(ch5Headers[c] || '').trim();
+    if (!cls) continue;
+    const key = normCls(cls);
+    ch5NamesMap[key] = {};
+    for (let r = 1; r < ch5Data.length; r++) {
+      const name = String(ch5Data[r][c] || '').trim();
+      if (name) ch5NamesMap[key][normName(name)] = name;
+    }
+  }
+
+  const mismatches = {};
+  for (const [className, sheetId] of Object.entries(SCORE_SHEETS)) {
+    const taskSheet = SpreadsheetApp.openById(sheetId).getSheetByName(TASK_SHEET_NAME);
+    if (!taskSheet) continue;
+    const taskData = taskSheet.getDataRange().getValues();
+    const ch5Names = ch5NamesMap[normCls(className)] || {};
+    const clsMismatches = [];
+    for (let r = 1; r < taskData.length; r++) {
+      const name = String(taskData[r][1] || '').trim();
+      if (!name) continue;
+      const norm = normName(name);
+      if (!ch5Names[norm]) {
+        // Not found in Ch5 Students sheet — find closest (share first token)
+        const firstToken = norm.split(' ')[0];
+        const similar = Object.values(ch5Names).filter(n => normName(n).startsWith(firstToken));
+        clsMismatches.push({ taskListName: name, ch5SheetName: similar[0] || null });
+      }
+    }
+    if (clsMismatches.length) mismatches[className] = clsMismatches;
+  }
+  return { success: true, mismatches };
+}
+
 // ── CH5 FILE URLS FOR A SPECIFIC STUDENT (teacher viewer) ────
 function getCh5StudentFiles(className, studentNo) {
   const CH5_SS_ID = '1WqvB1SkFEh-lnZ3mLAFzArCuHWqnuxXDbGz_gLZ3zyQ';
@@ -312,7 +362,7 @@ function getCh5StudentFiles(className, studentNo) {
   const respData = respSheet.getDataRange().getValues();
 
   const normCls  = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
-  const normName = s => String(s).toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+  const normName = s => String(s).toLowerCase().replace(/[-]/g, ' ').replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
 
   let submissionRow = null;
   for (let r = 1; r < respData.length; r++) {
@@ -334,7 +384,7 @@ function getCh5StudentFiles(className, studentNo) {
 function getCh5Submissions() {
   const CH5_SS_ID = '1WqvB1SkFEh-lnZ3mLAFzArCuHWqnuxXDbGz_gLZ3zyQ';
   const normCls  = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
-  const normName = s => String(s).toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+  const normName = s => String(s).toLowerCase().replace(/[-]/g, ' ').replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
   try {
     const respSheet = SpreadsheetApp.openById(CH5_SS_ID).getSheetByName('Responses');
     if (!respSheet) return { byKey: {} };
