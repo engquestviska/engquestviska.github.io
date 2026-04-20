@@ -1054,6 +1054,7 @@ function getSubmissions() {
   // Normalize name for comparison — lowercase, strip apostrophes/punctuation, collapse spaces
   function normName(s) {
     return String(s).toLowerCase()
+      .replace(/[-]/g, ' ')         // hyphens → spaces before stripping
       .replace(/['\u2018\u2019\u201A\u201B\u0060\u00B4]/g, '') // all apostrophe variants
       .replace(/[^a-z0-9\s]/g, '')  // remove other punctuation
       .replace(/\s+/g, ' ')         // collapse spaces

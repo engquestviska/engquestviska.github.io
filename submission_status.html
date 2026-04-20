@@ -147,7 +147,7 @@ var allData  = null; // Ch4: { classes, students: { ClassName: [{name, submitted
 var ch5Data  = null; // Ch5: { byKey: { 'normcls|normname': { tasks: [bool x5] } } }
 
 function normCls(s)  { return String(s).toLowerCase().replace(/[^a-z0-9]/g, ''); }
-function normName(s) { return String(s).toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim(); }
+function normName(s) { return String(s).toLowerCase().replace(/[-]/g, ' ').replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim(); }
 
 function ch5Key(cls, name) { return normCls(cls) + '|' + normName(name); }
 
