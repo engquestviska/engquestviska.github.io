@@ -9,8 +9,8 @@
   <style>
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
     :root {
-      --purple:#7C3AED; --purple-light:#A78BFA; --purple-soft:#EDE9FE; --purple-mid:#C4B5FD;
-      --white:#fff; --off-white:#F9F7FF; --text-dark:#1E1040; --text-muted:#6B5B95; --border:#E5DEFF;
+      --purple:#2563EB; --purple-light:#60A5FA; --purple-soft:#DBEAFE; --purple-mid:#93C5FD;
+      --white:#fff; --off-white:#F8FAFC; --text-dark:#0F172A; --text-muted:#475569; --border:#DBEAFE;
       --accent:#F59E0B; --green:#10B981; --green-soft:#D1FAE5; --red:#DC2626; --red-soft:#FEE2E2;
       --gold:#F59E0B;
     }
@@ -19,7 +19,7 @@
     .screen.active { display:block; }
 
     /* HEADER */
-    .page-header { background:linear-gradient(135deg,#7C3AED 0%,#5B21B6 50%,#4C1D95 100%); padding:36px 24px 52px; text-align:center; position:relative; overflow:hidden; }
+    .page-header { background:linear-gradient(135deg,#2563EB 0%,#1D4ED8 50%,#1E3A8A 100%); padding:36px 24px 52px; text-align:center; position:relative; overflow:hidden; }
     .page-header::before { content:''; position:absolute; inset:0; background-image:radial-gradient(circle,rgba(255,255,255,0.08) 1px,transparent 1px); background-size:28px 28px; pointer-events:none; }
     .back-btn { position:absolute; top:20px; left:20px; z-index:2; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); color:#fff; font-size:0.88rem; font-weight:600; padding:8px 18px; border-radius:999px; cursor:pointer; text-decoration:none; font-family:inherit; }
     .back-btn:hover { background:rgba(255,255,255,0.25); }
@@ -29,7 +29,7 @@
     .wave { display:block; width:100%; margin-top:-2px; }
 
     /* TOPBAR */
-    .topbar { background:linear-gradient(135deg,#7C3AED,#4C1D95); border-bottom:2px solid rgba(255,255,255,0.12); padding:10px 20px; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:50; flex-wrap:wrap; }
+    .topbar { background:linear-gradient(135deg,#2563EB,#1E3A8A); border-bottom:2px solid rgba(255,255,255,0.12); padding:10px 20px; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:50; flex-wrap:wrap; }
     .topbar-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:800; color:#fff; white-space:nowrap; }
     .topbar-sep { color:rgba(255,255,255,0.3); }
     .score-chips { display:flex; gap:8px; flex-wrap:wrap; flex:1; }
@@ -50,7 +50,7 @@
     .input-hint { font-size:0.75rem; color:var(--text-muted); margin-top:6px; font-family:'IBM Plex Mono',monospace; }
     .preview-list { margin-top:14px; display:flex; flex-wrap:wrap; gap:8px; min-height:8px; }
     .preview-chip { padding:5px 14px; background:var(--purple-soft); border:1.5px solid var(--purple-mid); border-radius:999px; font-size:0.82rem; font-weight:600; color:var(--purple); font-family:'IBM Plex Mono',monospace; }
-    .btn-primary { width:100%; padding:15px; background:linear-gradient(135deg,#7C3AED,#5B21B6); color:#fff; border:none; border-radius:14px; font-family:inherit; font-size:1rem; font-weight:700; cursor:pointer; transition:opacity 0.2s; }
+    .btn-primary { width:100%; padding:15px; background:linear-gradient(135deg,#2563EB,#1D4ED8); color:#fff; border:none; border-radius:14px; font-family:inherit; font-size:1rem; font-weight:700; cursor:pointer; transition:opacity 0.2s; }
     .btn-primary:hover { opacity:0.88; }
 
     /* ROUND SCREEN */
@@ -113,7 +113,7 @@
     .game-actions { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
     .btn-action { flex:1; padding:13px; border-radius:14px; border:none; font-family:inherit; font-size:0.92rem; font-weight:700; cursor:pointer; min-width:140px; transition:opacity 0.2s; }
     .btn-action:hover { opacity:0.85; }
-    .btn-reveal-hint { background:linear-gradient(135deg,#7C3AED,#5B21B6); color:#fff; }
+    .btn-reveal-hint { background:linear-gradient(135deg,#2563EB,#1D4ED8); color:#fff; }
     .btn-reveal-answer { background:linear-gradient(135deg,#F59E0B,#D97706); color:#fff; }
     .btn-next { background:linear-gradient(135deg,#10B981,#059669); color:#fff; }
     .btn-secondary { background:var(--off-white); border:1.5px solid var(--border) !important; color:var(--text-muted); }
@@ -149,7 +149,7 @@
     .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
     .toast.good { background:#065F46; color:#fff; }
     .toast.bad { background:#991B1B; color:#fff; }
-    .toast:not(.good):not(.bad) { background:#1E1040; color:#fff; }
+    .toast:not(.good):not(.bad) { background:#0F172A; color:#fff; }
 
     @media(max-width:600px) {
       .game-actions { flex-direction:column; }
@@ -167,8 +167,8 @@
     <p class="page-header-sub">Chapter 5 · Narrative Text · English Quest · Mr. Laksma</p>
   </div>
   <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
-    <path fill="#4C1D95" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
-    <path fill="#F9F7FF" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
+    <path fill="#1E3A8A" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
+    <path fill="#F8FAFC" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
   </svg>
   <main>
     <div class="setup-card">

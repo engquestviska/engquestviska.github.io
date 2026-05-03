@@ -9,16 +9,16 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --purple:#7C3AED; --purple-light:#A78BFA; --purple-soft:#EDE9FE;
-      --purple-mid:#C4B5FD; --white:#fff; --off-white:#F9F7FF;
-      --text-dark:#1E1040; --text-muted:#6B5B95; --border:#E5DEFF;
+      --purple:#2563EB; --purple-light:#60A5FA; --purple-soft:#DBEAFE;
+      --purple-mid:#93C5FD; --white:#fff; --off-white:#F8FAFC;
+      --text-dark:#0F172A; --text-muted:#475569; --border:#DBEAFE;
       --accent:#F59E0B; --green:#10B981; --red:#EF4444; --red-soft:#FEE2E2;
     }
     body { font-family:'IBM Plex Sans',sans-serif; background:var(--off-white); color:var(--text-dark); min-height:100vh; display:flex; flex-direction:column; }
     main { flex:1; max-width:760px; margin:0 auto; padding:28px 16px 80px; width:100%; }
 
     /* HEADER */
-    header { background:linear-gradient(135deg,#7C3AED 0%,#5B21B6 50%,#4C1D95 100%); padding:36px 20px 52px; text-align:center; position:relative; overflow:hidden; }
+    header { background:linear-gradient(135deg,#2563EB 0%,#1D4ED8 50%,#1E3A8A 100%); padding:36px 20px 52px; text-align:center; position:relative; overflow:hidden; }
     header::before { content:''; position:absolute; inset:0; background-image:radial-gradient(circle,rgba(255,255,255,0.08) 1px,transparent 1px); background-size:28px 28px; pointer-events:none; }
     .back-btn { position:absolute; top:20px; left:20px; z-index:2; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); color:#fff; font-family:'IBM Plex Sans',sans-serif; font-size:0.88rem; font-weight:600; padding:8px 18px; border-radius:999px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
     .back-btn:hover { background:rgba(255,255,255,0.25); }
@@ -41,13 +41,13 @@
     .field label { display:block; font-size:0.78rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; }
     .field select { width:100%; padding:14px 16px; border:1.5px solid var(--border); border-radius:12px; font-family:'IBM Plex Sans',sans-serif; font-size:1rem; background:var(--off-white); color:var(--text-dark); outline:none; }
     .field select:focus { border-color:var(--purple-light); }
-    .btn-primary { width:100%; padding:15px; background:linear-gradient(135deg,var(--purple),#5B21B6); color:#fff; font-family:'IBM Plex Sans',sans-serif; font-weight:700; font-size:1rem; border:none; border-radius:12px; cursor:pointer; margin-top:4px; transition:opacity 0.2s; }
+    .btn-primary { width:100%; padding:15px; background:linear-gradient(135deg,var(--purple),#1D4ED8); color:#fff; font-family:'IBM Plex Sans',sans-serif; font-weight:700; font-size:1rem; border:none; border-radius:12px; cursor:pointer; margin-top:4px; transition:opacity 0.2s; }
     .btn-primary:disabled { opacity:0.4; cursor:not-allowed; }
 
     /* STRIKE DISPLAY CARD */
     .strike-card { background:var(--white); border:1.5px solid var(--border); border-radius:20px; overflow:hidden; margin-bottom:20px; animation:slideUp 0.3s ease; }
     @keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-    .profile-strip { background:linear-gradient(135deg,#7C3AED,#5B21B6); padding:22px 24px; display:flex; align-items:center; gap:16px; }
+    .profile-strip { background:linear-gradient(135deg,#2563EB,#1D4ED8); padding:22px 24px; display:flex; align-items:center; gap:16px; }
     .avatar { width:54px; height:54px; border-radius:50%; background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.4); display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0; font-family:'Playfair Display',serif; font-weight:700; color:#fff; }
     .profile-name { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; color:#fff; }
     .profile-meta { font-size:0.82rem; color:rgba(255,255,255,0.7); margin-top:3px; }
@@ -65,7 +65,7 @@
     .strike-status.safe     { background:#D1FAE5; border:1.5px solid #34D399; }
     .strike-status.warning  { background:#FEF3C7; border:1.5px solid #FCD34D; }
     .strike-status.danger   { background:#FEE2E2; border:1.5px solid #FCA5A5; }
-    .strike-status.out      { background:#7C3AED; border:1.5px solid #5B21B6; }
+    .strike-status.out      { background:#2563EB; border:1.5px solid #1D4ED8; }
     .strike-status-icon { font-size:1.4rem; flex-shrink:0; }
     .strike-status-text { font-weight:700; font-size:0.95rem; }
     .strike-status.safe    .strike-status-text { color:#065F46; }
@@ -88,7 +88,7 @@
     /* TEACHER PANEL */
     .teacher-class-bar { background:var(--white); border:1.5px solid var(--border); border-radius:20px; padding:20px; margin-bottom:20px; }
     .student-strike-row { background:var(--white); border:1.5px solid var(--border); border-radius:16px; padding:16px 18px; margin-bottom:10px; display:flex; align-items:center; gap:12px; transition:box-shadow 0.15s; }
-    .student-strike-row:hover { box-shadow:0 4px 16px rgba(124,58,237,0.08); }
+    .student-strike-row:hover { box-shadow:0 4px 16px rgba(37,99,235,0.08); }
     .str-no { font-size:0.75rem; font-weight:700; color:var(--purple-light); width:22px; flex-shrink:0; font-family:'IBM Plex Mono',monospace; }
     .str-name { flex:1; font-size:0.95rem; font-weight:600; }
     .str-dots { display:flex; gap:5px; }
@@ -104,7 +104,7 @@
     .btn-rm-strike:disabled { opacity:0.3; cursor:not-allowed; }
 
     /* REASON MODAL */
-    .overlay { position:fixed; inset:0; background:rgba(30,16,64,0.6); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; z-index:100; padding:20px; }
+    .overlay { position:fixed; inset:0; background:rgba(15,23,42,0.6); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; z-index:100; padding:20px; }
     .overlay.hidden { display:none; }
     .modal { background:var(--white); border-radius:24px; padding:32px 24px; width:100%; max-width:420px; }
     .modal-title { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:800; margin-bottom:6px; }
@@ -136,7 +136,7 @@
 
     /* ── STRIKE CLEARANCE GUIDE ── */
     .clearance-guide { background:var(--white); border:1.5px solid var(--border); border-radius:20px; overflow:hidden; margin-top:16px; }
-    .clearance-header { background:linear-gradient(135deg,#7C3AED,#5B21B6); padding:16px 20px; display:flex; align-items:center; gap:12px; }
+    .clearance-header { background:linear-gradient(135deg,#2563EB,#1D4ED8); padding:16px 20px; display:flex; align-items:center; gap:12px; }
     .clearance-header-icon { font-size:1.4rem; }
     .clearance-header-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; color:#fff; }
     .clearance-header-sub { font-size:0.75rem; color:rgba(255,255,255,0.7); margin-top:2px; }
@@ -164,7 +164,7 @@
     .structure-item { display:flex; gap:10px; align-items:flex-start; margin-bottom:10px; }
     .structure-item:last-child { margin-bottom:0; }
     .structure-tag { font-size:0.68rem; font-weight:800; padding:3px 10px; border-radius:999px; white-space:nowrap; flex-shrink:0; font-family:'IBM Plex Mono',monospace; }
-    .structure-tag.thesis    { background:#EDE9FE; color:#5B21B6; }
+    .structure-tag.thesis    { background:#DBEAFE; color:#1D4ED8; }
     .structure-tag.arg       { background:#DBEAFE; color:#1D4ED8; }
     .structure-tag.reit      { background:#D1FAE5; color:#065F46; }
     .structure-tag.orient    { background:#FEF3C7; color:#92400E; }
@@ -195,7 +195,7 @@
     .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
     .sidebar-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.6); backdrop-filter:blur(6px); z-index:300; opacity:0; pointer-events:none; transition:opacity 0.3s; }
     .sidebar-overlay.open { opacity:1; pointer-events:all; }
-    .sidebar { position:fixed; top:0; right:0; height:100%; width:min(320px,85vw); background:#1E1040; z-index:301; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.34,1.1,0.64,1); display:flex; flex-direction:column; overflow-y:auto; }
+    .sidebar { position:fixed; top:0; right:0; height:100%; width:min(320px,85vw); background:#0F172A; z-index:301; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.34,1.1,0.64,1); display:flex; flex-direction:column; overflow-y:auto; }
     .sidebar.open { transform:translateX(0); }
     .sidebar-head { padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; gap:12px; }
     .sidebar-logo { width:36px; height:36px; border-radius:10px; object-fit:cover; }
@@ -207,14 +207,14 @@
     .sidebar-section-label { font-size:0.65rem; font-weight:700; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.12em; font-family:'IBM Plex Mono',monospace; padding:0 4px; margin-bottom:6px; }
     .sidebar-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; text-decoration:none; transition:background 0.15s; margin-bottom:2px; }
     .sidebar-item:hover, .sidebar-item:active { background:rgba(255,255,255,0.08); }
-    .sidebar-item.active { background:rgba(255,255,255,0.12); border-left:3px solid #A78BFA; padding-left:9px; }
+    .sidebar-item.active { background:rgba(255,255,255,0.12); border-left:3px solid #60A5FA; padding-left:9px; }
     .sidebar-item-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0; }
     .sidebar-item-name { font-size:0.88rem; font-weight:600; color:#fff; flex:1; }
     .sidebar-item-badge { font-size:0.6rem; font-weight:800; padding:2px 7px; border-radius:999px; font-family:'IBM Plex Mono',monospace; background:#F59E0B; color:#fff; }
     .sidebar-divider { height:1px; background:rgba(255,255,255,0.07); margin:8px 16px; }
-    .sidebar-teacher { margin:12px 16px 20px; background:rgba(124,58,237,0.2); border:1px solid rgba(124,58,237,0.35); border-radius:14px; padding:12px 14px; }
-    .sidebar-teacher-label { font-size:0.68rem; font-weight:700; color:#A78BFA; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
-    .sidebar-teacher-logged { font-size:0.82rem; color:#A78BFA; font-weight:600; display:flex; align-items:center; gap:8px; }
+    .sidebar-teacher { margin:12px 16px 20px; background:rgba(37,99,235,0.2); border:1px solid rgba(37,99,235,0.35); border-radius:14px; padding:12px 14px; }
+    .sidebar-teacher-label { font-size:0.68rem; font-weight:700; color:#60A5FA; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
+    .sidebar-teacher-logged { font-size:0.82rem; color:#60A5FA; font-weight:600; display:flex; align-items:center; gap:8px; }
     .sidebar-teacher-logged span { cursor:pointer; color:rgba(255,255,255,0.4); font-size:0.75rem; margin-left:auto; }
     .sidebar-home-btn { display:flex; align-items:center; gap:10px; margin:12px 16px 4px; padding:11px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:12px; text-decoration:none; }
     .sidebar-home-btn:hover { background:rgba(255,255,255,0.1); }
@@ -253,8 +253,8 @@
 <!-- HEADER -->
 <header>
   <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
-  
-  
+
+
   <a class="back-btn" href="index.html">← Back</a>
   <div id="headerRight">
     <button class="teacher-btn" onclick="openLogin()">🔑 Teacher</button>
@@ -264,8 +264,8 @@
 </header>
 
 <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
-  <path fill="#4C1D95" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
-  <path fill="#F9F7FF" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
+  <path fill="#1E3A8A" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
+  <path fill="#F8FAFC" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
 </svg>
 
 <div class="tab-bar">
@@ -329,7 +329,7 @@
     <div style="font-size:0.82rem;color:var(--red);margin:10px 0;display:none" id="loginError">Incorrect username or password.</div>
     <div class="modal-btns" style="margin-top:16px">
       <button class="btn-cancel-m" onclick="document.getElementById('loginModal').classList.add('hidden')">Cancel</button>
-      <button class="btn-confirm" style="background:linear-gradient(135deg,var(--purple),#5B21B6)" onclick="doLogin()">Login</button>
+      <button class="btn-confirm" style="background:linear-gradient(135deg,var(--purple),#1D4ED8)" onclick="doLogin()">Login</button>
     </div>
   </div>
 </div>

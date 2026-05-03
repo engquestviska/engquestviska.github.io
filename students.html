@@ -10,15 +10,15 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --purple: #7C3AED;
-      --purple-light: #A78BFA;
-      --purple-soft: #EDE9FE;
-      --purple-mid: #C4B5FD;
+      --purple: #2563EB;
+      --purple-light: #60A5FA;
+      --purple-soft: #DBEAFE;
+      --purple-mid: #93C5FD;
       --white: #FFFFFF;
-      --off-white: #F9F7FF;
-      --text-dark: #1E1040;
-      --text-muted: #6B5B95;
-      --border: #E5DEFF;
+      --off-white: #F8FAFC;
+      --text-dark: #0F172A;
+      --text-muted: #475569;
+      --border: #DBEAFE;
       --accent: #F59E0B;
     }
 
@@ -31,7 +31,7 @@
 
     /* ── HEADER ── */
     header {
-      background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 50%, #4C1D95 100%);
+      background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 50%, #1E3A8A 100%);
       padding: 36px 24px 48px;
       text-align: center;
       position: relative;
@@ -118,7 +118,7 @@
 
     .search-wrap input:focus {
       border-color: var(--purple-light);
-      box-shadow: 0 0 0 3px rgba(124,58,237,0.1);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
     }
 
     .search-wrap::before {
@@ -267,7 +267,7 @@
     @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     .act-sheet-handle { width: 40px; height: 4px; background: #3D2E6B; border-radius: 999px; margin: 12px auto 0; }
     .act-sheet-head { padding: 20px 24px 16px; border-bottom: 1px solid #2E2250; display: flex; align-items: center; gap: 14px; }
-    .act-avatar { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg, #7C3AED, #5B21B6); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; color: #fff; flex-shrink: 0; font-family: 'Playfair Display', serif; }
+    .act-avatar { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg, #2563EB, #1D4ED8); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; color: #fff; flex-shrink: 0; font-family: 'Playfair Display', serif; }
     .act-sheet-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: #F1EEFF; line-height: 1.2; }
     .act-sheet-sub { font-size: 0.78rem; color: #7C6FA0; margin-top: 2px; }
     .act-close { margin-left: auto; width: 32px; height: 32px; border-radius: 50%; background: #241A3A; border: 1px solid #2E2250; color: #7C6FA0; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -277,9 +277,9 @@
     .act-progress { padding: 16px 24px; border-bottom: 1px solid #2E2250; }
     .act-prog-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
     .act-prog-label { font-size: 0.78rem; color: #7C6FA0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
-    .act-prog-count { font-size: 0.88rem; font-weight: 700; color: #A78BFA; }
+    .act-prog-count { font-size: 0.88rem; font-weight: 700; color: #60A5FA; }
     .act-bar-wrap { background: #241A3A; border-radius: 999px; height: 8px; overflow: hidden; }
-    .act-bar-fill { height: 8px; border-radius: 999px; background: linear-gradient(90deg, #8B5CF6, #A78BFA); transition: width 0.7s ease; }
+    .act-bar-fill { height: 8px; border-radius: 999px; background: linear-gradient(90deg, #8B5CF6, #60A5FA); transition: width 0.7s ease; }
 
     /* Stat items */
     .act-stats { padding: 14px 20px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -296,7 +296,7 @@
 
     /* Info box */
     .act-info-box { margin: 14px 20px 0; background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.2); border-radius: 12px; padding: 10px 14px; }
-    .act-info-title { font-size: 0.7rem; font-weight: 700; color: #A78BFA; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+    .act-info-title { font-size: 0.7rem; font-weight: 700; color: #60A5FA; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
     .act-info-rows { display: flex; flex-direction: column; gap: 3px; }
     .act-info-row { display: flex; justify-content: space-between; font-size: 0.72rem; color: #7C6FA0; }
     .act-info-row span:last-child { color: #A79FC0; font-family: 'IBM Plex Mono', monospace; font-weight: 600; }
@@ -308,7 +308,7 @@
     .ind-ultra  { background: linear-gradient(135deg,rgba(239,68,68,0.15),rgba(251,191,36,0.15)); color: #F97316; border: 1px solid rgba(249,115,22,0.5); }
     .ind-hyper  { background: rgba(251,191,36,0.15); color: #FBBF24; border: 1px solid rgba(251,191,36,0.4); }
     .ind-super  { background: rgba(16,185,129,0.15);  color: #10B981; border: 1px solid rgba(16,185,129,0.3); }
-    .ind-active { background: rgba(139,92,246,0.15);  color: #A78BFA; border: 1px solid rgba(139,92,246,0.3); }
+    .ind-active { background: rgba(139,92,246,0.15);  color: #60A5FA; border: 1px solid rgba(139,92,246,0.3); }
     .ind-okay   { background: rgba(245,158,11,0.15);  color: #F59E0B; border: 1px solid rgba(245,158,11,0.3); }
     .ind-not    { background: rgba(239,68,68,0.1);    color: #EF4444; border: 1px solid rgba(239,68,68,0.2); }
 
@@ -332,7 +332,7 @@
     .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
     .sidebar-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.6); backdrop-filter:blur(6px); z-index:300; opacity:0; pointer-events:none; transition:opacity 0.3s; }
     .sidebar-overlay.open { opacity:1; pointer-events:all; }
-    .sidebar { position:fixed; top:0; right:0; height:100%; width:min(320px,85vw); background:#1E1040; z-index:301; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.34,1.1,0.64,1); display:flex; flex-direction:column; overflow-y:auto; }
+    .sidebar { position:fixed; top:0; right:0; height:100%; width:min(320px,85vw); background:#0F172A; z-index:301; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.34,1.1,0.64,1); display:flex; flex-direction:column; overflow-y:auto; }
     .sidebar.open { transform:translateX(0); }
     .sidebar-head { padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; gap:12px; }
     .sidebar-logo { width:36px; height:36px; border-radius:10px; object-fit:cover; }
@@ -344,14 +344,14 @@
     .sidebar-section-label { font-size:0.65rem; font-weight:700; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.12em; font-family:'IBM Plex Mono',monospace; padding:0 4px; margin-bottom:6px; }
     .sidebar-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; text-decoration:none; transition:background 0.15s; margin-bottom:2px; }
     .sidebar-item:hover, .sidebar-item:active { background:rgba(255,255,255,0.08); }
-    .sidebar-item.active { background:rgba(255,255,255,0.12); border-left:3px solid #A78BFA; padding-left:9px; }
+    .sidebar-item.active { background:rgba(255,255,255,0.12); border-left:3px solid #60A5FA; padding-left:9px; }
     .sidebar-item-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0; }
     .sidebar-item-name { font-size:0.88rem; font-weight:600; color:#fff; flex:1; }
     .sidebar-item-badge { font-size:0.6rem; font-weight:800; padding:2px 7px; border-radius:999px; font-family:'IBM Plex Mono',monospace; background:#F59E0B; color:#fff; }
     .sidebar-divider { height:1px; background:rgba(255,255,255,0.07); margin:8px 16px; }
-    .sidebar-teacher { margin:12px 16px 20px; background:rgba(124,58,237,0.2); border:1px solid rgba(124,58,237,0.35); border-radius:14px; padding:12px 14px; }
-    .sidebar-teacher-label { font-size:0.68rem; font-weight:700; color:#A78BFA; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
-    .sidebar-teacher-logged { font-size:0.82rem; color:#A78BFA; font-weight:600; display:flex; align-items:center; gap:8px; }
+    .sidebar-teacher { margin:12px 16px 20px; background:rgba(37,99,235,0.2); border:1px solid rgba(37,99,235,0.35); border-radius:14px; padding:12px 14px; }
+    .sidebar-teacher-label { font-size:0.68rem; font-weight:700; color:#60A5FA; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
+    .sidebar-teacher-logged { font-size:0.82rem; color:#60A5FA; font-weight:600; display:flex; align-items:center; gap:8px; }
     .sidebar-teacher-logged span { cursor:pointer; color:rgba(255,255,255,0.4); font-size:0.75rem; margin-left:auto; }
     .sidebar-home-btn { display:flex; align-items:center; gap:10px; margin:12px 16px 4px; padding:11px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:12px; text-decoration:none; }
     .sidebar-home-btn:hover { background:rgba(255,255,255,0.1); }
@@ -365,15 +365,15 @@
 
 <header>
   <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
-  
+
   <a href="index.html" class="back-btn">← Back</a>
   <h1>Student <span>List</span></h1>
   <p class="header-sub">English Quest · SMA Negeri 6 Surakarta</p>
 </header>
 
 <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
-  <path fill="#4C1D95" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
-  <path fill="#F9F7FF" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
+  <path fill="#1E3A8A" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
+  <path fill="#F8FAFC" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
 </svg>
 
 <!-- CONTROLS -->

@@ -9,16 +9,16 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --purple: #7C3AED; --purple-light: #A78BFA; --purple-soft: #EDE9FE;
-      --purple-mid: #C4B5FD; --white: #fff; --off-white: #F9F7FF;
-      --text-dark: #1E1040; --text-muted: #6B5B95; --border: #E5DEFF;
+      --purple: #2563EB; --purple-light: #60A5FA; --purple-soft: #DBEAFE;
+      --purple-mid: #93C5FD; --white: #fff; --off-white: #F8FAFC;
+      --text-dark: #0F172A; --text-muted: #475569; --border: #DBEAFE;
       --accent: #F59E0B; --green: #10B981; --green-soft: #D1FAE5;
       --red: #EF4444; --red-soft: #FEE2E2;
     }
     body { font-family: 'IBM Plex Sans', sans-serif; background: var(--off-white); color: var(--text-dark); min-height: 100vh; }
 
     /* HEADER */
-    header { background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 50%, #4C1D95 100%); padding: 36px 20px 52px; text-align: center; position: relative; overflow: hidden; }
+    header { background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 50%, #1E3A8A 100%); padding: 36px 20px 52px; text-align: center; position: relative; overflow: hidden; }
     header::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px); background-size: 28px 28px; pointer-events: none; }
     .back-btn { position: absolute; top: 20px; left: 20px; z-index: 2; background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.88rem; font-weight: 600; padding: 8px 18px; border-radius: 999px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
     .back-btn:hover { background: rgba(255,255,255,0.25); }
@@ -46,14 +46,14 @@
     .field label { display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
     .field select { width: 100%; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 1rem; background: var(--off-white); color: var(--text-dark); outline: none; }
     .field select:focus { border-color: var(--purple-light); }
-    .btn-primary { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--purple), #5B21B6); color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 1rem; border: none; border-radius: 12px; cursor: pointer; margin-top: 4px; }
+    .btn-primary { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--purple), #1D4ED8); color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 1rem; border: none; border-radius: 12px; cursor: pointer; margin-top: 4px; }
     .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
 
     /* ── STUDENT TASK STATUS CARD ── */
     .status-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; margin-bottom: 20px; animation: slideUp 0.3s ease; }
     @keyframes slideUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
 
-    .profile-strip { background: linear-gradient(135deg, #7C3AED, #5B21B6); padding: 22px 24px; display: flex; align-items: center; gap: 16px; }
+    .profile-strip { background: linear-gradient(135deg, #2563EB, #1D4ED8); padding: 22px 24px; display: flex; align-items: center; gap: 16px; }
     .avatar { width: 54px; height: 54px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; font-family: 'Playfair Display', serif; font-weight: 700; color: #fff; }
     .profile-name { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: #fff; }
     .profile-meta { font-size: 0.82rem; color: rgba(255,255,255,0.7); margin-top: 3px; }
@@ -113,7 +113,7 @@
     .task-toggle.saving { opacity: 0.5; cursor: not-allowed; }
 
     /* LOGIN MODAL */
-    .overlay { position: fixed; inset: 0; background: rgba(30,16,64,0.6); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+    .overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
     .overlay.hidden { display: none; }
     .modal { background: var(--white); border-radius: 24px; padding: 36px 28px; width: 100%; max-width: 400px; }
     .modal-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
@@ -124,7 +124,7 @@
     .modal-field input:focus { border-color: var(--purple-light); }
     .modal-error { font-size: 0.85rem; color: var(--red); margin-bottom: 14px; display: none; }
     .modal-btns { display: flex; gap: 10px; }
-    .btn-login { flex: 1; padding: 14px; background: linear-gradient(135deg, var(--purple), #5B21B6); color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 1rem; border: none; border-radius: 12px; cursor: pointer; }
+    .btn-login { flex: 1; padding: 14px; background: linear-gradient(135deg, var(--purple), #1D4ED8); color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 1rem; border: none; border-radius: 12px; cursor: pointer; }
     .btn-cancel { padding: 14px 20px; background: var(--off-white); border: 1.5px solid var(--border); border-radius: 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 1rem; cursor: pointer; color: var(--text-muted); }
 
     /* LOADING */
@@ -165,7 +165,7 @@
     .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
     .sidebar-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.6); backdrop-filter:blur(6px); z-index:300; opacity:0; pointer-events:none; transition:opacity 0.3s; }
     .sidebar-overlay.open { opacity:1; pointer-events:all; }
-    .sidebar { position:fixed; top:0; right:0; height:100%; width:min(320px,85vw); background:#1E1040; z-index:301; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.34,1.1,0.64,1); display:flex; flex-direction:column; overflow-y:auto; }
+    .sidebar { position:fixed; top:0; right:0; height:100%; width:min(320px,85vw); background:#0F172A; z-index:301; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.34,1.1,0.64,1); display:flex; flex-direction:column; overflow-y:auto; }
     .sidebar.open { transform:translateX(0); }
     .sidebar-head { padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; gap:12px; }
     .sidebar-logo { width:36px; height:36px; border-radius:10px; object-fit:cover; }
@@ -177,14 +177,14 @@
     .sidebar-section-label { font-size:0.65rem; font-weight:700; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.12em; font-family:'IBM Plex Mono',monospace; padding:0 4px; margin-bottom:6px; }
     .sidebar-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; text-decoration:none; transition:background 0.15s; margin-bottom:2px; }
     .sidebar-item:hover, .sidebar-item:active { background:rgba(255,255,255,0.08); }
-    .sidebar-item.active { background:rgba(255,255,255,0.12); border-left:3px solid #A78BFA; padding-left:9px; }
+    .sidebar-item.active { background:rgba(255,255,255,0.12); border-left:3px solid #60A5FA; padding-left:9px; }
     .sidebar-item-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0; }
     .sidebar-item-name { font-size:0.88rem; font-weight:600; color:#fff; flex:1; }
     .sidebar-item-badge { font-size:0.6rem; font-weight:800; padding:2px 7px; border-radius:999px; font-family:'IBM Plex Mono',monospace; background:#F59E0B; color:#fff; }
     .sidebar-divider { height:1px; background:rgba(255,255,255,0.07); margin:8px 16px; }
-    .sidebar-teacher { margin:12px 16px 20px; background:rgba(124,58,237,0.2); border:1px solid rgba(124,58,237,0.35); border-radius:14px; padding:12px 14px; }
-    .sidebar-teacher-label { font-size:0.68rem; font-weight:700; color:#A78BFA; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
-    .sidebar-teacher-logged { font-size:0.82rem; color:#A78BFA; font-weight:600; display:flex; align-items:center; gap:8px; }
+    .sidebar-teacher { margin:12px 16px 20px; background:rgba(37,99,235,0.2); border:1px solid rgba(37,99,235,0.35); border-radius:14px; padding:12px 14px; }
+    .sidebar-teacher-label { font-size:0.68rem; font-weight:700; color:#60A5FA; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
+    .sidebar-teacher-logged { font-size:0.82rem; color:#60A5FA; font-weight:600; display:flex; align-items:center; gap:8px; }
     .sidebar-teacher-logged span { cursor:pointer; color:rgba(255,255,255,0.4); font-size:0.75rem; margin-left:auto; }
     .sidebar-home-btn { display:flex; align-items:center; gap:10px; margin:12px 16px 4px; padding:11px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:12px; text-decoration:none; }
     .sidebar-home-btn:hover { background:rgba(255,255,255,0.1); }
@@ -214,8 +214,8 @@
 <!-- HEADER -->
 <header>
   <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
-  
-  
+
+
   <a class="back-btn" href="index.html">← Back</a>
   <div id="headerRight">
     <button class="teacher-btn" onclick="openLogin()">🔑 Teacher</button>
@@ -225,8 +225,8 @@
 </header>
 
 <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
-  <path fill="#4C1D95" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
-  <path fill="#F9F7FF" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
+  <path fill="#1E3A8A" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
+  <path fill="#F8FAFC" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
 </svg>
 
 <!-- TABS -->
@@ -283,8 +283,8 @@
 <div class="toast" id="toast"></div>
 
 <!-- Ch5 Files Modal -->
-<div id="ch5FilesOverlay" style="display:none;position:fixed;inset:0;background:rgba(30,16,64,0.6);backdrop-filter:blur(6px);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#fff;border-radius:20px;padding:28px 24px;width:100%;max-width:420px;box-shadow:0 8px 40px rgba(124,58,237,0.18)">
+<div id="ch5FilesOverlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.6);backdrop-filter:blur(6px);z-index:500;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:20px;padding:28px 24px;width:100%;max-width:420px;box-shadow:0 8px 40px rgba(37,99,235,0.18)">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
       <div>
         <div style="font-size:0.7rem;font-weight:700;color:var(--purple-light);text-transform:uppercase;letter-spacing:0.1em;font-family:'IBM Plex Mono',monospace">Chapter 5 Files</div>
@@ -575,7 +575,7 @@
 
       const ch5Section = ch5Keys.length ? `
         <div class="str-chapter-label" style="margin-top:8px;display:flex;align-items:center;gap:8px">Chapter 5
-          <button onclick="viewCh5Files(${s.no},'${cls}')" style="background:none;border:1px solid rgba(124,58,237,0.35);border-radius:6px;padding:1px 8px;cursor:pointer;font-size:0.65rem;color:var(--purple);font-family:inherit;font-weight:700;line-height:1.6">&#128196; Files</button>
+          <button onclick="viewCh5Files(${s.no},'${cls}')" style="background:none;border:1px solid rgba(37,99,235,0.35);border-radius:6px;padding:1px 8px;cursor:pointer;font-size:0.65rem;color:var(--purple);font-family:inherit;font-weight:700;line-height:1.6">&#128196; Files</button>
         </div>
         <div class="str-tasks">${makeBtns(s, ch5Keys)}</div>` : '';
 
@@ -776,7 +776,7 @@
         const url = (res.files || {})[k];
         const num = k.replace('C5T','');
         if (url) {
-          return '<a href="' + url + '" target="_blank" style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--off-white);border:1.5px solid var(--border);border-radius:12px;margin-bottom:8px;text-decoration:none;color:var(--text-dark);font-weight:600;font-size:0.88rem;transition:border-color 0.15s" onmouseover="this.style.borderColor=\'#A78BFA\'" onmouseout="this.style.borderColor=\'var(--border)\'">' +
+          return '<a href="' + url + '" target="_blank" style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--off-white);border:1.5px solid var(--border);border-radius:12px;margin-bottom:8px;text-decoration:none;color:var(--text-dark);font-weight:600;font-size:0.88rem;transition:border-color 0.15s" onmouseover="this.style.borderColor=\'#60A5FA\'" onmouseout="this.style.borderColor=\'var(--border)\'">' +
             '<span style="background:#D1FAE5;color:#065F46;border-radius:8px;padding:4px 10px;font-size:0.72rem;font-weight:700;font-family:\'IBM Plex Mono\',monospace;flex-shrink:0">Task ' + num + '</span>' +
             '<span style="flex:1">View file ↗</span>' +
             '</a>';
