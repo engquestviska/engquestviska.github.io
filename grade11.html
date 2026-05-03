@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Grade 11 · English Quest</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    :root {
+      --ink:#10201f;
+      --muted:#5f7370;
+      --paper:#f5fbf9;
+      --card:#ffffff;
+      --line:#d6ebe5;
+      --teal:#0f766e;
+      --teal-dark:#134e4a;
+      --mint:#ccfbf1;
+      --blue:#2563eb;
+      --gold:#f59e0b;
+      --rose:#e11d48;
+    }
+    body {
+      min-height:100vh;
+      font-family:'IBM Plex Sans',sans-serif;
+      background:var(--paper);
+      color:var(--ink);
+    }
+    header {
+      min-height:62vh;
+      padding:22px;
+      display:flex;
+      flex-direction:column;
+      background:
+        linear-gradient(120deg, rgba(15,118,110,0.94), rgba(19,78,74,0.9)),
+        url('logo.jpg') center/360px auto no-repeat;
+      color:#fff;
+    }
+    nav {
+      width:min(1160px,100%);
+      margin:0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+    .brand { display:flex; align-items:center; gap:12px; }
+    .brand img { width:46px; height:46px; border-radius:14px; object-fit:cover; border:2px solid rgba(255,255,255,0.28); }
+    .brand-title { font-family:'Playfair Display',serif; font-weight:800; font-size:1.1rem; }
+    .brand-sub { font-size:0.76rem; color:rgba(255,255,255,0.68); }
+    .nav-links { display:flex; align-items:center; gap:10px; }
+    .nav-links a, .nav-links button {
+      border:1.5px solid rgba(255,255,255,0.24);
+      background:rgba(255,255,255,0.1);
+      color:#fff;
+      border-radius:999px;
+      padding:9px 14px;
+      text-decoration:none;
+      font:inherit;
+      font-size:0.82rem;
+      font-weight:700;
+      cursor:pointer;
+    }
+    .hero {
+      width:min(1160px,100%);
+      margin:auto;
+      padding:58px 0 34px;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) minmax(280px,0.72fr);
+      gap:34px;
+      align-items:end;
+    }
+    .kicker {
+      font-family:'IBM Plex Mono',monospace;
+      text-transform:uppercase;
+      letter-spacing:0.14em;
+      color:var(--mint);
+      font-size:0.78rem;
+      font-weight:700;
+      margin-bottom:16px;
+    }
+    h1 {
+      font-family:'Playfair Display',serif;
+      font-size:clamp(3.2rem,8vw,7rem);
+      line-height:0.9;
+      font-weight:800;
+      margin-bottom:20px;
+      letter-spacing:0;
+    }
+    .hero-copy {
+      color:rgba(255,255,255,0.76);
+      font-size:1.02rem;
+      line-height:1.7;
+      max-width:620px;
+    }
+    .status-panel {
+      background:rgba(255,255,255,0.12);
+      border:1.5px solid rgba(255,255,255,0.22);
+      border-radius:26px;
+      padding:24px;
+      backdrop-filter:blur(12px);
+    }
+    .status-label {
+      font-family:'IBM Plex Mono',monospace;
+      color:var(--mint);
+      font-size:0.7rem;
+      font-weight:700;
+      letter-spacing:0.12em;
+      text-transform:uppercase;
+      margin-bottom:10px;
+    }
+    .status-title { font-weight:800; font-size:1.25rem; margin-bottom:8px; }
+    .status-copy { color:rgba(255,255,255,0.72); line-height:1.6; font-size:0.9rem; }
+    main {
+      width:min(1160px,100%);
+      margin:0 auto;
+      padding:42px 22px 72px;
+    }
+    .section-head {
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:18px;
+      margin-bottom:18px;
+    }
+    .section-kicker {
+      font-family:'IBM Plex Mono',monospace;
+      color:var(--teal);
+      font-size:0.72rem;
+      font-weight:700;
+      letter-spacing:0.12em;
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
+    h2 {
+      font-family:'Playfair Display',serif;
+      font-size:clamp(1.8rem,4vw,2.7rem);
+      line-height:1.05;
+    }
+    .grid {
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:16px;
+      margin-bottom:38px;
+    }
+    .module {
+      background:var(--card);
+      border:1.5px solid var(--line);
+      border-radius:22px;
+      padding:22px;
+      min-height:190px;
+      box-shadow:0 18px 44px rgba(15,118,110,0.07);
+    }
+    .module-icon {
+      width:48px;
+      height:48px;
+      border-radius:16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:1.35rem;
+      margin-bottom:16px;
+      background:var(--mint);
+    }
+    .module h3 { font-size:1rem; margin-bottom:8px; }
+    .module p { color:var(--muted); font-size:0.9rem; line-height:1.6; }
+    .roadmap {
+      background:#fff;
+      border:1.5px solid var(--line);
+      border-radius:26px;
+      padding:26px;
+    }
+    .roadmap-row {
+      display:grid;
+      grid-template-columns:42px minmax(0,1fr);
+      gap:14px;
+      padding:18px 0;
+      border-bottom:1px solid var(--line);
+    }
+    .roadmap-row:last-child { border-bottom:none; }
+    .roadmap-num {
+      width:34px;
+      height:34px;
+      border-radius:50%;
+      background:var(--teal);
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:800;
+    }
+    .roadmap-title { font-weight:800; margin-bottom:5px; }
+    .roadmap-copy { color:var(--muted); line-height:1.6; font-size:0.9rem; }
+    footer {
+      color:var(--muted);
+      text-align:center;
+      font-size:0.78rem;
+      padding:0 22px 28px;
+    }
+    @media (max-width:860px) {
+      .hero { grid-template-columns:1fr; align-items:start; }
+      .grid { grid-template-columns:1fr; }
+      header { min-height:auto; }
+      .nav-links { flex-wrap:wrap; justify-content:flex-end; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="brand">
+        <img src="logo.jpg" alt="English Quest Logo"/>
+        <div>
+          <div class="brand-title">English Quest</div>
+          <div class="brand-sub">Grade 11 Track</div>
+        </div>
+      </div>
+      <div class="nav-links">
+        <a href="index.html">Change Grade</a>
+        <a href="grade10.html" onclick="localStorage.setItem('eq_grade','10')">Grade 10</a>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div>
+        <div class="kicker">New Semester Build</div>
+        <h1>Grade 11 gets its own world.</h1>
+        <p class="hero-copy">This track is intentionally separate from Grade 10. The dashboard, resources, assignments, and data model can now grow in a different direction without dragging old class data along with it.</p>
+      </div>
+      <div class="status-panel">
+        <div class="status-label">No Student Data Yet</div>
+        <div class="status-title">Designed before the roster arrives.</div>
+        <div class="status-copy">Until the real Grade 11 classes are available, this page acts as the staging dashboard for structure, design, and future modules.</div>
+      </div>
+    </section>
+  </header>
+
+  <main>
+    <section>
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Future Modules</div>
+          <h2>Built as a separate track.</h2>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="module">
+          <div class="module-icon">📚</div>
+          <h3>Materials</h3>
+          <p>Grade 11 lessons, readings, videos, and class session resources will live here instead of sharing the Grade 10 dashboard.</p>
+        </article>
+        <article class="module">
+          <div class="module-icon">📝</div>
+          <h3>Assignments</h3>
+          <p>Task instructions and submission links can follow Grade 11 chapters, topics, and deadlines.</p>
+        </article>
+        <article class="module">
+          <div class="module-icon">🏆</div>
+          <h3>Progress</h3>
+          <p>Scores, attendance, tasks, activeness, and strikes will connect to Grade 11 data when the backend is ready.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="roadmap">
+      <div class="section-kicker">Build Order</div>
+      <h2>What changes next</h2>
+      <div class="roadmap-row">
+        <div class="roadmap-num">1</div>
+        <div>
+          <div class="roadmap-title">Split navigation by grade</div>
+          <div class="roadmap-copy">Grade 11 links should stay inside the Grade 11 track instead of jumping to Grade 10 pages.</div>
+        </div>
+      </div>
+      <div class="roadmap-row">
+        <div class="roadmap-num">2</div>
+        <div>
+          <div class="roadmap-title">Create Grade 11 content pages</div>
+          <div class="roadmap-copy">Lessons, assignments, submissions, and quizzes should get their own Grade 11 versions.</div>
+        </div>
+      </div>
+      <div class="roadmap-row">
+        <div class="roadmap-num">3</div>
+        <div>
+          <div class="roadmap-title">Connect the real class data</div>
+          <div class="roadmap-copy">Once rosters exist, wire the Apps Script and Sheets data without mixing it with Grade 10.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2026 English Quest · Grade 11 rebuild track</footer>
+  <script>
+    localStorage.setItem('eq_grade', '11');
+    localStorage.removeItem('eq_student_class');
+    localStorage.removeItem('eq_student_no');
+    localStorage.removeItem('eq_student_name');
+  </script>
+</body>
+</html>

@@ -1,0 +1,3415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Grade 10 · English Quest</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: #7C3AED;
+      --purple-light: #A78BFA;
+      --purple-soft: #EDE9FE;
+      --purple-mid: #C4B5FD;
+      --white: #FFFFFF;
+      --off-white: #F9F7FF;
+      --text-dark: #1E1040;
+      --text-muted: #6B5B95;
+      --accent: #F59E0B;
+      --accent2: #EC4899;
+      --border: #E5DEFF;
+      --shadow: 0 4px 24px rgba(124,58,237,0.10);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'IBM Plex Sans', sans-serif;
+      background: var(--off-white);
+      color: var(--text-dark);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: relative;
+      background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 50%, #4C1D95 100%);
+      overflow: hidden;
+      padding: 60px 24px 80px;
+      text-align: center;
+    }
+
+    /* decorative blobs */
+    header::before {
+      content: '';
+      position: absolute;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: rgba(167,139,250,0.18);
+      top: -100px; left: -100px;
+      pointer-events: none;
+    }
+    header::after {
+      content: '';
+      position: absolute;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: rgba(245,158,11,0.12);
+      bottom: -80px; right: -60px;
+      pointer-events: none;
+    }
+
+    .header-blob {
+      position: absolute;
+      width: 200px; height: 200px;
+      border-radius: 50%;
+      background: rgba(236,72,153,0.10);
+      top: 20px; right: 15%;
+      pointer-events: none;
+    }
+
+    /* dot grid texture */
+    .dot-grid {
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+    }
+
+    .logo-wrap {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 20px;
+      animation: fadeDown 0.7s ease both;
+    }
+
+    .logo-wrap img {
+      width: 100px; height: 100px;
+      border-radius: 24px;
+      border: 4px solid rgba(255,255,255,0.3);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+      object-fit: cover;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .logo-badge {
+      position: absolute;
+      bottom: -6px; right: -6px;
+      background: var(--accent);
+      color: #fff;
+      font-family: 'Playfair Display', serif;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 20px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+      animation: fadeDown 0.7s 0.1s ease both;
+    }
+
+    header h1 span {
+      color: var(--accent);
+    }
+
+    .header-welcome { color: rgba(255,255,255,0.7); font-size: 0.88rem; margin-bottom: 12px; position: relative; z-index: 1; }
+    .header-sub {
+      margin-top: 10px;
+      color: rgba(255,255,255,0.75);
+      font-size: 1rem;
+      font-weight: 400;
+      animation: fadeDown 0.7s 0.2s ease both;
+    }
+
+    .header-tags {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+      animation: fadeDown 0.7s 0.3s ease both;
+    }
+
+    .tag {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff;
+      font-size: 0.78rem;
+      font-weight: 500;
+      padding: 5px 14px;
+      border-radius: 999px;
+    }
+
+    /* ── WAVE DIVIDER ── */
+    .wave {
+      display: block;
+      width: 100%;
+      margin-top: -2px;
+    }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    /* ── SECTION ── */
+    .section { margin-bottom: 52px; }
+    .grade10-dashboard { display:block; }
+    .grade11-dashboard { display:none; }
+    html[data-grade="11"] .grade10-dashboard { display:none; }
+    html[data-grade="11"] .grade11-dashboard { display:block; }
+
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--purple);
+      margin-bottom: 18px;
+    }
+
+    .section-label::before {
+      content: '';
+      display: block;
+      width: 28px; height: 3px;
+      background: linear-gradient(90deg, var(--purple), var(--purple-light));
+      border-radius: 2px;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.3rem, 3vw, 1.8rem);
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 24px;
+      line-height: 1.2;
+    }
+
+    /* ── CARD GRID ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 22px 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, var(--purple-soft) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.22s ease;
+      border-radius: 20px;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(124,58,237,0.15);
+      border-color: var(--purple-mid);
+    }
+
+    .card:hover::before { opacity: 1; }
+
+    .card-icon {
+      width: 64px; height: 64px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 1;
+      flex-shrink: 0;
+    }
+
+    .card-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      position: relative;
+      z-index: 1;
+      line-height: 1.4;
+    }
+
+    .card-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 5px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .grade11-hero {
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 24px;
+      padding: 30px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(260px, 0.8fr);
+      gap: 24px;
+      align-items: center;
+    }
+    .grade11-kicker { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#0F766E; margin-bottom:10px; }
+    .grade11-title { font-family:'Playfair Display',serif; font-size:clamp(1.9rem,4vw,3rem); line-height:1.05; font-weight:800; color:var(--text-dark); margin-bottom:12px; }
+    .grade11-copy { color:var(--text-muted); line-height:1.65; font-size:0.98rem; max-width:620px; }
+    .grade11-status { background:linear-gradient(135deg,#ECFDF5,#EEF2FF); border:1.5px solid #C7D2FE; border-radius:20px; padding:20px; }
+    .grade11-status-label { font-family:'IBM Plex Mono',monospace; font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#0F766E; margin-bottom:10px; }
+    .grade11-status-title { font-weight:800; font-size:1.05rem; margin-bottom:8px; color:var(--text-dark); }
+    .grade11-status-copy { color:var(--text-muted); font-size:0.85rem; line-height:1.55; }
+    .grade11-roadmap { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-bottom:34px; }
+    .grade11-step { background:#fff; border:1.5px solid var(--border); border-radius:18px; padding:18px; min-height:150px; }
+    .grade11-step-num { width:32px; height:32px; border-radius:50%; background:#CCFBF1; color:#0F766E; display:flex; align-items:center; justify-content:center; font-weight:800; margin-bottom:12px; }
+    .grade11-step-title { font-weight:800; margin-bottom:7px; color:var(--text-dark); }
+    .grade11-step-copy { color:var(--text-muted); font-size:0.84rem; line-height:1.55; }
+    .grade11-card-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; }
+    .grade11-card { background:#fff; border:1.5px solid var(--border); border-radius:20px; padding:22px; min-height:155px; }
+    .grade11-card-icon { width:44px; height:44px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; margin-bottom:14px; background:#E0F2FE; }
+    .grade11-card-title { font-weight:800; color:var(--text-dark); margin-bottom:8px; }
+    .grade11-card-copy { color:var(--text-muted); font-size:0.86rem; line-height:1.55; }
+
+    /* icon color themes */
+    .ic-purple { background: linear-gradient(135deg, #DDD6FE, #A78BFA); }
+    .ic-blue   { background: linear-gradient(135deg, #BFDBFE, #60A5FA); }
+    .ic-green  { background: linear-gradient(135deg, #BBF7D0, #34D399); }
+    .ic-yellow { background: linear-gradient(135deg, #FDE68A, #FBBF24); }
+    .ic-pink   { background: linear-gradient(135deg, #FBCFE8, #F472B6); }
+    .ic-orange { background: linear-gradient(135deg, #FED7AA, #FB923C); }
+    .ic-teal   { background: linear-gradient(135deg, #99F6E4, #2DD4BF); }
+    .ic-rose   { background: linear-gradient(135deg, #FECDD3, #FB7185); }
+
+    /* ── WIDE CARD (for announcements) ── */
+    .card-wide {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      cursor: pointer;
+    }
+
+    .card-wide:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(124,58,237,0.12);
+      border-color: var(--purple-mid);
+    }
+
+    .card-wide-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .card-wide-body { flex: 1; }
+
+    .card-wide-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .card-wide-sub {
+      font-size: 0.77rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .card-wide-arrow {
+      color: var(--purple-light);
+      font-size: 1.2rem;
+    }
+
+    .wide-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 14px;
+    }
+
+    /* ── HIGHLIGHT BANNER ── */
+    .highlight-banner {
+      background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 100%);
+      border-radius: 24px;
+      padding: 32px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-bottom: 52px;
+      position: relative;
+      overflow: hidden;
+      flex-wrap: wrap;
+    }
+
+    .highlight-banner::after {
+      content: '📚';
+      position: absolute;
+      right: 36px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 80px;
+      opacity: 0.12;
+      pointer-events: none;
+    }
+
+    .highlight-banner-text h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.2rem, 3vw, 1.7rem);
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .highlight-banner-text p {
+      color: rgba(255,255,255,0.75);
+      margin-top: 6px;
+      font-size: 0.9rem;
+    }
+
+    .highlight-banner-btn {
+      background: var(--accent);
+      color: #fff;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 12px 24px;
+      border-radius: 999px;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: inline-block;
+    }
+
+    .highlight-banner-btn:hover {
+      transform: scale(1.04);
+      box-shadow: 0 6px 20px rgba(245,158,11,0.4);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--text-dark);
+      color: rgba(255,255,255,0.5);
+      text-align: center;
+      padding: 28px 24px;
+      font-size: 0.82rem;
+    }
+
+    footer strong { color: var(--purple-light); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .section { animation: fadeUp 0.6s ease both; }
+    .section:nth-child(2) { animation-delay: 0.05s; }
+    .section:nth-child(3) { animation-delay: 0.1s; }
+    .section:nth-child(4) { animation-delay: 0.15s; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .card-grid { grid-template-columns: repeat(2, 1fr); }
+      .highlight-banner { padding: 24px 22px; }
+      .highlight-banner::after { display: none; }
+      .grade11-hero { grid-template-columns:1fr; padding:24px 20px; }
+      .grade11-roadmap { grid-template-columns:1fr; }
+    }
+
+
+
+
+    /* ── POPUPS (HOF + STRIKE) ── */
+    .info-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.7); backdrop-filter:blur(8px); z-index:400; display:flex; align-items:flex-end; justify-content:center; }
+    .info-overlay.hidden { display:none; }
+    .info-sheet { background:#fff; border-radius:28px 28px 0 0; width:100%; max-width:480px; max-height:88vh; overflow-y:auto; animation:infoUp 0.35s cubic-bezier(0.34,1.2,0.64,1); padding-bottom:28px; }
+    @keyframes infoUp { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
+    .info-handle { width:40px; height:4px; background:#E5DEFF; border-radius:999px; margin:12px auto 0; }
+    .info-head { padding:18px 20px 14px; border-bottom:1.5px solid #E5DEFF; display:flex; align-items:center; gap:12px; }
+    .info-avatar { width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Playfair Display',serif; font-weight:800; font-size:1.2rem; color:#fff; flex-shrink:0; }
+    .info-head-name { font-family:'Playfair Display',serif; font-size:1.05rem; font-weight:700; color:#1E1040; }
+    .info-head-sub { font-size:0.75rem; color:#6B5B95; margin-top:2px; }
+    .info-close { margin-left:auto; width:30px; height:30px; border-radius:50%; background:#F9F7FF; border:1.5px solid #E5DEFF; color:#6B5B95; cursor:pointer; font-size:0.9rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .info-body { padding:16px 20px; }
+
+    /* HOF stats */
+    .hof-popup-total { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+    .hof-popup-total-label { font-size:0.72rem; font-weight:700; color:#6B5B95; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; }
+    .hof-popup-total-val { font-size:0.95rem; font-weight:700; color:#7C3AED; font-family:'IBM Plex Mono',monospace; }
+    .hof-popup-bar-wrap { background:#E5DEFF; border-radius:999px; height:8px; overflow:hidden; margin-bottom:18px; }
+    .hof-popup-bar { height:8px; border-radius:999px; background:linear-gradient(90deg,#7C3AED,#A78BFA); transition:width 0.7s ease; }
+    .hof-stat-cards { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .hof-stat-card { background:#F9F7FF; border:1.5px solid #E5DEFF; border-radius:12px; padding:10px 12px; }
+    .hof-stat-card-top { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+    .hof-stat-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+    .hof-stat-cat { font-size:0.65rem; font-weight:700; color:#6B5B95; text-transform:uppercase; letter-spacing:0.04em; font-family:'IBM Plex Mono',monospace; }
+    .hof-stat-nums { display:flex; justify-content:space-between; align-items:flex-end; }
+    .hof-stat-times { font-size:1.1rem; font-weight:800; color:#1E1040; font-family:'Playfair Display',serif; line-height:1; }
+    .hof-stat-times small { font-size:0.6rem; color:#6B5B95; font-weight:500; font-family:'IBM Plex Sans',sans-serif; display:block; margin-top:1px; }
+    .hof-stat-pts { font-size:0.8rem; font-weight:700; font-family:'IBM Plex Mono',monospace; }
+    .hof-popup-indicator { margin-top:14px; padding:10px 14px; border-radius:12px; font-size:0.82rem; font-weight:700; text-align:center; }
+
+    /* Strike popup */
+    .strike-popup-dots { display:flex; gap:10px; margin-bottom:14px; }
+    .strike-popup-dot { width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.1rem; border:2px solid; }
+    .strike-popup-dot.hit  { background:#FEE2E2; border-color:#FCA5A5; }
+    .strike-popup-dot.miss { background:#F9F7FF; border-color:#E5DEFF; }
+    .strike-popup-detail { background:#F9F7FF; border:1.5px solid #E5DEFF; border-radius:12px; padding:12px 14px; }
+    .strike-popup-row { display:flex; gap:10px; margin-bottom:8px; align-items:flex-start; }
+    .strike-popup-row:last-child { margin-bottom:0; }
+    .strike-popup-label { font-size:0.7rem; font-weight:700; color:#6B5B95; text-transform:uppercase; letter-spacing:0.06em; font-family:'IBM Plex Mono',monospace; min-width:55px; flex-shrink:0; padding-top:1px; }
+    .strike-popup-val { font-size:0.88rem; color:#1E1040; font-weight:500; }
+    .hof-row, .strike-list-row { cursor:pointer; }
+    .hof-row:hover .hof-name, .strike-list-row:hover .sl-name { color:var(--purple); }
+
+    /* ── STRIKE INFO MODAL ── */
+    .strike-info-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.7); backdrop-filter:blur(8px); z-index:400; display:flex; align-items:flex-end; justify-content:center; padding:0; }
+    .strike-info-overlay.hidden { display:none; }
+    .strike-info-sheet { background:#fff; border-radius:28px 28px 0 0; width:100%; max-width:540px; max-height:88vh; overflow-y:auto; padding:0 0 40px; animation:sheetUp 0.35s cubic-bezier(0.34,1.2,0.64,1); }
+    @keyframes sheetUp { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
+    .si-handle { width:40px; height:4px; background:#E5DEFF; border-radius:999px; margin:14px auto 0; }
+    .si-head { padding:20px 24px 16px; border-bottom:1.5px solid #FEE2E2; background:linear-gradient(135deg,#DC2626,#991B1B); border-radius:28px 28px 0 0; }
+    .si-head-title { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:800; color:#fff; margin-bottom:4px; }
+    .si-head-sub { font-size:0.8rem; color:rgba(255,255,255,0.7); }
+    .si-close { float:right; background:rgba(255,255,255,0.2); border:none; color:#fff; width:30px; height:30px; border-radius:50%; cursor:pointer; font-size:0.9rem; margin-top:-2px; }
+
+    .si-body { padding:20px 24px 0; }
+
+    /* Consequences */
+    .si-cons-title { font-size:0.7rem; font-weight:800; color:#DC2626; text-transform:uppercase; letter-spacing:0.1em; font-family:'IBM Plex Mono',monospace; margin-bottom:12px; }
+    .si-con-row { display:flex; gap:12px; align-items:flex-start; padding:12px 14px; border-radius:14px; margin-bottom:8px; }
+    .si-con-row.one   { background:#FEF3C7; border:1.5px solid #FCD34D; }
+    .si-con-row.three { background:#FEE2E2; border:1.5px solid #FCA5A5; }
+    .si-con-icon { font-size:1.3rem; flex-shrink:0; }
+    .si-con-label { font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; font-family:'IBM Plex Mono',monospace; margin-bottom:3px; }
+    .si-con-row.one   .si-con-label { color:#92400E; }
+    .si-con-row.three .si-con-label { color:#991B1B; }
+    .si-con-text { font-size:0.88rem; font-weight:600; color:var(--text-dark); line-height:1.4; }
+    .si-con-sub  { font-size:0.75rem; color:var(--text-muted); margin-top:3px; }
+
+    /* Divider */
+    .si-divider { display:flex; align-items:center; gap:10px; margin:18px 0; }
+    .si-divider-line { flex:1; height:1px; background:var(--border); }
+    .si-divider-label { font-size:0.7rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; white-space:nowrap; }
+
+    /* Clearance steps */
+    .si-step { display:flex; gap:12px; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--border); }
+    .si-step:last-child { border-bottom:none; }
+    .si-step-num { width:26px; height:26px; border-radius:50%; background:var(--purple-soft); color:var(--purple); font-size:0.75rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-family:'IBM Plex Mono',monospace; }
+    .si-step-text { font-size:0.88rem; color:var(--text-dark); line-height:1.5; padding-top:3px; }
+    .si-step-text strong { color:var(--purple); }
+    .si-step-text span { display:block; font-size:0.78rem; color:var(--text-muted); margin-top:3px; }
+
+    /* Full guide link */
+    .si-full-link { display:block; text-align:center; margin-top:18px; padding:13px; background:var(--purple-soft); border:1.5px solid var(--purple-mid); border-radius:14px; font-size:0.88rem; font-weight:700; color:var(--purple); text-decoration:none; }
+    .si-full-link:hover { background:var(--purple-mid); }
+
+
+
+    /* ── POPUPS (HOF + STRIKE) ── */
+    .info-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.7); backdrop-filter:blur(8px); z-index:400; display:flex; align-items:flex-end; justify-content:center; }
+    .info-overlay.hidden { display:none; }
+    .info-sheet { background:#fff; border-radius:28px 28px 0 0; width:100%; max-width:480px; max-height:88vh; overflow-y:auto; animation:infoUp 0.35s cubic-bezier(0.34,1.2,0.64,1); padding-bottom:28px; }
+    @keyframes infoUp { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
+    .info-handle { width:40px; height:4px; background:#E5DEFF; border-radius:999px; margin:12px auto 0; }
+    .info-head { padding:18px 20px 14px; border-bottom:1.5px solid #E5DEFF; display:flex; align-items:center; gap:12px; }
+    .info-avatar { width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'Playfair Display',serif; font-weight:800; font-size:1.2rem; color:#fff; flex-shrink:0; }
+    .info-head-name { font-family:'Playfair Display',serif; font-size:1.05rem; font-weight:700; color:#1E1040; }
+    .info-head-sub { font-size:0.75rem; color:#6B5B95; margin-top:2px; }
+    .info-close { margin-left:auto; width:30px; height:30px; border-radius:50%; background:#F9F7FF; border:1.5px solid #E5DEFF; color:#6B5B95; cursor:pointer; font-size:0.9rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .info-body { padding:16px 20px; }
+
+    /* HOF stats */
+    .hof-popup-total { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+    .hof-popup-total-label { font-size:0.72rem; font-weight:700; color:#6B5B95; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; }
+    .hof-popup-total-val { font-size:0.95rem; font-weight:700; color:#7C3AED; font-family:'IBM Plex Mono',monospace; }
+    .hof-popup-bar-wrap { background:#E5DEFF; border-radius:999px; height:8px; overflow:hidden; margin-bottom:18px; }
+    .hof-popup-bar { height:8px; border-radius:999px; background:linear-gradient(90deg,#7C3AED,#A78BFA); transition:width 0.7s ease; }
+    .hof-stat-cards { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .hof-stat-card { background:#F9F7FF; border:1.5px solid #E5DEFF; border-radius:12px; padding:10px 12px; }
+    .hof-stat-card-top { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+    .hof-stat-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+    .hof-stat-cat { font-size:0.65rem; font-weight:700; color:#6B5B95; text-transform:uppercase; letter-spacing:0.04em; font-family:'IBM Plex Mono',monospace; }
+    .hof-stat-nums { display:flex; justify-content:space-between; align-items:flex-end; }
+    .hof-stat-times { font-size:1.1rem; font-weight:800; color:#1E1040; font-family:'Playfair Display',serif; line-height:1; }
+    .hof-stat-times small { font-size:0.6rem; color:#6B5B95; font-weight:500; font-family:'IBM Plex Sans',sans-serif; display:block; margin-top:1px; }
+    .hof-stat-pts { font-size:0.8rem; font-weight:700; font-family:'IBM Plex Mono',monospace; }
+    .hof-popup-indicator { margin-top:14px; padding:10px 14px; border-radius:12px; font-size:0.82rem; font-weight:700; text-align:center; }
+
+    /* Strike popup */
+    .strike-popup-dots { display:flex; gap:10px; margin-bottom:14px; }
+    .strike-popup-dot { width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.1rem; border:2px solid; }
+    .strike-popup-dot.hit  { background:#FEE2E2; border-color:#FCA5A5; }
+    .strike-popup-dot.miss { background:#F9F7FF; border-color:#E5DEFF; }
+    .strike-popup-detail { background:#F9F7FF; border:1.5px solid #E5DEFF; border-radius:12px; padding:12px 14px; }
+    .strike-popup-row { display:flex; gap:10px; margin-bottom:8px; align-items:flex-start; }
+    .strike-popup-row:last-child { margin-bottom:0; }
+    .strike-popup-label { font-size:0.7rem; font-weight:700; color:#6B5B95; text-transform:uppercase; letter-spacing:0.06em; font-family:'IBM Plex Mono',monospace; min-width:55px; flex-shrink:0; padding-top:1px; }
+    .strike-popup-val { font-size:0.88rem; color:#1E1040; font-weight:500; }
+    .hof-row, .strike-list-row { cursor:pointer; }
+    .hof-row:hover .hof-name, .strike-list-row:hover .sl-name { color:var(--purple); }
+
+    /* ── STRIKE INFO MODAL ── */
+    .si-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.7); backdrop-filter:blur(8px); z-index:400; display:flex; align-items:flex-end; justify-content:center; }
+    .si-overlay.hidden { display:none; }
+    .si-sheet { background:#fff; border-radius:28px 28px 0 0; width:100%; max-width:540px; max-height:90vh; overflow-y:auto; padding-bottom:32px; animation:siUp 0.35s cubic-bezier(0.34,1.2,0.64,1); }
+    @keyframes siUp { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
+    .si-handle { width:40px; height:4px; background:#E5DEFF; border-radius:999px; margin:12px auto 0; }
+    .si-head { padding:20px 24px 16px; border-bottom:1.5px solid #FEE2E2; display:flex; align-items:center; gap:14px; }
+    .si-head-icon { font-size:1.8rem; }
+    .si-head-title { font-family:'Playfair Display',serif; font-size:1.15rem; font-weight:800; color:#1E1040; }
+    .si-head-sub { font-size:0.78rem; color:#6B5B95; margin-top:2px; }
+    .si-close { margin-left:auto; width:32px; height:32px; border-radius:50%; background:#F9F7FF; border:1.5px solid #E5DEFF; color:#6B5B95; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+
+    /* Consequence cards */
+    .si-consequences { padding:18px 20px; display:flex; flex-direction:column; gap:10px; border-bottom:1.5px solid #E5DEFF; }
+    .si-cons-title { font-size:0.7rem; font-weight:700; color:#6B5B95; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:4px; }
+    .si-cons-card { border-radius:14px; padding:14px 16px; display:flex; gap:12px; align-items:flex-start; border:1.5px solid; }
+    .si-cons-card.c1 { background:#FEF3C7; border-color:#FCD34D; }
+    .si-cons-card.c2 { background:#FEE2E2; border-color:#FCA5A5; }
+    .si-cons-card.c3 { background:#7C3AED; border-color:#5B21B6; }
+    .si-cons-icon { font-size:1.4rem; flex-shrink:0; }
+    .si-cons-strikes { font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:3px; }
+    .c1 .si-cons-strikes { color:#92400E; }
+    .c2 .si-cons-strikes { color:#991B1B; }
+    .c3 .si-cons-strikes { color:rgba(255,255,255,0.7); }
+    .si-cons-text { font-size:0.88rem; font-weight:700; }
+    .c1 .si-cons-text { color:#92400E; }
+    .c2 .si-cons-text { color:#991B1B; }
+    .c3 .si-cons-text { color:#fff; }
+    .si-cons-sub { font-size:0.75rem; margin-top:2px; }
+    .c1 .si-cons-sub { color:#92400E; opacity:0.75; }
+    .c2 .si-cons-sub { color:#991B1B; opacity:0.75; }
+    .c3 .si-cons-sub { color:rgba(255,255,255,0.65); }
+
+    /* Clearance steps */
+    .si-clear { padding:18px 20px; }
+    .si-clear-title { font-size:0.7rem; font-weight:700; color:#6B5B95; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:14px; }
+    .si-step { display:flex; gap:12px; align-items:flex-start; margin-bottom:14px; }
+    .si-step:last-child { margin-bottom:0; }
+    .si-step-num { width:28px; height:28px; border-radius:50%; background:#EDE9FE; color:#5B21B6; font-size:0.78rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-family:'IBM Plex Mono',monospace; }
+    .si-step-text { font-size:0.88rem; color:#1E1040; line-height:1.5; padding-top:4px; }
+    .si-step-text strong { color:#7C3AED; }
+    .si-step-text span { display:block; font-size:0.78rem; color:#6B5B95; margin-top:3px; }
+
+    /* Chapter badge */
+    .si-chapter { display:inline-flex; align-items:center; gap:8px; background:#EDE9FE; border:1.5px solid #C4B5FD; border-radius:10px; padding:6px 12px; margin-top:6px; }
+    .si-chapter-label { font-size:0.65rem; font-weight:700; color:#A78BFA; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; }
+    .si-chapter-val { font-size:0.82rem; font-weight:700; color:#5B21B6; }
+
+    /* ── STRIKE LIST ── */
+    .strike-list-section { margin-bottom: 40px; }
+    .strike-list-wrap { background: var(--white); border: 1.5px solid #FCA5A5; border-radius: 20px; overflow: hidden; }
+    .strike-list-header { background: linear-gradient(135deg, #DC2626, #991B1B); padding: 16px 20px; display: flex; align-items: center; gap: 12px; }
+    .strike-list-header-text { flex: 1; }
+    .strike-list-header-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: #fff; }
+    .strike-list-header-sub { font-size: 0.75rem; color: rgba(255,255,255,0.65); margin-top: 2px; }
+    .strike-pulse { width: 10px; height: 10px; border-radius: 50%; background: #FCA5A5; flex-shrink: 0; animation: strPulse 1.4s ease-in-out infinite; }
+    @keyframes strPulse { 0%,100%{box-shadow:0 0 0 0 rgba(252,165,165,0.7)} 50%{box-shadow:0 0 0 8px rgba(252,165,165,0)} }
+
+    .strike-list-row { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid #FEE2E2; transition: background 0.15s; }
+    .strike-list-row:last-child { border-bottom: none; }
+    .strike-list-row:hover { background: #FFF5F5; }
+    .sl-num { font-size: 0.72rem; font-weight: 700; color: #FCA5A5; width: 20px; flex-shrink: 0; text-align: center; font-family: 'IBM Plex Mono', monospace; }
+    .sl-avatar { width: 34px; height: 34px; border-radius: 50%; background: #FEE2E2; border: 2px solid #FCA5A5; display: flex; align-items: center; justify-content: center; font-size: 0.88rem; font-weight: 700; color: #DC2626; flex-shrink: 0; font-family: 'Playfair Display', serif; }
+    .sl-info { flex: 1; min-width: 0; }
+    .sl-name { font-size: 0.9rem; font-weight: 700; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sl-class { font-size: 0.7rem; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; margin-top: 1px; }
+    .sl-strikes { display: flex; gap: 4px; flex-shrink: 0; }
+    .sl-dot { width: 16px; height: 16px; border-radius: 50%; font-size: 0.6rem; display: flex; align-items: center; justify-content: center; }
+    .sl-dot.hit  { background: #FEE2E2; }
+    .sl-dot.miss { background: var(--border); }
+
+    .strike-empty { padding: 32px; text-align: center; }
+    .strike-empty-icon { font-size: 2rem; margin-bottom: 8px; }
+    .strike-empty-text { font-size: 0.88rem; color: var(--text-muted); }
+
+    .strike-list-footer { padding: 10px 20px; background: #FFF5F5; border-top: 1px solid #FEE2E2; text-align: center; }
+    .strike-list-footer a { font-size: 0.78rem; font-weight: 700; color: #DC2626; text-decoration: none; font-family: 'IBM Plex Mono', monospace; }
+
+    /* ── HALL OF FAME ── */
+    .hof-section { margin-bottom: 40px; }
+    .hof-title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+    .hof-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 800; color: var(--text-dark); }
+    .hof-subtitle { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
+    .hof-loading { text-align: center; padding: 32px; color: var(--text-muted); font-size: 0.88rem; }
+    .hof-spinner { display: inline-block; width: 20px; height: 20px; border: 2.5px solid var(--border); border-top-color: var(--purple); border-radius: 50%; animation: hofSpin 0.8s linear infinite; margin-bottom: 8px; }
+    @keyframes hofSpin { to { transform: rotate(360deg); } }
+
+    /* Top 5 leaderboard */
+    .hof-top5 { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; margin-bottom: 16px; }
+    .hof-top5-header { background: linear-gradient(135deg, #7C3AED, #5B21B6); padding: 14px 20px; display: flex; align-items: center; gap: 10px; }
+    .hof-top5-header-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: #fff; }
+    .hof-top5-header-sub { font-size: 0.75rem; color: rgba(255,255,255,0.65); margin-top: 1px; }
+    .hof-row { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    .hof-row:last-child { border-bottom: none; }
+    .hof-row:hover { background: var(--off-white); }
+    .hof-rank { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 800; width: 32px; text-align: center; flex-shrink: 0; }
+    .hof-rank-1 { color: #F59E0B; }
+    .hof-rank-2 { color: #9CA3AF; }
+    .hof-rank-3 { color: #B45309; }
+    .hof-rank-n { color: var(--purple-light); font-size: 0.85rem; }
+    .hof-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 0.95rem; color: #fff; flex-shrink: 0; }
+    .hof-info { flex: 1; min-width: 0; }
+    .hof-name { font-size: 0.92rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hof-class { font-size: 0.72rem; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; }
+    .hof-pts { font-family: 'IBM Plex Mono', monospace; font-size: 0.88rem; font-weight: 700; color: var(--purple); text-align: right; flex-shrink: 0; }
+    .hof-bar-wrap { width: 80px; background: var(--border); border-radius: 999px; height: 5px; overflow: hidden; flex-shrink: 0; }
+    .hof-bar { height: 5px; border-radius: 999px; background: linear-gradient(90deg, var(--purple), var(--purple-light)); }
+
+    /* Category champions */
+    .hof-champs-title { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; font-family: 'IBM Plex Mono', monospace; }
+    .hof-champs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
+    .hof-champ-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 16px; padding: 14px 12px; text-align: center; transition: transform 0.15s, box-shadow 0.15s; }
+    .hof-champ-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(124,58,237,0.1); }
+    .hof-champ-icon { font-size: 1.5rem; margin-bottom: 6px; }
+    .hof-champ-cat { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-family: 'IBM Plex Mono', monospace; margin-bottom: 6px; }
+    .hof-champ-name { font-family: 'Playfair Display', serif; font-size: 0.88rem; font-weight: 700; color: var(--text-dark); line-height: 1.2; margin-bottom: 3px; }
+    .hof-champ-class { font-size: 0.68rem; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; margin-bottom: 6px; }
+    .hof-champ-val { font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; display: inline-block; }
+
+
+    /* ── SCHEDULE ── */
+    .sched-wrap { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; margin-bottom: 16px; }
+    .sched-header { display: flex; align-items: center; gap: 12px; padding: 16px 20px; cursor: pointer; user-select: none; transition: background 0.15s; }
+    .sched-header:hover { background: var(--off-white); }
+    .sched-icon { font-size: 1.3rem; }
+    .sched-header-text { flex: 1; }
+    .sched-header-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; }
+    .sched-header-sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 1px; }
+    .sched-arrow { font-size: 1.1rem; color: var(--text-muted); transition: transform 0.3s; }
+    .sched-arrow.open { transform: rotate(90deg); }
+    .sched-body { display: none; border-top: 1.5px solid var(--border); }
+    .sched-body.open { display: block; }
+
+    /* Day tabs */
+    .sched-days { display: flex; overflow-x: auto; border-bottom: 1.5px solid var(--border); scrollbar-width: none; }
+    .sched-days::-webkit-scrollbar { display: none; }
+    .sched-day-btn { padding: 11px 18px; font-size: 0.82rem; font-weight: 700; border: none; background: none; cursor: pointer; white-space: nowrap; color: var(--text-muted); border-bottom: 2.5px solid transparent; margin-bottom: -2px; font-family: 'IBM Plex Sans', sans-serif; transition: all 0.2s; flex-shrink: 0; }
+    .sched-day-btn.active { color: var(--purple); border-bottom-color: var(--purple); }
+    .sched-day-btn.today { color: var(--accent); border-bottom-color: var(--accent); }
+    .sched-day-btn.today.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* Schedule items */
+    .sched-content { padding: 4px 0 8px; }
+    .sched-item { display: flex; align-items: center; gap: 14px; padding: 12px 20px; border-bottom: 1px solid var(--border); }
+    .sched-item:last-child { border-bottom: none; }
+    .sched-item.now { background: linear-gradient(90deg, rgba(124,58,237,0.06), transparent); }
+    .sched-period { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; font-weight: 700; color: var(--purple-light); min-width: 28px; text-align: center; background: var(--purple-soft); border-radius: 6px; padding: 3px 6px; flex-shrink: 0; }
+    .sched-time { font-size: 0.78rem; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; min-width: 100px; flex-shrink: 0; }
+    .sched-class-badge { font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem; font-weight: 700; padding: 5px 14px; border-radius: 999px; flex-shrink: 0; }
+    .sched-now-badge { font-size: 0.68rem; font-weight: 700; color: var(--accent); background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.3); padding: 2px 8px; border-radius: 999px; margin-left: auto; white-space: nowrap; }
+    .sched-break { display: flex; align-items: center; gap: 10px; padding: 8px 20px; }
+    .sched-break-line { flex: 1; height: 1px; background: var(--border); }
+    .sched-break-label { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap; font-family: 'IBM Plex Mono', monospace; }
+
+    /* Class color badges */
+    .cls-e1  { background: #EDE9FE; color: #5B21B6; }
+    .cls-e4  { background: #DBEAFE; color: #1D4ED8; }
+    .cls-e5  { background: #D1FAE5; color: #065F46; }
+    .cls-e6  { background: #FEF3C7; color: #92400E; }
+    .cls-e7  { background: #FCE7F3; color: #9D174D; }
+    .cls-e8  { background: #FEE2E2; color: #991B1B; }
+    .cls-e9  { background: #F0FDF4; color: #166534; }
+    .cls-e10 { background: #FFF7ED; color: #9A3412; }
+    .cls-e11 { background: #F5F3FF; color: #4C1D95; }
+
+
+
+    /* ── SIDEBAR NAV ── */
+    .hamburger { position:absolute; top:20px; right:20px; z-index:10; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); border-radius:10px; width:40px; height:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; cursor:pointer; padding:0; }
+    .hamburger span { display:block; width:18px; height:2px; background:#fff; border-radius:999px; transition:all 0.3s; }
+    .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity:0; }
+    .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+
+    .sidebar-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.6); backdrop-filter:blur(6px); z-index:300; opacity:0; pointer-events:none; transition:opacity 0.3s; }
+    .sidebar-overlay.open { opacity:1; pointer-events:all; }
+
+    .sidebar { position:fixed; top:0; right:0; height:100%; width:min(320px,85vw); background:#1E1040; z-index:301; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.34,1.1,0.64,1); display:flex; flex-direction:column; overflow-y:auto; }
+    .sidebar.open { transform:translateX(0); }
+
+    .sidebar-head { padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; gap:12px; }
+    .sidebar-logo { width:36px; height:36px; border-radius:10px; object-fit:cover; }
+    .sidebar-head-text { flex:1; }
+    .sidebar-head-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:800; color:#fff; }
+    .sidebar-head-sub { font-size:0.7rem; color:rgba(255,255,255,0.45); margin-top:1px; }
+    .sidebar-close { width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,0.08); border:none; color:rgba(255,255,255,0.5); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
+
+    .sidebar-section { padding:14px 16px 4px; }
+    .sidebar-section-label { font-size:0.65rem; font-weight:700; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.12em; font-family:'IBM Plex Mono',monospace; padding:0 4px; margin-bottom:6px; }
+    .sidebar-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; text-decoration:none; transition:background 0.15s; margin-bottom:2px; }
+    .sidebar-item:hover, .sidebar-item:active { background:rgba(255,255,255,0.08); }
+    .sidebar-item-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0; }
+    .sidebar-item-name { font-size:0.88rem; font-weight:600; color:#fff; flex:1; }
+    .sidebar-item-badge { font-size:0.6rem; font-weight:800; padding:2px 7px; border-radius:999px; font-family:'IBM Plex Mono',monospace; }
+    .badge-soon { background:rgba(245,158,11,0.2); color:#FCD34D; }
+    .badge-new  { background:rgba(16,185,129,0.2); color:#6EE7B7; }
+
+    .sidebar-divider { height:1px; background:rgba(255,255,255,0.07); margin:8px 16px; }
+
+    .sidebar-teacher { margin:12px 16px; background:rgba(124,58,237,0.2); border:1px solid rgba(124,58,237,0.35); border-radius:14px; padding:12px 14px; }
+    .sidebar-teacher-label { font-size:0.68rem; font-weight:700; color:#A78BFA; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
+    .sidebar-teacher-btn { width:100%; padding:10px; background:linear-gradient(135deg,#7C3AED,#5B21B6); color:#fff; font-family:'IBM Plex Sans',sans-serif; font-weight:700; font-size:0.85rem; border:none; border-radius:10px; cursor:pointer; }
+    .sidebar-teacher-logged { font-size:0.82rem; color:#A78BFA; font-weight:600; display:flex; align-items:center; gap:8px; }
+    .sidebar-teacher-logged span { cursor:pointer; color:rgba(255,255,255,0.4); font-size:0.75rem; margin-left:auto; }
+
+    /* ── SUMMATIVE BANNER ── */
+    .summ-banner {
+      position: sticky; top: 0; z-index: 200;
+      background: linear-gradient(135deg, #DC2626 0%, #991B1B 50%, #7F1D1D 100%);
+      border-bottom: 2px solid #FCA5A5;
+      padding: 0;
+      display: none; /* shown by JS when data exists */
+    }
+    .summ-banner.visible { display: block; }
+    .summ-banner-inner {
+      max-width: 960px; margin: 0 auto;
+      padding: 10px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .summ-pulse { width: 10px; height: 10px; border-radius: 50%; background: #FCA5A5; flex-shrink: 0;
+      animation: sumPulse 1.4s ease-in-out infinite; }
+    @keyframes sumPulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(252,165,165,0.7); }
+      50% { box-shadow: 0 0 0 8px rgba(252,165,165,0); }
+    }
+    .summ-label { font-size: 0.7rem; font-weight: 800; color: #FCA5A5; text-transform: uppercase;
+      letter-spacing: 0.1em; font-family: 'IBM Plex Mono', monospace; flex-shrink: 0; }
+    .summ-divider { width: 1px; height: 18px; background: rgba(255,255,255,0.2); flex-shrink: 0; }
+    .summ-text { flex: 1; font-size: 0.88rem; color: #fff; font-weight: 600; line-height: 1.4; }
+    .summ-text strong { color: #FCA5A5; }
+    .summ-countdown { font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem; font-weight: 700;
+      background: rgba(0,0,0,0.25); color: #fff; padding: 4px 12px; border-radius: 999px;
+      white-space: nowrap; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.15); }
+    .summ-countdown.urgent { background: rgba(255,255,255,0.15); color: #FEF2F2; animation: urgentBlink 1s ease-in-out infinite; }
+    @keyframes urgentBlink { 0%,100%{opacity:1} 50%{opacity:0.6} }
+    .summ-edit-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+      color: #fff; font-size: 0.72rem; font-weight: 700; padding: 4px 12px; border-radius: 999px;
+      cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; flex-shrink: 0; display: none; }
+    .summ-edit-btn.visible { display: block; }
+    .summ-edit-btn:hover { background: rgba(255,255,255,0.25); }
+
+
+    /* Floating summative set button for teacher */
+    .summ-float-btn {
+      position: fixed; bottom: 24px; right: 20px; z-index: 300;
+      background: linear-gradient(135deg, #DC2626, #991B1B);
+      color: #fff; border: none; border-radius: 999px;
+      padding: 12px 20px; font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.85rem; font-weight: 700; cursor: pointer;
+      display: none; align-items: center; gap: 8px;
+      box-shadow: 0 4px 20px rgba(220,38,38,0.4);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .summ-float-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(220,38,38,0.5); }
+
+    /* Teacher panel modal */
+    .summ-overlay { position: fixed; inset: 0; background: rgba(15,10,40,0.7); backdrop-filter: blur(6px);
+      z-index: 500; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .summ-overlay.hidden { display: none; }
+    .summ-modal { background: #fff; border-radius: 24px; padding: 32px 28px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+    .summ-modal-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 800; margin-bottom: 4px; color: #1E1040; }
+    .summ-modal-sub { font-size: 0.85rem; color: #6B5B95; margin-bottom: 24px; }
+    .summ-field { margin-bottom: 16px; }
+    .summ-field label { display: block; font-size: 0.75rem; font-weight: 700; color: #6B5B95;
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+    .summ-field input, .summ-field textarea, .summ-field select {
+      width: 100%; padding: 12px 16px; border: 1.5px solid #E5DEFF; border-radius: 12px;
+      font-family: 'IBM Plex Sans', sans-serif; font-size: 0.95rem; outline: none; color: #1E1040;
+      background: #F9F7FF; }
+    .summ-field input:focus, .summ-field textarea:focus, .summ-field select:focus { border-color: #A78BFA; }
+    .summ-field textarea { resize: none; height: 80px; }
+    .summ-classes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .summ-cls-btn { padding: 8px 6px; border: 1.5px solid #E5DEFF; border-radius: 10px; font-size: 0.78rem;
+      font-weight: 700; cursor: pointer; background: #F9F7FF; color: #6B5B95; font-family: 'IBM Plex Mono', monospace;
+      text-align: center; transition: all 0.15s; }
+    .summ-cls-btn.selected { background: #EDE9FE; border-color: #7C3AED; color: #5B21B6; }
+    .summ-modal-btns { display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
+    .summ-btn-save { flex: 1; padding: 13px; background: linear-gradient(135deg, #DC2626, #991B1B);
+      color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 0.95rem;
+      border: none; border-radius: 12px; cursor: pointer; }
+    .summ-btn-clear { padding: 13px 18px; background: #F9F7FF; border: 1.5px solid #E5DEFF;
+      border-radius: 12px; font-family: 'IBM Plex Sans', sans-serif; cursor: pointer; color: #6B5B95; }
+    .summ-btn-cancel { padding: 13px 18px; background: #F9F7FF; border: 1.5px solid #E5DEFF;
+      border-radius: 12px; font-family: 'IBM Plex Sans', sans-serif; cursor: pointer; color: #6B5B95; }
+
+    /* Toast */
+    .summ-toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #1E1040; color: #fff; padding: 12px 24px; border-radius: 999px; font-size: 0.9rem;
+      font-weight: 500; transition: transform 0.3s; z-index: 999; white-space: nowrap; pointer-events: none; }
+    .summ-toast.show { transform: translateX(-50%) translateY(0); }
+    .summ-toast.ok  { background: #059669; }
+    .summ-toast.err { background: #DC2626; }
+
+
+    /* STUDENT IDENTITY */
+    .student-greeting { display:none; align-items:center; gap:10px; margin-top:14px; position:relative; z-index:2; background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.25); border-radius:16px; padding:10px 16px; max-width:340px; margin-left:auto; margin-right:auto; }
+    .student-greeting.show { display:flex; }
+    .sg-avatar { width:36px; height:36px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1rem; color:#fff; flex-shrink:0; font-family:'Playfair Display',serif; }
+    .sg-info { flex:1; text-align:left; }
+    .sg-name { font-size:0.88rem; font-weight:700; color:#fff; }
+    .sg-class { font-size:0.72rem; color:rgba(255,255,255,0.65); }
+    .sg-change { font-size:0.7rem; color:rgba(255,255,255,0.5); cursor:pointer; text-decoration:underline; flex-shrink:0; }
+    .sg-change:hover { color:rgba(255,255,255,0.85); }
+
+    /* GRADE SELECTOR */
+    .grade-chip { display:inline-flex; align-items:center; gap:8px; margin-top:14px; position:relative; z-index:2; background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.25); color:#fff; border-radius:999px; padding:8px 16px; font-size:0.82rem; font-weight:700; }
+    .grade-chip button { background:transparent; border:none; color:rgba(255,255,255,0.68); font-family:inherit; font-size:0.74rem; font-weight:700; cursor:pointer; text-decoration:underline; padding:0; }
+    .grade-gate { position:fixed; inset:0; z-index:650; background:linear-gradient(135deg,rgba(30,16,64,0.96),rgba(76,29,149,0.94)); backdrop-filter:blur(12px); display:flex; align-items:center; justify-content:center; padding:22px; }
+    .grade-gate.hidden { display:none; }
+    .grade-gate-card { width:100%; max-width:760px; color:#fff; text-align:center; }
+    .grade-gate-logo { width:76px; height:76px; border-radius:22px; object-fit:cover; border:3px solid rgba(255,255,255,0.28); box-shadow:0 18px 48px rgba(0,0,0,0.28); margin-bottom:18px; }
+    .grade-gate-title { font-family:'Playfair Display',serif; font-size:clamp(2rem,6vw,3.2rem); line-height:1.05; font-weight:800; margin-bottom:10px; }
+    .grade-gate-sub { color:rgba(255,255,255,0.72); font-size:1rem; max-width:520px; margin:0 auto 26px; line-height:1.55; }
+    .grade-choice-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+    .grade-choice { border:1.5px solid rgba(255,255,255,0.22); background:rgba(255,255,255,0.1); color:#fff; border-radius:20px; padding:26px 22px; text-align:left; cursor:pointer; transition:transform 0.18s ease, background 0.18s ease, border-color 0.18s ease; font-family:inherit; min-height:170px; }
+    .grade-choice:hover { transform:translateY(-3px); background:rgba(255,255,255,0.16); border-color:rgba(255,255,255,0.42); }
+    .grade-choice-kicker { font-size:0.72rem; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.12em; color:var(--accent); font-weight:700; margin-bottom:10px; }
+    .grade-choice-title { font-family:'Playfair Display',serif; font-size:1.55rem; font-weight:800; margin-bottom:8px; }
+    .grade-choice-copy { font-size:0.88rem; color:rgba(255,255,255,0.68); line-height:1.5; }
+    .sidebar-grade { margin:12px 16px 0; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); border-radius:14px; padding:12px 14px; }
+    .sidebar-grade-label { font-size:0.68rem; font-weight:700; color:rgba(255,255,255,0.36); text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:7px; }
+    .sidebar-grade-row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .sidebar-grade-value { color:#fff; font-weight:800; font-size:0.88rem; }
+    .sidebar-grade-btn { border:none; background:rgba(255,255,255,0.12); color:#fff; border-radius:999px; padding:6px 10px; font-family:inherit; font-size:0.72rem; font-weight:700; cursor:pointer; }
+
+    @media (max-width: 640px) {
+      .grade-choice-grid { grid-template-columns:1fr; }
+      .grade-gate-card { text-align:left; }
+      .grade-gate-sub { margin-left:0; margin-right:0; }
+    }
+
+    /* SETUP MODAL */
+    .setup-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.85); backdrop-filter:blur(10px); z-index:500; display:flex; align-items:center; justify-content:center; padding:20px; }
+    .setup-overlay.hidden { display:none; }
+    .setup-card { background:#fff; border-radius:28px; width:100%; max-width:420px; overflow:hidden; box-shadow:0 32px 80px rgba(0,0,0,0.3); }
+    .setup-top { background:linear-gradient(135deg,#7C3AED,#5B21B6); padding:32px 28px 24px; text-align:center; }
+    .setup-top-icon { font-size:2.5rem; margin-bottom:12px; }
+    .setup-top-title { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:800; color:#fff; margin-bottom:6px; }
+    .setup-top-sub { font-size:0.85rem; color:rgba(255,255,255,0.75); }
+    .setup-body { padding:24px 28px 28px; display:flex; flex-direction:column; gap:16px; }
+    .setup-field label { display:block; font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:7px; font-family:'IBM Plex Mono',monospace; }
+    .setup-field select { width:100%; padding:12px 14px; border:1.5px solid var(--border); border-radius:12px; font-family:'IBM Plex Sans',sans-serif; font-size:0.95rem; color:var(--text-dark); background:var(--off-white); outline:none; }
+    .setup-field select:focus { border-color:var(--purple-light); background:#fff; }
+    .setup-submit { width:100%; padding:14px; background:linear-gradient(135deg,#7C3AED,#5B21B6); color:#fff; font-family:'IBM Plex Sans',sans-serif; font-weight:700; font-size:1rem; border:none; border-radius:14px; cursor:pointer; transition:opacity 0.15s; }
+    .setup-submit:hover { opacity:0.9; }
+    .setup-submit:disabled { opacity:0.5; cursor:not-allowed; }
+    .setup-skip { text-align:center; font-size:0.78rem; color:var(--text-muted); cursor:pointer; }
+    .setup-skip:hover { color:var(--purple); }
+
+
+    /* ANNOUNCEMENT BANNER */
+    .ann-banner { display:none; width:100%; padding:14px 20px; position:relative; animation: slideDown 0.4s ease; }
+    .ann-banner.show { display:block; }
+    .ann-banner.info    { background:linear-gradient(135deg,#EDE9FE,#DDD6FE); border-bottom:2px solid #C4B5FD; }
+    .ann-banner.warning { background:linear-gradient(135deg,#FEF3C7,#FDE68A); border-bottom:2px solid #FCD34D; }
+    .ann-banner.success { background:linear-gradient(135deg,#D1FAE5,#A7F3D0); border-bottom:2px solid #6EE7B7; }
+    .ann-banner.urgent  { background:linear-gradient(135deg,#FEE2E2,#FECACA); border-bottom:2px solid #FCA5A5; }
+    .ann-inner { max-width:900px; margin:0 auto; display:flex; align-items:flex-start; gap:12px; }
+    .ann-icon { font-size:1.3rem; flex-shrink:0; margin-top:1px; }
+    .ann-content { flex:1; }
+    .ann-title { font-weight:700; font-size:0.95rem; color:var(--text-dark); margin-bottom:2px; }
+    .ann-body  { font-size:0.85rem; color:var(--text-muted); line-height:1.5; }
+    .ann-meta  { font-size:0.7rem; color:var(--text-muted); margin-top:4px; font-family:'IBM Plex Mono',monospace; }
+    .ann-close { background:none; border:none; font-size:1.1rem; color:var(--text-muted); cursor:pointer; padding:2px 6px; flex-shrink:0; opacity:0.6; }
+    .ann-close:hover { opacity:1; }
+    @keyframes slideDown { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+
+    /* TEACHER ANNOUNCEMENT EDITOR */
+    .ann-editor { display:none; background:var(--white); border:2px solid var(--purple-mid); border-radius:20px; padding:20px 24px; margin-bottom:24px; }
+    .ann-editor.show { display:block; }
+    .ann-editor-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; }
+    .ann-fields { display:flex; flex-direction:column; gap:12px; }
+    .ann-field label { display:block; font-size:0.7rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:5px; font-family:'IBM Plex Mono',monospace; }
+    .ann-field input, .ann-field textarea, .ann-field select { width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:10px; font-family:'IBM Plex Sans',sans-serif; font-size:0.9rem; color:var(--text-dark); background:var(--off-white); outline:none; resize:vertical; }
+    .ann-field input:focus, .ann-field textarea:focus, .ann-field select:focus { border-color:var(--purple-light); background:#fff; }
+    .ann-editor-actions { display:flex; gap:10px; margin-top:14px; }
+    .ann-post-btn { flex:1; padding:11px; background:linear-gradient(135deg,#7C3AED,#5B21B6); color:#fff; border:none; border-radius:12px; font-weight:700; font-size:0.9rem; cursor:pointer; font-family:inherit; }
+    .ann-clear-btn { padding:11px 18px; background:var(--off-white); border:1.5px solid var(--border); border-radius:12px; font-weight:700; font-size:0.9rem; cursor:pointer; color:var(--text-muted); font-family:inherit; }
+    .ann-clear-btn:hover { border-color:#FCA5A5; color:#EF4444; }
+
+
+    /* READING + VIDEO CARDS */
+    .ic-red    { background: linear-gradient(135deg, #FEE2E2, #FCA5A5); }
+    .ic-amber  { background: linear-gradient(135deg, #FEF3C7, #FCD34D); }
+
+    /* RESOURCE MODAL (shared by PDF + YouTube) */
+    .res-overlay { position:fixed; inset:0; background:rgba(10,5,30,0.9); backdrop-filter:blur(10px); z-index:200; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:16px; }
+    .res-overlay.hidden { display:none; }
+    .res-top { width:100%; max-width:960px; display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; gap:12px; }
+    .res-top-title { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; color:#fff; flex:1; }
+    .res-top-actions { display:flex; gap:8px; align-items:center; flex-shrink:0; }
+    .res-dl-btn { background:var(--accent); color:#fff; border:none; padding:8px 16px; border-radius:999px; font-size:0.82rem; font-weight:700; cursor:pointer; font-family:inherit; text-decoration:none; display:inline-block; }
+    .res-close-btn { background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.25); color:#fff; width:36px; height:36px; border-radius:50%; font-size:1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .res-frame { width:100%; max-width:960px; flex:1; max-height:82vh; border-radius:16px; overflow:hidden; background:#000; }
+    .res-frame iframe { width:100%; height:100%; border:none; min-height:72vh; }
+
+    /* TEACHER RESOURCE EDITOR (inside existing ann-editor style) */
+    .res-editor { display:none; background:var(--white); border:2px solid #FCD34D; border-radius:20px; padding:20px 24px; margin-bottom:24px; }
+    .res-editor.show { display:block; }
+    .res-editor-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; margin-bottom:16px; color:var(--text-dark); }
+    .res-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    @media(max-width:600px) { .res-row { grid-template-columns:1fr; } }
+    .res-field { display:flex; flex-direction:column; gap:6px; }
+    .res-field label { font-size:0.7rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; }
+    .res-field input { padding:10px 12px; border:1.5px solid var(--border); border-radius:10px; font-family:'IBM Plex Sans',sans-serif; font-size:0.88rem; color:var(--text-dark); background:var(--off-white); outline:none; }
+    .res-field input:focus { border-color:var(--purple-light); background:#fff; }
+    .res-field .hint { font-size:0.72rem; color:var(--text-muted); }
+    .res-field .hint code { background:var(--purple-soft); color:var(--purple); padding:1px 5px; border-radius:4px; font-family:'IBM Plex Mono',monospace; }
+    .res-save-btn { margin-top:14px; padding:11px 24px; background:linear-gradient(135deg,#7C3AED,#5B21B6); color:#fff; border:none; border-radius:12px; font-weight:700; font-size:0.9rem; cursor:pointer; font-family:inherit; }
+    .res-status { font-size:0.78rem; color:var(--green); margin-top:8px; display:none; }
+    .res-status.show { display:block; }
+
+
+    /* STRIKE WARNING ON GREETING */
+    .student-greeting.has-strike { background: linear-gradient(135deg, rgba(239,68,68,0.25), rgba(220,38,38,0.2)); border-color: rgba(239,68,68,0.5); }
+    .sg-strike-badge { display:flex; align-items:center; gap:6px; margin-top:6px; background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.4); border-radius:8px; padding:5px 10px; cursor:pointer; transition: background 0.15s; }
+    .sg-strike-badge:hover { background:rgba(239,68,68,0.25); }
+    .sg-strike-badge-text { font-size:0.75rem; font-weight:700; color:#FCA5A5; line-height:1.3; }
+    .sg-strike-badge-arrow { font-size:0.7rem; color:rgba(255,100,100,0.6); margin-left:auto; }
+
+
+    /* ── BANNER SLIDER ──────────────────────────────────────── */
+    .banner-wrap { margin-bottom:24px; position:relative; }
+    .banner-track-outer { border-radius:20px; overflow:hidden; position:relative; background:#1E1040; height:170px; }
+    @media(min-width:480px) { .banner-track-outer { height:195px; } }
+    @media(min-width:700px) { .banner-track-outer { height:220px; } }
+    .banner-track { display:flex; transition:transform 0.5s cubic-bezier(0.4,0,0.2,1); height:100%; }
+    .banner-slide { min-width:100%; height:100%; position:relative; display:flex; align-items:flex-end; padding:18px 20px 22px; flex-shrink:0; text-decoration:none; overflow:hidden; }
+    /* gradient background layer */
+    .banner-slide-bg { position:absolute; inset:0; background-size:cover; background-position:center; }
+    /* image layer — sits on top of gradient, semi-transparent so gradient color bleeds through */
+    .banner-slide-img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center right; mix-blend-mode:luminosity; opacity:0.45; }
+    /* dark overlay for text readability */
+    .banner-slide-overlay { position:absolute; inset:0; background:linear-gradient(105deg, rgba(15,10,40,0.92) 0%, rgba(15,10,40,0.65) 50%, rgba(15,10,40,0.2) 100%); }
+    .banner-slide-content { position:relative; z-index:2; flex:1; min-width:0; max-width:75%; }
+    .banner-slide-tag { font-size:0.6rem; font-weight:800; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.16em; color:var(--accent); margin-bottom:6px; }
+    .banner-slide-title { font-family:'Playfair Display',serif; font-size:clamp(1rem,4.5vw,1.35rem); font-weight:800; color:#fff; line-height:1.25; margin-bottom:5px; }
+    .banner-slide-sub { font-size:0.76rem; color:rgba(255,255,255,0.68); line-height:1.45; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; }
+    .banner-slide-cta { display:inline-flex; align-items:center; gap:6px; margin-top:10px; padding:6px 14px; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); border-radius:999px; color:#fff; font-size:0.72rem; font-weight:700; font-family:'IBM Plex Mono',monospace; }
+
+    /* nav buttons */
+    .banner-nav { position:absolute; top:50%; transform:translateY(-50%); z-index:5; width:28px; height:28px; border-radius:50%; background:rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.2); color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:0.9rem; transition:background 0.2s; backdrop-filter:blur(4px); }
+    .banner-nav:hover { background:rgba(0,0,0,0.6); }
+    .banner-nav.prev { left:8px; }
+    .banner-nav.next { right:8px; }
+
+    /* dots — inside banner bottom-center */
+    .banner-dots { position:absolute; bottom:8px; left:50%; transform:translateX(-50%); display:flex; gap:5px; z-index:5; }
+    .banner-dot { width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,0.3); cursor:pointer; transition:all 0.25s; }
+    .banner-dot.active { background:#fff; width:16px; border-radius:999px; }
+
+    /* teacher banner editor */
+    .banner-editor { background:var(--white); border:1.5px solid var(--border); border-radius:20px; padding:20px 22px; margin-bottom:16px; }
+    .banner-editor-title { font-size:0.78rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; }
+    .banner-slide-list { display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
+    .banner-slide-item { display:flex; align-items:center; gap:10px; background:var(--off-white); border:1.5px solid var(--border); border-radius:12px; padding:10px 14px; }
+    .banner-slide-item-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+    .banner-slide-item-info { flex:1; min-width:0; }
+    .banner-slide-item-title { font-size:0.88rem; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .banner-slide-item-tag { font-size:0.72rem; color:var(--text-muted); font-family:'IBM Plex Mono',monospace; }
+    .banner-slide-item-del { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1rem; padding:2px 6px; border-radius:6px; }
+    .banner-slide-item-del:hover { color:var(--red); background:var(--red-soft); }
+    .banner-add-form { background:var(--off-white); border:1.5px solid var(--border); border-radius:14px; padding:14px; }
+    .banner-add-form .ann-field { margin-bottom:10px; }
+    .banner-add-form .ann-field:last-child { margin-bottom:0; }
+    .banner-add-form label { display:block; font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:5px; font-family:'IBM Plex Mono',monospace; }
+    .banner-add-form input, .banner-add-form select, .banner-add-form textarea { width:100%; padding:9px 12px; border:1.5px solid var(--border); border-radius:10px; font-family:'IBM Plex Sans',sans-serif; font-size:0.88rem; color:var(--text-dark); background:#fff; outline:none; }
+    .banner-add-form input:focus, .banner-add-form select:focus, .banner-add-form textarea:focus { border-color:var(--purple-light); }
+    .banner-add-btn { width:100%; margin-top:10px; padding:10px; background:linear-gradient(135deg,#7C3AED,#5B21B6); color:#fff; border:none; border-radius:10px; font-family:'IBM Plex Sans',sans-serif; font-size:0.88rem; font-weight:700; cursor:pointer; }
+    .banner-add-btn:hover { opacity:0.88; }
+  </style>
+</head>
+<script>
+  localStorage.setItem('eq_grade', '10');
+</script>
+<body>
+
+<!-- HOMEPAGE TEACHER LOGIN MODAL -->
+<div id="headerLoginModal" style="position:fixed;inset:0;background:rgba(30,16,64,0.65);backdrop-filter:blur(8px);z-index:600;display:none;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:24px;padding:36px 28px;width:100%;max-width:380px;text-align:center;">
+    <div style="font-size:2rem;margin-bottom:12px;">🔐</div>
+    <div style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:800;margin-bottom:6px;color:#1E1040;">Teacher Login</div>
+    <div style="font-size:0.85rem;color:#6B5B95;margin-bottom:24px;">Login once to access all teacher features across the site.</div>
+    <input type="text" id="hlUser" placeholder="Username" style="width:100%;padding:13px 16px;border:1.5px solid #E5DEFF;border-radius:12px;font-family:'IBM Plex Sans',sans-serif;font-size:0.95rem;outline:none;margin-bottom:12px;background:#F9F7FF;color:#1E1040;"/>
+    <input type="password" id="hlPass" placeholder="Password" onkeydown="if(event.key==='Enter')doHeaderLogin()" style="width:100%;padding:13px 16px;border:1.5px solid #E5DEFF;border-radius:12px;font-family:'IBM Plex Sans',sans-serif;font-size:0.95rem;outline:none;margin-bottom:8px;background:#F9F7FF;color:#1E1040;"/>
+    <div id="hlError" style="font-size:0.82rem;color:#DC2626;margin-bottom:12px;display:none;">Incorrect username or password.</div>
+    <div style="display:flex;gap:10px;margin-top:8px;">
+      <button onclick="closeHeaderLogin()" style="flex:1;padding:13px;background:#F9F7FF;border:1.5px solid #E5DEFF;border-radius:12px;font-family:'IBM Plex Sans',sans-serif;cursor:pointer;color:#6B5B95;font-size:0.95rem;">Cancel</button>
+      <button onclick="doHeaderLogin()" style="flex:2;padding:13px;background:linear-gradient(135deg,#7C3AED,#5B21B6);color:#fff;font-family:'IBM Plex Sans',sans-serif;font-weight:700;font-size:0.95rem;border:none;border-radius:12px;cursor:pointer;">Login</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── SUMMATIVE STICKY BANNER ── -->
+<div class="summ-banner" id="summBanner">
+  <div class="summ-banner-inner">
+    <div class="summ-pulse"></div>
+    <div class="summ-label">📝 Summative</div>
+    <div class="summ-divider"></div>
+    <div class="summ-text" id="summBannerText">Loading...</div>
+    <div class="summ-countdown" id="summCountdown"></div>
+    <button class="summ-edit-btn" id="summEditBtn" onclick="openSummModal()">✏️ Edit</button>
+  </div>
+</div>
+
+<!-- SUMMATIVE TEACHER MODAL -->
+<div class="summ-overlay hidden" id="summOverlay">
+  <div class="summ-modal">
+    <div class="summ-modal-title">📝 Summative Info</div>
+    <div class="summ-modal-sub">Set the exam details students will see in the banner.</div>
+    <div class="summ-field">
+      <label>Exam Date</label>
+      <input type="date" id="summDate"/>
+    </div>
+    <div class="summ-field">
+      <label>Exam Title / Topic</label>
+      <input type="text" id="summTitle" placeholder="e.g. Chapter 4 & 5 — Present Perfect"/>
+    </div>
+    <div class="summ-field">
+      <label>What to Study</label>
+      <textarea id="summStudy" placeholder="e.g. Grammar: Present Perfect, Vocabulary Box words, Chapter 4 & 5 reading texts..."></textarea>
+    </div>
+    <div class="summ-field">
+      <label>Which Classes</label>
+      <div class="summ-classes-grid" id="summClasses">
+        <div class="summ-cls-btn" data-cls="XE1" onclick="toggleCls(this)">X E-1</div>
+        <div class="summ-cls-btn" data-cls="XE4" onclick="toggleCls(this)">X E-4</div>
+        <div class="summ-cls-btn" data-cls="XE5" onclick="toggleCls(this)">X E-5</div>
+        <div class="summ-cls-btn" data-cls="XE6" onclick="toggleCls(this)">X E-6</div>
+        <div class="summ-cls-btn" data-cls="XE7" onclick="toggleCls(this)">X E-7</div>
+        <div class="summ-cls-btn" data-cls="XE8" onclick="toggleCls(this)">X E-8</div>
+        <div class="summ-cls-btn" data-cls="XE9" onclick="toggleCls(this)">X E-9</div>
+        <div class="summ-cls-btn" data-cls="XE10" onclick="toggleCls(this)">X E-10</div>
+        <div class="summ-cls-btn" data-cls="XE11" onclick="toggleCls(this)">X E-11</div>
+      </div>
+    </div>
+    <div class="summ-modal-btns">
+      <button class="summ-btn-cancel" onclick="closeSummModal()">Cancel</button>
+      <button class="summ-btn-clear" onclick="clearSumm()">🗑 Clear</button>
+      <button class="summ-btn-save" onclick="saveSumm()">💾 Save & Publish</button>
+    </div>
+  </div>
+</div>
+
+<div class="summ-toast" id="summToast"></div>
+<button class="summ-float-btn" id="summFloatBtn" onclick="openSummModal()">
+  📝 Set Summative
+</button>
+
+<!-- ── HEADER ── -->
+
+<!-- ANNOUNCEMENT BANNER -->
+<div class="ann-banner" id="annBanner">
+  <div class="ann-inner">
+    <div class="ann-icon" id="annIcon">📢</div>
+    <div class="ann-content">
+      <div class="ann-title" id="annTitle"></div>
+      <div class="ann-body"  id="annBody"></div>
+      <div class="ann-meta"  id="annMeta"></div>
+    </div>
+    <button class="ann-close" onclick="dismissAnnouncement()" title="Dismiss">&#10005;</button>
+  </div>
+</div>
+
+<header>
+  <div class="dot-grid"></div>
+  <div class="header-blob"></div>
+
+  <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="logo-wrap">
+    <img src="logo.jpg" alt="English Quest Logo" />
+    <span class="logo-badge">SMAVISKA</span>
+  </div>
+
+  <h1>GRADE <span>10</span></h1>
+  <p class="header-sub">English Quest Dashboard · SMA Negeri 6 Surakarta</p>
+
+  <p class="header-welcome">Your one-stop hub for class documents, student data, and updates.</p>
+  <div class="header-tags">
+    <span class="tag">📖 English Class</span>
+    <span class="tag">🏫 SMAVISKA</span>
+  </div>
+  <div class="grade-chip" id="gradeChip" style="display:none;">
+    <span id="gradeChipText">Grade</span>
+    <button type="button" onclick="openGradeGate(true)">Change</button>
+  </div>
+  <div id="headerLoginArea" style="margin-top:14px;position:relative;z-index:2;">
+    <button id="headerLoginBtn" onclick="openHeaderLogin()" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.35);color:#fff;font-family:'IBM Plex Sans',sans-serif;font-size:0.82rem;font-weight:700;padding:8px 20px;border-radius:999px;cursor:pointer;">🔑 Teacher Login</button>
+    <div id="headerTeacherBadge" style="display:none;background:var(--accent);color:#fff;font-size:0.82rem;font-weight:700;padding:8px 18px;border-radius:999px;display:none;align-items:center;gap:8px;">
+      🎓 Logged in as Teacher <span style="cursor:pointer;opacity:0.8" onclick="headerLogout()">✕</span>
+    </div>
+  </div>
+
+  <div class="student-greeting" id="studentGreeting">
+    <div class="sg-avatar" id="sgAvatar">?</div>
+    <div class="sg-info">
+      <div class="sg-name" id="sgName">Student</div>
+      <div class="sg-class" id="sgClass">Class</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0;">
+      <span class="sg-change" onclick="openSetup(true)">Change</span>
+      <span class="sg-change" onclick="logoutStudent()" style="color:rgba(255,100,100,0.7);">Sign out</span>
+    </div>
+  </div>
+</header>
+
+<svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
+  <path fill="#4C1D95" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
+  <path fill="#F9F7FF" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
+</svg>
+
+<!-- ── MAIN ── -->
+<main>
+
+
+
+<!-- TEACHER ANNOUNCEMENT EDITOR (injected by JS when logged in) -->
+<div class="ann-editor" id="annEditor">
+  <div class="ann-editor-title">
+    <span>📢 Post Announcement</span>
+    <span id="annEditorStatus" style="font-size:0.75rem;font-weight:400;color:var(--text-muted);"></span>
+  </div>
+  <div class="ann-fields">
+    <div class="ann-field">
+      <label>Type</label>
+      <select id="annType">
+        <option value="info">📘 Info (purple)</option>
+        <option value="warning">⚠️ Warning (yellow)</option>
+        <option value="success">✅ Success (green)</option>
+        <option value="urgent">🚨 Urgent (red)</option>
+      </select>
+    </div>
+    <div class="ann-field">
+      <label>Title</label>
+      <input type="text" id="annTitleInput" placeholder="e.g. Chapter 5 Quiz Next Week!"/>
+    </div>
+    <div class="ann-field">
+      <label>Message</label>
+      <textarea id="annBodyInput" rows="3" placeholder="Write your announcement here..."></textarea>
+    </div>
+  </div>
+  <div class="ann-editor-actions">
+    <button class="ann-post-btn" onclick="postAnnouncement()">&#128228; Post Announcement</button>
+    <button class="ann-clear-btn" onclick="clearAnnouncement()">&#128465; Clear</button>
+  </div>
+</div>
+
+
+
+<!-- BANNER EDITOR (teacher) -->
+<div class="ann-editor teacher-only" id="bannerEditor" style="display:none;">
+  <div class="banner-editor">
+    <div class="banner-editor-title">
+      <span>&#127775; Banner Slides</span>
+      <span id="bannerSlideCount" style="font-weight:400;color:var(--text-muted);"></span>
+    </div>
+    <div class="banner-slide-list" id="bannerSlideList"></div>
+    <div class="banner-add-form">
+      <div class="ann-field">
+        <label>Tag (e.g. NEW · QUIZ)</label>
+        <input type="text" id="bnTag" placeholder="e.g. NEW · FEATURE"/>
+      </div>
+      <div class="ann-field">
+        <label>Title</label>
+        <input type="text" id="bnTitle" placeholder="e.g. Chapter 4 Jeopardy Quiz is Live!"/>
+      </div>
+      <div class="ann-field">
+        <label>Subtitle</label>
+        <input type="text" id="bnSub" placeholder="e.g. Play solo or challenge your friends"/>
+      </div>
+      <div class="ann-field">
+        <label>Link (optional)</label>
+        <input type="text" id="bnLink" placeholder="e.g. jeopardyquiz.html"/>
+      </div>
+      <div class="ann-field">
+        <label>Image URL (optional)</label>
+        <input type="text" id="bnImage" placeholder="Paste a direct image URL (Google Drive, imgbb, etc.)"/>
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;font-family:'IBM Plex Mono',monospace;">Tip: Upload to imgbb.com or use a public Google Drive image link</div>
+      </div>
+      <div class="ann-field">
+        <label>Color Theme (background fallback)</label>
+        <select id="bnColor">
+          <option value="purple">Purple (default)</option>
+          <option value="red">Red</option>
+          <option value="green">Green</option>
+          <option value="amber">Amber / Gold</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
+      <button class="banner-add-btn" onclick="addBannerSlide()">&#65291; Add Slide</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var cls  = localStorage.getItem('eq_student_class');
+  var no   = localStorage.getItem('eq_student_no');
+  var name = localStorage.getItem('eq_student_name');
+  if (!cls || !no || !name) return;
+
+  var clsLabels = { XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
+
+  var card = document.createElement('div');
+  card.style.cssText = 'background:linear-gradient(135deg,#7C3AED,#4C1D95);border-radius:20px;padding:18px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:0 8px 24px rgba(124,58,237,0.25);';
+  card.innerHTML =
+    '<div style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-family:serif;font-weight:800;font-size:1.2rem;color:#fff;flex-shrink:0;">' + name.charAt(0) + '</div>' +
+    '<div style="flex:1;">' +
+      '<div style="font-size:0.72rem;color:rgba(255,255,255,0.65);font-family:monospace;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">My Scores</div>' +
+      '<div style="font-weight:700;font-size:1rem;color:#fff;">' + name.split(' ').slice(0,2).join(' ') + '</div>' +
+      '<div style="font-size:0.78rem;color:rgba(255,255,255,0.65);">' + (clsLabels[cls] || cls) + ' · Tap to view your scores</div>' +
+    '</div>' +
+    '<div style="font-size:1.3rem;color:rgba(255,255,255,0.5);">›</div>';
+  card.onclick = function() { window.location.href = 'scores.html'; };
+
+  function insertScoreCard() {
+    var dash = document.getElementById('grade10Dashboard') || document.querySelector('main');
+    if (dash) dash.insertBefore(card, dash.firstChild);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', insertScoreCard);
+  } else {
+    insertScoreCard();
+  }
+})();
+</script>
+
+
+
+
+
+
+
+<div class="grade10-dashboard" id="grade10Dashboard">
+
+  <!-- BANNER SLIDER -->
+  <div class="banner-wrap" id="bannerWrap" style="display:none;">
+    <div class="banner-track-outer">
+      <div class="banner-track" id="bannerTrack"></div>
+      <button class="banner-nav prev" id="bannerPrev" onclick="bannerNav(-1)">&#8249;</button>
+      <button class="banner-nav next" id="bannerNext" onclick="bannerNav(1)">&#8250;</button>
+      <div class="banner-dots" id="bannerDots"></div>
+    </div>
+  </div>
+
+  <!-- HALL OF FAME -->
+  <div class="hof-section" id="hofSection">
+    <div class="hof-title-row">
+      <div>
+        <div class="hof-title">🏆 Hall of Fame</div>
+        <div class="hof-subtitle">Most active students across all classes</div>
+      </div>
+      <button id="hofRefreshBtn" onclick="refreshHallOfFame()" style="padding:7px 14px;background:rgba(124,58,237,0.12);border:1.5px solid rgba(124,58,237,0.3);color:#7C3AED;border-radius:999px;font-family:inherit;font-size:0.78rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;">&#8635; Refresh</button>
+    </div>
+    <div id="hofContent">
+      <div class="hof-loading"><div class="hof-spinner"></div><br/>Loading hall of fame...</div>
+    </div>
+  </div>
+
+  <!-- STRIKE LIST -->
+  <div class="strike-list-section">
+    <div class="hof-title-row">
+      <div>
+        <div class="hof-title">⚠️ Strike Board</div>
+        <div class="hof-subtitle">Students who need to clear their strikes</div>
+      </div>
+    </div>
+    <div class="strike-list-wrap">
+      <div class="strike-list-header">
+        <div class="strike-pulse"></div>
+        <div class="strike-list-header-text">
+          <div class="strike-list-header-title">Students with Active Strikes</div>
+          <div class="strike-list-header-sub">Submit your clearance text to your teacher to remove strikes</div>
+        </div>
+      </div>
+      <div id="strikeListContent">
+        <div class="hof-loading"><div class="hof-spinner" style="border-top-color:#DC2626"></div><br/>Loading...</div>
+      </div>
+      <div class="strike-list-footer">
+        <a href="javascript:void(0)" onclick="openStrikeInfo()">📝 How to clear your strike →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOCUMENTS / FILES -->
+  <div class="section" id="docs">
+    <div class="section-label">Documents & Files</div>
+    <div class="section-title">Class Resources</div>
+    <div class="card-grid">
+      <a href="lessons.html" class="card">
+        <div class="card-icon ic-purple">📑</div>
+        <div class="card-name">Lesson Materials</div>
+        <div class="card-desc">View & download lesson slides</div>
+      </a>
+      <a href="assignments.html" class="card">
+        <div class="card-icon ic-blue">📋</div>
+        <div class="card-name">Assignments</div>
+        <div class="card-desc">Download task PDFs & instructions</div>
+      </a>
+      <a href="submission.html" class="card">
+        <div class="card-icon ic-yellow">📝</div>
+        <div class="card-name">Submission</div>
+        <div class="card-desc">Submit your task PDF files here</div>
+      </a>
+      <a href="session.html" class="card">
+        <div class="card-icon ic-amber">📖</div>
+        <div class="card-name">Reading</div>
+        <div class="card-desc">Class reading material</div>
+      </a>
+      <a href="session.html" class="card">
+        <div class="card-icon ic-red">🎬</div>
+        <div class="card-name">Video Lesson</div>
+        <div class="card-desc">Watch the lesson video</div>
+      </a>
+      <a href="summative.html" class="card">
+        <div class="card-icon ic-green">🎯</div>
+        <div class="card-name">Summative</div>
+        <div class="card-desc">Exam schedule, topics &amp; what to study</div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="section" id="quiz">
+    <div class="section-label">Practice &amp; Games</div>
+    <div class="section-title">Quiz &amp; Review</div>
+    <div class="card-grid">
+      <a href="quiz.html" class="card">
+        <div class="card-icon ic-yellow">🎮</div>
+        <div class="card-name">Quiz &amp; Games</div>
+        <div class="card-desc">Jeopardy, Guess Who &amp; more review games</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- STUDENT DATA -->
+  <div class="section" id="students">
+    <div class="section-label">Staff & Student Data</div>
+    <div class="section-title">Class Members</div>
+    <div class="card-grid">
+      <a href="students.html" class="card">
+        <div class="card-icon ic-pink">👨‍🎓</div>
+        <div class="card-name">Student List</div>
+        <div class="card-desc">Browse names & activeness stats</div>
+      </a>
+      <a href="attendance.html" class="card">
+        <div class="card-icon ic-teal">✅</div>
+        <div class="card-name">Attendance</div>
+        <div class="card-desc">View & record class attendance</div>
+      </a>
+      <a href="scores.html" class="card">
+        <div class="card-icon ic-orange">🏆</div>
+        <div class="card-name">Student Scores</div>
+        <div class="card-desc">Check chapter & final scores</div>
+      </a>
+      <a href="tasks.html" class="card">
+        <div class="card-icon ic-green">✅</div>
+        <div class="card-name">Task Status</div>
+        <div class="card-desc">See which tasks are done or missing</div>
+      </a>
+      <a href="strikes.html" class="card">
+        <div class="card-icon ic-red">⚠️</div>
+        <div class="card-name">Strikes</div>
+        <div class="card-desc">View strike count & reasons</div>
+      </a>
+      <a href="activeness.html" class="card">
+        <div class="card-icon ic-yellow">⚡</div>
+        <div class="card-name">Activeness</div>
+        <div class="card-desc">Real-time activeness tracker</div>
+      </a>
+
+
+    </div>
+  </div>
+
+  <!-- GALLERY / BRANDING -->
+  <div class="section" id="gallery">
+    <div class="section-label">Gallery & Branding</div>
+    <div class="section-title">Our Identity</div>
+    <div class="card-grid">
+      <a href="https://www.instagram.com/engquest.viska/" target="_blank" class="card">
+        <div class="card-icon ic-purple">📸</div>
+        <div class="card-name">Instagram</div>
+        <div class="card-desc">@engquest.viska</div>
+      </a>
+      <a href="gallery.html" class="card">
+        <div class="card-icon ic-blue">🖼️</div>
+        <div class="card-name">Photo Gallery</div>
+        <div class="card-desc">Class moments & memories</div>
+      </a>
+
+
+    </div>
+  </div>
+
+</div>
+
+<div class="grade11-dashboard" id="grade11Dashboard">
+  <div class="grade11-hero">
+    <div>
+      <div class="grade11-kicker">Grade 11 Workspace</div>
+      <div class="grade11-title">A fresh English Quest is being prepared.</div>
+      <div class="grade11-copy">This mode will become the Grade 11 dashboard once class data, lessons, assignments, and teacher workflows are ready. For now, it keeps Grade 11 separate from the current Grade 10 system.</div>
+    </div>
+    <div class="grade11-status">
+      <div class="grade11-status-label">Current Status</div>
+      <div class="grade11-status-title">Structure first, data later</div>
+      <div class="grade11-status-copy">Grade 11 classes are not connected yet, so this page avoids showing Grade 10 scores, strikes, and student lists as if they belonged here.</div>
+    </div>
+  </div>
+
+  <div class="grade11-roadmap">
+    <div class="grade11-step">
+      <div class="grade11-step-num">1</div>
+      <div class="grade11-step-title">Prepare Classes</div>
+      <div class="grade11-step-copy">Add Grade 11 class names when the official data is available.</div>
+    </div>
+    <div class="grade11-step">
+      <div class="grade11-step-num">2</div>
+      <div class="grade11-step-title">Separate Materials</div>
+      <div class="grade11-step-copy">Create lesson, assignment, submission, and quiz spaces for Grade 11 only.</div>
+    </div>
+    <div class="grade11-step">
+      <div class="grade11-step-num">3</div>
+      <div class="grade11-step-title">Connect Data</div>
+      <div class="grade11-step-copy">Point student lists, scores, attendance, and tasks to the correct Grade 11 data source.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Coming Next</div>
+    <div class="section-title">Grade 11 Modules</div>
+    <div class="grade11-card-grid">
+      <div class="grade11-card">
+        <div class="grade11-card-icon">📚</div>
+        <div class="grade11-card-title">Learning Materials</div>
+        <div class="grade11-card-copy">A separate place for Grade 11 reading, video, and classroom resources.</div>
+      </div>
+      <div class="grade11-card">
+        <div class="grade11-card-icon">📝</div>
+        <div class="grade11-card-title">Assignments</div>
+        <div class="grade11-card-copy">Grade-specific task instructions and submission links when the semester starts.</div>
+      </div>
+      <div class="grade11-card">
+        <div class="grade11-card-icon">🏆</div>
+        <div class="grade11-card-title">Progress Tracking</div>
+        <div class="grade11-card-copy">Scores, task status, attendance, activeness, and strikes without mixing Grade 10 data.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- ── FOOTER ── -->
+<footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
+
+
+<script>
+// ── HALL OF FAME ────────────────────────────────────────────
+const HOF_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+const HOF_CLASSES = ['XE1','XE4','XE5','XE6','XE7','XE8','XE9','XE10','XE11'];
+const HOF_ACTS = [
+  { key: 'VocabularyBox',    label: 'Vocab Box',    icon: '📚', color: '#8B5CF6', bg: '#EDE9FE', pts: 1 },
+  { key: 'Answering',        label: 'Answering',    icon: '🙋', color: '#3B82F6', bg: '#DBEAFE', pts: 2 },
+  { key: 'Presenting',       label: 'Presenting',   icon: '🎤', color: '#10B981', bg: '#D1FAE5', pts: 5 },
+  { key: 'DoingTaskOnTime',  label: 'Task On Time', icon: '✅', color: '#F59E0B', bg: '#FEF3C7', pts: 2 },
+  { key: 'HelpingHand',      label: 'Helping Hand', icon: '🤝', color: '#EC4899', bg: '#FCE7F3', pts: 1 },
+  { key: 'Quiz',             label: 'Quiz',         icon: '🎯', color: '#14B8A6', bg: '#CCFBF1', pts: 1 },
+];
+const AVATAR_COLORS = ['#7C3AED','#2563EB','#059669','#D97706','#DC2626','#7C3AED','#0891B2','#9333EA','#16A34A'];
+
+async function hofApiGet(params) {
+  const url = HOF_API + '?' + new URLSearchParams(params);
+  try { const res = await fetch(url); if (res.ok) return await res.json(); } catch(e) {}
+  return new Promise((resolve, reject) => {
+    const cb = 'hof_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    const p  = { ...params, callback: cb, _t: Date.now() };
+    const script = document.createElement('script');
+    script.async = true;
+    const timer = setTimeout(() => { cleanup(); reject(new Error('Timeout')); }, 25000);
+    function cleanup() { delete window[cb]; try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e){} clearTimeout(timer); }
+    window[cb]     = d => { cleanup(); resolve(d); };
+    script.onerror = () => { cleanup(); reject(new Error('Network error')); };
+    script.src = HOF_API + '?' + new URLSearchParams(p);
+    (document.head || document.body).appendChild(script);
+  });
+}
+
+async function loadHallOfFame() {
+  try {
+    // Fetch all classes in parallel
+    const results = await Promise.all(
+      HOF_CLASSES.map(cls =>
+        hofApiGet({ action: 'getAllActiveness', className: cls })
+          .then(d => ({ cls, students: d.students || [] }))
+          .catch(() => ({ cls, students: [] }))
+      )
+    );
+
+    // Flatten all students with class tag
+    const all = [];
+    results.forEach(({ cls, students }) => {
+      students.forEach(s => {
+        const total = (s.Total || 0);
+        all.push({ ...s, cls, total });
+      });
+    });
+
+    if (all.length === 0) { document.getElementById('hofContent').innerHTML = '<div class="hof-loading">No data yet.</div>'; return; }
+
+    // Top 5 overall by total points
+    const top5 = [...all].sort((a,b) => b.total - a.total).slice(0, 5);
+    const maxPts = 200; // Pro Maxxing threshold
+
+    // Category champions — highest raw count per activity
+    const champs = HOF_ACTS.map(act => {
+      const best = [...all].sort((a,b) => (b[act.key]||0) - (a[act.key]||0))[0];
+      return { ...act, champion: best };
+    });
+
+    const rankIcons = ['🥇','🥈','🥉','4','5'];
+    const rankClasses = ['hof-rank-1','hof-rank-2','hof-rank-3','hof-rank-n','hof-rank-n'];
+
+    const top5Html = top5.map((s, i) => {
+      const pct     = Math.round((s.total / maxPts) * 100);
+      const clsIdx  = HOF_CLASSES.indexOf(s.cls);
+      const avatarBg = AVATAR_COLORS[clsIdx] || '#7C3AED';
+      const initial  = (s.nickname || s.name)[0].toUpperCase();
+      const dispName = s.nickname || s.name.split(' ')[0];
+      const clsLabel = s.cls.replace('XE','X E-');
+      const sd = encodeURIComponent(JSON.stringify(s));
+      return `<div class="hof-row" onclick="openHofPopup('${sd}')" style="cursor:pointer;">
+        <div class="hof-rank ${rankClasses[i]}">${rankIcons[i]}</div>
+        <div class="hof-avatar" style="background:${avatarBg}">${initial}</div>
+        <div class="hof-info">
+          <div class="hof-name">${dispName}</div>
+          <div class="hof-class">${clsLabel}</div>
+        </div>
+        <div class="hof-bar-wrap"><div class="hof-bar" style="width:${pct}%"></div></div>
+        <div class="hof-pts">${s.total} pts</div>
+      </div>`;
+    }).join('');
+
+    const champsHtml = champs.map(c => {
+      const s    = c.champion;
+      if (!s) return '';
+      const val  = s[c.key] || 0;
+      const pts  = val * c.pts;
+      const name = s.nickname || s.name.split(' ')[0];
+      const cls  = s.cls.replace('XE','X E-');
+      return `<div class="hof-champ-card">
+        <div class="hof-champ-icon">${c.icon}</div>
+        <div class="hof-champ-cat">${c.label}</div>
+        <div class="hof-champ-name">${name}</div>
+        <div class="hof-champ-class">${cls}</div>
+        <div class="hof-champ-val" style="background:${c.bg};color:${c.color}">${val}× · +${pts}pts</div>
+      </div>`;
+    }).join('');
+
+    document.getElementById('hofContent').innerHTML = `
+      <div class="hof-top5">
+        <div class="hof-top5-header">
+          <div>
+            <div class="hof-top5-header-title">⚡ Top 5 Most Active</div>
+            <div class="hof-top5-header-sub">Ranked by total activeness points</div>
+          </div>
+        </div>
+        ${top5Html}
+      </div>
+      <div class="hof-champs-title">👑 Category Champions</div>
+      <div class="hof-champs-grid">${champsHtml}</div>`;
+
+  } catch(e) {
+    document.getElementById('hofContent').innerHTML = '<div class="hof-loading">Could not load hall of fame.</div>';
+  }
+}
+
+loadHallOfFame();
+
+async function refreshHallOfFame() {
+  const btn = document.getElementById('hofRefreshBtn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '⏳ Loading...'; }
+  document.getElementById('hofContent').innerHTML = '<div class="hof-loading"><div class="hof-spinner"></div><br/>Refreshing...</div>';
+  await loadHallOfFame();
+  if (btn) { btn.disabled = false; btn.innerHTML = '&#8635; Refresh'; }
+}
+</script>
+
+
+<script>
+// ── SCHEDULE ──────────────────────────────────────────────────
+const PERIODS = [
+  { p:1,  time:'07.00–07.45' },
+  { p:2,  time:'07.45–08.30' },
+  { p:3,  time:'08.30–09.15' },
+  { break: 'Break' },
+  { p:4,  time:'09.30–10.15' },
+  { p:5,  time:'10.15–11.00' },
+  { p:6,  time:'11.00–11.45' },
+  { break: 'Break & Sholat' },
+  { p:7,  time:'12.30–13.15' },
+  { p:8,  time:'13.15–14.00' },
+  { p:9,  time:'14.00–14.45' },
+  { p:10, time:'14.45–15.30' },
+];
+
+const SCHEDULE = {
+  Monday:    [ {p:2, cls:'XE4'}, {p:3, cls:'XE5'}, {p:6, cls:'XE6'}, {p:8, cls:'XE7'} ],
+  Tuesday:   [ {p:'1-2', cls:'XE11'}, {p:'5-6', cls:'XE7'}, {p:'9-10', cls:'XE8'} ],
+  Wednesday: [ {p:'1-2', cls:'XE1'}, {p:'3-4', cls:'XE5'}, {p:5, cls:'XE9'}, {p:'7-8', cls:'XE6'}, {p:9, cls:'XE10'} ],
+  Thursday:  [ {p:4, cls:'XE8'}, {p:'5-6', cls:'XE4'}, {p:7, cls:'XE11'}, {p:'9-10', cls:'XE9'} ],
+  Friday:    [ {p:3, cls:'XE1'}, {p:'4-5', cls:'XE10'} ],
+};
+
+const CLS_COLORS = { XE1:'cls-e1', XE4:'cls-e4', XE5:'cls-e5', XE6:'cls-e6', XE7:'cls-e7', XE8:'cls-e8', XE9:'cls-e9', XE10:'cls-e10', XE11:'cls-e11' };
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+const DAY_SHORT = ['Mon','Tue','Wed','Thu','Fri'];
+
+let activeDay = '';
+let schedOpen = false;
+
+// Get current day
+function getTodayDay() {
+  const d = new Date().getDay(); // 0=Sun,1=Mon...5=Fri,6=Sat
+  if (d >= 1 && d <= 5) return DAYS[d - 1];
+  return 'Monday';
+}
+
+// Get current period
+function getCurrentPeriod() {
+  const now  = new Date();
+  const mins = now.getHours() * 60 + now.getMinutes();
+  const ranges = [
+    [0*60+0,  7*60+45,  1],
+    [7*60+45, 8*60+30,  2],
+    [8*60+30, 9*60+15,  3],
+    [9*60+30, 10*60+15, 4],
+    [10*60+15,11*60+0,  5],
+    [11*60+0, 11*60+45, 6],
+    [12*60+30,13*60+15, 7],
+    [13*60+15,14*60+0,  8],
+    [14*60+0, 14*60+45, 9],
+    [14*60+45,15*60+30, 10],
+  ];
+  for (const [s,e,p] of ranges) { if (mins >= s && mins < e) return p; }
+  return -1;
+}
+
+function toggleSched() {
+  schedOpen = !schedOpen;
+  document.getElementById('schedBody').classList.toggle('open', schedOpen);
+  document.getElementById('schedArrow').classList.toggle('open', schedOpen);
+  if (schedOpen && !activeDay) {
+    buildTabs();
+    showDay(getTodayDay());
+  }
+}
+
+function buildTabs() {
+  const today = getTodayDay();
+  const tabs = document.getElementById('schedDayTabs');
+  tabs.innerHTML = DAYS.map((d,i) => {
+    const isToday = d === today;
+    return `<button class="sched-day-btn ${isToday?'today':''}" id="tab-${d}" onclick="showDay('${d}')">${DAY_SHORT[i]}${isToday?' 📍':''}</button>`;
+  }).join('');
+}
+
+function showDay(day) {
+  activeDay = day;
+  // Update tab active state
+  DAYS.forEach(d => {
+    const tab = document.getElementById('tab-' + d);
+    if (tab) tab.classList.toggle('active', d === day);
+  });
+
+  const daySchedule = SCHEDULE[day] || [];
+  const today       = getTodayDay();
+  const currPeriod  = today === day ? getCurrentPeriod() : -1;
+
+  // Build period lookup for this day
+  const periodMap = {};
+  daySchedule.forEach(item => {
+    if (typeof item.p === 'string') {
+      item.p.split('-').forEach(n => { periodMap[parseInt(n)] = item.cls; });
+    } else {
+      periodMap[item.p] = item.cls;
+    }
+  });
+
+  // Render
+  let html = '';
+  PERIODS.forEach(slot => {
+    if (slot.break) {
+      html += `<div class="sched-break">
+        <div class="sched-break-line"></div>
+        <div class="sched-break-label">☕ ${slot.break}</div>
+        <div class="sched-break-line"></div>
+      </div>`;
+      return;
+    }
+    const cls    = periodMap[slot.p];
+    const isNow  = slot.p === currPeriod && cls;
+    if (!cls) return; // skip empty periods
+
+    // Get display period string
+    const matchEntry = daySchedule.find(e => {
+      if (typeof e.p === 'string') return e.p.split('-').includes(String(slot.p)) && e.cls === cls;
+      return e.p === slot.p;
+    });
+
+    // Only render the FIRST period of a double class
+    const pStr = typeof matchEntry?.p === 'string' ? matchEntry.p : String(slot.p);
+    // Avoid rendering second slot of doubles
+    if (typeof matchEntry?.p === 'string') {
+      const parts = matchEntry.p.split('-').map(Number);
+      if (slot.p !== parts[0]) return;
+    }
+
+    // Get time range
+    let timeStr = slot.time;
+    if (typeof matchEntry?.p === 'string') {
+      const parts   = matchEntry.p.split('-').map(Number);
+      const start   = PERIODS.find(x => x.p === parts[0])?.time.split('–')[0] || '';
+      const end     = PERIODS.find(x => x.p === parts[parts.length-1])?.time.split('–')[1] || '';
+      timeStr = start + '–' + end;
+    }
+
+    const clsLabel = cls.replace('XE','X E-');
+    const colCls   = CLS_COLORS[cls] || '';
+    html += `<div class="sched-item ${isNow?'now':''}">
+      <span class="sched-period">${pStr}</span>
+      <span class="sched-time">${timeStr}</span>
+      <span class="sched-class-badge ${colCls}">${clsLabel}</span>
+      ${isNow ? '<span class="sched-now-badge">▶ Now</span>' : ''}
+    </div>`;
+  });
+
+  if (!html) html = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:0.88rem;">No classes today 🎉</div>';
+  document.getElementById('schedContent').innerHTML = html;
+
+  // Update sub text
+  const count = daySchedule.length;
+  document.getElementById('schedSub').textContent = `${day} · ${count} class${count !== 1 ? 'es' : ''}`;
+}
+
+// Auto-open on today if it's a school day
+window.addEventListener('DOMContentLoaded', () => {
+  const today = getTodayDay();
+  const d = new Date().getDay();
+  if (d >= 1 && d <= 5) {
+    // Show today's schedule info in sub even before opening
+    const count = SCHEDULE[today]?.length || 0;
+    document.getElementById('schedSub').textContent = `Today: ${today} · ${count} class${count !== 1 ? 'es' : ''}`;
+  }
+});
+</script>
+
+
+<script>
+// ── SUMMATIVE BANNER ──────────────────────────────────────────
+const SUMM_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+let summData = null;
+let summTeacher = false;
+let summUser = '', summPass = '';
+let countdownInterval = null;
+
+// Share session with other pages
+summUser = localStorage.getItem('eq_tu') || '';
+summPass = localStorage.getItem('eq_tp') || '';
+if (summUser && summPass) {
+  summApiGet({ action:'checkLogin', username:summUser, password:summPass })
+    .then(d => {
+      if (d.ok) {
+        summTeacher = true;
+        document.getElementById('summEditBtn').classList.add('visible');
+        // Also show floating set button in case banner is hidden
+        document.getElementById('summFloatBtn').style.display = 'flex';
+      }
+    }).catch(()=>{});
+}
+
+async function summApiGet(params) {
+  const url = SUMM_API + '?' + new URLSearchParams(params);
+  try { const r = await fetch(url); if(r.ok) return await r.json(); } catch(e){}
+  return new Promise((resolve,reject) => {
+    const cb = 'summ_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+    const p  = {...params, callback:cb, _t:Date.now()};
+    const s  = document.createElement('script'); s.async=true;
+    const t  = setTimeout(()=>{cleanup();reject(new Error('Timeout'));},15000);
+    function cleanup(){delete window[cb];try{if(s.parentNode)s.parentNode.removeChild(s);}catch(e){}clearTimeout(t);}
+    window[cb]=d=>{cleanup();resolve(d);};
+    s.onerror=()=>{cleanup();reject(new Error('Network error'));};
+    s.src=SUMM_API+'?'+new URLSearchParams(p);
+    (document.head||document.body).appendChild(s);
+  });
+}
+
+// Load summative on page open
+async function loadSummative() {
+  try {
+    const res = await summApiGet({ action:'getSummative' });
+    if (res.exists && res.data) {
+      summData = res.data;
+      renderBanner(res.data);
+    }
+  } catch(e) { /* fail silently */ }
+}
+loadSummative();
+
+function renderBanner(d) {
+  if (!d || !d.date || !d.title) return;
+  const banner = document.getElementById('summBanner');
+  const textEl  = document.getElementById('summBannerText');
+  const cdEl    = document.getElementById('summCountdown');
+  banner.classList.add('visible');
+  document.getElementById('summFloatBtn').style.display = 'none'; // banner visible, float not needed
+
+  // Format classes
+  const clsLabel = d.classes && d.classes.length > 0
+    ? d.classes.map(c => c.replace('XE','X E-')).join(', ')
+    : 'All classes';
+
+  // Study info
+  const studyPart = d.study ? ` · Study: <strong>${d.study}</strong>` : '';
+  textEl.innerHTML = `<strong>${d.title}</strong> · ${clsLabel} · ${formatDate(d.date)}${studyPart}`;
+
+  // Countdown
+  startCountdown(d.date, cdEl);
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+}
+
+function startCountdown(dateStr, el) {
+  if (countdownInterval) clearInterval(countdownInterval);
+  function update() {
+    const now    = new Date();
+    const target = new Date(dateStr + 'T00:00:00');
+    const diff   = target - now;
+    if (diff <= 0) { el.textContent = '🔴 Exam Day!'; el.classList.add('urgent'); return; }
+    const days  = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const mins  = Math.floor((diff % 3600000) / 60000);
+    if (days > 0) el.textContent = `⏳ ${days}d ${hours}h left`;
+    else if (hours > 0) { el.textContent = `⚠️ ${hours}h ${mins}m left`; el.classList.add('urgent'); }
+    else { el.textContent = `🚨 ${mins}m left`; el.classList.add('urgent'); }
+  }
+  update();
+  countdownInterval = setInterval(update, 60000);
+}
+
+// ── TEACHER MODAL ─────────────────────────────────────────────
+function openSummModal() {
+  if (!summTeacher) return;
+  // Pre-fill if data exists
+  if (summData) {
+    document.getElementById('summDate').value  = summData.date || '';
+    document.getElementById('summTitle').value = summData.title || '';
+    document.getElementById('summStudy').value = summData.study || '';
+    document.querySelectorAll('.summ-cls-btn').forEach(b => {
+      b.classList.toggle('selected', (summData.classes||[]).includes(b.dataset.cls));
+    });
+  }
+  document.getElementById('summOverlay').classList.remove('hidden');
+}
+function closeSummModal() { document.getElementById('summOverlay').classList.add('hidden'); }
+function toggleCls(btn) { btn.classList.toggle('selected'); }
+
+async function saveSumm() {
+  const date  = document.getElementById('summDate').value;
+  const title = document.getElementById('summTitle').value.trim();
+  const study = document.getElementById('summStudy').value.trim();
+  const classes = [...document.querySelectorAll('.summ-cls-btn.selected')].map(b => b.dataset.cls);
+  if (!date)  { showSummToast('Please pick an exam date', 'err'); return; }
+  if (!title) { showSummToast('Please enter a title/topic', 'err'); return; }
+  const data = { date, title, study, classes };
+  try {
+    const res = await summApiGet({ action:'setSummative', username:summUser, password:summPass, data: JSON.stringify(data) });
+    if (res.success) {
+      summData = data; renderBanner(data); closeSummModal();
+      showSummToast('✅ Summative published!', 'ok');
+    } else { showSummToast('Error: ' + res.error, 'err'); }
+  } catch(e) { showSummToast('Failed to save', 'err'); }
+}
+
+async function clearSumm() {
+  if (!confirm('Remove the summative banner?')) return;
+  try {
+    const res = await summApiGet({ action:'clearSummative', username:summUser, password:summPass });
+    if (res.success) {
+      summData = null;
+      document.getElementById('summBanner').classList.remove('visible');
+      if (summTeacher) document.getElementById('summFloatBtn').style.display = 'flex';
+      closeSummModal();
+      showSummToast('Banner cleared', 'ok');
+    } else { showSummToast('Error: ' + res.error, 'err'); }
+  } catch(e) { showSummToast('Failed to clear', 'err'); }
+}
+
+function showSummToast(msg, type) {
+  const t = document.getElementById('summToast');
+  t.textContent = msg; t.className = 'summ-toast ' + (type||'');
+  setTimeout(()=>t.classList.add('show'), 10);
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+</script>
+
+
+<script>
+// ── HOMEPAGE TEACHER LOGIN ─────────────────────────────────────
+(function() {
+  const u = localStorage.getItem('eq_tu') || '';
+  const p = localStorage.getItem('eq_tp') || '';
+  if (u && p) {
+    // Already logged in — verify and show badge
+    fetch('https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec?action=checkLogin&username=' + encodeURIComponent(u) + '&password=' + encodeURIComponent(p))
+      .then(r => r.json()).then(d => { if (d.ok) showTeacherBadge(); }).catch(()=>{});
+  }
+})();
+
+function openHeaderLogin() {
+  document.getElementById('headerLoginModal').style.display = 'flex';
+  setTimeout(() => document.getElementById('hlUser').focus(), 100);
+}
+function closeHeaderLogin() {
+  document.getElementById('headerLoginModal').style.display = 'none';
+  document.getElementById('hlError').style.display = 'none';
+}
+
+async function hashPass(plain) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(plain));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+
+async function doHeaderLogin() {
+  const u = document.getElementById('hlUser').value.trim();
+  const p = document.getElementById('hlPass').value.trim();
+  if (!u || !p) return;
+  try {
+    const res = await fetch('https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec?action=checkLogin&username=' + encodeURIComponent(u) + '&password=' + encodeURIComponent(p));
+    const data = await res.json();
+    if (data.ok) {
+      const hashed = await hashPass(p);
+      localStorage.setItem('eq_tu', u);
+      localStorage.setItem('eq_tp', hashed);
+      closeHeaderLogin();
+      showTeacherBadge();
+      // Trigger summative float button if exists
+      if (typeof summTeacher !== 'undefined') {
+        summTeacher = true; summUser = u; summPass = hashed;
+        document.getElementById('summFloatBtn').style.display = 'flex';
+        document.getElementById('summEditBtn').classList.add('visible');
+      }
+      showSummToast('✅ Logged in as Teacher!', 'ok');
+    } else {
+      document.getElementById('hlError').style.display = 'block';
+    }
+  } catch(e) { document.getElementById('hlError').textContent = 'Connection error.'; document.getElementById('hlError').style.display = 'block'; }
+}
+
+function showTeacherBadge() {
+  document.getElementById('headerLoginBtn').style.display = 'none';
+  const badge = document.getElementById('headerTeacherBadge');
+  badge.style.display = 'inline-flex';
+}
+
+function headerLogout() {
+  localStorage.removeItem('eq_tu');
+  localStorage.removeItem('eq_tp');
+  document.getElementById('headerLoginBtn').style.display = 'inline-block';
+  document.getElementById('headerTeacherBadge').style.display = 'none';
+  // Hide summative controls
+  if (typeof summTeacher !== 'undefined') {
+    summTeacher = false;
+    document.getElementById('summFloatBtn').style.display = 'none';
+    document.getElementById('summEditBtn').classList.remove('visible');
+  }
+}
+</script>
+
+
+<script>
+// ── STRIKE BOARD ──────────────────────────────────────────────
+const SL_API     = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+const SL_CLASSES = ['XE1','XE4','XE5','XE6','XE7','XE8','XE9','XE10','XE11'];
+
+async function slApiGet(params) {
+  const url = SL_API + '?' + new URLSearchParams(params);
+  try { const r = await fetch(url); if (r.ok) return await r.json(); } catch(e) {}
+  return new Promise((resolve, reject) => {
+    const cb = 'sl_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+    const p  = {...params, callback:cb, _t:Date.now()};
+    const s  = document.createElement('script'); s.async = true;
+    const t  = setTimeout(()=>{cleanup();reject();},20000);
+    function cleanup(){delete window[cb];try{if(s.parentNode)s.parentNode.removeChild(s);}catch(e){}clearTimeout(t);}
+    window[cb] = d=>{cleanup();resolve(d);};
+    s.onerror  = ()=>{cleanup();reject();};
+    s.src = SL_API+'?'+new URLSearchParams(p);
+    (document.head||document.body).appendChild(s);
+  });
+}
+
+async function loadStrikeBoard() {
+  try {
+    const results = await Promise.all(
+      SL_CLASSES.map(cls =>
+        slApiGet({ action: 'getAllStrikes', className: cls })
+          .then(d => ({ cls, students: d.students || [] }))
+          .catch(() => ({ cls, students: [] }))
+      )
+    );
+
+    // Flatten and filter only students with strikes
+    const withStrikes = [];
+    results.forEach(({ cls, students }) => {
+      students.forEach(s => {
+        if (s.total > 0) withStrikes.push({ ...s, cls });
+      });
+    });
+
+    // Sort by most strikes first, then name
+    withStrikes.sort((a, b) => b.total - a.total || a.name.localeCompare(b.name));
+
+    const el = document.getElementById('strikeListContent');
+    if (withStrikes.length === 0) {
+      el.innerHTML = `<div class="strike-empty">
+        <div class="strike-empty-icon">🎉</div>
+        <div class="strike-empty-text">No students with active strikes. Keep it up everyone!</div>
+      </div>`;
+      return;
+    }
+
+    el.innerHTML = withStrikes.map((s, i) => {
+      const initial = (s.nickname || s.name)[0].toUpperCase();
+      const dispName = s.nickname || s.name.split(' ').slice(0,2).join(' ');
+      const clsLabel = s.cls.replace('XE', 'X E-');
+      const dots = [1,2,3,4].map(n =>
+        `<div class="sl-dot ${n <= s.total ? 'hit' : 'miss'}">${n <= s.total ? '⚠️' : ''}</div>`
+      ).join('');
+      const sd2 = encodeURIComponent(JSON.stringify(s));
+      return `<div class="strike-list-row" onclick="openStrikePopup('${sd2}')" style="cursor:pointer;">
+        <div class="sl-num">${i+1}</div>
+        <div class="sl-avatar">${initial}</div>
+        <div class="sl-info">
+          <div class="sl-name">${dispName}</div>
+          <div class="sl-class">${clsLabel}</div>
+        </div>
+        <div class="sl-strikes">${dots}</div>
+      </div>`;
+    }).join('');
+
+  } catch(e) {
+    document.getElementById('strikeListContent').innerHTML =
+      '<div class="strike-empty"><div class="strike-empty-text">Could not load strike board.</div></div>';
+  }
+}
+
+loadStrikeBoard();
+
+function openStrikeInfo() {
+  document.getElementById('strikeInfoOverlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeStrikeInfo(e) {
+  if (e && e.target !== document.getElementById('strikeInfoOverlay')) return;
+  document.getElementById('strikeInfoOverlay').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { document.getElementById('strikeInfoOverlay').classList.add('hidden'); document.body.style.overflow = ''; }
+});
+</script>
+
+
+
+<!-- HOF STATS POPUP -->
+<div class="info-overlay hidden" id="hofPopupOverlay" onclick="closeHofPopup(event)">
+  <div class="info-sheet" id="hofPopupSheet">
+    <div class="info-handle"></div>
+    <div class="info-head">
+      <div class="info-avatar" id="hofPopupAvatar"></div>
+      <div>
+        <div class="info-head-name" id="hofPopupName">—</div>
+        <div class="info-head-sub" id="hofPopupSub">—</div>
+      </div>
+      <button class="info-close" onclick="closeHofPopup()">✕</button>
+    </div>
+    <div class="info-body" id="hofPopupBody"></div>
+  </div>
+</div>
+
+<!-- STRIKE DETAIL POPUP -->
+<div class="info-overlay hidden" id="strikePopupOverlay" onclick="closeStrikePopup(event)">
+  <div class="info-sheet" id="strikePopupSheet">
+    <div class="info-handle"></div>
+    <div class="info-head">
+      <div class="info-avatar" id="strikePopupAvatar" style="background:#DC2626;"></div>
+      <div>
+        <div class="info-head-name" id="strikePopupName">—</div>
+        <div class="info-head-sub" id="strikePopupSub">—</div>
+      </div>
+      <button class="info-close" onclick="closeStrikePopup()">✕</button>
+    </div>
+    <div class="info-body" id="strikePopupBody"></div>
+  </div>
+</div>
+
+<!-- STRIKE INFO MODAL -->
+<div class="strike-info-overlay hidden" id="strikeInfoOverlay" onclick="closeStrikeInfo(event)">
+  <div class="strike-info-sheet" id="strikeInfoSheet">
+    <div class="si-handle"></div>
+    <div class="si-head">
+      <button class="si-close" onclick="closeStrikeInfo()">✕</button>
+      <div class="si-head-title">⚠️ Strike Information</div>
+      <div class="si-head-sub">Consequences & how to clear your strike</div>
+    </div>
+    <div class="si-body">
+
+      <div class="si-cons-title">🚨 Consequences</div>
+      <div class="si-con-row one">
+        <div class="si-con-icon">📝</div>
+        <div>
+          <div class="si-con-label">1 Strike or more</div>
+          <div class="si-con-text">You cannot join the Summative Test</div>
+          <div class="si-con-sub">Your strike must be cleared before the exam date.</div>
+        </div>
+      </div>
+      <div class="si-con-row three">
+        <div class="si-con-icon">🚫</div>
+        <div>
+          <div class="si-con-label">3 Strikes or more</div>
+          <div class="si-con-text">You cannot join the class</div>
+          <div class="si-con-sub">You will be asked to leave until your strikes are resolved.</div>
+        </div>
+      </div>
+
+      <div class="si-divider">
+        <div class="si-divider-line"></div>
+        <div class="si-divider-label">How to clear your strike</div>
+        <div class="si-divider-line"></div>
+      </div>
+
+      <div class="si-step">
+        <div class="si-step-num">1</div>
+        <div class="si-step-text">
+          Write a <strong>text based on the current chapter</strong>
+          <span>Chapter 4 → Analytical Exposition · Chapter 5 → Narrative Text</span>
+        </div>
+      </div>
+      <div class="si-step">
+        <div class="si-step-num">2</div>
+        <div class="si-step-text">
+          Minimum <strong>3 paragraphs</strong>, each with at least <strong>5 sentences</strong>
+          <span>All text structure parts must be included.</span>
+        </div>
+      </div>
+      <div class="si-step">
+        <div class="si-step-num">3</div>
+        <div class="si-step-text">
+          <strong>Submit on paper</strong> directly to your teacher
+          <span>Handwritten or printed — your teacher will review it in class.</span>
+        </div>
+      </div>
+      <div class="si-step">
+        <div class="si-step-num">4</div>
+        <div class="si-step-text">
+          Your teacher will <strong>clear your strike</strong> once it's approved
+          <span>Check back here after submission to see it removed from the board.</span>
+        </div>
+      </div>
+
+      <a href="strikes.html" class="si-full-link">📖 See full text structure guide →</a>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const HOF_ACT_DEFS = [
+  { key:'VocabularyBox',   label:'Vocab Box',    color:'#8B5CF6', pts:1 },
+  { key:'Answering',       label:'Answering',    color:'#3B82F6', pts:2 },
+  { key:'Presenting',      label:'Presenting',   color:'#10B981', pts:5 },
+  { key:'DoingTaskOnTime', label:'Task On Time', color:'#F59E0B', pts:2 },
+  { key:'HelpingHand',     label:'Helping Hand', color:'#EC4899', pts:1 },
+  { key:'Quiz',            label:'Quiz',         color:'#14B8A6', pts:1 },
+];
+const HOF_AVATAR_COLORS = ['#7C3AED','#2563EB','#059669','#D97706','#DC2626','#7C3AED','#0891B2','#9333EA','#16A34A'];
+const HOF_CLS_LIST = ['XE1','XE4','XE5','XE6','XE7','XE8','XE9','XE10','XE11'];
+
+function openHofPopup(encoded) {
+  const s = JSON.parse(decodeURIComponent(encoded));
+  const clsIdx   = HOF_CLS_LIST.indexOf(s.cls);
+  const avatarBg = HOF_AVATAR_COLORS[clsIdx] || '#7C3AED';
+  const initial  = (s.nickname || s.name)[0].toUpperCase();
+  const dispName = s.nickname || s.name.split(' ')[0];
+  const clsLabel = s.cls.replace('XE','X E-');
+  const barPct   = Math.min(100, Math.round((s.total / 200) * 100));
+
+  document.getElementById('hofPopupAvatar').textContent = initial;
+  document.getElementById('hofPopupAvatar').style.background = avatarBg;
+  document.getElementById('hofPopupName').textContent = s.name;
+  document.getElementById('hofPopupSub').textContent  = clsLabel + ' · Activeness Stats';
+
+  const indClass = s.Indicator && s.Indicator.includes('Pro Maxxing') ? 'ind-promax' :
+    s.Indicator && s.Indicator.includes('Ultra Pro') ? 'ind-ultrapro' :
+    s.Indicator && s.Indicator.includes('Plus Ultra') ? 'ind-ultra' :
+    s.Indicator && s.Indicator.includes('Hyperactive') ? 'ind-hyper' :
+    s.Indicator && s.Indicator.includes('Super') ? 'ind-super' :
+    s.Indicator && s.Indicator.includes('Active') && !s.Indicator.includes('Not') ? 'ind-active' :
+    s.Indicator && s.Indicator.includes('Okay') ? 'ind-okay' : 'ind-not';
+
+  const indColors = {
+    'ind-promax':'#fff','ind-ultrapro':'#FCA5A5','ind-ultra':'#F97316','ind-hyper':'#FBBF24','ind-super':'#10B981',
+    'ind-active':'#A78BFA','ind-okay':'#F59E0B','ind-not':'#EF4444'
+  };
+  const indBgs = {
+    'ind-promax':'rgba(139,92,246,0.25)','ind-ultrapro':'rgba(239,68,68,0.15)','ind-ultra':'rgba(249,115,22,0.1)','ind-hyper':'rgba(251,191,36,0.12)',
+    'ind-super':'rgba(16,185,129,0.1)','ind-active':'rgba(139,92,246,0.1)',
+    'ind-okay':'rgba(245,158,11,0.1)','ind-not':'rgba(239,68,68,0.08)'
+  };
+
+  const statsHtml = HOF_ACT_DEFS.map(a => {
+    const times = s[a.key] || 0;
+    const pts   = times * a.pts;
+    return `<div class="hof-stat-card">
+      <div class="hof-stat-card-top">
+        <div class="hof-stat-dot" style="background:${a.color}"></div>
+        <div class="hof-stat-cat">${a.label}</div>
+      </div>
+      <div class="hof-stat-nums">
+        <div class="hof-stat-times">${times}<small>times</small></div>
+        <div class="hof-stat-pts" style="color:${a.color}">+${pts}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('hofPopupBody').innerHTML = `
+    <div class="hof-popup-total">
+      <span class="hof-popup-total-label">Total Points</span>
+      <span class="hof-popup-total-val">${s.total} pts</span>
+    </div>
+    <div class="hof-popup-bar-wrap"><div class="hof-popup-bar" style="width:${barPct}%"></div></div>
+    <div class="hof-stat-cards">${statsHtml}</div>
+    <div class="hof-popup-indicator" style="background:${indBgs[indClass]||'#F9F7FF'};color:${indColors[indClass]||'#6B5B95'};border:1.5px solid ${indColors[indClass]||'#E5DEFF'}33;margin-top:14px;">
+      ${s.Indicator || '—'}
+    </div>`;
+
+  document.getElementById('hofPopupOverlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeHofPopup(e) {
+  if (e && e.target !== document.getElementById('hofPopupOverlay')) return;
+  document.getElementById('hofPopupOverlay').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+function openStrikePopup(encoded) {
+  const s = JSON.parse(decodeURIComponent(encoded));
+  const initial  = (s.nickname || s.name)[0].toUpperCase();
+  const clsLabel = s.cls.replace('XE','X E-');
+
+  document.getElementById('strikePopupAvatar').textContent = initial;
+  document.getElementById('strikePopupName').textContent   = s.name;
+  document.getElementById('strikePopupSub').textContent    = clsLabel + ' · ' + s.total + ' strike' + (s.total !== 1 ? 's' : '');
+
+  const dots = [1,2,3,4].map(n =>
+    `<div class="strike-popup-dot ${n <= s.total ? 'hit' : 'miss'}">${n <= s.total ? '⚠️' : ''}</div>`
+  ).join('');
+
+  document.getElementById('strikePopupBody').innerHTML = `
+    <div class="strike-popup-dots">${dots}</div>
+    <div class="strike-popup-detail">
+      ${s.date   ? `<div class="strike-popup-row"><span class="strike-popup-label">Date</span><span class="strike-popup-val">${s.date}</span></div>` : ''}
+      ${s.reason ? `<div class="strike-popup-row"><span class="strike-popup-label">Reason</span><span class="strike-popup-val">${s.reason}</span></div>` : ''}
+      ${!s.date && !s.reason ? '<div style="color:#6B5B95;font-size:0.85rem;">No details recorded.</div>' : ''}
+    </div>`;
+
+  document.getElementById('strikePopupOverlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeStrikePopup(e) {
+  if (e && e.target !== document.getElementById('strikePopupOverlay')) return;
+  document.getElementById('strikePopupOverlay').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.getElementById('hofPopupOverlay').classList.add('hidden');
+    document.getElementById('strikePopupOverlay').classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+});
+</script>
+
+
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-head">
+    <img class="sidebar-logo" src="logo.jpg" alt="Logo"/>
+    <div class="sidebar-head-text">
+      <div class="sidebar-head-title">English Quest</div>
+      <div class="sidebar-head-sub">SMA Negeri 6 Surakarta</div>
+    </div>
+    <button class="sidebar-close" onclick="closeSidebar()">✕</button>
+  </div>
+
+  <!-- Teacher login area in sidebar -->
+  <div class="sidebar-teacher">
+    <div class="sidebar-teacher-label">🔑 Teacher Access</div>
+    <div id="sbTeacherLoggedOut">
+      <button class="sidebar-teacher-btn" onclick="closeSidebar();openHeaderLogin();">Login as Teacher</button>
+    </div>
+    <div id="sbTeacherLoggedIn" style="display:none;">
+      <div class="sidebar-teacher-logged">🎓 Logged in as Teacher <span onclick="headerLogout();updateSidebarTeacher()">Logout</span></div>
+    </div>
+  </div>
+
+  <div class="sidebar-grade">
+    <div class="sidebar-grade-label">Grade Mode</div>
+    <div class="sidebar-grade-row">
+      <div class="sidebar-grade-value" id="sidebarGradeValue">Choose grade</div>
+      <button class="sidebar-grade-btn" type="button" onclick="openGradeGate(true)">Change</button>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">📂 Documents</div>
+    <a href="jeopardyquiz.html" class="sidebar-item" data-page="jeopardyquiz">
+      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">🎮</div>
+      <div class="sidebar-item-name">Chapter 4 Quiz</div>
+    </a>
+    <a href="lessons.html" class="sidebar-item">
+      <div class="sidebar-item-icon" style="background:rgba(124,58,237,0.2)">📑</div>
+      <div class="sidebar-item-name">Lesson Materials</div>
+    </a>
+    <a href="assignments.html" class="sidebar-item">
+      <div class="sidebar-item-icon" style="background:rgba(59,130,246,0.2)">📋</div>
+      <div class="sidebar-item-name">Assignments</div>
+    </a>
+    <a href="submission.html" class="sidebar-item" data-page="submission">
+      <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">📨</div>
+      <div class="sidebar-item-name">Submission</div>
+    </a>
+    <a href="submission_status.html" class="sidebar-item" data-page="submission_status"><div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#9989;</div><div class="sidebar-item-name">Submission Status</div></a>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">👥 Student Data</div>
+    <a href="students.html" class="sidebar-item">
+      <div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">👨‍🎓</div>
+      <div class="sidebar-item-name">Student List</div>
+    </a>
+    <a href="attendance.html" class="sidebar-item">
+      <div class="sidebar-item-icon" style="background:rgba(20,184,166,0.2)">✅</div>
+      <div class="sidebar-item-name">Attendance</div>
+    </a>
+    <a href="scores.html" class="sidebar-item">
+      <div class="sidebar-item-icon" style="background:rgba(249,115,22,0.2)">🏆</div>
+      <div class="sidebar-item-name">Student Scores</div>
+    </a>
+    <a href="tasks.html" class="sidebar-item">
+      <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">✅</div>
+      <div class="sidebar-item-name">Task Status</div>
+    </a>
+    <a href="activeness.html" class="sidebar-item">
+      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">⚡</div>
+      <div class="sidebar-item-name">Activeness</div>
+    </a>
+
+    <a href="strikes.html" class="sidebar-item">
+      <div class="sidebar-item-icon" style="background:rgba(220,38,38,0.2)">⚠️</div>
+      <div class="sidebar-item-name">Strikes</div>
+    </a>
+  </div>
+
+  <div class="sidebar-divider"></div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">📢 Info</div>
+    <a href="summative.html" class="sidebar-item">
+      <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">🎯</div>
+      <div class="sidebar-item-name">Summative</div>
+    </a>
+    <a href="chapter5_guess_who.html" class="sidebar-item" data-page="guess_who" id="sbGuessWho" style="display:none"><div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">&#129300;</div><div class="sidebar-item-name">Guess Who? <span style="font-size:0.65rem;background:#7C3AED;color:#fff;padding:1px 6px;border-radius:999px;margin-left:4px;font-family:IBM Plex Mono,monospace;">Ch.5</span></div></a>
+    <a href="https://www.instagram.com/engquest.viska/" target="_blank" class="sidebar-item">
+      <div class="sidebar-item-icon" style="background:rgba(124,58,237,0.2)">📸</div>
+      <div class="sidebar-item-name">Instagram</div>
+    </a>
+    <a href="gallery.html" class="sidebar-item" data-page="gallery">
+      <div class="sidebar-item-icon" style="background:rgba(59,130,246,0.2)">🖼️</div>
+      <div class="sidebar-item-name">Photo Gallery</div>
+    </a>
+
+  </div>
+
+</nav>
+
+
+<script>
+function toggleSidebar() {
+  const open = document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open', open);
+  document.getElementById('hamburgerBtn').classList.toggle('open', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+  updateSidebarTeacher();
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+  document.getElementById('hamburgerBtn').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function updateSidebarTeacher() {
+  const loggedIn = !!localStorage.getItem('eq_tu');
+  document.getElementById('sbTeacherLoggedOut').style.display = loggedIn ? 'none' : 'block';
+  document.getElementById('sbTeacherLoggedIn').style.display  = loggedIn ? 'block' : 'none';
+  var gwItem = document.getElementById('sbGuessWho');
+  if (gwItem) gwItem.style.display = loggedIn ? 'flex' : 'none';
+}
+updateSidebarTeacher();
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
+</script>
+
+
+<!-- GRADE SELECTOR -->
+<div class="grade-gate hidden" id="gradeGate" role="dialog" aria-modal="true" aria-labelledby="gradeGateTitle">
+  <div class="grade-gate-card">
+    <img class="grade-gate-logo" src="logo.jpg" alt="English Quest Logo"/>
+    <div class="grade-gate-title" id="gradeGateTitle">Choose Your Grade</div>
+    <div class="grade-gate-sub">English Quest will prepare a different space for each grade, starting from the dashboard you see first.</div>
+    <div class="grade-choice-grid">
+      <button class="grade-choice" type="button" onclick="chooseGrade('10')">
+        <div class="grade-choice-kicker">Current English Quest</div>
+        <div class="grade-choice-title">Grade 10</div>
+        <div class="grade-choice-copy">Use the existing class dashboard, materials, scores, tasks, submissions, and activities.</div>
+      </button>
+      <button class="grade-choice" type="button" onclick="chooseGrade('11')">
+        <div class="grade-choice-kicker">Next Semester Draft</div>
+        <div class="grade-choice-title">Grade 11</div>
+        <div class="grade-choice-copy">Open the new Grade 11 mode so future lessons and data can be separated cleanly.</div>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- STUDENT SETUP MODAL -->
+<div class="setup-overlay hidden" id="setupOverlay">
+  <div class="setup-card">
+    <div class="setup-top">
+      <div class="setup-top-icon">👋</div>
+      <div class="setup-top-title">Welcome to English Quest!</div>
+      <div class="setup-top-sub">Tell us who you are so we can personalize your experience</div>
+    </div>
+    <div class="setup-body">
+      <div class="setup-field">
+        <label>Your Class</label>
+        <select id="setupClass">
+          <option value="">-- Select your class --</option>
+          <option value="XE1">X E-1</option>
+          <option value="XE4">X E-4</option>
+          <option value="XE5">X E-5</option>
+          <option value="XE6">X E-6</option>
+          <option value="XE7">X E-7</option>
+          <option value="XE8">X E-8</option>
+          <option value="XE9">X E-9</option>
+          <option value="XE10">X E-10</option>
+          <option value="XE11">X E-11</option>
+        </select>
+      </div>
+      <div class="setup-field">
+        <label>Your Name</label>
+        <select id="setupName" disabled>
+          <option value="">-- Select class first --</option>
+        </select>
+      </div>
+      <button class="setup-submit" id="setupSubmit" disabled>Let's Go! 🚀</button>
+      <div class="setup-skip" onclick="skipSetup()">I'm just browsing, skip this</div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ── STUDENT IDENTITY ─────────────────────────────────────────
+const SETUP_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+const CLASS_LABELS_FULL = { XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
+const GRADE_LABELS = { '10':'Grade 10', '11':'Grade 11' };
+const CLASS_OPTIONS_BY_GRADE = {
+  '10': [
+    ['XE1', 'X E-1'],
+    ['XE4', 'X E-4'],
+    ['XE5', 'X E-5'],
+    ['XE6', 'X E-6'],
+    ['XE7', 'X E-7'],
+    ['XE8', 'X E-8'],
+    ['XE9', 'X E-9'],
+    ['XE10', 'X E-10'],
+    ['XE11', 'X E-11']
+  ],
+  '11': []
+};
+
+function getSelectedGrade() {
+  return localStorage.getItem('eq_grade') || '';
+}
+
+function updateGradeUi() {
+  var grade = getSelectedGrade();
+  var label = GRADE_LABELS[grade] || 'Choose grade';
+  document.documentElement.setAttribute('data-grade', grade || 'unset');
+
+  var chip = document.getElementById('gradeChip');
+  var chipText = document.getElementById('gradeChipText');
+  var sidebarValue = document.getElementById('sidebarGradeValue');
+
+  if (chip) chip.style.display = grade ? 'inline-flex' : 'none';
+  if (chipText) chipText.textContent = label;
+  if (sidebarValue) sidebarValue.textContent = label;
+}
+
+function openGradeGate(isChange) {
+  closeSidebar();
+  var gate = document.getElementById('gradeGate');
+  if (!gate) return;
+  gate.classList.remove('hidden');
+  gate.setAttribute('data-change', isChange ? '1' : '0');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeGradeGate() {
+  var gate = document.getElementById('gradeGate');
+  if (gate) gate.classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+function chooseGrade(grade) {
+  var previous = getSelectedGrade();
+  localStorage.setItem('eq_grade', grade);
+
+  if ((previous && previous !== grade) || (!previous && grade !== '10')) {
+    localStorage.removeItem('eq_student_class');
+    localStorage.removeItem('eq_student_no');
+    localStorage.removeItem('eq_student_name');
+    localStorage.removeItem('eq_setup_skipped');
+  }
+
+  updateGradeUi();
+  renderSetupClasses();
+  closeGradeGate();
+  initStudentGreeting();
+}
+
+function renderSetupClasses() {
+  var grade = getSelectedGrade();
+  var select = document.getElementById('setupClass');
+  if (!select) return;
+
+  select.innerHTML = '<option value="">-- Select your class --</option>';
+  var options = CLASS_OPTIONS_BY_GRADE[grade] || [];
+
+  if (!grade) {
+    select.innerHTML = '<option value="">-- Choose grade first --</option>';
+    return;
+  }
+
+  if (!options.length) {
+    select.innerHTML = '<option value="">Grade ' + grade + ' classes coming soon</option>';
+    return;
+  }
+
+  options.forEach(function(item) {
+    var opt = document.createElement('option');
+    opt.value = item[0];
+    opt.textContent = item[1];
+    select.appendChild(opt);
+  });
+}
+
+function setupApiGet(params) {
+  var url = SETUP_API + '?';
+  var parts = [];
+  for (var k in params) parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
+  url += parts.join('&');
+  return new Promise(function(resolve, reject) {
+    var cb = 'setup_cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    var script = document.createElement('script');
+    var timer = setTimeout(function() {
+      delete window[cb];
+      try { document.head.removeChild(script); } catch(e) {}
+      reject(new Error('Timeout'));
+    }, 12000);
+    window[cb] = function(data) {
+      clearTimeout(timer);
+      delete window[cb];
+      try { document.head.removeChild(script); } catch(e) {}
+      resolve(data);
+    };
+    script.onerror = function() { clearTimeout(timer); reject(new Error('Network error')); };
+    script.src = url + '&callback=' + cb;
+    document.head.appendChild(script);
+  });
+}
+
+function getStudentIdentity() {
+  var cls  = localStorage.getItem('eq_student_class');
+  var no   = localStorage.getItem('eq_student_no');
+  var name = localStorage.getItem('eq_student_name');
+  if (cls && no && name) return { cls: cls, no: no, name: name };
+  return null;
+}
+
+function initStudentGreeting() {
+  updateGradeUi();
+
+  var greeting = document.getElementById('studentGreeting');
+  if (!getSelectedGrade()) {
+    greeting.classList.add('show');
+    greeting.style.justifyContent = 'center';
+    greeting.innerHTML = '<span onclick="openGradeGate(false)" style="font-size:0.8rem;color:rgba(255,255,255,0.7);cursor:pointer;text-decoration:underline;">Choose your grade</span>';
+    openGradeGate(false);
+    return;
+  }
+
+  var id = getStudentIdentity();
+  if (id) {
+    greeting.classList.add('show');
+    greeting.style.justifyContent = '';
+    document.getElementById('sgAvatar').textContent = id.name.charAt(0).toUpperCase();
+    document.getElementById('sgName').textContent   = id.name.split(' ')[0];
+    document.getElementById('sgClass').textContent  = CLASS_LABELS_FULL[id.cls] || id.cls;
+  } else {
+    // Show a small "Personalize" button in greeting area instead of greeting
+    greeting.classList.add('show');
+    greeting.style.justifyContent = 'center';
+    greeting.innerHTML = '<span onclick="openSetup(false)" style="font-size:0.8rem;color:rgba(255,255,255,0.7);cursor:pointer;text-decoration:underline;">Personalize for me</span>';
+
+    // Also auto-open setup on first ever visit
+    var skipped = localStorage.getItem('eq_setup_skipped');
+    if (!skipped) {
+      // Wait for fonts/layout to settle before showing modal
+      if (document.readyState === 'complete') {
+        openSetup(false);
+      } else {
+        window.addEventListener('load', function() { openSetup(false); });
+      }
+    }
+  }
+}
+
+function openSetup(isChange) {
+  if (!getSelectedGrade()) {
+    openGradeGate(false);
+    return;
+  }
+
+  renderSetupClasses();
+  var overlay = document.getElementById('setupOverlay');
+  overlay.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+
+  if (isChange) {
+    var id = getStudentIdentity();
+    if (id) {
+      document.getElementById('setupClass').value = id.cls;
+      loadSetupNames(id.cls, id.no);
+      return;
+    }
+  }
+  // Reset form
+  document.getElementById('setupClass').value = '';
+  document.getElementById('setupName').innerHTML = '<option value="">-- Select class first --</option>';
+  document.getElementById('setupName').disabled = true;
+  document.getElementById('setupSubmit').disabled = true;
+}
+
+function logoutStudent() {
+  localStorage.removeItem('eq_student_class');
+  localStorage.removeItem('eq_student_no');
+  localStorage.removeItem('eq_student_name');
+  localStorage.removeItem('eq_setup_skipped');
+  document.getElementById('studentGreeting').classList.remove('show');
+  // Show setup modal so they can pick again or skip
+  openSetup(false);
+}
+
+function skipSetup() {
+  localStorage.setItem('eq_setup_skipped', '1');
+  document.getElementById('setupOverlay').classList.add('hidden');
+  document.body.style.overflow = '';
+  // Show personalize link
+  var greeting = document.getElementById('studentGreeting');
+  greeting.classList.add('show');
+  greeting.style.justifyContent = 'center';
+  greeting.innerHTML = '<span onclick="openSetup(false)" style="font-size:0.8rem;color:rgba(255,255,255,0.7);cursor:pointer;text-decoration:underline;">Personalize for me</span>';
+}
+
+document.getElementById('setupClass').addEventListener('change', function() {
+  var cls = this.value;
+  if (!cls) return;
+  loadSetupNames(cls, null);
+});
+
+document.getElementById('setupName').addEventListener('change', function() {
+  document.getElementById('setupSubmit').disabled = !this.value;
+});
+
+function loadSetupNames(cls, preselectNo) {
+  var sel = document.getElementById('setupName');
+  sel.innerHTML = '<option value="">Loading...</option>';
+  sel.disabled = true;
+  document.getElementById('setupSubmit').disabled = true;
+
+  setupApiGet({ action: 'getStudents', className: cls })
+    .then(function(res) {
+      if (!res.students || !res.students.length) {
+        sel.innerHTML = '<option value="">No students found</option>';
+        return;
+      }
+      sel.innerHTML = '<option value="">-- Select your name --</option>';
+      res.students.forEach(function(s) {
+        var label = s.nickname ? s.name + ' (' + s.nickname + ')' : s.name;
+        var opt   = document.createElement('option');
+        opt.value = s.no;
+        opt.textContent = label;
+        opt.setAttribute('data-name', s.name);
+        if (preselectNo && String(s.no) === String(preselectNo)) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      sel.disabled = false;
+      if (preselectNo) document.getElementById('setupSubmit').disabled = false;
+    })
+    .catch(function(e) {
+      sel.innerHTML = '<option value="">Failed to load — try again</option>';
+      sel.disabled = false;
+    });
+}
+
+document.getElementById('setupSubmit').addEventListener('click', function() {
+  var cls = document.getElementById('setupClass').value;
+  var sel = document.getElementById('setupName');
+  var no  = sel.value;
+  var selectedOpt = sel.options[sel.selectedIndex];
+  var name = selectedOpt ? (selectedOpt.getAttribute('data-name') || selectedOpt.textContent.split(' (')[0]) : '';
+  if (!cls || !no || !name) return;
+
+  localStorage.setItem('eq_student_class', cls);
+  localStorage.setItem('eq_student_no',    no);
+  localStorage.setItem('eq_student_name',  name);
+  localStorage.removeItem('eq_setup_skipped');
+
+  document.getElementById('setupOverlay').classList.add('hidden');
+  document.body.style.overflow = '';
+
+  var greeting = document.getElementById('studentGreeting');
+  greeting.classList.add('show');
+  greeting.style.justifyContent = '';
+  greeting.innerHTML =
+    '<div class="sg-avatar" id="sgAvatar">' + name.charAt(0).toUpperCase() + '</div>' +
+    '<div class="sg-info">' +
+      '<div class="sg-name" id="sgName">' + name.split(' ')[0] + '</div>' +
+      '<div class="sg-class" id="sgClass">' + (CLASS_LABELS_FULL[cls] || cls) + '</div>' +
+    '</div>' +
+    '<div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0;">' +
+      '<span class="sg-change" onclick="openSetup(true)">Change</span>' +
+      '<span class="sg-change" onclick="logoutStudent()" style="color:rgba(255,100,100,0.7);">Sign out</span>' +
+    '</div>';
+});
+
+// Run on load
+updateGradeUi();
+renderSetupClasses();
+initStudentGreeting();
+</script>
+
+
+<script>
+// ── ANNOUNCEMENTS ─────────────────────────────────────────────
+var SCORES_API_ANN = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+
+function annApiGet(params) {
+  var url = SCORES_API_ANN + '?';
+  var parts = [];
+  for (var k in params) parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
+  url += parts.join('&');
+  return new Promise(function(resolve, reject) {
+    var cb = 'ann_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    var script = document.createElement('script');
+    var timer = setTimeout(function() {
+      delete window[cb];
+      try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
+      reject(new Error('Timeout'));
+    }, 15000);
+    window[cb] = function(d) {
+      clearTimeout(timer); delete window[cb];
+      try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
+      resolve(d);
+    };
+    script.onerror = function() { clearTimeout(timer); delete window[cb]; reject(new Error('Network error')); };
+    script.src = url + '&callback=' + cb;
+    (document.body || document.head).appendChild(script);
+  });
+}
+
+var ANN_ICONS = { info:'📘', warning:'⚠️', success:'✅', urgent:'🚨' };
+
+function loadAnnouncement() {
+  annApiGet({ action: 'getAnnouncement' }).then(function(res) {
+    if (!res.announcement) return;
+    var ann = res.announcement;
+
+    // Store postedAt so dismiss works correctly
+    window.__annPostedAt = ann.postedAt;
+
+    // Check if student already dismissed this exact announcement
+    var dismissed = localStorage.getItem('eq_ann_dismissed');
+    if (dismissed === ann.postedAt) return;
+
+    showAnnouncementBanner(ann);
+
+    // Pre-fill editor if teacher
+    if (localStorage.getItem('eq_tu')) {
+      document.getElementById('annType').value       = ann.type  || 'info';
+      document.getElementById('annTitleInput').value = ann.title || '';
+      document.getElementById('annBodyInput').value  = ann.body  || '';
+      document.getElementById('annEditorStatus').textContent = 'Active announcement';
+    }
+  }).catch(function() {});
+}
+
+function showAnnouncementBanner(ann) {
+  var banner = document.getElementById('annBanner');
+  banner.className = 'ann-banner show ' + (ann.type || 'info');
+  document.getElementById('annIcon').textContent  = ANN_ICONS[ann.type] || '📢';
+  document.getElementById('annTitle').textContent = ann.title || '';
+  document.getElementById('annBody').textContent  = ann.body  || '';
+  var d = new Date(ann.postedAt);
+  var dateStr = d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+  document.getElementById('annMeta').textContent = 'Posted ' + dateStr;
+}
+
+function dismissAnnouncement() {
+  localStorage.setItem('eq_ann_dismissed', window.__annPostedAt || 'dismissed');
+  var banner = document.getElementById('annBanner');
+  banner.style.transition = 'opacity 0.3s';
+  banner.style.opacity = '0';
+  setTimeout(function() { banner.classList.remove('show'); banner.style.opacity = ''; }, 300);
+}
+
+function postAnnouncement() {
+  var u    = localStorage.getItem('eq_tu');
+  var p    = localStorage.getItem('eq_tp');
+  var type = document.getElementById('annType').value;
+  var title = document.getElementById('annTitleInput').value.trim();
+  var body  = document.getElementById('annBodyInput').value.trim();
+
+  if (!title && !body) { alert('Please enter a title or message.'); return; }
+
+  var btn = document.querySelector('.ann-post-btn');
+  btn.textContent = 'Posting...'; btn.disabled = true;
+
+  annApiGet({ action:'setAnnouncement', username:u, password:p, title:title, body:body, type:type })
+    .then(function(res) {
+      if (res.success) {
+        document.getElementById('annEditorStatus').textContent = '✅ Posted!';
+        // Show banner live
+        window.__annPostedAt = res.announcement.postedAt;
+        showAnnouncementBanner(res.announcement);
+        setTimeout(function() { document.getElementById('annEditorStatus').textContent = 'Active announcement'; }, 2000);
+      } else {
+        alert('Error: ' + (res.error || 'Failed'));
+      }
+    }).catch(function(e) {
+      alert('Network error: ' + e.message);
+    }).finally(function() {
+      btn.textContent = '📨 Post Announcement'; btn.disabled = false;
+    });
+}
+
+function clearAnnouncement() {
+  if (!confirm('Remove the current announcement?')) return;
+  var u = localStorage.getItem('eq_tu');
+  var p = localStorage.getItem('eq_tp');
+
+  annApiGet({ action:'clearAnnouncement', username:u, password:p })
+    .then(function(res) {
+      if (res.success) {
+        document.getElementById('annBanner').classList.remove('show');
+        document.getElementById('annTitleInput').value = '';
+        document.getElementById('annBodyInput').value  = '';
+        document.getElementById('annEditorStatus').textContent = 'Cleared';
+      }
+    }).catch(function() {});
+}
+
+// Show editor only for teacher
+if (localStorage.getItem('eq_tu')) {
+  document.getElementById('annEditor').classList.add('show');
+}
+
+// Load on page ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadAnnouncement);
+} else {
+  loadAnnouncement();
+}
+
+// ── BANNER SLIDER ─────────────────────────────────────────────
+var bannerSlides = [];
+var bannerCurrent = 0;
+var bannerTimer = null;
+
+var BANNER_COLORS = {
+  purple: 'linear-gradient(135deg,#4C1D95 0%,#7C3AED 60%,#A78BFA 100%)',
+  red:    'linear-gradient(135deg,#7F1D1D 0%,#DC2626 60%,#F87171 100%)',
+  green:  'linear-gradient(135deg,#064E3B 0%,#059669 60%,#34D399 100%)',
+  amber:  'linear-gradient(135deg,#78350F 0%,#D97706 60%,#FCD34D 100%)',
+  dark:   'linear-gradient(135deg,#0F0A28 0%,#1E1040 60%,#3B1F6B 100%)',
+};
+
+function loadBannerSlides() {
+  annApiGet({ action: 'getBannerSlides' }).then(function(res) {
+    if (res.slides && res.slides.length > 0) {
+      bannerSlides = res.slides;
+      renderBanner();
+      renderBannerEditor();
+    }
+  }).catch(function() {});
+}
+
+function renderBanner() {
+  if (!bannerSlides.length) return;
+  var wrap  = document.getElementById('bannerWrap');
+  var track = document.getElementById('bannerTrack');
+  var dots  = document.getElementById('bannerDots');
+  wrap.style.display = 'block';
+  track.innerHTML = '';
+  dots.innerHTML  = '';
+
+  bannerSlides.forEach(function(slide, i) {
+    var bg = BANNER_COLORS[slide.color] || BANNER_COLORS.purple;
+    var el = document.createElement(slide.link ? 'a' : 'div');
+    el.className = 'banner-slide';
+    if (slide.link) { el.href = slide.link; }
+    // Background: image if provided, else gradient
+    // Always show gradient background
+    // If image provided: show image with blend mode so color shows through
+    el.innerHTML =
+      '<div class="banner-slide-bg" style="background:' + bg + '"></div>' +
+      (slide.image ? '<img class="banner-slide-img" src="' + slide.image + '" alt="" onerror="this.style.display=\'none\'"/>' : '') +
+      '<div class="banner-slide-overlay"></div>' +
+      '<div class="banner-slide-content">' +
+        (slide.tag ? '<div class="banner-slide-tag">' + slide.tag + '</div>' : '') +
+        '<div class="banner-slide-title">' + (slide.title || '') + '</div>' +
+        (slide.sub ? '<div class="banner-slide-sub">' + slide.sub + '</div>' : '') +
+        (slide.link ? '<div class="banner-slide-cta">Open &#8594;</div>' : '') +
+      '</div>';
+    track.appendChild(el);
+
+    var dot = document.createElement('div');
+    dot.className = 'banner-dot' + (i === 0 ? ' active' : '');
+    dot.onclick = (function(idx) { return function() { bannerGoTo(idx); }; })(i);
+    dots.appendChild(dot);
+  });
+
+  // Hide nav if only 1 slide
+  document.getElementById('bannerPrev').style.display = bannerSlides.length < 2 ? 'none' : 'flex';
+  document.getElementById('bannerNext').style.display = bannerSlides.length < 2 ? 'none' : 'flex';
+
+  bannerGoTo(0);
+  bannerAutoPlay();
+}
+
+function bannerGoTo(idx) {
+  bannerCurrent = (idx + bannerSlides.length) % bannerSlides.length;
+  document.getElementById('bannerTrack').style.transform = 'translateX(-' + (bannerCurrent * 100) + '%)';
+  document.querySelectorAll('.banner-dot').forEach(function(d, i) {
+    d.classList.toggle('active', i === bannerCurrent);
+  });
+}
+
+function bannerNav(dir) {
+  bannerGoTo(bannerCurrent + dir);
+  bannerAutoPlay(); // reset timer on manual nav
+}
+
+function bannerAutoPlay() {
+  if (bannerTimer) clearInterval(bannerTimer);
+  if (bannerSlides.length < 2) return;
+  bannerTimer = setInterval(function() { bannerGoTo(bannerCurrent + 1); }, 4000);
+}
+
+// ── TEACHER: RENDER SLIDE LIST ────────────────────────────────
+function renderBannerEditor() {
+  if (!localStorage.getItem('eq_tu')) return;
+  document.getElementById('bannerEditor').style.display = 'block';
+  var list = document.getElementById('bannerSlideList');
+  var count = document.getElementById('bannerSlideCount');
+  count.textContent = bannerSlides.length + ' slide' + (bannerSlides.length !== 1 ? 's' : '');
+  if (!bannerSlides.length) {
+    list.innerHTML = '<div style="font-size:0.82rem;color:var(--text-muted);padding:8px 4px;">No slides yet. Add one below.</div>';
+    return;
+  }
+  list.innerHTML = bannerSlides.map(function(slide, i) {
+    var dotColor = { purple:'#7C3AED', red:'#DC2626', green:'#059669', amber:'#D97706', dark:'#1E1040' }[slide.color] || '#7C3AED';
+    return '<div class="banner-slide-item">' +
+      '<div class="banner-slide-item-dot" style="background:' + dotColor + '"></div>' +
+      '<div class="banner-slide-item-info">' +
+        '<div class="banner-slide-item-title">' + (slide.title || '—') + '</div>' +
+        '<div class="banner-slide-item-tag">' + (slide.tag || '') + (slide.link ? ' · ' + slide.link : '') + '</div>' +
+      '</div>' +
+      '<button class="banner-slide-item-del" onclick="deleteBannerSlide(' + i + ')">&#10005;</button>' +
+    '</div>';
+  }).join('');
+}
+
+function addBannerSlide() {
+  var tag   = document.getElementById('bnTag').value.trim();
+  var title = document.getElementById('bnTitle').value.trim();
+  var sub   = document.getElementById('bnSub').value.trim();
+  var link  = document.getElementById('bnLink').value.trim();
+  var image = document.getElementById('bnImage').value.trim();
+  var color = document.getElementById('bnColor').value;
+  if (!title) { showToast && showToast('Please enter a title', 'warn'); return; }
+  var u = localStorage.getItem('eq_tu'), p = localStorage.getItem('eq_tp');
+  var newSlides = bannerSlides.concat([{ tag:tag, title:title, sub:sub, link:link, image:image, color:color }]);
+  annApiGet({ action:'setBannerSlides', username:u, password:p, data: JSON.stringify(newSlides) })
+    .then(function(res) {
+      if (res.success) {
+        bannerSlides = newSlides;
+        document.getElementById('bnTag').value = '';
+        document.getElementById('bnTitle').value = '';
+        document.getElementById('bnSub').value = '';
+        document.getElementById('bnLink').value = '';
+        document.getElementById('bnImage').value = '';
+        renderBanner();
+        renderBannerEditor();
+      }
+    }).catch(function() {});
+}
+
+function deleteBannerSlide(idx) {
+  if (!confirm('Remove this slide?')) return;
+  var u = localStorage.getItem('eq_tu'), p = localStorage.getItem('eq_tp');
+  var newSlides = bannerSlides.filter(function(_, i) { return i !== idx; });
+  annApiGet({ action:'setBannerSlides', username:u, password:p, data: JSON.stringify(newSlides) })
+    .then(function(res) {
+      if (res.success) {
+        bannerSlides = newSlides;
+        if (!bannerSlides.length) document.getElementById('bannerWrap').style.display = 'none';
+        else renderBanner();
+        renderBannerEditor();
+      }
+    }).catch(function() {});
+}
+
+loadBannerSlides();
+if (localStorage.getItem('eq_tu')) renderBannerEditor();
+
+</script>
+
+
+<!-- READING MODAL -->
+<div class="res-overlay hidden" id="readingOverlay">
+  <div class="res-top">
+    <div class="res-top-title" id="readingModalTitle">Reading Material</div>
+    <div class="res-top-actions">
+      <a class="res-dl-btn" id="readingDlBtn" href="#" target="_blank">&#8595; Download</a>
+      <button class="res-close-btn" onclick="closeReading()">&#10005;</button>
+    </div>
+  </div>
+  <div class="res-frame">
+    <iframe id="readingIframe" src="" allowfullscreen></iframe>
+  </div>
+</div>
+
+<!-- VIDEO MODAL -->
+<div class="res-overlay hidden" id="videoOverlay">
+  <div class="res-top">
+    <div class="res-top-title" id="videoModalTitle">Video Lesson</div>
+    <div class="res-top-actions">
+      <a class="res-dl-btn" id="videoYtBtn" href="#" target="_blank">&#9654; Open in YouTube</a>
+      <button class="res-close-btn" onclick="closeVideo()">&#10005;</button>
+    </div>
+  </div>
+  <div class="res-frame">
+    <iframe id="videoIframe" src="" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+  </div>
+</div>
+
+
+<script>
+// ── CLASS RESOURCES (Reading + Video) ─────────────────────────
+var RES_KEY_READING = 'eq_res_reading';  // { fileId, title }
+var RES_KEY_VIDEO   = 'eq_res_video';    // { videoId, title }
+
+function loadResources() {
+  var r = JSON.parse(localStorage.getItem(RES_KEY_READING) || 'null');
+  var v = JSON.parse(localStorage.getItem(RES_KEY_VIDEO)   || 'null');
+
+  if (r && r.fileId) {
+    document.getElementById('readingCardDesc').textContent = r.title || 'Class reading material';
+    document.getElementById('readingCard').style.opacity = '1';
+    if (localStorage.getItem('eq_tu')) {
+      document.getElementById('resReadingId').value    = r.fileId;
+      document.getElementById('resReadingTitle').value = r.title || '';
+    }
+  } else {
+    document.getElementById('readingCard').style.opacity = '0.5';
+    document.getElementById('readingCardDesc').textContent = 'No reading set yet';
+  }
+
+  if (v && v.videoId) {
+    document.getElementById('videoCardDesc').textContent = v.title || 'Watch the lesson video';
+    document.getElementById('videoCard').style.opacity = '1';
+    if (localStorage.getItem('eq_tu')) {
+      document.getElementById('resVideoId').value    = v.videoId;
+      document.getElementById('resVideoTitle').value = v.title || '';
+    }
+  } else {
+    document.getElementById('videoCard').style.opacity = '0.5';
+    document.getElementById('videoCardDesc').textContent = 'No video set yet';
+  }
+}
+
+function saveResources() {
+  var readingRaw  = document.getElementById('resReadingId').value.trim();
+  var readingTitle = document.getElementById('resReadingTitle').value.trim();
+  var videoRaw    = document.getElementById('resVideoId').value.trim();
+  var videoTitle  = document.getElementById('resVideoTitle').value.trim();
+
+  // Extract Drive file ID
+  var readingId = readingRaw;
+  var driveMatch = readingRaw.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (driveMatch) readingId = driveMatch[1];
+
+  // Extract YouTube video ID
+  var videoId = videoRaw;
+  var ytMatch = videoRaw.match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
+  if (ytMatch) videoId = ytMatch[1];
+
+  if (readingId) localStorage.setItem(RES_KEY_READING, JSON.stringify({ fileId: readingId, title: readingTitle || 'Reading Material' }));
+  if (videoId)   localStorage.setItem(RES_KEY_VIDEO,   JSON.stringify({ videoId: videoId,   title: videoTitle   || 'Video Lesson' }));
+
+  var status = document.getElementById('resStatus');
+  status.classList.add('show');
+  setTimeout(function() { status.classList.remove('show'); }, 2500);
+
+  loadResources();
+}
+
+function openReading() {
+  var r = JSON.parse(localStorage.getItem(RES_KEY_READING) || 'null');
+  if (!r || !r.fileId) {
+    if (localStorage.getItem('eq_tu')) { alert('Set a Drive file ID in the editor above first.'); }
+    else { alert('No reading material has been set yet.'); }
+    return;
+  }
+  document.getElementById('readingModalTitle').textContent = r.title || 'Reading Material';
+  document.getElementById('readingIframe').src = 'https://drive.google.com/file/d/' + r.fileId + '/preview';
+  document.getElementById('readingDlBtn').href = 'https://drive.google.com/uc?export=download&id=' + r.fileId;
+  document.getElementById('readingOverlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeReading() {
+  document.getElementById('readingOverlay').classList.add('hidden');
+  document.getElementById('readingIframe').src = '';
+  document.body.style.overflow = '';
+}
+
+function openVideo() {
+  var v = JSON.parse(localStorage.getItem(RES_KEY_VIDEO) || 'null');
+  if (!v || !v.videoId) {
+    if (localStorage.getItem('eq_tu')) { alert('Set a YouTube video ID in the editor above first.'); }
+    else { alert('No video has been set yet.'); }
+    return;
+  }
+  document.getElementById('videoModalTitle').textContent = v.title || 'Video Lesson';
+  document.getElementById('videoIframe').src = 'https://www.youtube.com/embed/' + v.videoId + '?autoplay=1&rel=0';
+  document.getElementById('videoYtBtn').href = 'https://www.youtube.com/watch?v=' + v.videoId;
+  document.getElementById('videoOverlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeVideo() {
+  document.getElementById('videoOverlay').classList.add('hidden');
+  document.getElementById('videoIframe').src = '';
+  document.body.style.overflow = '';
+}
+
+// Show teacher editor if logged in
+if (localStorage.getItem('eq_tu')) {
+  document.getElementById('resEditor').classList.add('show');
+}
+
+// Close modals on overlay click or Escape
+document.getElementById('readingOverlay').addEventListener('click', function(e) { if (e.target === this) closeReading(); });
+document.getElementById('videoOverlay').addEventListener('click', function(e) { if (e.target === this) closeVideo(); });
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closeReading(); closeVideo(); } });
+
+// Load on ready
+loadResources();
+</script>
+
+
+<script>
+// Wake up Apps Script while user is on homepage (reduces cold start on inner pages)
+(function() {
+  var API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+  var last = localStorage.getItem('eq_last_ping');
+  if (last && Date.now() - parseInt(last) < 5 * 60 * 1000) return; // skip if pinged <5 min ago
+  var script = document.createElement('script');
+  script.src = API + '?action=ping&callback=eq_ping_cb';
+  window.eq_ping_cb = function() { localStorage.setItem('eq_last_ping', Date.now()); delete window.eq_ping_cb; };
+  setTimeout(function() { (document.body || document.head).appendChild(script); }, 1500); // after page renders
+})();
+</script>
+
+
+<script>
+// ── STRIKE CHECK ON HOMEPAGE ─────────────────────────────────
+(function() {
+  var cls  = localStorage.getItem('eq_student_class');
+  var no   = localStorage.getItem('eq_student_no');
+  var name = localStorage.getItem('eq_student_name');
+  if (!cls || !no || !name) return;
+
+  var STRIKE_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+
+  // Check cache first (same cache TTL as other pages)
+  var cacheParams = { action: 'getStudentStrikes', className: cls, studentNo: no };
+  var cacheK = 'eq_cache_' + Object.keys(cacheParams).sort().map(function(k) { return k + '=' + cacheParams[k]; }).join('_').replace(/[^a-zA-Z0-9_=]/g, '_');
+
+  function applyStrikeWarning(total) {
+    if (!total || total === 0) return;
+    var greeting = document.getElementById('studentGreeting');
+    if (!greeting || !greeting.classList.contains('show')) return;
+
+    greeting.classList.add('has-strike');
+
+    var msgs = ['', '⚠️ You have 1 strike — stay on track!', '⚠️ 2 strikes — be careful!', '🚨 3 strikes — warning!', '❌ 4 strikes — see your teacher!'];
+    var msg = msgs[Math.min(total, 4)] || ('🚨 ' + total + ' strikes!');
+
+    // Inject strike badge inside sg-info
+    var info = greeting.querySelector('.sg-info');
+    if (!info) return;
+    var existing = info.querySelector('.sg-strike-badge');
+    if (existing) existing.remove();
+
+    var badge = document.createElement('div');
+    badge.className = 'sg-strike-badge';
+    badge.onclick = function() { window.location.href = 'strikes.html'; };
+    badge.innerHTML = '<span class="sg-strike-badge-text">' + msg + '</span><span class="sg-strike-badge-arrow">› See details</span>';
+    info.appendChild(badge);
+  }
+
+  // Try cache first
+  try {
+    var raw = localStorage.getItem(cacheK);
+    if (raw) {
+      var entry = JSON.parse(raw);
+      if (Date.now() - entry.ts < 30 * 60 * 1000 && entry.data && entry.data.total !== undefined) {
+        applyStrikeWarning(entry.data.total);
+        return; // Cache hit — no need to fetch
+      }
+    }
+  } catch(e) {}
+
+  // No cache — fetch silently in background
+  var cb = 'strike_home_' + Date.now();
+  var script = document.createElement('script');
+  var timer = setTimeout(function() {
+    delete window[cb];
+    try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
+  }, 15000);
+
+  window[cb] = function(data) {
+    clearTimeout(timer); delete window[cb];
+    try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
+    if (data && data.total !== undefined) {
+      // Save to cache
+      try { localStorage.setItem(cacheK, JSON.stringify({ ts: Date.now(), data: data })); } catch(e) {}
+      applyStrikeWarning(data.total);
+    }
+  };
+
+  script.src = STRIKE_API + '?action=getStudentStrikes&className=' + encodeURIComponent(cls) + '&studentNo=' + encodeURIComponent(no) + '&callback=' + cb;
+  setTimeout(function() { (document.body || document.head).appendChild(script); }, 2000); // after page settles
+})();
+</script>
+
+<script>
+// Grade 10 is now its own dashboard; grade switching happens at the landing page.
+localStorage.setItem('eq_grade', '10');
+window.openGradeGate = function() {
+  window.location.href = 'index.html';
+};
+window.chooseGrade = function(grade) {
+  localStorage.setItem('eq_grade', grade);
+  window.location.href = grade === '11' ? 'grade11.html' : 'grade10.html';
+};
+</script>
+
+</body>
+</html>
