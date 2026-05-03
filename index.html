@@ -865,6 +865,33 @@
     .sg-change { font-size:0.7rem; color:rgba(255,255,255,0.5); cursor:pointer; text-decoration:underline; flex-shrink:0; }
     .sg-change:hover { color:rgba(255,255,255,0.85); }
 
+    /* GRADE SELECTOR */
+    .grade-chip { display:inline-flex; align-items:center; gap:8px; margin-top:14px; position:relative; z-index:2; background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.25); color:#fff; border-radius:999px; padding:8px 16px; font-size:0.82rem; font-weight:700; }
+    .grade-chip button { background:transparent; border:none; color:rgba(255,255,255,0.68); font-family:inherit; font-size:0.74rem; font-weight:700; cursor:pointer; text-decoration:underline; padding:0; }
+    .grade-gate { position:fixed; inset:0; z-index:650; background:linear-gradient(135deg,rgba(30,16,64,0.96),rgba(76,29,149,0.94)); backdrop-filter:blur(12px); display:flex; align-items:center; justify-content:center; padding:22px; }
+    .grade-gate.hidden { display:none; }
+    .grade-gate-card { width:100%; max-width:760px; color:#fff; text-align:center; }
+    .grade-gate-logo { width:76px; height:76px; border-radius:22px; object-fit:cover; border:3px solid rgba(255,255,255,0.28); box-shadow:0 18px 48px rgba(0,0,0,0.28); margin-bottom:18px; }
+    .grade-gate-title { font-family:'Playfair Display',serif; font-size:clamp(2rem,6vw,3.2rem); line-height:1.05; font-weight:800; margin-bottom:10px; }
+    .grade-gate-sub { color:rgba(255,255,255,0.72); font-size:1rem; max-width:520px; margin:0 auto 26px; line-height:1.55; }
+    .grade-choice-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+    .grade-choice { border:1.5px solid rgba(255,255,255,0.22); background:rgba(255,255,255,0.1); color:#fff; border-radius:20px; padding:26px 22px; text-align:left; cursor:pointer; transition:transform 0.18s ease, background 0.18s ease, border-color 0.18s ease; font-family:inherit; min-height:170px; }
+    .grade-choice:hover { transform:translateY(-3px); background:rgba(255,255,255,0.16); border-color:rgba(255,255,255,0.42); }
+    .grade-choice-kicker { font-size:0.72rem; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.12em; color:var(--accent); font-weight:700; margin-bottom:10px; }
+    .grade-choice-title { font-family:'Playfair Display',serif; font-size:1.55rem; font-weight:800; margin-bottom:8px; }
+    .grade-choice-copy { font-size:0.88rem; color:rgba(255,255,255,0.68); line-height:1.5; }
+    .sidebar-grade { margin:12px 16px 0; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); border-radius:14px; padding:12px 14px; }
+    .sidebar-grade-label { font-size:0.68rem; font-weight:700; color:rgba(255,255,255,0.36); text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:7px; }
+    .sidebar-grade-row { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .sidebar-grade-value { color:#fff; font-weight:800; font-size:0.88rem; }
+    .sidebar-grade-btn { border:none; background:rgba(255,255,255,0.12); color:#fff; border-radius:999px; padding:6px 10px; font-family:inherit; font-size:0.72rem; font-weight:700; cursor:pointer; }
+
+    @media (max-width: 640px) {
+      .grade-choice-grid { grid-template-columns:1fr; }
+      .grade-gate-card { text-align:left; }
+      .grade-gate-sub { margin-left:0; margin-right:0; }
+    }
+
     /* SETUP MODAL */
     .setup-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.85); backdrop-filter:blur(10px); z-index:500; display:flex; align-items:center; justify-content:center; padding:20px; }
     .setup-overlay.hidden { display:none; }
@@ -1114,6 +1141,10 @@
   <div class="header-tags">
     <span class="tag">📖 English Class</span>
     <span class="tag">🏫 SMAVISKA</span>
+  </div>
+  <div class="grade-chip" id="gradeChip" style="display:none;">
+    <span id="gradeChipText">Grade</span>
+    <button type="button" onclick="openGradeGate(true)">Change</button>
   </div>
   <div id="headerLoginArea" style="margin-top:14px;position:relative;z-index:2;">
     <button id="headerLoginBtn" onclick="openHeaderLogin()" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.35);color:#fff;font-family:'IBM Plex Sans',sans-serif;font-size:0.82rem;font-weight:700;padding:8px 20px;border-radius:999px;cursor:pointer;">🔑 Teacher Login</button>
@@ -2288,6 +2319,14 @@ document.addEventListener('keydown', e => {
     </div>
   </div>
 
+  <div class="sidebar-grade">
+    <div class="sidebar-grade-label">Grade Mode</div>
+    <div class="sidebar-grade-row">
+      <div class="sidebar-grade-value" id="sidebarGradeValue">Choose grade</div>
+      <button class="sidebar-grade-btn" type="button" onclick="openGradeGate(true)">Change</button>
+    </div>
+  </div>
+
   <div class="sidebar-section">
     <div class="sidebar-section-label">📂 Documents</div>
     <a href="jeopardyquiz.html" class="sidebar-item" data-page="jeopardyquiz">
@@ -2389,6 +2428,27 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar
 </script>
 
 
+<!-- GRADE SELECTOR -->
+<div class="grade-gate hidden" id="gradeGate" role="dialog" aria-modal="true" aria-labelledby="gradeGateTitle">
+  <div class="grade-gate-card">
+    <img class="grade-gate-logo" src="logo.jpg" alt="English Quest Logo"/>
+    <div class="grade-gate-title" id="gradeGateTitle">Choose Your Grade</div>
+    <div class="grade-gate-sub">English Quest will prepare a different space for each grade, starting from the dashboard you see first.</div>
+    <div class="grade-choice-grid">
+      <button class="grade-choice" type="button" onclick="chooseGrade('10')">
+        <div class="grade-choice-kicker">Current English Quest</div>
+        <div class="grade-choice-title">Grade 10</div>
+        <div class="grade-choice-copy">Use the existing class dashboard, materials, scores, tasks, submissions, and activities.</div>
+      </button>
+      <button class="grade-choice" type="button" onclick="chooseGrade('11')">
+        <div class="grade-choice-kicker">Next Semester Draft</div>
+        <div class="grade-choice-title">Grade 11</div>
+        <div class="grade-choice-copy">Open the new Grade 11 mode so future lessons and data can be separated cleanly.</div>
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- STUDENT SETUP MODAL -->
 <div class="setup-overlay hidden" id="setupOverlay">
   <div class="setup-card">
@@ -2430,6 +2490,97 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar
 // ── STUDENT IDENTITY ─────────────────────────────────────────
 const SETUP_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
 const CLASS_LABELS_FULL = { XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
+const GRADE_LABELS = { '10':'Grade 10', '11':'Grade 11' };
+const CLASS_OPTIONS_BY_GRADE = {
+  '10': [
+    ['XE1', 'X E-1'],
+    ['XE4', 'X E-4'],
+    ['XE5', 'X E-5'],
+    ['XE6', 'X E-6'],
+    ['XE7', 'X E-7'],
+    ['XE8', 'X E-8'],
+    ['XE9', 'X E-9'],
+    ['XE10', 'X E-10'],
+    ['XE11', 'X E-11']
+  ],
+  '11': []
+};
+
+function getSelectedGrade() {
+  return localStorage.getItem('eq_grade') || '';
+}
+
+function updateGradeUi() {
+  var grade = getSelectedGrade();
+  var label = GRADE_LABELS[grade] || 'Choose grade';
+  document.documentElement.setAttribute('data-grade', grade || 'unset');
+
+  var chip = document.getElementById('gradeChip');
+  var chipText = document.getElementById('gradeChipText');
+  var sidebarValue = document.getElementById('sidebarGradeValue');
+
+  if (chip) chip.style.display = grade ? 'inline-flex' : 'none';
+  if (chipText) chipText.textContent = label;
+  if (sidebarValue) sidebarValue.textContent = label;
+}
+
+function openGradeGate(isChange) {
+  closeSidebar();
+  var gate = document.getElementById('gradeGate');
+  if (!gate) return;
+  gate.classList.remove('hidden');
+  gate.setAttribute('data-change', isChange ? '1' : '0');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeGradeGate() {
+  var gate = document.getElementById('gradeGate');
+  if (gate) gate.classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+function chooseGrade(grade) {
+  var previous = getSelectedGrade();
+  localStorage.setItem('eq_grade', grade);
+
+  if ((previous && previous !== grade) || (!previous && grade !== '10')) {
+    localStorage.removeItem('eq_student_class');
+    localStorage.removeItem('eq_student_no');
+    localStorage.removeItem('eq_student_name');
+    localStorage.removeItem('eq_setup_skipped');
+  }
+
+  updateGradeUi();
+  renderSetupClasses();
+  closeGradeGate();
+  initStudentGreeting();
+}
+
+function renderSetupClasses() {
+  var grade = getSelectedGrade();
+  var select = document.getElementById('setupClass');
+  if (!select) return;
+
+  select.innerHTML = '<option value="">-- Select your class --</option>';
+  var options = CLASS_OPTIONS_BY_GRADE[grade] || [];
+
+  if (!grade) {
+    select.innerHTML = '<option value="">-- Choose grade first --</option>';
+    return;
+  }
+
+  if (!options.length) {
+    select.innerHTML = '<option value="">Grade ' + grade + ' classes coming soon</option>';
+    return;
+  }
+
+  options.forEach(function(item) {
+    var opt = document.createElement('option');
+    opt.value = item[0];
+    opt.textContent = item[1];
+    select.appendChild(opt);
+  });
+}
 
 function setupApiGet(params) {
   var url = SETUP_API + '?';
@@ -2465,19 +2616,29 @@ function getStudentIdentity() {
 }
 
 function initStudentGreeting() {
+  updateGradeUi();
+
+  var greeting = document.getElementById('studentGreeting');
+  if (!getSelectedGrade()) {
+    greeting.classList.add('show');
+    greeting.style.justifyContent = 'center';
+    greeting.innerHTML = '<span onclick="openGradeGate(false)" style="font-size:0.8rem;color:rgba(255,255,255,0.7);cursor:pointer;text-decoration:underline;">Choose your grade</span>';
+    openGradeGate(false);
+    return;
+  }
+
   var id = getStudentIdentity();
   if (id) {
-    var greeting = document.getElementById('studentGreeting');
     greeting.classList.add('show');
+    greeting.style.justifyContent = '';
     document.getElementById('sgAvatar').textContent = id.name.charAt(0).toUpperCase();
     document.getElementById('sgName').textContent   = id.name.split(' ')[0];
     document.getElementById('sgClass').textContent  = CLASS_LABELS_FULL[id.cls] || id.cls;
   } else {
     // Show a small "Personalize" button in greeting area instead of greeting
-    var greeting = document.getElementById('studentGreeting');
     greeting.classList.add('show');
     greeting.style.justifyContent = 'center';
-    greeting.innerHTML = '<span onclick="openSetup(false)" style="font-size:0.8rem;color:rgba(255,255,255,0.7);cursor:pointer;text-decoration:underline;">👤 Personalize for me</span>';
+    greeting.innerHTML = '<span onclick="openSetup(false)" style="font-size:0.8rem;color:rgba(255,255,255,0.7);cursor:pointer;text-decoration:underline;">Personalize for me</span>';
 
     // Also auto-open setup on first ever visit
     var skipped = localStorage.getItem('eq_setup_skipped');
@@ -2493,6 +2654,12 @@ function initStudentGreeting() {
 }
 
 function openSetup(isChange) {
+  if (!getSelectedGrade()) {
+    openGradeGate(false);
+    return;
+  }
+
+  renderSetupClasses();
   var overlay = document.getElementById('setupOverlay');
   overlay.classList.remove('hidden');
   document.body.style.overflow = 'hidden';
@@ -2530,7 +2697,7 @@ function skipSetup() {
   var greeting = document.getElementById('studentGreeting');
   greeting.classList.add('show');
   greeting.style.justifyContent = 'center';
-  greeting.innerHTML = '<span onclick="openSetup(false)" style="font-size:0.8rem;color:rgba(255,255,255,0.7);cursor:pointer;text-decoration:underline;">👤 Personalize for me</span>';
+  greeting.innerHTML = '<span onclick="openSetup(false)" style="font-size:0.8rem;color:rgba(255,255,255,0.7);cursor:pointer;text-decoration:underline;">Personalize for me</span>';
 }
 
 document.getElementById('setupClass').addEventListener('change', function() {
@@ -2606,6 +2773,8 @@ document.getElementById('setupSubmit').addEventListener('click', function() {
 });
 
 // Run on load
+updateGradeUi();
+renderSetupClasses();
 initStudentGreeting();
 </script>
 
