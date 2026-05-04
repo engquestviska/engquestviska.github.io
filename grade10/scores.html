@@ -6,6 +6,7 @@
   <title>Chapter Scores · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css?v=20260505-scores-revamp"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -184,18 +185,315 @@
     .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
     .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
 
+    /* SCORES REVAMP */
+    body.scores-page {
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 30rem),
+        linear-gradient(180deg, #eff6ff 0%, #f8fafc 38%, #f8fafc 100%) !important;
+      color: #0f172a !important;
+    }
+    body.scores-page .subpage-header {
+      text-align: left !important;
+      padding: 22px 22px 78px !important;
+      min-height: 430px !important;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e3a8a 100%) !important;
+      overflow: hidden !important;
+    }
+    body.scores-page .subpage-header::before {
+      content: "" !important;
+      position: absolute !important;
+      inset: 0 !important;
+      background-image: none !important;
+      pointer-events: none !important;
+    }
+    body.scores-page .subpage-header::after {
+      content: "" !important;
+      position: absolute !important;
+      right: max(24px, calc((100vw - 1180px) / 2 + 24px)) !important;
+      bottom: 58px !important;
+      width: min(170px, 24vw) !important;
+      aspect-ratio: 1 !important;
+      background: url("../logo.jpg") center/cover no-repeat !important;
+      opacity: 0.12 !important;
+    }
+    body.scores-page .topbar {
+      position: relative !important;
+      z-index: 2 !important;
+      width: min(1180px, 100%) !important;
+      margin-inline: auto !important;
+      margin-bottom: 70px !important;
+    }
+    body.scores-page .brand-title,
+    body.scores-page .brand-sub,
+    body.scores-page .subpage-hero,
+    body.scores-page .subpage-hero h1,
+    body.scores-page .hero-copy {
+      color: #fff !important;
+    }
+    body.scores-page .brand img {
+      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.18) !important;
+    }
+    body.scores-page .nav a,
+    body.scores-page .nav button {
+      color: #fff !important;
+      background: rgba(255, 255, 255, 0.12) !important;
+      border-color: rgba(255, 255, 255, 0.35) !important;
+    }
+    body.scores-page .subpage-hero {
+      position: relative !important;
+      z-index: 1 !important;
+      width: min(1180px, 100%) !important;
+      margin-inline: auto !important;
+    }
+    body.scores-page .subpage-hero h1 {
+      max-width: 760px !important;
+      font-size: clamp(3.1rem, 7vw, 6.3rem) !important;
+      line-height: 0.9 !important;
+      margin: 12px 0 20px !important;
+      letter-spacing: 0 !important;
+    }
+    body.scores-page .kicker {
+      color: #bfdbfe !important;
+    }
+    body.scores-page .hero-copy {
+      max-width: 670px !important;
+      font-size: 1.05rem !important;
+      line-height: 1.8 !important;
+      opacity: 0.86 !important;
+    }
+    body.scores-page .wave {
+      display: none !important;
+    }
+    body.scores-page main {
+      width: min(1120px, calc(100% - 44px)) !important;
+      max-width: none !important;
+      margin: -44px auto 0 !important;
+      padding: 0 0 88px !important;
+      position: relative !important;
+      z-index: 5 !important;
+    }
+    body.scores-page .mode-badge {
+      display: inline-flex !important;
+      margin-bottom: 16px !important;
+      border-radius: 999px !important;
+      background: #fff !important;
+      color: #1d4ed8 !important;
+      border: 1.5px solid #bfdbfe !important;
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.08) !important;
+    }
+    body.scores-page .identity-card,
+    body.scores-page .student-score-card,
+    body.scores-page .table-wrap,
+    body.scores-page .leaderboard,
+    body.scores-page .state-card {
+      border: 1.5px solid #bfdbfe !important;
+      border-radius: 28px !important;
+      background: rgba(255, 255, 255, 0.96) !important;
+      box-shadow: 0 22px 64px rgba(37, 99, 235, 0.1) !important;
+    }
+    body.scores-page .identity-card {
+      padding: clamp(22px, 4vw, 34px) !important;
+      margin-bottom: 22px !important;
+    }
+    body.scores-page .identity-head {
+      display: flex !important;
+      align-items: center !important;
+      gap: 16px !important;
+      margin-bottom: 20px !important;
+    }
+    body.scores-page .identity-icon {
+      width: 54px !important;
+      height: 54px !important;
+      border-radius: 18px !important;
+      display: grid !important;
+      place-items: center !important;
+      background: #dbeafe !important;
+      color: #1d4ed8 !important;
+      font-size: 1.35rem !important;
+    }
+    body.scores-page .identity-title {
+      font-family: 'Playfair Display', serif !important;
+      font-size: clamp(1.55rem, 3vw, 2.15rem) !important;
+      font-weight: 800 !important;
+      line-height: 1 !important;
+      margin-bottom: 6px !important;
+    }
+    body.scores-page .identity-copy {
+      color: #64748b !important;
+      font-size: 0.95rem !important;
+    }
+    body.scores-page .identity-controls {
+      display: grid !important;
+      grid-template-columns: minmax(150px, 0.45fr) minmax(220px, 1fr) !important;
+      gap: 12px !important;
+    }
+    body.scores-page .filter-select {
+      min-height: 52px !important;
+      border-radius: 16px !important;
+      background: #f8fafc !important;
+      border-color: #bfdbfe !important;
+      color: #0f172a !important;
+      font-weight: 600 !important;
+    }
+    body.scores-page .student-score-card {
+      overflow: hidden !important;
+      margin-bottom: 22px !important;
+    }
+    body.scores-page .score-card-header {
+      background: linear-gradient(135deg, #2563eb, #1e40af) !important;
+      padding: 24px !important;
+    }
+    body.scores-page .score-card-avatar {
+      width: 58px !important;
+      height: 58px !important;
+      border-radius: 18px !important;
+      background: rgba(255, 255, 255, 0.2) !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+    }
+    body.scores-page .score-card-name .name {
+      font-size: clamp(1.3rem, 2.3vw, 1.85rem) !important;
+      line-height: 1.05 !important;
+    }
+    body.scores-page .score-card-body {
+      padding: clamp(18px, 4vw, 28px) !important;
+    }
+    body.scores-page .chapter-tabs,
+    body.scores-page .lb-filters {
+      display: flex !important;
+      gap: 10px !important;
+      flex-wrap: wrap !important;
+    }
+    body.scores-page .ch-tab,
+    body.scores-page .lb-filter-btn,
+    body.scores-page .btn-csv {
+      min-height: 42px !important;
+      border-radius: 999px !important;
+      font-weight: 800 !important;
+      border-color: #bfdbfe !important;
+    }
+    body.scores-page .score-grid {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+      gap: 12px !important;
+    }
+    body.scores-page .score-tile,
+    body.scores-page .summary-item {
+      border-radius: 20px !important;
+      background: linear-gradient(135deg, #fff, #f8fbff) !important;
+      border-color: #dbeafe !important;
+      min-height: 112px !important;
+      display: grid !important;
+      align-content: center !important;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04) !important;
+    }
+    body.scores-page .score-tile-val,
+    body.scores-page .summary-val {
+      color: #0f172a !important;
+      font-size: clamp(1.6rem, 3vw, 2rem) !important;
+    }
+    body.scores-page .score-tile.highlight,
+    body.scores-page .summary-item.grade {
+      background: linear-gradient(135deg, #dbeafe, #bfdbfe) !important;
+      border-color: #93c5fd !important;
+    }
+    body.scores-page .final-summary {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 12px !important;
+    }
+    body.scores-page .table-wrap {
+      padding: 12px !important;
+      overflow: auto !important;
+    }
+    body.scores-page table {
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+      min-width: 780px !important;
+    }
+    body.scores-page thead th {
+      background: #1d4ed8 !important;
+      padding: 14px !important;
+    }
+    body.scores-page tbody tr {
+      border-bottom: 0 !important;
+    }
+    body.scores-page tbody td {
+      border-bottom: 1px solid #dbeafe !important;
+      padding: 13px 14px !important;
+    }
+    body.scores-page .score-input {
+      min-height: 38px !important;
+      border-radius: 12px !important;
+      background: #fff !important;
+    }
+    body.scores-page .leaderboard {
+      overflow: hidden !important;
+      margin-top: 22px !important;
+    }
+    body.scores-page .leaderboard-header {
+      background: linear-gradient(135deg, #0f172a, #1e3a8a) !important;
+      padding: 20px 24px !important;
+    }
+    body.scores-page .leaderboard-body {
+      padding: 18px !important;
+    }
+    body.scores-page .lb-row {
+      border-radius: 18px !important;
+      background: #f8fafc !important;
+      border-color: #dbeafe !important;
+    }
+    body.scores-page footer {
+      background: #0f172a !important;
+    }
+    @media (max-width: 720px) {
+      body.scores-page .subpage-header {
+        min-height: 400px !important;
+        padding-bottom: 64px !important;
+      }
+      body.scores-page .topbar {
+        margin-bottom: 54px !important;
+      }
+      body.scores-page .subpage-hero h1 {
+        font-size: clamp(2.7rem, 13vw, 4.2rem) !important;
+      }
+      body.scores-page main {
+        width: min(100% - 28px, 1120px) !important;
+      }
+      body.scores-page .identity-controls,
+      body.scores-page .final-summary {
+        grid-template-columns: 1fr !important;
+      }
+      body.scores-page .score-card-header,
+      body.scores-page .identity-head {
+        align-items: flex-start !important;
+      }
+    }
   </style>
   <script src="../shared/js/sidebar.js"></script>
 </head>
-<body data-page="scores">
+<body class="grade10-subpage scores-page" data-page="scores">
 
-<header>
-  <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
+<header class="subpage-header">
+  <div class="topbar">
+    <div class="brand">
+      <img src="../logo.jpg" alt="English Quest Logo"/>
+      <div>
+        <div class="brand-title">English Quest</div>
+        <div class="brand-sub">Grade 10 Student Track</div>
+      </div>
+    </div>
+    <nav class="nav" aria-label="Main navigation">
+      <a href="index.html">Grade 10 Home</a>
+      <a href="../teacher/">Teacher</a>
+      <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
+    </nav>
+  </div>
 
-
-  <a class="back-btn" href="index.html">&#8592; Back</a>
-  <h1>Chapter <span>Scores</span></h1>
-  <p class="header-sub">English Quest &middot; SMA Negeri 6 Surakarta</p>
+  <section class="subpage-hero">
+    <div class="kicker">Scores</div>
+    <h1>Check chapter scores without digging through sheets.</h1>
+    <p class="hero-copy">Students can open their own chapter and final score summary, while teacher mode keeps the editable class table ready for updates.</p>
+  </section>
 </header>
 <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
   <path fill="#1E3A8A" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
@@ -322,13 +620,17 @@ function renderStudentMode() {
 
   main.innerHTML =
     '<div class="mode-badge student">&#128203; Student View</div>' +
-    '<div style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:20px 24px;margin-bottom:20px;text-align:center;">' +
-      '<div style="font-size:1.5rem;margin-bottom:8px;">👤</div>' +
-      '<div style="font-family:Georgia,serif;font-size:1rem;font-weight:700;margin-bottom:4px;">Who are you?</div>' +
-      '<div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:16px;">Select your class and name to view your scores</div>' +
-      '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
-        '<div style="flex:1;min-width:140px;"><select class="filter-select" style="width:100%;" id="sClass">' + classOptions + '</select></div>' +
-        '<div style="flex:2;min-width:180px;"><select class="filter-select" style="width:100%;" id="sStudent"><option value="">-- Select class first --</option></select></div>' +
+    '<div class="identity-card">' +
+      '<div class="identity-head">' +
+        '<div class="identity-icon">&#128100;</div>' +
+        '<div>' +
+          '<div class="identity-title">Choose your score profile.</div>' +
+          '<div class="identity-copy">Pick your class and name to open your chapter scores.</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="identity-controls">' +
+        '<select class="filter-select" id="sClass">' + classOptions + '</select>' +
+        '<select class="filter-select" id="sStudent"><option value="">-- Select class first --</option></select>' +
       '</div>' +
     '</div>' +
     '<div id="sResult"></div>';
