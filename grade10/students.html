@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Student List · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css?v=20260504-students"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -359,44 +360,53 @@
     .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
 
   </style>
+  <link rel="stylesheet" href="../shared/css/system.css?v=20260504-students-fix"/>
   <script src="../shared/js/sidebar.js"></script>
 </head>
-<body data-page="students">
+<body class="grade10-subpage student-directory-page" data-page="students">
 
-<header>
-  <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
+<header class="subpage-header">
+  <div class="topbar">
+    <div class="brand">
+      <img src="../logo.jpg" alt="English Quest Logo"/>
+      <div>
+        <div class="brand-title">English Quest</div>
+        <div class="brand-sub">Grade 10 Student Track</div>
+      </div>
+    </div>
+    <nav class="nav" aria-label="Main navigation">
+      <a href="index.html">Grade 10 Home</a>
+      <a href="../teacher/">Teacher</a>
+      <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
+    </nav>
+  </div>
 
-  <a href="index.html" class="back-btn">← Back</a>
-  <h1>Student <span>List</span></h1>
-  <p class="header-sub">English Quest · SMA Negeri 6 Surakarta</p>
+  <section class="subpage-hero">
+    <div class="kicker">Student List</div>
+    <h1>Find every Grade 10 student by class.</h1>
+    <p class="hero-copy">Search the student directory, filter by class, and open activeness stats from each student row.</p>
+  </section>
 </header>
 
-<svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
-  <path fill="#1E3A8A" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
-  <path fill="#F8FAFC" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
-</svg>
-
-<!-- CONTROLS -->
-<div class="controls">
-  <div class="search-wrap">
-    <input type="text" id="searchInput" placeholder="Search student name..." oninput="filterStudents()"/>
-  </div>
-  <select class="filter-select" id="classFilter" onchange="filterStudents()">
-    <option value="">All Classes</option>
-    <option value="XE-1">XE-1</option>
-    <option value="XE-4">XE-4</option>
-    <option value="XE-5">XE-5</option>
-    <option value="XE-6">XE-6</option>
-    <option value="XE-7">XE-7</option>
-    <option value="XE-8">XE-8</option>
-    <option value="XE-9">XE-9</option>
-    <option value="XE-10">XE-10</option>
-    <option value="XE-11">XE-11</option>
-  </select>
-  <div class="count-badge" id="countBadge">Loading...</div>
-</div>
-
 <main id="mainContent">
+  <section class="content-section student-controls" aria-label="Student filters">
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="Search student name..." oninput="filterStudents()"/>
+    </div>
+    <select class="filter-select" id="classFilter" onchange="filterStudents()">
+      <option value="">All Classes</option>
+      <option value="XE-1">XE-1</option>
+      <option value="XE-4">XE-4</option>
+      <option value="XE-5">XE-5</option>
+      <option value="XE-6">XE-6</option>
+      <option value="XE-7">XE-7</option>
+      <option value="XE-8">XE-8</option>
+      <option value="XE-9">XE-9</option>
+      <option value="XE-10">XE-10</option>
+      <option value="XE-11">XE-11</option>
+    </select>
+    <div class="count-badge" id="countBadge">Loading...</div>
+  </section>
 
   <div id="noResults" class="no-results">No students found matching your search.</div>
 
