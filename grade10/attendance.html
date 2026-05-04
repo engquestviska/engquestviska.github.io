@@ -284,7 +284,9 @@
     }
     body.attendance-page .view-badge,
     body.attendance-page .meeting-bar,
-    body.attendance-page .quick-actions,
+    body.attendance-page .quick-actions {
+      grid-column: 1 / -1;
+    }
     body.attendance-page .list-card {
       grid-column: 1;
     }
@@ -331,6 +333,16 @@
     body.attendance-page .date-field {
       grid-column: 1 / -1 !important;
       margin-top: 0 !important;
+    }
+    body.attendance-page .quick-actions {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 12px !important;
+      margin-bottom: 0 !important;
+    }
+    body.attendance-page .quick-actions .btn-quick {
+      min-height: 48px !important;
+      border-radius: 16px !important;
     }
     body.attendance-page .list-card {
       border-radius: 28px !important;
@@ -439,6 +451,7 @@
       top: 18px !important;
       border-radius: 26px !important;
       padding: 18px !important;
+      margin-bottom: 0 !important;
     }
     body.attendance-page .lb-card {
       padding: 0 !important;
