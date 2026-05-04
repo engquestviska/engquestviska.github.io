@@ -245,7 +245,237 @@
     .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
 
   </style>
-  <link rel="stylesheet" href="../shared/css/system.css?v=20260504-attendance"/>
+  <link rel="stylesheet" href="../shared/css/system.css?v=20260504-attendance-revamp"/>
+  <style>
+    body.attendance-page main {
+      width: min(1040px, 100%) !important;
+      max-width: none !important;
+      padding: 42px 22px 86px !important;
+    }
+    body.attendance-page .attendance-control-card {
+      display: grid !important;
+      grid-template-columns: minmax(180px, 1fr) minmax(220px, 1fr) auto !important;
+      align-items: end !important;
+      gap: 14px !important;
+      padding: 22px !important;
+      border-radius: 26px !important;
+      background: rgba(255, 255, 255, 0.94) !important;
+      box-shadow: 0 18px 56px rgba(15, 23, 42, 0.08) !important;
+    }
+    body.attendance-page .attendance-control-card .card-title {
+      grid-column: 1 / -1 !important;
+      margin-bottom: 0 !important;
+      font-size: clamp(1.35rem, 2vw, 1.7rem) !important;
+    }
+    body.attendance-page .attendance-control-card .btn-primary {
+      width: auto !important;
+      min-width: 180px !important;
+      min-height: 50px !important;
+      margin-top: 0 !important;
+    }
+    body.attendance-page #attendanceSection {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: 18px;
+      align-items: start;
+    }
+    body.attendance-page #attendanceSection.hidden {
+      display: none !important;
+    }
+    body.attendance-page .view-badge,
+    body.attendance-page .meeting-bar,
+    body.attendance-page .quick-actions,
+    body.attendance-page .list-card {
+      grid-column: 1;
+    }
+    body.attendance-page .submit-card,
+    body.attendance-page .lb-card {
+      grid-column: 2;
+    }
+    body.attendance-page .meeting-bar {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1fr) auto !important;
+      gap: 16px !important;
+      padding: 22px !important;
+      border-radius: 26px !important;
+      background:
+        linear-gradient(135deg, rgba(239, 246, 255, 0.96), rgba(255, 255, 255, 0.98)) !important;
+      box-shadow: 0 18px 50px rgba(37, 99, 235, 0.08) !important;
+    }
+    body.attendance-page .meeting-bar-title {
+      font-size: clamp(1.5rem, 2vw, 2rem) !important;
+      color: #0f172a !important;
+    }
+    body.attendance-page .day-label {
+      color: #64748b !important;
+      font-weight: 700 !important;
+    }
+    body.attendance-page .meeting-bar-counts {
+      grid-column: 1 / -1 !important;
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      gap: 10px !important;
+      margin-top: 0 !important;
+    }
+    body.attendance-page .meeting-bar-counts span {
+      display: grid !important;
+      place-items: center !important;
+      min-height: 54px !important;
+      border-radius: 18px !important;
+      background: #fff !important;
+      border: 1.5px solid #dbeafe !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.76rem !important;
+      font-weight: 800 !important;
+    }
+    body.attendance-page .date-field {
+      grid-column: 1 / -1 !important;
+      margin-top: 0 !important;
+    }
+    body.attendance-page .list-card {
+      border-radius: 28px !important;
+      background: rgba(255, 255, 255, 0.94) !important;
+      padding: 0 18px 18px !important;
+    }
+    body.attendance-page .list-header {
+      margin: 0 -18px 16px !important;
+      padding: 18px 22px !important;
+      border-bottom: 1.5px solid #dbeafe !important;
+      background: #f8fafc !important;
+    }
+    body.attendance-page #studentRows {
+      display: grid !important;
+      gap: 10px !important;
+    }
+    body.attendance-page .s-row {
+      overflow: hidden !important;
+      border: 1.5px solid #dbeafe !important;
+      border-radius: 20px !important;
+      background: linear-gradient(135deg, #ffffff, #f8fbff) !important;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04) !important;
+    }
+    body.attendance-page .s-top {
+      display: grid !important;
+      grid-template-columns: 48px minmax(0, 1fr) auto !important;
+      gap: 14px !important;
+      align-items: center !important;
+      padding: 14px 16px !important;
+    }
+    body.attendance-page .s-avatar {
+      width: 48px !important;
+      height: 48px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border-radius: 16px !important;
+      background: #2563eb !important;
+      color: #fff !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.78rem !important;
+      font-weight: 800 !important;
+    }
+    body.attendance-page .s-main {
+      display: grid !important;
+      gap: 5px !important;
+      min-width: 0 !important;
+    }
+    body.attendance-page .s-name {
+      color: #0f172a !important;
+      font-size: 0.98rem !important;
+      font-weight: 800 !important;
+      line-height: 1.3 !important;
+      overflow-wrap: anywhere !important;
+    }
+    body.attendance-page .s-meta {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      gap: 6px !important;
+    }
+    body.attendance-page .s-meta span,
+    body.attendance-page .s-status {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border-radius: 999px !important;
+      background: #eef6ff !important;
+      color: #475569 !important;
+      padding: 5px 9px !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.66rem !important;
+      font-weight: 800 !important;
+      white-space: nowrap !important;
+    }
+    body.attendance-page .s-status.status-Present { background: #dcfce7 !important; color: #166534 !important; }
+    body.attendance-page .s-status.status-Absent { background: #fee2e2 !important; color: #991b1b !important; }
+    body.attendance-page .s-status.status-Sick { background: #fef3c7 !important; color: #92400e !important; }
+    body.attendance-page .s-status.status-Permission,
+    body.attendance-page .s-status.status-Dispen { background: #dbeafe !important; color: #1e3a8a !important; }
+    body.attendance-page .s-status.status-empty { background: #f1f5f9 !important; color: #64748b !important; }
+    body.attendance-page .s-btns {
+      display: grid !important;
+      grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+      gap: 8px !important;
+      border-top: 1.5px solid #dbeafe !important;
+      padding: 12px 14px 14px !important;
+      background: #f8fafc !important;
+    }
+    body.attendance-page .s-btn {
+      min-height: 40px !important;
+      border: 1.5px solid #dbeafe !important;
+      border-radius: 12px !important;
+      background: #fff !important;
+      color: #64748b !important;
+      font-size: 0.72rem !important;
+      font-weight: 800 !important;
+    }
+    body.attendance-page .s-btn.on-Present { background: #dcfce7 !important; border-color: #86efac !important; color: #166534 !important; }
+    body.attendance-page .s-btn.on-Absent { background: #fee2e2 !important; border-color: #fca5a5 !important; color: #991b1b !important; }
+    body.attendance-page .s-btn.on-Sick { background: #fef3c7 !important; border-color: #fcd34d !important; color: #92400e !important; }
+    body.attendance-page .s-btn.on-Permission,
+    body.attendance-page .s-btn.on-Dispen { background: #dbeafe !important; border-color: #93c5fd !important; color: #1e3a8a !important; }
+    body.attendance-page .submit-card,
+    body.attendance-page .lb-card {
+      position: sticky !important;
+      top: 18px !important;
+      border-radius: 26px !important;
+      padding: 18px !important;
+    }
+    body.attendance-page .lb-card {
+      padding: 0 !important;
+    }
+    @media (max-width: 900px) {
+      body.attendance-page .attendance-control-card,
+      body.attendance-page #attendanceSection {
+        grid-template-columns: 1fr !important;
+      }
+      body.attendance-page .attendance-control-card .btn-primary,
+      body.attendance-page .view-badge,
+      body.attendance-page .meeting-bar,
+      body.attendance-page .quick-actions,
+      body.attendance-page .list-card,
+      body.attendance-page .submit-card,
+      body.attendance-page .lb-card {
+        grid-column: 1 !important;
+      }
+      body.attendance-page .submit-card,
+      body.attendance-page .lb-card {
+        position: static !important;
+      }
+    }
+    @media (max-width: 620px) {
+      body.attendance-page .meeting-bar-counts,
+      body.attendance-page .s-btns {
+        grid-template-columns: 1fr !important;
+      }
+      body.attendance-page .s-top {
+        grid-template-columns: 44px minmax(0, 1fr) !important;
+      }
+      body.attendance-page .s-status {
+        grid-column: 2 !important;
+        justify-self: start !important;
+      }
+    }
+  </style>
   <script src="../shared/js/sidebar.js"></script>
 </head>
 <body class="grade10-subpage attendance-page" data-page="attendance">
@@ -588,8 +818,14 @@
 
     currentStudents.forEach(s => {
       const st = studentStatuses[s.no] || '';
-      html.push(`<div class="s-row">`);
-      html.push(`  <div class="s-top"><span class="s-no">${s.no}</span><span class="s-name">${s.name}</span></div>`);
+      const initials = (s.name || '').split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase() || '?';
+      const statusClass = st ? 'status-' + st : 'status-empty';
+      html.push(`<div class="s-row ${statusClass}" data-row-no="${s.no}">`);
+      html.push(`  <div class="s-top">`);
+      html.push(`    <span class="s-avatar">${initials}</span>`);
+      html.push(`    <span class="s-main"><span class="s-name">${s.name}</span><span class="s-meta"><span>No. ${s.no}</span><span>${currentClass}</span></span></span>`);
+      html.push(`    <span class="s-status ${statusClass}">${st || 'Unmarked'}</span>`);
+      html.push(`  </div>`);
 
       if (isTeacher) {
         html.push(`  <div class="s-btns" id="btns-${s.no}">`);
@@ -598,9 +834,6 @@
           html.push(`    <button class="s-btn${on}" data-no="${s.no}" data-status="${btn}">${btn}</button>`);
         });
         html.push(`  </div>`);
-      } else {
-        const cls = st ? 'pill-' + st : 'pill-empty';
-        html.push(`  <span class="s-pill ${cls}">${st || '–'}</span>`);
       }
       html.push(`</div>`);
     });
@@ -611,6 +844,15 @@
 
   function setStatus(no, status) {
     studentStatuses[no] = status;
+    const row = document.querySelector('[data-row-no="' + no + '"]');
+    if (row) {
+      row.className = 's-row status-' + status;
+      const badge = row.querySelector('.s-status');
+      if (badge) {
+        badge.className = 's-status status-' + status;
+        badge.textContent = status;
+      }
+    }
     const btns = document.getElementById('btns-' + no);
     if (!btns) return;
     btns.querySelectorAll('.s-btn').forEach(b => {
