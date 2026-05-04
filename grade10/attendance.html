@@ -275,7 +275,7 @@
     }
     body.attendance-page #attendanceSection {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 320px;
+      grid-template-columns: minmax(0, 1fr);
       gap: 18px;
       align-items: start;
     }
@@ -284,15 +284,11 @@
     }
     body.attendance-page .view-badge,
     body.attendance-page .meeting-bar,
-    body.attendance-page .quick-actions {
-      grid-column: 1 / -1;
-    }
-    body.attendance-page .list-card {
-      grid-column: 1;
-    }
+    body.attendance-page .quick-actions,
+    body.attendance-page .list-card,
     body.attendance-page .submit-card,
     body.attendance-page .lb-card {
-      grid-column: 2;
+      grid-column: 1;
     }
     body.attendance-page .meeting-bar {
       display: grid !important;
@@ -339,6 +335,9 @@
       grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
       gap: 12px !important;
       margin-bottom: 0 !important;
+    }
+    body.attendance-page .quick-actions.hidden {
+      display: none !important;
     }
     body.attendance-page .quick-actions .btn-quick {
       min-height: 48px !important;
@@ -447,8 +446,7 @@
     body.attendance-page .s-btn.on-Dispen { background: #dbeafe !important; border-color: #93c5fd !important; color: #1e3a8a !important; }
     body.attendance-page .submit-card,
     body.attendance-page .lb-card {
-      position: sticky !important;
-      top: 18px !important;
+      position: static !important;
       border-radius: 26px !important;
       padding: 18px !important;
       margin-bottom: 0 !important;
