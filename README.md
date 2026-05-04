@@ -13,7 +13,7 @@ English Quest is a static GitHub Pages website for class activities, scores, att
 Important files and folders:
 
 - `index.html` - main landing/dashboard page.
-- `sidebar.js` - shared sidebar/navigation script used by pages on this branch.
+- `shared/js/sidebar.js` - shared sidebar/navigation script used by Grade 10 pages on this branch.
 - `scores.html`, `attendance.html`, `students.html`, `tasks.html`, `strikes.html` - teacher/student tracking pages.
 - `submission.html`, `submission_status.html` - submission workflow pages.
 - `lessons.html`, `assignments.html`, `session.html`, `quiz.html`, `jeopardyquiz.html`, `chapter5_guess_who.html` - learning/activity pages.
