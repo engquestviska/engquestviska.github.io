@@ -6,7 +6,6 @@
   <title>Student List · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="../shared/css/system.css?v=20260504-students"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -360,7 +359,7 @@
     .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
 
   </style>
-  <link rel="stylesheet" href="../shared/css/system.css?v=20260504-students-fix"/>
+  <link rel="stylesheet" href="../shared/css/system.css?v=20260504-students-polish"/>
   <script src="../shared/js/sidebar.js"></script>
 </head>
 <body class="grade10-subpage student-directory-page" data-page="students">
@@ -508,14 +507,22 @@ function renderStudentClass(cls, students) {
   list.innerHTML = '';
   students.forEach((s, i) => {
     const name = s.name || '';
+    const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase() || '?';
     const item = document.createElement('div');
     item.className = 'student-item';
     item.dataset.name  = name.toLowerCase();
     item.dataset.class = cls;
     item.innerHTML = `
-      <span class="student-num">${i + 1}</span>
-      <span class="student-dot"></span>
-      <span class="student-name">${name}${s.nickname ? ' <span style="color:var(--text-muted);font-size:0.82em;">(' + s.nickname + ')</span>' : ''}</span>
+      <span class="student-avatar">${initials}</span>
+      <span class="student-main">
+        <span class="student-name">${name}</span>
+        <span class="student-meta">
+          <span>No. ${i + 1}</span>
+          <span>${cls}</span>
+          ${s.nickname ? '<span>' + s.nickname + '</span>' : ''}
+        </span>
+      </span>
+      <span class="student-action">Stats</span>
     `;
     item.addEventListener('click', () => openActModal(name, cls));
     list.appendChild(item);

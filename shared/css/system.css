@@ -1139,18 +1139,25 @@ a.module:hover {
   margin-right: auto;
 }
 
+.student-directory-page main {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 40px 22px 84px;
+}
+
 .student-controls {
   display: grid;
   grid-template-columns: minmax(220px, 1fr) minmax(160px, auto) auto;
   align-items: center;
   gap: 12px;
-  margin-top: -8px;
-  margin-bottom: 28px;
+  width: min(860px, 100%);
+  margin: -4px auto 30px;
   border: 1.5px solid var(--line);
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.86);
-  box-shadow: 0 16px 44px rgba(15, 23, 42, 0.06);
-  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.07);
+  padding: 16px;
 }
 
 .student-directory-page .search-wrap {
@@ -1217,15 +1224,21 @@ a.module:hover {
 }
 
 .student-directory-page .class-section {
-  width: min(1040px, 100%);
-  margin: 0 auto 24px;
+  width: min(860px, 100%);
+  margin: 0 auto 26px;
+  border: 1.5px solid var(--line);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.06);
+  padding: 18px;
 }
 
 .student-directory-page .class-header {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
 }
 
 .student-directory-page .class-badge {
@@ -1241,80 +1254,123 @@ a.module:hover {
 }
 
 .student-directory-page .class-count {
+  border-radius: 999px;
+  background: #f8fafc;
   color: var(--muted);
-  font-size: 0.82rem;
-  font-weight: 700;
+  padding: 7px 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 800;
 }
 
 .student-directory-page .student-list {
-  overflow: hidden;
-  border: 1.5px solid var(--line);
-  border-radius: 20px;
-  background: var(--card);
-  box-shadow: 0 16px 44px rgba(15, 23, 42, 0.05);
+  display: grid;
+  gap: 10px;
+  overflow: visible;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .student-directory-page .student-item {
   display: grid;
-  grid-template-columns: 42px 10px 1fr;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
   align-items: center;
   gap: 14px;
-  border-bottom: 1px solid var(--line);
-  padding: 14px 18px;
+  border: 1.5px solid #dbeafe;
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(239, 246, 255, 0.72), rgba(255, 255, 255, 0.98));
+  padding: 13px 14px;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
 }
 
 .student-directory-page .student-item:last-child {
-  border-bottom: none;
+  border-bottom: 1.5px solid #dbeafe;
 }
 
 .student-directory-page .student-item:hover {
-  background: #eff6ff;
+  transform: translateY(-2px);
+  border-color: #93c5fd;
+  box-shadow: 0 14px 34px rgba(37, 99, 235, 0.12);
 }
 
 .student-directory-page .student-item.hidden {
   display: none;
 }
 
-.student-directory-page .student-num {
-  color: var(--primary);
+.student-directory-page .student-avatar {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background: var(--primary);
+  color: #fff;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 800;
-  text-align: right;
+  letter-spacing: 0.04em;
 }
 
-.student-directory-page .student-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 999px;
-  background: #93c5fd;
+.student-directory-page .student-main {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
 }
 
 .student-directory-page .student-name {
+  display: block;
   color: var(--ink);
-  font-size: 0.94rem;
-  font-weight: 700;
+  font-size: 0.98rem;
+  font-weight: 800;
   line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
-.student-directory-page .student-name::after {
-  content: ' Open';
-  color: var(--primary);
+.student-directory-page .student-name::after,
+.student-directory-page .student-item .student-name::after {
+  content: none;
+}
+
+.student-directory-page .student-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.student-directory-page .student-meta span {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: #eef6ff;
+  color: #475569;
+  padding: 4px 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.student-directory-page .student-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 66px;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: var(--primary-dark);
+  padding: 8px 12px;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.68rem;
   font-weight: 800;
-  opacity: 0;
-  transition: opacity 0.15s ease;
-}
-
-.student-directory-page .student-item:hover .student-name::after {
-  opacity: 1;
+  text-transform: uppercase;
 }
 
 .student-directory-page .no-results {
-  width: min(1040px, 100%);
+  width: min(860px, 100%);
   margin: 0 auto 24px;
   border: 1.5px dashed var(--line);
   border-radius: 20px;
