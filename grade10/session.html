@@ -3,605 +3,550 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Class Session · English Quest</title>
+  <title>Reading · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --purple: #2563EB; --purple-light: #60A5FA; --purple-soft: #DBEAFE;
-      --purple-mid: #93C5FD; --white: #FFFFFF; --off-white: #F8FAFC;
-      --text-dark: #0F172A; --text-muted: #475569; --border: #DBEAFE;
-      --accent: #F59E0B; --green: #10B981; --red: #EF4444;
-      --amber: #D97706; --amber-soft: #FEF3C7; --amber-mid: #FCD34D;
-      --red-soft: #FEE2E2; --red-mid: #FCA5A5;
-    }
-    body { font-family: 'IBM Plex Sans', sans-serif; background: var(--off-white); color: var(--text-dark); min-height: 100vh; }
-
-    /* HEADER */
-    header { background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 50%, #1E3A8A 100%); padding: 36px 24px 52px; text-align: center; position: relative; overflow: hidden; }
-    header::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px); background-size: 28px 28px; pointer-events: none; }
-    .back-btn { position: absolute; top: 20px; left: 20px; z-index: 2; background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #fff; font-size: 0.88rem; font-weight: 600; padding: 8px 18px; border-radius: 999px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-family: inherit; }
-    .back-btn:hover { background: rgba(255,255,255,0.25); }
-    .logout-btn { position: absolute; top: 20px; right: 20px; z-index: 2; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.85); font-size: 0.78rem; font-weight: 600; padding: 6px 14px; border-radius: 999px; cursor: pointer; font-family: inherit; display: none; align-items: center; gap: 5px; }
-    .logout-btn:hover { background: rgba(255,255,255,0.22); }
-    .teacher-active .logout-btn { display: flex; }
-    header h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem,5vw,2.8rem); font-weight: 800; color: #fff; position: relative; z-index: 1; }
-    header h1 span { color: var(--accent); font-style: italic; }
-    .header-sub { color: rgba(255,255,255,0.75); font-size: 0.95rem; margin-top: 8px; position: relative; z-index: 1; }
-    .wave { display: block; width: 100%; margin-top: -2px; }
-
-    /* MAIN */
-    main { max-width: 900px; margin: 0 auto; padding: 32px 20px 80px; }
-
-    /* SECTION HEADERS */
-    .section-block { margin-bottom: 52px; }
-    .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
-    .section-badge { color: #fff; font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; font-weight: 600; padding: 6px 14px; border-radius: 999px; flex-shrink: 0; letter-spacing: 0.05em; }
-    .section-badge.reading { background: linear-gradient(135deg, #D97706, #B45309); }
-    .section-badge.video   { background: linear-gradient(135deg, #DC2626, #991B1B); }
-    .section-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; }
-    .section-line { flex: 1; height: 1.5px; background: var(--border); }
-    .add-btn { display: none; align-items: center; gap: 6px; padding: 7px 14px; background: rgba(37,99,235,0.1); border: 1.5px solid var(--purple-mid); border-radius: 999px; color: var(--purple); font-size: 0.78rem; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Mono', monospace; transition: all 0.15s; flex-shrink: 0; }
-    .add-btn:hover { background: var(--purple-soft); }
-    .teacher-active .add-btn { display: flex; }
-
-    /* CONTENT GRID — same as pdf-grid in lessons.html */
-    .content-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-
-    /* PDF CARD — identical to lessons.html */
-    .pdf-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
-    .pdf-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(37,99,235,0.12); }
-    .pdf-preview { width: 100%; aspect-ratio: 4/3; background: var(--amber-soft); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border-bottom: 1.5px solid var(--border); cursor: pointer; }
-    .pdf-preview iframe { width: 100%; height: 100%; border: none; pointer-events: none; }
-    .pdf-icon { font-size: 3rem; position: absolute; opacity: 0.3; }
-    .pdf-overlay { position: absolute; inset: 0; background: rgba(217,119,6,0.08); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
-    .pdf-card:hover .pdf-overlay { opacity: 1; }
-    .pdf-overlay-btn { background: var(--amber); color: #fff; font-size: 0.85rem; font-weight: 700; padding: 10px 20px; border-radius: 999px; }
-    .pdf-info { padding: 16px 18px 18px; }
-    .pdf-name { font-size: 1rem; font-weight: 700; margin-bottom: 4px; line-height: 1.3; }
-    .pdf-meta { font-size: 0.78rem; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; margin-bottom: 14px; }
-    .pdf-actions { display: flex; gap: 8px; }
-    .btn-view { flex: 1; padding: 10px; background: var(--amber-soft); color: var(--amber); border: 1.5px solid var(--amber-mid); border-radius: 10px; font-size: 0.85rem; font-weight: 700; text-align: center; cursor: pointer; font-family: inherit; text-decoration: none; display: block; transition: background 0.15s; }
-    .btn-view:hover { background: var(--amber-mid); }
-    .btn-download { padding: 10px 14px; background: var(--amber); color: #fff; border: none; border-radius: 10px; font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: inherit; text-decoration: none; display: flex; align-items: center; transition: opacity 0.15s; }
-    .btn-download:hover { opacity: 0.85; }
-
-    /* VIDEO CARD */
-    .video-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
-    .video-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(220,38,38,0.12); }
-    .video-thumb { width: 100%; aspect-ratio: 16/9; background: #111; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border-bottom: 1.5px solid var(--border); cursor: pointer; }
-    .video-thumb img { width: 100%; height: 100%; object-fit: cover; }
-    .video-play-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
-    .video-card:hover .video-play-overlay { background: rgba(0,0,0,0.5); }
-    .video-play-btn { width: 56px; height: 56px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; transition: transform 0.2s; padding-left: 4px; }
-    .video-card:hover .video-play-btn { transform: scale(1.1); }
-    .video-info { padding: 16px 18px 18px; }
-    .video-name { font-size: 1rem; font-weight: 700; margin-bottom: 4px; line-height: 1.3; }
-    .video-meta { font-size: 0.78rem; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; margin-bottom: 14px; }
-    .video-actions { display: flex; gap: 8px; }
-    .btn-watch { flex: 1; padding: 10px; background: var(--red-soft); color: #DC2626; border: 1.5px solid var(--red-mid); border-radius: 10px; font-size: 0.85rem; font-weight: 700; text-align: center; cursor: pointer; font-family: inherit; text-decoration: none; display: block; transition: background 0.15s; }
-    .btn-watch:hover { background: var(--red-mid); }
-    .btn-yt { padding: 10px 14px; background: #DC2626; color: #fff; border: none; border-radius: 10px; font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: inherit; text-decoration: none; display: flex; align-items: center; transition: opacity 0.15s; }
-    .btn-yt:hover { opacity: 0.85; }
-
-    /* DELETE BUTTON (teacher) */
-    .btn-delete { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(239,68,68,0.9); color: #fff; border: none; font-size: 0.75rem; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 5; }
-    .teacher-active .btn-delete { display: flex; }
-
-    /* EMPTY STATE */
-    .empty-card { background: var(--white); border: 1.5px dashed var(--border); border-radius: 20px; padding: 32px 24px; display: flex; align-items: center; gap: 20px; }
-    .empty-icon { width: 56px; height: 56px; background: var(--off-white); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0; border: 1.5px solid var(--border); }
-    .empty-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
-    .empty-sub { font-size: 0.83rem; color: var(--purple-light); font-weight: 500; }
-
-    /* PDF VIEWER MODAL */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(15,10,40,0.85); backdrop-filter: blur(8px); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-    .modal-overlay.hidden { display: none; }
-    .modal-top { width: 100%; max-width: 900px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: #fff; }
-    .modal-actions { display: flex; gap: 10px; align-items: center; }
-    .btn-modal-dl { background: var(--accent); color: #fff; border: none; padding: 9px 18px; border-radius: 999px; font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: inherit; text-decoration: none; display: inline-block; }
-    .btn-modal-close { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #fff; width: 38px; height: 38px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .modal-frame { width: 100%; max-width: 900px; flex: 1; max-height: 80vh; border-radius: 16px; overflow: hidden; background: #fff; }
-    .modal-frame iframe { width: 100%; height: 100%; border: none; min-height: 70vh; }
-
-    /* VIDEO PLAYER MODAL */
-    .video-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(12px); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-    .video-modal-overlay.hidden { display: none; }
-    .video-modal-top { width: 100%; max-width: 960px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .video-modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: #fff; }
-    .video-modal-frame { width: 100%; max-width: 960px; aspect-ratio: 16/9; border-radius: 16px; overflow: hidden; background: #000; }
-    .video-modal-frame iframe { width: 100%; height: 100%; border: none; }
-
-    /* ADD SHEET MODAL */
-    .am-overlay { position: fixed; inset: 0; background: rgba(15,10,40,0.7); backdrop-filter: blur(8px); z-index: 300; display: flex; align-items: flex-end; justify-content: center; }
-    .am-overlay.hidden { display: none; }
-    .am-sheet { background: #fff; border-radius: 28px 28px 0 0; width: 100%; max-width: 540px; padding-bottom: 32px; }
-    .am-handle { width: 40px; height: 4px; background: var(--border); border-radius: 999px; margin: 12px auto 0; }
-    .am-head { padding: 18px 24px 14px; border-bottom: 1.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-    .am-head-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 800; color: var(--text-dark); }
-    .am-close-btn { width: 30px; height: 30px; border-radius: 50%; background: var(--off-white); border: 1.5px solid var(--border); color: var(--text-muted); cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; }
-    .am-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; }
-    .am-field label { display: block; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 7px; font-family: 'IBM Plex Mono', monospace; }
-    .am-field input { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.92rem; color: var(--text-dark); background: var(--off-white); outline: none; }
-    .am-field input:focus { border-color: var(--purple-light); background: #fff; }
-    .am-hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 5px; line-height: 1.5; }
-    .am-hint code { background: var(--purple-soft); color: var(--purple); padding: 1px 5px; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; }
-    .am-err { background: #FEE2E2; border: 1.5px solid #FCA5A5; border-radius: 10px; padding: 10px 14px; font-size: 0.82rem; color: #991B1B; display: none; }
-    .am-err.show { display: block; }
-    .am-submit { width: 100%; padding: 14px; background: linear-gradient(135deg, #2563EB, #1D4ED8); color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 0.95rem; border: none; border-radius: 14px; cursor: pointer; }
-    .am-submit:disabled { opacity: 0.6; cursor: not-allowed; }
-    .spinner-sm { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    footer { background: #0F172A; color: rgba(255,255,255,0.5); text-align: center; padding: 20px; font-size: 0.85rem; }
-    footer strong { color: #60A5FA; }
-
-    /* ── SIDEBAR (shared) ───────────────────────────────────── */
-    .hamburger { position:absolute; top:20px; right:20px; z-index:10; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); border-radius:10px; width:40px; height:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; cursor:pointer; padding:0; }
-    .hamburger span { display:block; width:18px; height:2px; background:#fff; border-radius:999px; transition:all 0.3s; }
-    .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
-    .hamburger.open span:nth-child(2) { opacity:0; }
-    .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
-    .sidebar-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.6); backdrop-filter:blur(6px); z-index:300; opacity:0; pointer-events:none; transition:opacity 0.3s; }
-    .sidebar-overlay.open { opacity:1; pointer-events:all; }
-    .sidebar { position:fixed; top:0; right:0; height:100%; width:min(320px,85vw); background:#0F172A; z-index:301; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.34,1.1,0.64,1); display:flex; flex-direction:column; overflow-y:auto; }
-    .sidebar.open { transform:translateX(0); }
-    .sidebar-head { padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; gap:12px; }
-    .sidebar-logo { width:36px; height:36px; border-radius:10px; object-fit:cover; }
-    .sidebar-head-text { flex:1; }
-    .sidebar-head-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:800; color:#fff; }
-    .sidebar-head-sub { font-size:0.7rem; color:rgba(255,255,255,0.45); margin-top:1px; }
-    .sidebar-close { width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,0.08); border:none; color:rgba(255,255,255,0.5); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
-    .sidebar-section { padding:14px 16px 4px; }
-    .sidebar-section-label { font-size:0.65rem; font-weight:700; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.12em; font-family:'IBM Plex Mono',monospace; padding:0 4px; margin-bottom:6px; }
-    .sidebar-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; text-decoration:none; transition:background 0.15s; margin-bottom:2px; }
-    .sidebar-item:hover, .sidebar-item:active { background:rgba(255,255,255,0.08); }
-    .sidebar-item.active { background:rgba(255,255,255,0.12); border-left:3px solid #60A5FA; padding-left:9px; }
-    .sidebar-item-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0; }
-    .sidebar-item-name { font-size:0.88rem; font-weight:600; color:#fff; flex:1; }
-    .sidebar-item-badge { font-size:0.6rem; font-weight:800; padding:2px 7px; border-radius:999px; font-family:'IBM Plex Mono',monospace; background:#F59E0B; color:#fff; }
-    .sidebar-divider { height:1px; background:rgba(255,255,255,0.07); margin:8px 16px; }
-    .sidebar-teacher { margin:12px 16px 20px; background:rgba(37,99,235,0.2); border:1px solid rgba(37,99,235,0.35); border-radius:14px; padding:12px 14px; }
-    .sidebar-teacher-label { font-size:0.68rem; font-weight:700; color:#60A5FA; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
-    .sidebar-teacher-logged { font-size:0.82rem; color:#60A5FA; font-weight:600; display:flex; align-items:center; gap:8px; }
-    .sidebar-teacher-logged span { cursor:pointer; color:rgba(255,255,255,0.4); font-size:0.75rem; margin-left:auto; }
-    .sidebar-home-btn { display:flex; align-items:center; gap:10px; margin:12px 16px 4px; padding:11px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:12px; text-decoration:none; }
-    .sidebar-home-btn:hover { background:rgba(255,255,255,0.1); }
-    .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
-    .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
-
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css?v=20260504-session"/>
   <script src="../shared/js/sidebar.js"></script>
 </head>
-<body data-page="session">
-
-<!-- PDF VIEWER MODAL -->
-<div class="modal-overlay hidden" id="pdfModal">
-  <div class="modal-top">
-    <div class="modal-title" id="pdfModalTitle">Reading Material</div>
-    <div class="modal-actions">
-      <a class="btn-modal-dl" id="pdfModalDl" href="#" target="_blank">&#8595; Download</a>
-      <button class="btn-modal-close" onclick="closePdfModal()">&#10005;</button>
-    </div>
-  </div>
-  <div class="modal-frame">
-    <iframe id="pdfModalIframe" src="" allowfullscreen></iframe>
-  </div>
-</div>
-
-<!-- VIDEO PLAYER MODAL -->
-<div class="video-modal-overlay hidden" id="videoModal">
-  <div class="video-modal-top">
-    <div class="video-modal-title" id="videoModalTitle">Video Lesson</div>
-    <div class="modal-actions">
-      <a class="btn-modal-dl" id="videoModalYt" href="#" target="_blank" style="background:#DC2626;">&#9654; YouTube</a>
-      <button class="btn-modal-close" onclick="closeVideoModal()">&#10005;</button>
-    </div>
-  </div>
-  <div class="video-modal-frame">
-    <iframe id="videoModalIframe" src="" allowfullscreen allow="autoplay; encrypted-media"></iframe>
-  </div>
-</div>
-
-<!-- ADD READING SHEET -->
-<div class="am-overlay hidden" id="addReadingOverlay">
-  <div class="am-sheet">
-    <div class="am-handle"></div>
-    <div class="am-head">
-      <div class="am-head-title">📖 Add Reading Material</div>
-      <button class="am-close-btn" onclick="closeAddReading()">&#10005;</button>
-    </div>
-    <div class="am-body">
-      <div class="am-field">
-        <label>Title</label>
-        <input type="text" id="rTitle" placeholder="e.g. Chapter 5 Reading Text"/>
+<body class="grade10-subpage" data-page="session">
+  <div class="viewer-overlay hidden" id="pdfModal">
+    <div class="viewer-top">
+      <div class="viewer-title" id="pdfModalTitle">Reading Material</div>
+      <div class="viewer-actions">
+        <a class="btn primary" id="pdfModalDl" href="#" target="_blank">Download</a>
+        <button class="round-close" onclick="closePdfModal()" aria-label="Close reading viewer">x</button>
       </div>
-      <div class="am-field">
-        <label>Google Drive File ID or URL</label>
-        <input type="text" id="rFileId" placeholder="Paste Drive link or file ID"/>
-        <div class="am-hint">From share link: <code>drive.google.com/file/d/<strong>COPY_THIS</strong>/view</code></div>
-      </div>
-      <div class="am-err" id="rErr"></div>
-      <button class="am-submit" id="rSubmitBtn">&#65291; Add Reading</button>
+    </div>
+    <div class="viewer-frame">
+      <iframe id="pdfModalIframe" src="" allowfullscreen></iframe>
     </div>
   </div>
-</div>
 
-<!-- ADD VIDEO SHEET -->
-<div class="am-overlay hidden" id="addVideoOverlay">
-  <div class="am-sheet">
-    <div class="am-handle"></div>
-    <div class="am-head">
-      <div class="am-head-title">🎬 Add Video</div>
-      <button class="am-close-btn" onclick="closeAddVideo()">&#10005;</button>
+  <div class="viewer-overlay hidden video-viewer" id="videoModal">
+    <div class="viewer-top">
+      <div class="viewer-title" id="videoModalTitle">Video Lesson</div>
+      <div class="viewer-actions">
+        <a class="btn danger" id="videoModalYt" href="#" target="_blank">YouTube</a>
+        <button class="round-close" onclick="closeVideoModal()" aria-label="Close video player">x</button>
+      </div>
     </div>
-    <div class="am-body">
-      <div class="am-field">
-        <label>Title</label>
-        <input type="text" id="vTitle" placeholder="e.g. Chapter 5 Video Explanation"/>
-      </div>
-      <div class="am-field">
-        <label>YouTube URL or Video ID</label>
-        <input type="text" id="vVideoId" placeholder="Paste YouTube link or just the video ID"/>
-        <div class="am-hint">From share link: <code>youtube.com/watch?v=<strong>COPY_THIS</strong></code></div>
-      </div>
-      <div class="am-err" id="vErr"></div>
-      <button class="am-submit" id="vSubmitBtn">&#65291; Add Video</button>
+    <div class="video-frame">
+      <iframe id="videoModalIframe" src="" allowfullscreen></iframe>
     </div>
   </div>
-</div>
 
-<header>
-  <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
-  <a class="back-btn" href="index.html">&#8592; Back</a>
-
-  <h1>Class <span>Session</span></h1>
-  <p class="header-sub">English Quest &middot; SMA Negeri 6 Surakarta</p>
-</header>
-<svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
-  <path fill="#1E3A8A" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
-  <path fill="#F8FAFC" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
-</svg>
-
-<main>
-
-  <!-- READING SECTION -->
-  <div class="section-block">
-    <div class="section-header">
-      <div class="section-badge reading">📖 READING</div>
-      <div class="section-title">Reading Material</div>
-      <div class="section-line"></div>
-      <button class="add-btn" id="addReadingBtn">&#65291; Add</button>
+  <div class="sheet-overlay hidden" id="addReadingOverlay">
+    <div class="sheet-panel">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head">
+        <div class="sheet-title">Add Reading Material</div>
+        <button class="round-close" onclick="closeAddReading()" aria-label="Close add reading form">x</button>
+      </div>
+      <div class="sheet-body">
+        <div class="field">
+          <label for="rTitle">Title</label>
+          <input type="text" id="rTitle" placeholder="e.g. Chapter 5 Reading Text"/>
+        </div>
+        <div class="field">
+          <label for="rFileId">Google Drive File ID or URL</label>
+          <input type="text" id="rFileId" placeholder="Paste Drive link or file ID"/>
+          <div class="field-hint">From your share link: <code>drive.google.com/file/d/COPY_THIS/view</code></div>
+        </div>
+        <div class="form-error" id="rErr"></div>
+        <button class="btn primary" id="rSubmitBtn">Add Reading</button>
+      </div>
     </div>
-    <div class="content-grid" id="readingGrid">
-      <div class="empty-card" id="readingEmpty">
-        <div class="empty-icon">📖</div>
+  </div>
+
+  <div class="sheet-overlay hidden" id="addVideoOverlay">
+    <div class="sheet-panel">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head">
+        <div class="sheet-title">Add Video</div>
+        <button class="round-close" onclick="closeAddVideo()" aria-label="Close add video form">x</button>
+      </div>
+      <div class="sheet-body">
+        <div class="field">
+          <label for="vTitle">Title</label>
+          <input type="text" id="vTitle" placeholder="e.g. Chapter 5 Video Explanation"/>
+        </div>
+        <div class="field">
+          <label for="vVideoId">YouTube URL or Video ID</label>
+          <input type="text" id="vVideoId" placeholder="Paste YouTube link or just the video ID"/>
+          <div class="field-hint">From your share link: <code>youtube.com/watch?v=COPY_THIS</code></div>
+        </div>
+        <div class="form-error" id="vErr"></div>
+        <button class="btn primary" id="vSubmitBtn">Add Video</button>
+      </div>
+    </div>
+  </div>
+
+  <header class="subpage-header">
+    <div class="topbar">
+      <div class="brand">
+        <img src="../logo.jpg" alt="English Quest Logo"/>
         <div>
-          <div class="empty-title">No Reading Yet</div>
-          <div class="empty-sub">Teacher will upload reading material soon</div>
+          <div class="brand-title">English Quest</div>
+          <div class="brand-sub">Grade 10 Student Track</div>
         </div>
       </div>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="index.html">Grade 10 Home</a>
+        <a href="../teacher/">Teacher</a>
+        <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
+      </nav>
     </div>
-  </div>
 
-  <!-- VIDEO SECTION -->
-  <div class="section-block">
-    <div class="section-header">
-      <div class="section-badge video">🎬 VIDEO</div>
-      <div class="section-title">Video Lesson</div>
-      <div class="section-line"></div>
-      <button class="add-btn" id="addVideoBtn">&#65291; Add</button>
-    </div>
-    <div class="content-grid" id="videoGrid">
-      <div class="empty-card" id="videoEmpty">
-        <div class="empty-icon">🎬</div>
-        <div>
-          <div class="empty-title">No Video Yet</div>
-          <div class="empty-sub">Teacher will upload the lesson video soon</div>
+    <section class="subpage-hero">
+      <div class="kicker">Reading</div>
+      <h1>Open class texts and video explanations in one place.</h1>
+      <p class="hero-copy">Reading materials and lesson videos stay organized for Grade 10 students. Teacher-only controls appear after teacher login.</p>
+    </section>
+  </header>
+
+  <main>
+    <section class="content-section" aria-labelledby="readingTitle">
+      <div class="content-section-head">
+        <div class="content-title-row">
+          <div class="content-badge">Reading</div>
+          <h2 class="content-title" id="readingTitle">Reading Material</h2>
+        </div>
+        <button class="teacher-only-btn" id="addReadingBtn">Add Reading</button>
+      </div>
+
+      <div class="material-grid" id="readingGrid">
+        <div class="empty-material-card" id="readingEmpty">
+          <div class="empty-material-icon">PDF</div>
+          <div>
+            <div class="empty-material-title">No Reading Yet</div>
+            <div class="empty-material-copy">Teacher will upload reading material soon.</div>
+          </div>
+          <div class="empty-material-badge">Empty</div>
         </div>
       </div>
-    </div>
-  </div>
+    </section>
 
-</main>
+    <section class="content-section" aria-labelledby="videoTitle">
+      <div class="content-section-head">
+        <div class="content-title-row">
+          <div class="content-badge video-badge">Video</div>
+          <h2 class="content-title" id="videoTitle">Video Lesson</h2>
+        </div>
+        <button class="teacher-only-btn" id="addVideoBtn">Add Video</button>
+      </div>
 
-<footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
+      <div class="material-grid" id="videoGrid">
+        <div class="empty-material-card" id="videoEmpty">
+          <div class="empty-material-icon">YT</div>
+          <div>
+            <div class="empty-material-title">No Video Yet</div>
+            <div class="empty-material-copy">Teacher will upload the lesson video soon.</div>
+          </div>
+          <div class="empty-material-badge">Empty</div>
+        </div>
+      </div>
+    </section>
+  </main>
 
-<script>
-var SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
-var savedUser = localStorage.getItem('eq_tu') || '';
-var savedPass = localStorage.getItem('eq_tp') || '';
-var isTeacher = !!savedUser;
+  <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built by <strong>LaksMedia</strong></footer>
 
-if (isTeacher) document.body.classList.add('teacher-active');
+  <script>
+    var SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+    var savedUser = localStorage.getItem('eq_tu') || '';
+    var savedPass = localStorage.getItem('eq_tp') || '';
+    var isTeacher = !!savedUser;
 
-// ── API ───────────────────────────────────────────────────────
-function apiGet(params) {
-  var url = SCORES_API + '?';
-  var parts = [];
-  for (var k in params) parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
-  url += parts.join('&');
-  function attempt(retries) {
-    return new Promise(function(resolve, reject) {
-      var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-      var script = document.createElement('script');
-      var timer = setTimeout(function() {
-        cleanup();
-        if (retries > 0) attempt(retries - 1).then(resolve).catch(reject);
-        else reject(new Error('Request timed out. Please try again.'));
-      }, 15000);
-      function cleanup() {
-        clearTimeout(timer); delete window[cb];
-        try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
-      }
-      window[cb] = function(d) { cleanup(); resolve(d); };
-      script.onerror = function() {
-        cleanup();
-        if (retries > 0) attempt(retries - 1).then(resolve).catch(reject);
-        else reject(new Error('Network error. Please try again.'));
-      };
-      script.src = url + '&callback=' + cb;
-      (document.body || document.head).appendChild(script);
-    });
-  }
-  return attempt(1);
-}
-
-// ── TOAST ─────────────────────────────────────────────────────
-function showToast(msg) {
-  var t = document.createElement('div');
-  t.textContent = msg;
-  t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#0F172A;color:#fff;padding:12px 22px;border-radius:999px;font-size:0.85rem;font-weight:600;z-index:9999;white-space:nowrap;';
-  document.body.appendChild(t);
-  setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 3000);
-}
-
-// ── PDF MODAL ─────────────────────────────────────────────────
-function openPdf(title, fileId) {
-  document.getElementById('pdfModalTitle').textContent = title;
-  document.getElementById('pdfModalIframe').src = 'https://drive.google.com/file/d/' + fileId + '/preview';
-  document.getElementById('pdfModalDl').href = 'https://drive.google.com/uc?export=download&id=' + fileId;
-  document.getElementById('pdfModal').classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-}
-function closePdfModal() {
-  document.getElementById('pdfModal').classList.add('hidden');
-  document.getElementById('pdfModalIframe').src = '';
-  document.body.style.overflow = '';
-}
-document.getElementById('pdfModal').addEventListener('click', function(e) { if (e.target === this) closePdfModal(); });
-
-// ── VIDEO MODAL ───────────────────────────────────────────────
-function openVideo(title, videoId) {
-  document.getElementById('videoModalTitle').textContent = title;
-  document.getElementById('videoModalIframe').src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0';
-  document.getElementById('videoModalYt').href = 'https://www.youtube.com/watch?v=' + videoId;
-  document.getElementById('videoModal').classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-}
-function closeVideoModal() {
-  document.getElementById('videoModal').classList.add('hidden');
-  document.getElementById('videoModalIframe').src = '';
-  document.body.style.overflow = '';
-}
-document.getElementById('videoModal').addEventListener('click', function(e) { if (e.target === this) closeVideoModal(); });
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closePdfModal(); closeVideoModal(); closeAddReading(); closeAddVideo(); } });
-
-// ── LOAD SAVED CONTENT ────────────────────────────────────────
-function loadAll() {
-  // Reading — stored via ScoresAPI materials with chapter 'r'
-  apiGet({ action: 'getMaterials', chapter: 'reading' }).then(function(res) {
-    if (res.materials && res.materials.length > 0) {
-      res.materials.forEach(function(m) { appendReadingCard(m.title, m.fileId, false); });
+    if (isTeacher) {
+      document.body.classList.add('teacher-active');
     }
-  }).catch(function() {});
 
-  // Video — stored via ScoresAPI materials with chapter 'video'
-  apiGet({ action: 'getMaterials', chapter: 'video' }).then(function(res) {
-    if (res.materials && res.materials.length > 0) {
-      res.materials.forEach(function(m) { appendVideoCard(m.title, m.fileId, false); });
+    function apiGet(params) {
+      var url = SCORES_API + '?';
+      var parts = [];
+      for (var k in params) parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
+      url += parts.join('&');
+
+      function attempt(retries) {
+        return new Promise(function(resolve, reject) {
+          var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+          var script = document.createElement('script');
+          var timer = setTimeout(function() {
+            cleanup();
+            if (retries > 0) attempt(retries - 1).then(resolve).catch(reject);
+            else reject(new Error('Request timed out. Please try again.'));
+          }, 15000);
+
+          function cleanup() {
+            clearTimeout(timer);
+            delete window[cb];
+            try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
+          }
+
+          window[cb] = function(data) {
+            cleanup();
+            resolve(data);
+          };
+
+          script.onerror = function() {
+            cleanup();
+            if (retries > 0) attempt(retries - 1).then(resolve).catch(reject);
+            else reject(new Error('Network error. Please try again.'));
+          };
+
+          script.src = url + '&callback=' + cb;
+          (document.body || document.head).appendChild(script);
+        });
+      }
+
+      return attempt(1);
     }
-  }).catch(function() {});
-}
 
-// ── READING CARDS ─────────────────────────────────────────────
-function appendReadingCard(title, fileId, animate) {
-  var existing = document.querySelector('[data-reading-id="' + fileId + '"]');
-  if (existing) return;
-  var empty = document.getElementById('readingEmpty');
-  if (empty) empty.remove();
+    function showToast(msg) {
+      var toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = msg;
+      document.body.appendChild(toast);
+      setTimeout(function() {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 3000);
+    }
 
-  var previewUrl  = 'https://drive.google.com/file/d/' + fileId + '/preview';
-  var downloadUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
+    function openPdf(title, fileId) {
+      document.getElementById('pdfModalTitle').textContent = title;
+      document.getElementById('pdfModalIframe').src = 'https://drive.google.com/file/d/' + fileId + '/preview';
+      document.getElementById('pdfModalDl').href = 'https://drive.google.com/uc?export=download&id=' + fileId;
+      document.getElementById('pdfModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
 
-  var card = document.createElement('div');
-  card.className = 'pdf-card';
-  card.setAttribute('data-reading-id', fileId);
+    function closePdfModal() {
+      document.getElementById('pdfModal').classList.add('hidden');
+      document.getElementById('pdfModalIframe').src = '';
+      document.body.style.overflow = '';
+    }
 
-  var delBtn = document.createElement('button');
-  delBtn.className = 'btn-delete';
-  delBtn.innerHTML = '&#10005;';
-  delBtn.onclick = function() { deleteReading(fileId, card); };
+    function openVideo(title, videoId) {
+      document.getElementById('videoModalTitle').textContent = title;
+      document.getElementById('videoModalIframe').src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0';
+      document.getElementById('videoModalYt').href = 'https://www.youtube.com/watch?v=' + videoId;
+      document.getElementById('videoModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
 
-  var preview = document.createElement('div');
-  preview.className = 'pdf-preview';
-  preview.innerHTML = '<span class="pdf-icon">📖</span><iframe src="' + previewUrl + '" title="' + title + '"></iframe><div class="pdf-overlay"><div class="pdf-overlay-btn">Read</div></div>';
-  preview.onclick = function() { openPdf(title, fileId); };
+    function closeVideoModal() {
+      document.getElementById('videoModal').classList.add('hidden');
+      document.getElementById('videoModalIframe').src = '';
+      document.body.style.overflow = '';
+    }
 
-  var info = document.createElement('div');
-  info.className = 'pdf-info';
-  var pName = document.createElement('div'); pName.className = 'pdf-name'; pName.textContent = title;
-  var pMeta = document.createElement('div'); pMeta.className = 'pdf-meta'; pMeta.textContent = 'PDF · Reading Material';
-  var pActs = document.createElement('div'); pActs.className = 'pdf-actions';
-  var btnView = document.createElement('button'); btnView.className = 'btn-view'; btnView.textContent = '👁 Read'; btnView.onclick = function() { openPdf(title, fileId); };
-  var btnDl = document.createElement('a'); btnDl.className = 'btn-download'; btnDl.href = downloadUrl; btnDl.target = '_blank'; btnDl.textContent = '↓';
-  pActs.appendChild(btnView); pActs.appendChild(btnDl);
-  info.appendChild(pName); info.appendChild(pMeta); info.appendChild(pActs);
-  card.appendChild(delBtn); card.appendChild(preview); card.appendChild(info);
-  document.getElementById('readingGrid').appendChild(card);
-}
+    document.getElementById('pdfModal').addEventListener('click', function(e) {
+      if (e.target === this) closePdfModal();
+    });
 
-function deleteReading(fileId, card) {
-  if (!confirm('Remove this reading material?')) return;
-  apiGet({ action: 'deleteMaterial', username: savedUser, password: savedPass, chapter: 'reading', fileId: fileId })
-    .then(function(res) {
-      if (res.success) {
-        card.remove();
-        if (document.getElementById('readingGrid').children.length === 0) {
-          var e = document.createElement('div'); e.className = 'empty-card'; e.id = 'readingEmpty';
-          e.innerHTML = '<div class="empty-icon">📖</div><div><div class="empty-title">No Reading Yet</div><div class="empty-sub">Add reading material above</div></div>';
-          document.getElementById('readingGrid').appendChild(e);
+    document.getElementById('videoModal').addEventListener('click', function(e) {
+      if (e.target === this) closeVideoModal();
+    });
+
+    function loadAll() {
+      apiGet({ action: 'getMaterials', chapter: 'reading' }).then(function(res) {
+        if (res.materials && res.materials.length > 0) {
+          res.materials.forEach(function(m) {
+            appendReadingCard(m.title, m.fileId);
+          });
         }
-        showToast('Removed!');
+      }).catch(function() {});
+
+      apiGet({ action: 'getMaterials', chapter: 'video' }).then(function(res) {
+        if (res.materials && res.materials.length > 0) {
+          res.materials.forEach(function(m) {
+            appendVideoCard(m.title, m.fileId);
+          });
+        }
+      }).catch(function() {});
+    }
+
+    function appendReadingCard(title, fileId) {
+      if (document.querySelector('[data-reading-id="' + fileId + '"]')) return;
+      var empty = document.getElementById('readingEmpty');
+      if (empty) empty.remove();
+
+      var previewUrl = 'https://drive.google.com/file/d/' + fileId + '/preview';
+      var downloadUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
+      var card = document.createElement('article');
+      card.className = 'material-card';
+      card.setAttribute('data-reading-id', fileId);
+
+      var delBtn = document.createElement('button');
+      delBtn.className = 'delete-material-btn';
+      delBtn.textContent = 'x';
+      delBtn.onclick = function() { deleteReading(fileId, card); };
+
+      var preview = document.createElement('div');
+      preview.className = 'material-preview';
+      preview.innerHTML = '<span class="material-icon">PDF</span><iframe src="' + previewUrl + '" title="' + title + '"></iframe><div class="material-overlay"><span>Read</span></div>';
+      preview.onclick = function() { openPdf(title, fileId); };
+
+      var info = document.createElement('div');
+      info.className = 'material-info';
+      info.innerHTML =
+        '<div class="material-name"></div>' +
+        '<div class="material-meta">PDF · Reading Material</div>' +
+        '<div class="material-actions"></div>';
+      info.querySelector('.material-name').textContent = title;
+
+      var actions = info.querySelector('.material-actions');
+      var btnView = document.createElement('button');
+      btnView.className = 'btn';
+      btnView.textContent = 'Read';
+      btnView.onclick = function() { openPdf(title, fileId); };
+      var btnDownload = document.createElement('a');
+      btnDownload.className = 'btn primary icon-btn';
+      btnDownload.href = downloadUrl;
+      btnDownload.target = '_blank';
+      btnDownload.textContent = '↓';
+      actions.appendChild(btnView);
+      actions.appendChild(btnDownload);
+
+      card.appendChild(delBtn);
+      card.appendChild(preview);
+      card.appendChild(info);
+      document.getElementById('readingGrid').appendChild(card);
+    }
+
+    function deleteReading(fileId, card) {
+      if (!confirm('Remove this reading material?')) return;
+      apiGet({ action: 'deleteMaterial', username: savedUser, password: savedPass, chapter: 'reading', fileId: fileId })
+        .then(function(res) {
+          if (res.success) {
+            card.remove();
+            showReadingEmptyIfNeeded();
+            showToast('Removed!');
+          }
+        }).catch(function() {
+          showToast('Error removing.');
+        });
+    }
+
+    function showReadingEmptyIfNeeded() {
+      var grid = document.getElementById('readingGrid');
+      if (!grid || grid.children.length > 0) return;
+      var empty = document.createElement('div');
+      empty.className = 'empty-material-card';
+      empty.id = 'readingEmpty';
+      empty.innerHTML = '<div class="empty-material-icon">PDF</div><div><div class="empty-material-title">No Reading Yet</div><div class="empty-material-copy">Teacher will upload reading material soon.</div></div><div class="empty-material-badge">Empty</div>';
+      grid.appendChild(empty);
+    }
+
+    function appendVideoCard(title, videoId) {
+      if (document.querySelector('[data-video-id="' + videoId + '"]')) return;
+      var empty = document.getElementById('videoEmpty');
+      if (empty) empty.remove();
+
+      var thumbUrl = 'https://img.youtube.com/vi/' + videoId + '/hqdefault.jpg';
+      var ytUrl = 'https://www.youtube.com/watch?v=' + videoId;
+      var card = document.createElement('article');
+      card.className = 'material-card video-card';
+      card.setAttribute('data-video-id', videoId);
+
+      var delBtn = document.createElement('button');
+      delBtn.className = 'delete-material-btn';
+      delBtn.textContent = 'x';
+      delBtn.onclick = function() { deleteVideo(videoId, card); };
+
+      var preview = document.createElement('div');
+      preview.className = 'video-preview';
+      preview.innerHTML = '<img src="' + thumbUrl + '" alt="' + title + '" onerror="this.style.display=\'none\'"/><div class="video-play"><span>Play</span></div>';
+      preview.onclick = function() { openVideo(title, videoId); };
+
+      var info = document.createElement('div');
+      info.className = 'material-info';
+      info.innerHTML =
+        '<div class="material-name"></div>' +
+        '<div class="material-meta">YouTube · Video Lesson</div>' +
+        '<div class="material-actions"></div>';
+      info.querySelector('.material-name').textContent = title;
+
+      var actions = info.querySelector('.material-actions');
+      var btnWatch = document.createElement('button');
+      btnWatch.className = 'btn';
+      btnWatch.textContent = 'Watch';
+      btnWatch.onclick = function() { openVideo(title, videoId); };
+      var btnYt = document.createElement('a');
+      btnYt.className = 'btn danger icon-btn';
+      btnYt.href = ytUrl;
+      btnYt.target = '_blank';
+      btnYt.textContent = '↗';
+      actions.appendChild(btnWatch);
+      actions.appendChild(btnYt);
+
+      card.appendChild(delBtn);
+      card.appendChild(preview);
+      card.appendChild(info);
+      document.getElementById('videoGrid').appendChild(card);
+    }
+
+    function deleteVideo(videoId, card) {
+      if (!confirm('Remove this video?')) return;
+      apiGet({ action: 'deleteMaterial', username: savedUser, password: savedPass, chapter: 'video', fileId: videoId })
+        .then(function(res) {
+          if (res.success) {
+            card.remove();
+            showVideoEmptyIfNeeded();
+            showToast('Removed!');
+          }
+        }).catch(function() {
+          showToast('Error removing.');
+        });
+    }
+
+    function showVideoEmptyIfNeeded() {
+      var grid = document.getElementById('videoGrid');
+      if (!grid || grid.children.length > 0) return;
+      var empty = document.createElement('div');
+      empty.className = 'empty-material-card';
+      empty.id = 'videoEmpty';
+      empty.innerHTML = '<div class="empty-material-icon">YT</div><div><div class="empty-material-title">No Video Yet</div><div class="empty-material-copy">Teacher will upload the lesson video soon.</div></div><div class="empty-material-badge">Empty</div>';
+      grid.appendChild(empty);
+    }
+
+    document.getElementById('addReadingBtn').onclick = function() {
+      document.getElementById('rTitle').value = '';
+      document.getElementById('rFileId').value = '';
+      document.getElementById('rErr').className = 'form-error';
+      document.getElementById('rSubmitBtn').disabled = false;
+      document.getElementById('rSubmitBtn').textContent = 'Add Reading';
+      document.getElementById('addReadingOverlay').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    };
+
+    function closeAddReading() {
+      document.getElementById('addReadingOverlay').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('addReadingOverlay').onclick = function(e) {
+      if (e.target === this) closeAddReading();
+    };
+
+    document.getElementById('rSubmitBtn').onclick = function() {
+      var raw = document.getElementById('rFileId').value.trim();
+      var title = document.getElementById('rTitle').value.trim();
+      var err = document.getElementById('rErr');
+      var btn = document.getElementById('rSubmitBtn');
+      var fileId = raw;
+      var match = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (match) fileId = match[1];
+
+      if (!title) {
+        err.textContent = 'Please enter a title.';
+        err.className = 'form-error show';
+        return;
+      }
+      if (!fileId || fileId.length < 10) {
+        err.textContent = 'Please enter a valid Drive link or file ID.';
+        err.className = 'form-error show';
+        return;
+      }
+
+      err.className = 'form-error';
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-sm"></span>Saving...';
+
+      apiGet({ action: 'addMaterial', username: savedUser, password: savedPass, chapter: 'reading', title: title, fileId: fileId, fileType: 'PDF' })
+        .then(function(res) {
+          if (res.success) {
+            appendReadingCard(title, fileId);
+            closeAddReading();
+            showToast('Added: ' + title);
+          } else {
+            err.textContent = res.error || 'Failed to save.';
+            err.className = 'form-error show';
+            btn.disabled = false;
+            btn.textContent = 'Add Reading';
+          }
+        }).catch(function() {
+          err.textContent = 'Network error. Please try again.';
+          err.className = 'form-error show';
+          btn.disabled = false;
+          btn.textContent = 'Add Reading';
+        });
+    };
+
+    document.getElementById('addVideoBtn').onclick = function() {
+      document.getElementById('vTitle').value = '';
+      document.getElementById('vVideoId').value = '';
+      document.getElementById('vErr').className = 'form-error';
+      document.getElementById('vSubmitBtn').disabled = false;
+      document.getElementById('vSubmitBtn').textContent = 'Add Video';
+      document.getElementById('addVideoOverlay').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    };
+
+    function closeAddVideo() {
+      document.getElementById('addVideoOverlay').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('addVideoOverlay').onclick = function(e) {
+      if (e.target === this) closeAddVideo();
+    };
+
+    document.getElementById('vSubmitBtn').onclick = function() {
+      var raw = document.getElementById('vVideoId').value.trim();
+      var title = document.getElementById('vTitle').value.trim();
+      var err = document.getElementById('vErr');
+      var btn = document.getElementById('vSubmitBtn');
+      var videoId = raw;
+      var match = raw.match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
+      if (match) videoId = match[1];
+
+      if (!title) {
+        err.textContent = 'Please enter a title.';
+        err.className = 'form-error show';
+        return;
+      }
+      if (!videoId || videoId.length < 5) {
+        err.textContent = 'Please enter a valid YouTube link or video ID.';
+        err.className = 'form-error show';
+        return;
+      }
+
+      err.className = 'form-error';
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-sm"></span>Saving...';
+
+      apiGet({ action: 'addMaterial', username: savedUser, password: savedPass, chapter: 'video', title: title, fileId: videoId, fileType: 'YT' })
+        .then(function(res) {
+          if (res.success) {
+            appendVideoCard(title, videoId);
+            closeAddVideo();
+            showToast('Added: ' + title);
+          } else {
+            err.textContent = res.error || 'Failed to save.';
+            err.className = 'form-error show';
+            btn.disabled = false;
+            btn.textContent = 'Add Video';
+          }
+        }).catch(function() {
+          err.textContent = 'Network error. Please try again.';
+          err.className = 'form-error show';
+          btn.disabled = false;
+          btn.textContent = 'Add Video';
+        });
+    };
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closePdfModal();
+        closeVideoModal();
+        closeAddReading();
+        closeAddVideo();
       }
     });
-}
 
-// ── VIDEO CARDS ───────────────────────────────────────────────
-function appendVideoCard(title, videoId, animate) {
-  var existing = document.querySelector('[data-video-id="' + videoId + '"]');
-  if (existing) return;
-  var empty = document.getElementById('videoEmpty');
-  if (empty) empty.remove();
-
-  var thumbUrl = 'https://img.youtube.com/vi/' + videoId + '/hqdefault.jpg';
-  var ytUrl    = 'https://www.youtube.com/watch?v=' + videoId;
-
-  var card = document.createElement('div');
-  card.className = 'video-card';
-  card.setAttribute('data-video-id', videoId);
-
-  var delBtn = document.createElement('button');
-  delBtn.className = 'btn-delete';
-  delBtn.innerHTML = '&#10005;';
-  delBtn.onclick = function() { deleteVideo(videoId, card); };
-
-  var thumb = document.createElement('div');
-  thumb.className = 'video-thumb';
-  thumb.innerHTML = '<img src="' + thumbUrl + '" alt="' + title + '" onerror="this.style.display=\'none\'"/><div class="video-play-overlay"><div class="video-play-btn">▶</div></div>';
-  thumb.onclick = function() { openVideo(title, videoId); };
-
-  var info = document.createElement('div');
-  info.className = 'video-info';
-  var vName = document.createElement('div'); vName.className = 'video-name'; vName.textContent = title;
-  var vMeta = document.createElement('div'); vMeta.className = 'video-meta'; vMeta.textContent = 'YouTube · Video Lesson';
-  var vActs = document.createElement('div'); vActs.className = 'video-actions';
-  var btnWatch = document.createElement('button'); btnWatch.className = 'btn-watch'; btnWatch.textContent = '▶ Watch'; btnWatch.onclick = function() { openVideo(title, videoId); };
-  var btnYt = document.createElement('a'); btnYt.className = 'btn-yt'; btnYt.href = ytUrl; btnYt.target = '_blank'; btnYt.textContent = '↗';
-  vActs.appendChild(btnWatch); vActs.appendChild(btnYt);
-  info.appendChild(vName); info.appendChild(vMeta); info.appendChild(vActs);
-  card.appendChild(delBtn); card.appendChild(thumb); card.appendChild(info);
-  document.getElementById('videoGrid').appendChild(card);
-}
-
-function deleteVideo(videoId, card) {
-  if (!confirm('Remove this video?')) return;
-  apiGet({ action: 'deleteMaterial', username: savedUser, password: savedPass, chapter: 'video', fileId: videoId })
-    .then(function(res) {
-      if (res.success) {
-        card.remove();
-        if (document.getElementById('videoGrid').children.length === 0) {
-          var e = document.createElement('div'); e.className = 'empty-card'; e.id = 'videoEmpty';
-          e.innerHTML = '<div class="empty-icon">🎬</div><div><div class="empty-title">No Video Yet</div><div class="empty-sub">Add a video above</div></div>';
-          document.getElementById('videoGrid').appendChild(e);
-        }
-        showToast('Removed!');
-      }
-    });
-}
-
-// ── ADD READING ───────────────────────────────────────────────
-document.getElementById('addReadingBtn').onclick = function() {
-  document.getElementById('rTitle').value = '';
-  document.getElementById('rFileId').value = '';
-  document.getElementById('rErr').className = 'am-err';
-  document.getElementById('addReadingOverlay').classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-};
-function closeAddReading() {
-  document.getElementById('addReadingOverlay').classList.add('hidden');
-  document.body.style.overflow = '';
-}
-document.getElementById('addReadingOverlay').onclick = function(e) { if (e.target === this) closeAddReading(); };
-
-document.getElementById('rSubmitBtn').onclick = function() {
-  var raw   = document.getElementById('rFileId').value.trim();
-  var title = document.getElementById('rTitle').value.trim();
-  var err   = document.getElementById('rErr');
-  var btn   = document.getElementById('rSubmitBtn');
-
-  var fileId = raw;
-  var m = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if (m) fileId = m[1];
-
-  if (!title) { err.textContent = 'Please enter a title.'; err.className = 'am-err show'; return; }
-  if (!fileId || fileId.length < 10) { err.textContent = 'Please enter a valid Drive link or file ID.'; err.className = 'am-err show'; return; }
-  err.className = 'am-err';
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-sm"></span>Saving...';
-
-  apiGet({ action: 'addMaterial', username: savedUser, password: savedPass, chapter: 'reading', title: title, fileId: fileId, fileType: 'PDF' })
-    .then(function(res) {
-      if (res.success) { appendReadingCard(title, fileId, true); closeAddReading(); showToast('Added: ' + title); }
-      else { err.textContent = res.error || 'Failed to save.'; err.className = 'am-err show'; }
-    }).catch(function() { err.textContent = 'Network error. Please try again.'; err.className = 'am-err show'; })
-    .finally(function() { btn.disabled = false; btn.innerHTML = '&#65291; Add Reading'; });
-};
-
-// ── ADD VIDEO ─────────────────────────────────────────────────
-document.getElementById('addVideoBtn').onclick = function() {
-  document.getElementById('vTitle').value = '';
-  document.getElementById('vVideoId').value = '';
-  document.getElementById('vErr').className = 'am-err';
-  document.getElementById('addVideoOverlay').classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-};
-function closeAddVideo() {
-  document.getElementById('addVideoOverlay').classList.add('hidden');
-  document.body.style.overflow = '';
-}
-document.getElementById('addVideoOverlay').onclick = function(e) { if (e.target === this) closeAddVideo(); };
-
-document.getElementById('vSubmitBtn').onclick = function() {
-  var raw   = document.getElementById('vVideoId').value.trim();
-  var title = document.getElementById('vTitle').value.trim();
-  var err   = document.getElementById('vErr');
-  var btn   = document.getElementById('vSubmitBtn');
-
-  // Extract YouTube video ID
-  var videoId = raw;
-  var ytMatch = raw.match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
-  if (ytMatch) videoId = ytMatch[1];
-
-  if (!title) { err.textContent = 'Please enter a title.'; err.className = 'am-err show'; return; }
-  if (!videoId || videoId.length < 5) { err.textContent = 'Please enter a valid YouTube link or video ID.'; err.className = 'am-err show'; return; }
-  err.className = 'am-err';
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-sm"></span>Saving...';
-
-  apiGet({ action: 'addMaterial', username: savedUser, password: savedPass, chapter: 'video', title: title, fileId: videoId, fileType: 'YT' })
-    .then(function(res) {
-      if (res.success) { appendVideoCard(title, videoId, true); closeAddVideo(); showToast('Added: ' + title); }
-      else { err.textContent = res.error || 'Failed to save.'; err.className = 'am-err show'; }
-    }).catch(function() { err.textContent = 'Network error. Please try again.'; err.className = 'am-err show'; })
-    .finally(function() { btn.disabled = false; btn.innerHTML = '&#65291; Add Video'; });
-};
-
-// ── LOGOUT ────────────────────────────────────────────────────
-function doLogout() {
-  localStorage.removeItem('eq_tu'); localStorage.removeItem('eq_tp');
-  window.location.href = 'index.html';
-}
-
-// Load on ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', loadAll);
-} else {
-  loadAll();
-}
-</script>
-
+    localStorage.setItem('eq_grade', '10');
+    loadAll();
+  </script>
 </body>
 </html>

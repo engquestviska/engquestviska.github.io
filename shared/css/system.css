@@ -414,6 +414,11 @@ footer {
   color: #fff;
 }
 
+.btn.danger {
+  background: #dc2626;
+  color: #fff;
+}
+
 .btn.ghost,
 .ghost-btn,
 .btn {
@@ -696,6 +701,61 @@ a.module:hover {
 .material-actions .btn {
   flex: 1;
   border-radius: 12px;
+}
+
+.video-badge {
+  background: #dc2626;
+}
+
+.video-card:hover {
+  border-color: #fca5a5;
+  box-shadow: 0 22px 48px rgba(220, 38, 38, 0.12);
+}
+
+.video-preview {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #111827;
+  border-bottom: 1.5px solid var(--line);
+  cursor: pointer;
+}
+
+.video-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.38);
+  transition: background 0.18s ease;
+}
+
+.video-card:hover .video-play {
+  background: rgba(15, 23, 42, 0.56);
+}
+
+.video-play span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 76px;
+  min-height: 42px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #991b1b;
+  font-size: 0.84rem;
+  font-weight: 800;
 }
 
 .icon-btn {
@@ -1115,6 +1175,24 @@ a.module:hover {
   width: 100%;
   height: 100%;
   min-height: 70vh;
+  border: none;
+}
+
+.video-viewer {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.video-frame {
+  width: min(960px, 100%);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #000;
+  border-radius: 20px;
+}
+
+.video-frame iframe {
+  width: 100%;
+  height: 100%;
   border: none;
 }
 
@@ -1652,6 +1730,13 @@ a.module:hover {
 
   .action-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .subpage-header {
+    background:
+      linear-gradient(135deg, rgba(37, 99, 235, 0.96), rgba(30, 58, 138, 0.96));
   }
 }
 
