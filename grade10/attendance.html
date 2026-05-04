@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Attendance · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -245,9 +245,10 @@
     .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
 
   </style>
+  <link rel="stylesheet" href="../shared/css/system.css?v=20260504-attendance"/>
   <script src="../shared/js/sidebar.js"></script>
 </head>
-<body data-page="attendance">
+<body class="grade10-subpage attendance-page" data-page="attendance">
 
 <!-- LOGIN MODAL -->
 <div class="overlay hidden" id="loginModal">
@@ -271,28 +272,36 @@
 </div>
 
 <!-- HEADER -->
-<header>
-  <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
-
-
-  <a class="back-btn" href="index.html">&#8592; Back</a>
-  <div class="header-right" id="headerRight">
-    <button class="login-btn" onclick="openLogin()">🔑 Teacher Login</button>
+<header class="subpage-header">
+  <div class="topbar">
+    <div class="brand">
+      <img src="../logo.jpg" alt="English Quest Logo"/>
+      <div>
+        <div class="brand-title">English Quest</div>
+        <div class="brand-sub">Grade 10 Student Track</div>
+      </div>
+    </div>
+    <nav class="nav" aria-label="Main navigation">
+      <a href="index.html">Grade 10 Home</a>
+      <div class="header-right" id="headerRight">
+        <button class="login-btn" onclick="openLogin()">Teacher Login</button>
+      </div>
+      <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
+    </nav>
   </div>
-  <h1>Attendance <span>Tracker</span></h1>
-  <p class="header-sub">English Quest · SMA Negeri 6 Surakarta</p>
-</header>
 
-<svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
-  <path fill="#1E3A8A" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
-  <path fill="#F8FAFC" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
-</svg>
+  <section class="subpage-hero">
+    <div class="kicker">Attendance</div>
+    <h1>Track class attendance by meeting.</h1>
+    <p class="hero-copy">Students can view attendance records, while teacher mode unlocks marking, dates, saving, new meetings, and low-attendance summaries.</p>
+  </section>
+</header>
 
 <main>
 
   <!-- CONTROLS -->
-  <div class="card">
-    <div class="card-title">📋 Select Class & Meeting</div>
+  <div class="card attendance-control-card">
+    <div class="card-title">Select Class & Meeting</div>
     <div class="field">
       <label>Class</label>
       <select id="classSelect" onchange="onClassChange()">
