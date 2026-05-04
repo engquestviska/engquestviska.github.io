@@ -158,25 +158,6 @@
       font-size: 0.95rem; border-radius: 12px; cursor: pointer; margin-top: 10px;
     }
 
-    /* LEADERBOARD */
-    .lb-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; margin-bottom: 20px; }
-    .lb-head { background: linear-gradient(135deg, #2563EB, #1D4ED8); padding: 18px 20px; display: flex; justify-content: space-between; align-items: center; }
-    .lb-head-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: #fff; }
-    .lb-head-sub { font-size: 0.82rem; color: rgba(255,255,255,0.7); margin-top: 3px; }
-    .btn-lb-refresh { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 7px 14px; border-radius: 999px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: inherit; }
-    .lb-row { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--border); }
-    .lb-row:last-child { border-bottom: none; }
-    .lb-rank { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; flex-shrink: 0; }
-    .r1 { background: #FEF3C7; color: #92400E; border: 2px solid #F59E0B; }
-    .r2 { background: #F3F4F6; color: #374151; border: 2px solid #9CA3AF; }
-    .r3 { background: #FEE2E2; color: #7C2D12; border: 2px solid #FB923C; }
-    .rN { background: var(--purple-soft); color: var(--purple); border: 2px solid var(--purple-mid); }
-    .lb-name { flex: 1; font-size: 0.92rem; font-weight: 600; }
-    .lb-pct { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--green); min-width: 52px; text-align: right; }
-    .lb-bar-wrap { width: 60px; background: #F3F4F6; border-radius: 999px; height: 7px; }
-    .lb-bar { height: 7px; border-radius: 999px; background: linear-gradient(90deg, #34D399, #10B981); }
-    .lb-empty { padding: 32px; text-align: center; color: var(--text-muted); font-size: 0.9rem; }
-
     /* LOGIN MODAL */
     .overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
     .modal { background: var(--white); border-radius: 24px; padding: 36px 28px; width: 100%; max-width: 400px; }
@@ -286,8 +267,7 @@
     body.attendance-page .meeting-bar,
     body.attendance-page .quick-actions,
     body.attendance-page .list-card,
-    body.attendance-page .submit-card,
-    body.attendance-page .lb-card {
+    body.attendance-page .submit-card {
       grid-column: 1;
     }
     body.attendance-page .meeting-bar {
@@ -444,15 +424,11 @@
     body.attendance-page .s-btn.on-Sick { background: #fef3c7 !important; border-color: #fcd34d !important; color: #92400e !important; }
     body.attendance-page .s-btn.on-Permission,
     body.attendance-page .s-btn.on-Dispen { background: #dbeafe !important; border-color: #93c5fd !important; color: #1e3a8a !important; }
-    body.attendance-page .submit-card,
-    body.attendance-page .lb-card {
+    body.attendance-page .submit-card {
       position: static !important;
       border-radius: 26px !important;
       padding: 18px !important;
       margin-bottom: 0 !important;
-    }
-    body.attendance-page .lb-card {
-      padding: 0 !important;
     }
     @media (max-width: 900px) {
       body.attendance-page .attendance-control-card,
@@ -464,12 +440,10 @@
       body.attendance-page .meeting-bar,
       body.attendance-page .quick-actions,
       body.attendance-page .list-card,
-      body.attendance-page .submit-card,
-      body.attendance-page .lb-card {
+      body.attendance-page .submit-card {
         grid-column: 1 !important;
       }
-      body.attendance-page .submit-card,
-      body.attendance-page .lb-card {
+      body.attendance-page .submit-card {
         position: static !important;
       }
     }
@@ -603,18 +577,6 @@
       <div class="submit-info">Unmarked students are saved as <strong>Present</strong>.</div>
       <button class="btn-save" id="saveBtn" onclick="submitAttendance()">💾 Save Attendance</button>
       <button class="btn-add-meeting hidden" id="addMeetingBtn" onclick="addNewMeeting()">＋ Add New Meeting</button>
-    </div>
-
-    <!-- Leaderboard -->
-    <div class="lb-card hidden" id="lbCard">
-      <div class="lb-head">
-        <div>
-          <div class="lb-head-title">⚠️ Top 10 Low Attendance</div>
-          <div class="lb-head-sub" id="lbSub">Load a class to see</div>
-        </div>
-        <button class="btn-lb-refresh" onclick="loadLeaderboard()">↻ Refresh</button>
-      </div>
-      <div id="lbRows"><div class="lb-empty">Loading...</div></div>
     </div>
 
   </div>
@@ -766,11 +728,6 @@
 
       renderMeeting(data.nextMeeting);
       setTeacherUI(isTeacher);
-
-      // Leaderboard
-      document.getElementById('lbCard').classList.remove('hidden');
-      document.getElementById('lbSub').textContent = 'Lowest attendance in ' + currentClass;
-      loadLeaderboard();
 
     } catch(e) { showToast('Failed to load. Check connection.', 'err'); }
     finally {
@@ -924,23 +881,6 @@
       else showToast('Error: ' + res.error, 'err');
     } catch(e) { showToast('Failed. Check connection.', 'err'); }
     finally { document.getElementById('addMeetingBtn').textContent = '＋ Add New Meeting'; }
-  }
-
-  // ── LEADERBOARD ────────────────────────────────────────────
-  async function loadLeaderboard() {
-    document.getElementById('lbRows').innerHTML = '<div class="lb-empty"><div class="spinner"></div></div>';
-    try {
-      const data = await apiGet({ action: 'getLeaderboard', className: currentClass });
-      if (!data.length) { document.getElementById('lbRows').innerHTML = '<div class="lb-empty">No data yet.</div>'; return; }
-      const icons = ['🔴','🟠','🟡'];
-      document.getElementById('lbRows').innerHTML = data.map((s, i) => `
-        <div class="lb-row">
-          <div class="lb-rank ${i<3?'r'+(i+1):'rN'}">${i<3?icons[i]:i+1}</div>
-          <div class="lb-name">${s.name}</div>
-          <div class="lb-bar-wrap"><div class="lb-bar" style="width:${s.pct}%;background:${s.pct < 50 ? 'linear-gradient(90deg,#EF4444,#DC2626)' : s.pct < 75 ? 'linear-gradient(90deg,#F59E0B,#D97706)' : 'linear-gradient(90deg,#34D399,#10B981)'}"></div></div>
-          <div class="lb-pct" style="color:${s.pct < 50 ? '#DC2626' : s.pct < 75 ? '#D97706' : '#10B981'}">${s.pct}%</div>
-        </div>`).join('');
-    } catch(e) { document.getElementById('lbRows').innerHTML = '<div class="lb-empty">Failed to load.</div>'; }
   }
 
   // ── TOAST ──────────────────────────────────────────────────
