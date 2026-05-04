@@ -83,19 +83,17 @@
         <button class="teacher-only-btn" id="addBtn4" onclick="openAddModal(4)">Add Assignment</button>
       </div>
 
-      <div class="task-grid" id="grid-ch4">
-        <article class="task-card" data-fileid="1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8">
+      <div class="material-grid" id="grid-ch4">
+        <article class="material-card assignment-card" data-fileid="1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8">
           <button class="delete-material-btn" onclick="deleteAssignment(4,'1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8',this)">x</button>
-          <div class="task-top">
-            <div class="task-number">5</div>
-            <div class="task-info">
-              <div class="task-name">Present Perfect Exercise</div>
-              <div class="task-tag">GRAMMAR · PRESENT PERFECT</div>
+          <div class="material-info">
+            <div class="content-badge">Task 5</div>
+            <div class="material-name">Present Perfect Exercise</div>
+            <div class="material-meta">GRAMMAR · PRESENT PERFECT</div>
+            <div class="material-actions">
+              <button class="btn" onclick="openPDF('Present Perfect Exercise','https://drive.google.com/file/d/1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8/preview','https://drive.google.com/uc?export=download&id=1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8')">View</button>
+              <a class="btn primary icon-btn" href="https://drive.google.com/uc?export=download&id=1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8" target="_blank">↓</a>
             </div>
-          </div>
-          <div class="task-actions">
-            <button class="btn" onclick="openPDF('Present Perfect Exercise','https://drive.google.com/file/d/1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8/preview','https://drive.google.com/uc?export=download&id=1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8')">View</button>
-            <a class="btn primary icon-btn" href="https://drive.google.com/uc?export=download&id=1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8" target="_blank">↓</a>
           </div>
         </article>
       </div>
@@ -110,7 +108,7 @@
         <button class="teacher-only-btn" id="addBtn5" onclick="openAddModal(5)">Add Assignment</button>
       </div>
 
-      <div class="task-grid" id="grid-ch5"></div>
+      <div class="material-grid" id="grid-ch5"></div>
       <div class="empty-material-card hidden-state" id="ch5-empty">
         <div class="empty-material-icon">📋</div>
         <div>
@@ -196,13 +194,13 @@
       if (document.querySelector('[data-fileid="' + fileId + '"]')) return;
       var previewUrl = 'https://drive.google.com/file/d/' + fileId + '/preview';
       var downloadUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
-      var num = document.getElementById('grid-ch' + ch).querySelectorAll('.task-card').length + 1;
+      var num = document.getElementById('grid-ch' + ch).querySelectorAll('.assignment-card').length + 1;
 
       var empty = document.getElementById('ch' + ch + '-empty');
       if (empty) empty.classList.add('hidden-state');
 
       var card = document.createElement('article');
-      card.className = 'task-card';
+      card.className = 'material-card assignment-card';
       card.setAttribute('data-fileid', fileId);
 
       var delBtn = document.createElement('button');
@@ -210,28 +208,25 @@
       delBtn.textContent = 'x';
       delBtn.onclick = function() { deleteAssignment(ch, fileId, delBtn); };
 
-      var top = document.createElement('div');
-      top.className = 'task-top';
-
-      var number = document.createElement('div');
-      number.className = 'task-number';
-      number.textContent = num;
-
       var info = document.createElement('div');
-      info.className = 'task-info';
+      info.className = 'material-info';
+      var number = document.createElement('div');
+      number.className = 'content-badge';
+      number.textContent = 'Task ' + num;
       var title = document.createElement('div');
-      title.className = 'task-name';
+      title.className = 'material-name';
       title.textContent = name;
+      info.appendChild(number);
       info.appendChild(title);
       if (tag) {
         var tagEl = document.createElement('div');
-        tagEl.className = 'task-tag';
+        tagEl.className = 'material-meta';
         tagEl.textContent = tag;
         info.appendChild(tagEl);
       }
 
       var actions = document.createElement('div');
-      actions.className = 'task-actions';
+      actions.className = 'material-actions';
       var viewBtn = document.createElement('button');
       viewBtn.className = 'btn';
       viewBtn.textContent = 'View';
@@ -242,13 +237,11 @@
       downloadBtn.target = '_blank';
       downloadBtn.textContent = '↓';
 
-      top.appendChild(number);
-      top.appendChild(info);
       actions.appendChild(viewBtn);
       actions.appendChild(downloadBtn);
+      info.appendChild(actions);
       card.appendChild(delBtn);
-      card.appendChild(top);
-      card.appendChild(actions);
+      card.appendChild(info);
       document.getElementById('grid-ch' + ch).appendChild(card);
     }
 
@@ -347,7 +340,7 @@
       apiGet({ action: 'deleteMaterial', username: savedUser, password: savedPass, chapter: 'assign' + ch, fileId: fileId })
         .then(function(res) {
           if (res.success) {
-            var card = triggerEl.closest('.task-card');
+            var card = triggerEl.closest('.assignment-card');
             if (card) card.remove();
             if (ch === 5 && document.getElementById('grid-ch5').children.length === 0) {
               document.getElementById('ch5-empty').classList.remove('hidden-state');
