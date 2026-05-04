@@ -5,463 +5,383 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Lesson Materials · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --purple: #2563EB; --purple-light: #60A5FA; --purple-soft: #DBEAFE;
-      --purple-mid: #93C5FD; --white: #FFFFFF; --off-white: #F8FAFC;
-      --text-dark: #0F172A; --text-muted: #475569; --border: #DBEAFE;
-      --accent: #F59E0B; --green: #10B981; --red: #EF4444;
-    }
-    body { font-family: 'IBM Plex Sans', sans-serif; background: var(--off-white); color: var(--text-dark); min-height: 100vh; }
-    header { background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 50%, #1E3A8A 100%); padding: 36px 24px 52px; text-align: center; position: relative; overflow: hidden; }
-    header::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px); background-size: 28px 28px; pointer-events: none; }
-    .back-btn { position: absolute; top: 20px; left: 20px; z-index: 2; background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #fff; font-size: 0.88rem; font-weight: 600; padding: 8px 18px; border-radius: 999px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-family: inherit; }
-    .back-btn:hover { background: rgba(255,255,255,0.25); }
-    header h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem,5vw,2.8rem); font-weight: 800; color: #fff; position: relative; z-index: 1; }
-    header h1 span { color: var(--accent); font-style: italic; }
-    .header-sub { color: rgba(255,255,255,0.75); font-size: 0.95rem; margin-top: 8px; position: relative; z-index: 1; }
-    .wave { display: block; width: 100%; margin-top: -2px; }
-    main { max-width: 900px; margin: 0 auto; padding: 32px 20px 80px; }
-    .chapter-section { margin-bottom: 48px; }
-    .chapter-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
-    .chapter-badge { background: linear-gradient(135deg, var(--purple), #1D4ED8); color: #fff; font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; font-weight: 600; padding: 6px 14px; border-radius: 999px; flex-shrink: 0; letter-spacing: 0.05em; }
-    .chapter-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 700; }
-    .chapter-line { flex: 1; height: 1.5px; background: var(--border); }
-    .add-material-btn { display: none; align-items: center; gap: 6px; padding: 7px 14px; background: rgba(37,99,235,0.1); border: 1.5px solid var(--purple-mid); border-radius: 999px; color: var(--purple); font-size: 0.78rem; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Mono', monospace; transition: all 0.15s; flex-shrink: 0; }
-    .add-material-btn:hover { background: var(--purple-soft); }
-    .pdf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
-    .pdf-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
-    .pdf-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(37,99,235,0.12); }
-    .pdf-preview { width: 100%; aspect-ratio: 4/3; background: var(--purple-soft); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border-bottom: 1.5px solid var(--border); cursor: pointer; }
-    .pdf-preview iframe { width: 100%; height: 100%; border: none; pointer-events: none; }
-    .pdf-icon { font-size: 3rem; position: absolute; opacity: 0.3; }
-    .pdf-overlay { position: absolute; inset: 0; background: rgba(37,99,235,0.05); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
-    .pdf-card:hover .pdf-overlay { opacity: 1; }
-    .pdf-overlay-btn { background: var(--purple); color: #fff; font-size: 0.85rem; font-weight: 700; padding: 10px 20px; border-radius: 999px; }
-    .pdf-info { padding: 16px 18px 18px; }
-    .pdf-name { font-size: 1rem; font-weight: 700; margin-bottom: 4px; line-height: 1.3; }
-    .pdf-meta { font-size: 0.78rem; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; margin-bottom: 14px; }
-    .pdf-actions { display: flex; gap: 8px; }
-    .btn-view { flex: 1; padding: 10px; background: var(--purple-soft); color: var(--purple); border: 1.5px solid var(--purple-mid); border-radius: 10px; font-size: 0.85rem; font-weight: 700; text-align: center; cursor: pointer; font-family: inherit; text-decoration: none; display: block; transition: background 0.15s; }
-    .btn-view:hover { background: var(--purple-mid); }
-    .btn-download { padding: 10px 14px; background: var(--purple); color: #fff; border: none; border-radius: 10px; font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: inherit; text-decoration: none; display: flex; align-items: center; transition: opacity 0.15s; }
-    .btn-download:hover { opacity: 0.85; }
-    .btn-delete { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 50%; background: rgba(239,68,68,0.9); color: #fff; border: none; font-size: 0.75rem; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 5; }
-    .teacher-active .btn-delete { display: flex; }
-    .coming-soon-card { background: var(--white); border: 1.5px dashed var(--border); border-radius: 20px; padding: 32px 24px; display: flex; align-items: center; gap: 20px; }
-    .cs-icon { width: 56px; height: 56px; background: var(--off-white); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; flex-shrink: 0; border: 1.5px solid var(--border); }
-    .cs-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
-    .cs-sub { font-size: 0.83rem; color: var(--purple-light); font-weight: 500; }
-    .cs-badge { margin-left: auto; background: var(--off-white); border: 1.5px solid var(--border); color: var(--text-muted); font-size: 0.72rem; font-weight: 700; padding: 5px 12px; border-radius: 999px; flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; }
-    .modal-overlay { position: fixed; inset: 0; background: rgba(15,10,40,0.85); backdrop-filter: blur(8px); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-    .modal-overlay.hidden { display: none; }
-    .modal-top { width: 100%; max-width: 900px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: #fff; }
-    .modal-actions { display: flex; gap: 10px; align-items: center; }
-    .btn-modal-download { background: var(--accent); color: #fff; border: none; padding: 9px 18px; border-radius: 999px; font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: inherit; text-decoration: none; display: inline-block; }
-    .btn-modal-close { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #fff; width: 38px; height: 38px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .modal-iframe-wrap { width: 100%; max-width: 900px; flex: 1; max-height: 80vh; border-radius: 16px; overflow: hidden; background: #fff; }
-    .modal-iframe-wrap iframe { width: 100%; height: 100%; border: none; min-height: 70vh; }
-    .am-overlay { position: fixed; inset: 0; background: rgba(15,10,40,0.7); backdrop-filter: blur(8px); z-index: 300; display: flex; align-items: flex-end; justify-content: center; }
-    .am-overlay.hidden { display: none; }
-    .am-sheet { background: #fff; border-radius: 28px 28px 0 0; width: 100%; max-width: 540px; padding-bottom: 32px; }
-    .am-handle { width: 40px; height: 4px; background: var(--border); border-radius: 999px; margin: 12px auto 0; }
-    .am-head { padding: 18px 24px 14px; border-bottom: 1.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-    .am-head-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 800; color: var(--text-dark); }
-    .am-close-btn { width: 30px; height: 30px; border-radius: 50%; background: var(--off-white); border: 1.5px solid var(--border); color: var(--text-muted); cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; }
-    .am-body { padding: 20px 24px; display: flex; flex-direction: column; gap: 14px; }
-    .am-field label { display: block; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 7px; font-family: 'IBM Plex Mono', monospace; }
-    .am-field input, .am-field select { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.92rem; color: var(--text-dark); background: var(--off-white); outline: none; }
-    .am-field input:focus, .am-field select:focus { border-color: var(--purple-light); background: #fff; }
-    .am-hint { font-size: 0.75rem; color: var(--text-muted); margin-top: 5px; line-height: 1.5; }
-    .am-hint code { background: var(--purple-soft); color: var(--purple); padding: 1px 5px; border-radius: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; }
-    .am-err { background: #FEE2E2; border: 1.5px solid #FCA5A5; border-radius: 10px; padding: 10px 14px; font-size: 0.82rem; color: #991B1B; display: none; }
-    .am-err.show { display: block; }
-    .am-submit { width: 100%; padding: 14px; background: linear-gradient(135deg, #2563EB, #1D4ED8); color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 0.95rem; border: none; border-radius: 14px; cursor: pointer; }
-    .am-submit:disabled { opacity: 0.6; cursor: not-allowed; }
-    .spinner-sm { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    footer { background: #0F172A; color: rgba(255,255,255,0.5); text-align: center; padding: 20px; font-size: 0.85rem; }
-    footer strong { color: #60A5FA; }
-
-    .logout-btn { position: absolute; top: 20px; right: 20px; z-index: 2; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.85); font-size: 0.78rem; font-weight: 600; padding: 6px 14px; border-radius: 999px; cursor: pointer; font-family: inherit; display: none; align-items: center; gap: 5px; }
-    .logout-btn:hover { background: rgba(255,255,255,0.22); }
-    .teacher-active .logout-btn { display: flex; }
-
-    /* ── SIDEBAR (shared) ───────────────────────────────────── */
-    .hamburger { position:absolute; top:20px; right:20px; z-index:10; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); border-radius:10px; width:40px; height:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; cursor:pointer; padding:0; }
-    .hamburger span { display:block; width:18px; height:2px; background:#fff; border-radius:999px; transition:all 0.3s; }
-    .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
-    .hamburger.open span:nth-child(2) { opacity:0; }
-    .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
-    .sidebar-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.6); backdrop-filter:blur(6px); z-index:300; opacity:0; pointer-events:none; transition:opacity 0.3s; }
-    .sidebar-overlay.open { opacity:1; pointer-events:all; }
-    .sidebar { position:fixed; top:0; right:0; height:100%; width:min(320px,85vw); background:#0F172A; z-index:301; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.34,1.1,0.64,1); display:flex; flex-direction:column; overflow-y:auto; }
-    .sidebar.open { transform:translateX(0); }
-    .sidebar-head { padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; gap:12px; }
-    .sidebar-logo { width:36px; height:36px; border-radius:10px; object-fit:cover; }
-    .sidebar-head-text { flex:1; }
-    .sidebar-head-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:800; color:#fff; }
-    .sidebar-head-sub { font-size:0.7rem; color:rgba(255,255,255,0.45); margin-top:1px; }
-    .sidebar-close { width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,0.08); border:none; color:rgba(255,255,255,0.5); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
-    .sidebar-section { padding:14px 16px 4px; }
-    .sidebar-section-label { font-size:0.65rem; font-weight:700; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.12em; font-family:'IBM Plex Mono',monospace; padding:0 4px; margin-bottom:6px; }
-    .sidebar-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; text-decoration:none; transition:background 0.15s; margin-bottom:2px; }
-    .sidebar-item:hover, .sidebar-item:active { background:rgba(255,255,255,0.08); }
-    .sidebar-item.active { background:rgba(255,255,255,0.12); border-left:3px solid #60A5FA; padding-left:9px; }
-    .sidebar-item-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0; }
-    .sidebar-item-name { font-size:0.88rem; font-weight:600; color:#fff; flex:1; }
-    .sidebar-item-badge { font-size:0.6rem; font-weight:800; padding:2px 7px; border-radius:999px; font-family:'IBM Plex Mono',monospace; background:#F59E0B; color:#fff; }
-    .sidebar-divider { height:1px; background:rgba(255,255,255,0.07); margin:8px 16px; }
-    .sidebar-teacher { margin:12px 16px 20px; background:rgba(37,99,235,0.2); border:1px solid rgba(37,99,235,0.35); border-radius:14px; padding:12px 14px; }
-    .sidebar-teacher-label { font-size:0.68rem; font-weight:700; color:#60A5FA; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
-    .sidebar-teacher-logged { font-size:0.82rem; color:#60A5FA; font-weight:600; display:flex; align-items:center; gap:8px; }
-    .sidebar-teacher-logged span { cursor:pointer; color:rgba(255,255,255,0.4); font-size:0.75rem; margin-left:auto; }
-    .sidebar-home-btn { display:flex; align-items:center; gap:10px; margin:12px 16px 4px; padding:11px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:12px; text-decoration:none; }
-    .sidebar-home-btn:hover { background:rgba(255,255,255,0.1); }
-    .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
-    .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
-
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css"/>
   <script src="../shared/js/sidebar.js"></script>
 </head>
-<body data-page="lessons">
-
-<div class="modal-overlay hidden" id="pdfModal">
-  <div class="modal-top">
-    <div class="modal-title" id="modalTitle">Document</div>
-    <div class="modal-actions">
-      <a class="btn-modal-download" id="modalDownload" href="#" target="_blank">&#8595; Download</a>
-      <button class="btn-modal-close" onclick="closeModal()">&#10005;</button>
+<body class="grade10-subpage" data-page="lessons">
+  <div class="viewer-overlay hidden" id="pdfModal">
+    <div class="viewer-top">
+      <div class="viewer-title" id="modalTitle">Document</div>
+      <div class="viewer-actions">
+        <a class="btn primary" id="modalDownload" href="#" target="_blank">Download</a>
+        <button class="round-close" onclick="closeModal()" aria-label="Close viewer">x</button>
+      </div>
+    </div>
+    <div class="viewer-frame">
+      <iframe id="modalIframe" src="" allowfullscreen></iframe>
     </div>
   </div>
-  <div class="modal-iframe-wrap">
-    <iframe id="modalIframe" src="" allowfullscreen></iframe>
-  </div>
-</div>
 
-<div class="am-overlay hidden" id="amOverlay">
-  <div class="am-sheet">
-    <div class="am-handle"></div>
-    <div class="am-head">
-      <div class="am-head-title" id="amTitle">Add Material</div>
-      <button class="am-close-btn" id="amCloseBtn">&#10005;</button>
-    </div>
-    <div class="am-body">
-      <div class="am-field">
-        <label>Material Title</label>
-        <input type="text" id="amName" placeholder="e.g. Analytical Exposition Structure"/>
+  <div class="sheet-overlay hidden" id="amOverlay">
+    <div class="sheet-panel">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head">
+        <div class="sheet-title" id="amTitle">Add Material</div>
+        <button class="round-close" id="amCloseBtn" aria-label="Close add material form">x</button>
       </div>
-      <div class="am-field">
-        <label>Google Drive File ID or URL</label>
-        <input type="text" id="amFileId" placeholder="Paste Drive link or just the file ID"/>
-        <div class="am-hint">From your share link: <code>drive.google.com/file/d/<strong>COPY_THIS</strong>/view</code></div>
-      </div>
-      <div class="am-field">
-        <label>File Type</label>
-        <select id="amType">
-          <option value="PDF">PDF</option>
-          <option value="PPT">PPT / Slides</option>
-          <option value="DOC">Word Document</option>
-          <option value="IMG">Image</option>
-        </select>
-      </div>
-      <div class="am-err" id="amErr"></div>
-      <button class="am-submit" id="amSubmitBtn">&#65291; Add Material</button>
-    </div>
-  </div>
-</div>
-
-<header>
-  <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
-
-
-  <a class="back-btn" href="index.html">&#8592; Back</a>
-  <h1>Lesson <span>Materials</span></h1>
-  <p class="header-sub">English Quest &middot; SMA Negeri 6 Surakarta</p>
-</header>
-<svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
-  <path fill="#1E3A8A" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
-  <path fill="#F8FAFC" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
-</svg>
-
-<main>
-  <div class="chapter-section">
-    <div class="chapter-header">
-      <div class="chapter-badge">CHAPTER 4</div>
-      <div class="chapter-title">Analytical Exposition</div>
-      <div class="chapter-line"></div>
-      <button class="add-material-btn" id="addBtn4">&#65291; Add</button>
-    </div>
-    <div class="pdf-grid" id="grid-ch4">
-      <!-- hardcoded defaults -->
-      <div class="pdf-card" data-fileid="12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx">
-        <button class="btn-delete" onclick="deleteMaterial(4,'12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx',this)">&#10005;</button>
-        <div class="pdf-preview" onclick="openPDF('Fact vs Opinion','https://drive.google.com/file/d/12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx/preview','https://drive.google.com/uc?export=download&id=12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx')">
-          <span class="pdf-icon">&#128196;</span>
-          <iframe src="https://drive.google.com/file/d/12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx/preview" title="Fact vs Opinion"></iframe>
-          <div class="pdf-overlay"><div class="pdf-overlay-btn">View</div></div>
+      <div class="sheet-body">
+        <div class="field">
+          <label for="amName">Material Title</label>
+          <input type="text" id="amName" placeholder="e.g. Analytical Exposition Structure"/>
         </div>
-        <div class="pdf-info">
-          <div class="pdf-name">Fact vs Opinion</div>
-          <div class="pdf-meta">PDF &middot; Chapter 4</div>
-          <div class="pdf-actions">
-            <button class="btn-view" onclick="openPDF('Fact vs Opinion','https://drive.google.com/file/d/12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx/preview','https://drive.google.com/uc?export=download&id=12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx')">&#128065; View</button>
-            <a class="btn-download" href="https://drive.google.com/uc?export=download&id=12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx" target="_blank">&#8595;</a>
-          </div>
+        <div class="field">
+          <label for="amFileId">Google Drive File ID or URL</label>
+          <input type="text" id="amFileId" placeholder="Paste Drive link or just the file ID"/>
+          <div class="field-hint">From your share link: <code>drive.google.com/file/d/COPY_THIS/view</code></div>
         </div>
-      </div>
-      <div class="pdf-card" data-fileid="1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ">
-        <button class="btn-delete" onclick="deleteMaterial(4,'1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ',this)">&#10005;</button>
-        <div class="pdf-preview" onclick="openPDF('Argument','https://drive.google.com/file/d/1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ/preview','https://drive.google.com/uc?export=download&id=1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ')">
-          <span class="pdf-icon">&#128196;</span>
-          <iframe src="https://drive.google.com/file/d/1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ/preview" title="Argument"></iframe>
-          <div class="pdf-overlay"><div class="pdf-overlay-btn">View</div></div>
+        <div class="field">
+          <label for="amType">File Type</label>
+          <select id="amType">
+            <option value="PDF">PDF</option>
+            <option value="PPT">PPT / Slides</option>
+            <option value="DOC">Word Document</option>
+            <option value="IMG">Image</option>
+          </select>
         </div>
-        <div class="pdf-info">
-          <div class="pdf-name">Argument</div>
-          <div class="pdf-meta">PDF &middot; Chapter 4</div>
-          <div class="pdf-actions">
-            <button class="btn-view" onclick="openPDF('Argument','https://drive.google.com/file/d/1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ/preview','https://drive.google.com/uc?export=download&id=1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ')">&#128065; View</button>
-            <a class="btn-download" href="https://drive.google.com/uc?export=download&id=1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ" target="_blank">&#8595;</a>
-          </div>
-        </div>
+        <div class="form-error" id="amErr"></div>
+        <button class="btn primary" id="amSubmitBtn">Add Material</button>
       </div>
     </div>
   </div>
 
-  <div class="chapter-section">
-    <div class="chapter-header">
-      <div class="chapter-badge">CHAPTER 5</div>
-      <div class="chapter-title">Narrative Text</div>
-      <div class="chapter-line"></div>
-      <button class="add-material-btn" id="addBtn5">&#65291; Add</button>
-    </div>
-    <div class="pdf-grid" id="grid-ch5">
-      <div class="coming-soon-card" id="ch5-empty">
-        <div class="cs-icon">&#128218;</div>
+  <header class="subpage-header">
+    <div class="topbar">
+      <div class="brand">
+        <img src="../logo.jpg" alt="English Quest Logo"/>
         <div>
-          <div class="cs-title">Chapter 5 Materials</div>
-          <div class="cs-sub">Will be uploaded soon - stay tuned!</div>
+          <div class="brand-title">English Quest</div>
+          <div class="brand-sub">Grade 10 Student Track</div>
         </div>
-        <div class="cs-badge">COMING SOON</div>
       </div>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="index.html">Grade 10 Home</a>
+        <a href="../teacher/">Teacher</a>
+        <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
+      </nav>
     </div>
-  </div>
-</main>
 
-<footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
+    <section class="subpage-hero">
+      <div class="kicker">Lesson Materials</div>
+      <h1>Open the class materials for each chapter.</h1>
+      <p class="hero-copy">Grade 10 lesson files stay here for students to view or download. Teacher-only material controls appear after teacher login.</p>
+    </section>
+  </header>
 
-<script>
-var SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
-var savedUser = localStorage.getItem('eq_tu') || '';
-var savedPass = localStorage.getItem('eq_tp') || '';
-var isTeacher = !!savedUser;
-var amChapter = 4;
+  <main>
+    <section class="content-section" aria-labelledby="chapter4Title">
+      <div class="content-section-head">
+        <div class="content-title-row">
+          <div class="content-badge">Chapter 4</div>
+          <h2 class="content-title" id="chapter4Title">Analytical Exposition</h2>
+        </div>
+        <button class="teacher-only-btn" id="addBtn4">Add Material</button>
+      </div>
 
-function apiGet(params) {
-  var url = SCORES_API + '?';
-  var parts = [];
-  for (var k in params) parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
-  url += parts.join('&');
-  return new Promise(function(resolve, reject) {
-    var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-    var script = document.createElement('script');
-    var timer = setTimeout(function() {
-      delete window[cb];
-      try { document.head.removeChild(script); } catch(e) {}
-      reject(new Error('Request timed out. Please check your connection and try again.'));
-    }, 12000);
-    window[cb] = function(data) {
-      clearTimeout(timer);
-      delete window[cb];
-      try { document.head.removeChild(script); } catch(e) {}
-      resolve(data);
+      <div class="material-grid" id="grid-ch4">
+        <article class="material-card" data-fileid="12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx">
+          <button class="delete-material-btn" onclick="deleteMaterial(4,'12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx')">x</button>
+          <div class="material-preview" onclick="openPDF('Fact vs Opinion','https://drive.google.com/file/d/12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx/preview','https://drive.google.com/uc?export=download&id=12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx')">
+            <span class="material-icon">PDF</span>
+            <iframe src="https://drive.google.com/file/d/12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx/preview" title="Fact vs Opinion"></iframe>
+            <div class="material-overlay"><span>View</span></div>
+          </div>
+          <div class="material-info">
+            <div class="material-name">Fact vs Opinion</div>
+            <div class="material-meta">PDF · Chapter 4</div>
+            <div class="material-actions">
+              <button class="btn" onclick="openPDF('Fact vs Opinion','https://drive.google.com/file/d/12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx/preview','https://drive.google.com/uc?export=download&id=12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx')">View</button>
+              <a class="btn primary icon-btn" href="https://drive.google.com/uc?export=download&id=12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx" target="_blank">↓</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="material-card" data-fileid="1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ">
+          <button class="delete-material-btn" onclick="deleteMaterial(4,'1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ')">x</button>
+          <div class="material-preview" onclick="openPDF('Argument','https://drive.google.com/file/d/1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ/preview','https://drive.google.com/uc?export=download&id=1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ')">
+            <span class="material-icon">PDF</span>
+            <iframe src="https://drive.google.com/file/d/1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ/preview" title="Argument"></iframe>
+            <div class="material-overlay"><span>View</span></div>
+          </div>
+          <div class="material-info">
+            <div class="material-name">Argument</div>
+            <div class="material-meta">PDF · Chapter 4</div>
+            <div class="material-actions">
+              <button class="btn" onclick="openPDF('Argument','https://drive.google.com/file/d/1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ/preview','https://drive.google.com/uc?export=download&id=1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ')">View</button>
+              <a class="btn primary icon-btn" href="https://drive.google.com/uc?export=download&id=1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ" target="_blank">↓</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="content-section" aria-labelledby="chapter5Title">
+      <div class="content-section-head">
+        <div class="content-title-row">
+          <div class="content-badge">Chapter 5</div>
+          <h2 class="content-title" id="chapter5Title">Narrative Text</h2>
+        </div>
+        <button class="teacher-only-btn" id="addBtn5">Add Material</button>
+      </div>
+
+      <div class="material-grid" id="grid-ch5">
+        <div class="empty-material-card" id="ch5-empty">
+          <div class="empty-material-icon">📘</div>
+          <div>
+            <div class="empty-material-title">Chapter 5 Materials</div>
+            <div class="empty-material-copy">Will be uploaded soon. Stay tuned!</div>
+          </div>
+          <div class="empty-material-badge">Coming Soon</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built by <strong>LaksMedia</strong></footer>
+
+  <script>
+    var SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+    var savedUser = localStorage.getItem('eq_tu') || '';
+    var savedPass = localStorage.getItem('eq_tp') || '';
+    var isTeacher = !!savedUser;
+    var amChapter = 4;
+
+    function apiGet(params) {
+      var url = SCORES_API + '?';
+      var parts = [];
+      for (var k in params) parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
+      url += parts.join('&');
+      return new Promise(function(resolve, reject) {
+        var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+        var script = document.createElement('script');
+        var timer = setTimeout(function() {
+          delete window[cb];
+          try { document.head.removeChild(script); } catch(e) {}
+          reject(new Error('Request timed out. Please check your connection and try again.'));
+        }, 12000);
+        window[cb] = function(data) {
+          clearTimeout(timer);
+          delete window[cb];
+          try { document.head.removeChild(script); } catch(e) {}
+          resolve(data);
+        };
+        script.onerror = function() {
+          clearTimeout(timer);
+          delete window[cb];
+          reject(new Error('Network error. Please try again.'));
+        };
+        script.src = url + '&callback=' + cb;
+        document.head.appendChild(script);
+      });
+    }
+
+    function openPDF(title, previewUrl, downloadUrl) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalIframe').src = previewUrl;
+      document.getElementById('modalDownload').href = downloadUrl;
+      document.getElementById('pdfModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      document.getElementById('pdfModal').classList.add('hidden');
+      document.getElementById('modalIframe').src = '';
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('pdfModal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    if (isTeacher) {
+      document.body.classList.add('teacher-active');
+    }
+
+    function loadSavedMaterials() {
+      [4, 5].forEach(function(ch) {
+        apiGet({ action: 'getMaterials', chapter: ch }).then(function(res) {
+          if (res.materials && res.materials.length > 0) {
+            res.materials.forEach(function(m) {
+              appendCard(ch, m.title, m.fileId, m.fileType);
+            });
+          }
+        }).catch(function() {});
+      });
+    }
+
+    function appendCard(ch, name, fileId, fileType) {
+      var previewUrl = 'https://drive.google.com/file/d/' + fileId + '/preview';
+      var downloadUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
+      var existing = document.querySelector('[data-fileid="' + fileId + '"]');
+      if (existing) return;
+
+      var empty = document.getElementById('ch' + ch + '-empty');
+      if (empty) empty.remove();
+
+      var card = document.createElement('article');
+      card.className = 'material-card';
+      card.setAttribute('data-fileid', fileId);
+
+      var delBtn = document.createElement('button');
+      delBtn.className = 'delete-material-btn';
+      delBtn.textContent = 'x';
+      delBtn.onclick = function() { deleteMaterial(ch, fileId); };
+
+      var preview = document.createElement('div');
+      preview.className = 'material-preview';
+      preview.innerHTML = '<span class="material-icon">PDF</span><iframe src="' + previewUrl + '" title="' + name + '"></iframe><div class="material-overlay"><span>View</span></div>';
+      preview.onclick = function() { openPDF(name, previewUrl, downloadUrl); };
+
+      var info = document.createElement('div');
+      info.className = 'material-info';
+      info.innerHTML =
+        '<div class="material-name"></div>' +
+        '<div class="material-meta"></div>' +
+        '<div class="material-actions"></div>';
+      info.querySelector('.material-name').textContent = name;
+      info.querySelector('.material-meta').textContent = (fileType || 'PDF') + ' · Chapter ' + ch;
+
+      var actions = info.querySelector('.material-actions');
+      var btnView = document.createElement('button');
+      btnView.className = 'btn';
+      btnView.textContent = 'View';
+      btnView.onclick = function() { openPDF(name, previewUrl, downloadUrl); };
+      var btnDownload = document.createElement('a');
+      btnDownload.className = 'btn primary icon-btn';
+      btnDownload.href = downloadUrl;
+      btnDownload.target = '_blank';
+      btnDownload.textContent = '↓';
+      actions.appendChild(btnView);
+      actions.appendChild(btnDownload);
+
+      card.appendChild(delBtn);
+      card.appendChild(preview);
+      card.appendChild(info);
+      document.getElementById('grid-ch' + ch).appendChild(card);
+    }
+
+    document.getElementById('addBtn4').onclick = function() { openAddMaterial(4); };
+    document.getElementById('addBtn5').onclick = function() { openAddMaterial(5); };
+    document.getElementById('amCloseBtn').onclick = closeAddMaterial;
+    document.getElementById('amOverlay').onclick = function(e) {
+      if (e.target === this) closeAddMaterial();
     };
-    script.onerror = function() {
-      clearTimeout(timer);
-      delete window[cb];
-      reject(new Error('Network error. Please try again.'));
-    };
-    script.src = url + '&callback=' + cb;
-    document.head.appendChild(script);
-  });
-}
 
-// ── PDF VIEWER ──────────────────────────────────────────────
-function openPDF(title, previewUrl, downloadUrl) {
-  document.getElementById('modalTitle').textContent = title;
-  document.getElementById('modalIframe').src = previewUrl;
-  document.getElementById('modalDownload').href = downloadUrl;
-  document.getElementById('pdfModal').classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-}
-function closeModal() {
-  document.getElementById('pdfModal').classList.add('hidden');
-  document.getElementById('modalIframe').src = '';
-  document.body.style.overflow = '';
-}
-document.getElementById('pdfModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+    function openAddMaterial(ch) {
+      amChapter = ch;
+      document.getElementById('amTitle').textContent = 'Add Material · Chapter ' + ch;
+      document.getElementById('amName').value = '';
+      document.getElementById('amFileId').value = '';
+      document.getElementById('amType').value = 'PDF';
+      document.getElementById('amErr').className = 'form-error';
+      document.getElementById('amSubmitBtn').disabled = false;
+      document.getElementById('amSubmitBtn').textContent = 'Add Material';
+      document.getElementById('amOverlay').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
 
-// ── TEACHER BUTTONS ─────────────────────────────────────────
-if (isTeacher) {
-  document.body.classList.add('teacher-active');
-  document.getElementById('addBtn4').style.display = 'flex';
-  document.getElementById('addBtn5').style.display = 'flex';
-}
+    function closeAddMaterial() {
+      document.getElementById('amOverlay').classList.add('hidden');
+      document.body.style.overflow = '';
+    }
 
-// ── LOAD SAVED MATERIALS ON PAGE LOAD ───────────────────────
-function loadSavedMaterials() {
-  [4, 5].forEach(function(ch) {
-    apiGet({ action: 'getMaterials', chapter: ch }).then(function(res) {
-      if (res.materials && res.materials.length > 0) {
-        res.materials.forEach(function(m) {
-          appendCard(ch, m.title, m.fileId, m.fileType, false);
+    document.getElementById('amSubmitBtn').onclick = function() {
+      var raw = document.getElementById('amFileId').value.trim();
+      var name = document.getElementById('amName').value.trim();
+      var type = document.getElementById('amType').value;
+      var err = document.getElementById('amErr');
+      var btn = document.getElementById('amSubmitBtn');
+      var fileId = raw;
+      var match = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (match) fileId = match[1];
+
+      if (!name) {
+        err.textContent = 'Please enter a title.';
+        err.className = 'form-error show';
+        return;
+      }
+      if (!fileId || fileId.length < 10) {
+        err.textContent = 'Please enter a valid Drive file ID or link.';
+        err.className = 'form-error show';
+        return;
+      }
+
+      err.className = 'form-error';
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-sm"></span>Saving...';
+
+      apiGet({ action: 'addMaterial', username: savedUser, password: savedPass, chapter: amChapter, title: name, fileId: fileId, fileType: type })
+        .then(function(res) {
+          if (res.success) {
+            appendCard(amChapter, name, fileId, type);
+            closeAddMaterial();
+            showToast('Added: ' + name);
+          } else {
+            err.textContent = res.error || 'Failed to save.';
+            err.className = 'form-error show';
+            btn.disabled = false;
+            btn.textContent = 'Add Material';
+          }
+        }).catch(function() {
+          err.textContent = 'Network error. Please try again.';
+          err.className = 'form-error show';
+          btn.disabled = false;
+          btn.textContent = 'Add Material';
         });
-      }
-    }).catch(function() {});
-  });
-}
+    };
 
-function appendCard(ch, name, fileId, fileType, animate) {
-  var previewUrl  = 'https://drive.google.com/file/d/' + fileId + '/preview';
-  var downloadUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
-  var chLabel = 'Chapter ' + ch;
+    function deleteMaterial(ch, fileId) {
+      if (!confirm('Remove this material?')) return;
+      apiGet({ action: 'deleteMaterial', username: savedUser, password: savedPass, chapter: ch, fileId: fileId })
+        .then(function(res) {
+          if (res.success) {
+            var card = document.querySelector('[data-fileid="' + fileId + '"]');
+            if (card) card.remove();
+            showEmptyStateIfNeeded(ch);
+            showToast('Removed!');
+          }
+        });
+    }
 
-  // Don't duplicate existing hardcoded cards
-  var existing = document.querySelector('[data-fileid="' + fileId + '"]');
-  if (existing) return;
+    function showEmptyStateIfNeeded(ch) {
+      var grid = document.getElementById('grid-ch' + ch);
+      if (!grid || grid.children.length > 0) return;
+      var empty = document.createElement('div');
+      empty.className = 'empty-material-card';
+      empty.id = 'ch' + ch + '-empty';
+      empty.innerHTML = '<div class="empty-material-icon">📘</div><div><div class="empty-material-title">Chapter ' + ch + ' Materials</div><div class="empty-material-copy">No materials yet.</div></div><div class="empty-material-badge">Empty</div>';
+      grid.appendChild(empty);
+    }
 
-  var empty = document.getElementById('ch' + ch + '-empty');
-  if (empty) empty.remove();
+    function showToast(msg) {
+      var toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.textContent = msg;
+      document.body.appendChild(toast);
+      setTimeout(function() {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 3000);
+    }
 
-  var card = document.createElement('div');
-  card.className = 'pdf-card';
-  card.setAttribute('data-fileid', fileId);
-
-  var delBtn = document.createElement('button');
-  delBtn.className = 'btn-delete';
-  delBtn.innerHTML = '&#10005;';
-  delBtn.onclick = function() { deleteMaterial(ch, fileId, delBtn); };
-
-  var preview = document.createElement('div');
-  preview.className = 'pdf-preview';
-  preview.innerHTML = '<span class="pdf-icon">&#128196;</span><iframe src="' + previewUrl + '" title="' + name + '"></iframe><div class="pdf-overlay"><div class="pdf-overlay-btn">View</div></div>';
-  preview.onclick = function() { openPDF(name, previewUrl, downloadUrl); };
-
-  var info = document.createElement('div');
-  info.className = 'pdf-info';
-
-  var pName = document.createElement('div'); pName.className = 'pdf-name'; pName.textContent = name;
-  var pMeta = document.createElement('div'); pMeta.className = 'pdf-meta'; pMeta.textContent = (fileType || 'PDF') + ' - ' + chLabel;
-  var pActions = document.createElement('div'); pActions.className = 'pdf-actions';
-  var btnView = document.createElement('button'); btnView.className = 'btn-view'; btnView.textContent = 'View'; btnView.onclick = function() { openPDF(name, previewUrl, downloadUrl); };
-  var btnDl = document.createElement('a'); btnDl.className = 'btn-download'; btnDl.href = downloadUrl; btnDl.target = '_blank'; btnDl.textContent = 'Download';
-  pActions.appendChild(btnView); pActions.appendChild(btnDl);
-  info.appendChild(pName); info.appendChild(pMeta); info.appendChild(pActions);
-  card.appendChild(delBtn); card.appendChild(preview); card.appendChild(info);
-
-  document.getElementById('grid-ch' + ch).appendChild(card);
-}
-
-// ── ADD MATERIAL ─────────────────────────────────────────────
-document.getElementById('addBtn4').onclick = function() { openAddMaterial(4); };
-document.getElementById('addBtn5').onclick = function() { openAddMaterial(5); };
-document.getElementById('amCloseBtn').onclick = closeAddMaterial;
-document.getElementById('amOverlay').onclick = function(e) { if (e.target === this) closeAddMaterial(); };
-
-function openAddMaterial(ch) {
-  amChapter = ch;
-  document.getElementById('amTitle').textContent = 'Add Material - Chapter ' + ch;
-  document.getElementById('amName').value = '';
-  document.getElementById('amFileId').value = '';
-  document.getElementById('amType').value = 'PDF';
-  document.getElementById('amErr').className = 'am-err';
-  document.getElementById('amSubmitBtn').disabled = false;
-  document.getElementById('amSubmitBtn').innerHTML = '&#65291; Add Material';
-  document.getElementById('amOverlay').classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-}
-function closeAddMaterial() {
-  document.getElementById('amOverlay').classList.add('hidden');
-  document.body.style.overflow = '';
-}
-
-document.getElementById('amSubmitBtn').onclick = function() {
-  var raw    = document.getElementById('amFileId').value.trim();
-  var name   = document.getElementById('amName').value.trim();
-  var type   = document.getElementById('amType').value;
-  var err    = document.getElementById('amErr');
-  var btn    = document.getElementById('amSubmitBtn');
-
-  var fileId = raw;
-  var m = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if (m) fileId = m[1];
-
-  if (!name) { err.textContent = 'Please enter a title.'; err.className = 'am-err show'; return; }
-  if (!fileId || fileId.length < 10) { err.textContent = 'Please enter a valid Drive file ID or link.'; err.className = 'am-err show'; return; }
-  err.className = 'am-err';
-
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner-sm"></span>Saving...';
-
-  apiGet({ action: 'addMaterial', username: savedUser, password: savedPass, chapter: amChapter, title: name, fileId: fileId, fileType: type })
-    .then(function(res) {
-      if (res.success) {
-        appendCard(amChapter, name, fileId, type, true);
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeModal();
         closeAddMaterial();
-        showToast('Added: ' + name);
-      } else {
-        err.textContent = res.error || 'Failed to save.';
-        err.className = 'am-err show';
-        btn.disabled = false;
-        btn.innerHTML = '&#65291; Add Material';
-      }
-    }).catch(function() {
-      err.textContent = 'Network error. Please try again.';
-      err.className = 'am-err show';
-      btn.disabled = false;
-      btn.innerHTML = '&#65291; Add Material';
-    });
-};
-
-// ── DELETE MATERIAL ─────────────────────────────────────────
-function deleteMaterial(ch, fileId, btn) {
-  if (!confirm('Remove this material?')) return;
-  apiGet({ action: 'deleteMaterial', username: savedUser, password: savedPass, chapter: ch, fileId: fileId })
-    .then(function(res) {
-      if (res.success) {
-        var card = document.querySelector('[data-fileid="' + fileId + '"]');
-        if (card) card.remove();
-        // Show coming soon if grid is empty
-        var grid = document.getElementById('grid-ch' + ch);
-        if (grid && grid.children.length === 0) {
-          var cs = document.createElement('div');
-          cs.className = 'coming-soon-card';
-          cs.id = 'ch' + ch + '-empty';
-          cs.innerHTML = '<div class="cs-icon">&#128218;</div><div><div class="cs-title">Chapter ' + ch + ' Materials</div><div class="cs-sub">No materials yet.</div></div><div class="cs-badge">EMPTY</div>';
-          grid.appendChild(cs);
-        }
-        showToast('Removed!');
       }
     });
-}
 
-function showToast(msg) {
-  var t = document.createElement('div');
-  t.textContent = msg;
-  t.style.cssText = 'position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:#0F172A;color:#fff;padding:12px 22px;border-radius:999px;font-size:0.85rem;font-weight:600;z-index:9999;white-space:nowrap;';
-  document.body.appendChild(t);
-  setTimeout(function() { if (t.parentNode) t.parentNode.removeChild(t); }, 3000);
-}
-
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closeModal(); closeAddMaterial(); } });
-
-// Load saved materials on startup
-loadSavedMaterials();
-</script>
-
+    localStorage.setItem('eq_grade', '10');
+    loadSavedMaterials();
+  </script>
 </body>
 </html>
