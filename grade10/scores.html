@@ -239,6 +239,9 @@
       background: rgba(255, 255, 255, 0.12) !important;
       border-color: rgba(255, 255, 255, 0.35) !important;
     }
+    body.scores-page .sidebar-teacher {
+      display: none !important;
+    }
     body.scores-page .subpage-hero {
       position: relative !important;
       z-index: 1 !important;
@@ -484,7 +487,6 @@
     </div>
     <nav class="nav" aria-label="Main navigation">
       <a href="index.html">Grade 10 Home</a>
-      <a href="../teacher/">Teacher</a>
       <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
     </nav>
   </div>
@@ -492,7 +494,7 @@
   <section class="subpage-hero">
     <div class="kicker">Scores</div>
     <h1>Check chapter scores without digging through sheets.</h1>
-    <p class="hero-copy">Students can open their own chapter and final score summary, while teacher mode keeps the editable class table ready for updates.</p>
+    <p class="hero-copy">Students can open their own chapter and final score summary from a clean, read-only view.</p>
   </section>
 </header>
 <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
@@ -511,11 +513,7 @@ const SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdR
 const CLASSES = ['XE1','XE4','XE5','XE6','XE7','XE8','XE9','XE10','XE11'];
 const CLASS_LABELS = { XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
 
-var savedUser = localStorage.getItem('eq_tu') || '';
-var savedPass = localStorage.getItem('eq_tp') || '';
-var isTeacher = !!savedUser;
 var currentClass   = localStorage.getItem('eq_last_class') || 'XE1';
-var currentChapter = 4;
 var allStudents    = [];
 
 
@@ -585,11 +583,7 @@ function apiGet(params) {
 }
 
 function init() {
-  if (isTeacher) {
-    renderTeacherMode();
-  } else {
-    renderStudentMode();
-  }
+  renderStudentMode();
 }
 
 // ── STUDENT MODE ─────────────────────────────────────────────
@@ -829,267 +823,6 @@ function switchStudentTab(ch) {
   document.getElementById('sScoreCh5').style.display = ch === 5 ? '' : 'none';
   var sScoreF = document.getElementById('sScoreF');
   if (sScoreF) sScoreF.style.display = ch === 'F' ? '' : 'none';
-}
-
-// ── TEACHER MODE ─────────────────────────────────────────────
-function previewAsStudent() {
-  renderStudentMode();
-}
-
-function renderTeacherMode() {
-  var main = document.getElementById('mainContent');
-  var classOptions = CLASSES.map(function(c) {
-    return '<option value="' + c + '"' + (c === currentClass ? ' selected' : '') + '>' + CLASS_LABELS[c] + '</option>';
-  }).join('');
-
-  main.innerHTML =
-    '<div class="mode-badge teacher" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">&#9997; Teacher Mode &mdash; Editable <button onclick="previewAsStudent()" style="font-size:0.75rem;padding:5px 12px;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);color:#fff;border-radius:999px;cursor:pointer;font-family:inherit;font-weight:700;">&#128203; Student View</button></div>' +
-    '<div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;">Having display issues? <span onclick="clearScoreCache()" style="color:var(--purple);cursor:pointer;font-weight:700;text-decoration:underline;">Clear cache</span></div>' +
-    '<div class="filters"><span class="filter-label">Class</span><select class="filter-select" id="tClassSelect">' + classOptions + '</select></div>' +
-    '<div class="chapter-tabs"><button class="ch-tab active" id="ttab4" onclick="switchTeacherChapter(4)">Chapter 4</button><button class="ch-tab" id="ttab5" onclick="switchTeacherChapter(5)">Chapter 5</button><button class="ch-tab" id="ttabF" onclick="switchTeacherChapter(&apos;F&apos;)">&#127942; Final Score</button></div>' +
-    '<div id="tTableArea"><div class="state-card"><div class="spinner"></div><div class="state-title">Loading...</div></div></div>';
-
-  document.getElementById('tClassSelect').addEventListener('change', function() {
-    currentClass = this.value;
-    localStorage.setItem('eq_last_class', currentClass);
-    loadTeacherScores();
-  });
-
-  loadTeacherScores();
-}
-
-function switchTeacherChapter(ch) {
-  currentChapter = ch;
-  document.getElementById('ttab4').className = 'ch-tab' + (ch === 4 ? ' active' : '');
-  document.getElementById('ttab5').className = 'ch-tab' + (ch === 5 ? ' active' : '');
-  var ttabF = document.getElementById('ttabF');
-  if (ttabF) ttabF.className = 'ch-tab' + (ch === 'F' ? ' active' : '');
-  loadTeacherScores();
-}
-
-function loadTeacherScores() {
-  var area = document.getElementById('tTableArea');
-  area.innerHTML = '<div class="state-card"><div class="spinner"></div><div class="state-title">Loading...</div></div>';
-  if (currentChapter === 'F') {
-    apiGet({ action: 'getFinalScores', className: currentClass })
-      .then(function(res) {
-        if (res.error) { area.innerHTML = '<div class="state-card"><div class="state-icon">&#128580;</div><div class="state-title">Error: ' + res.error + '</div><div class="state-sub">Make sure ScoresAPI.gs is redeployed with the latest version.</div></div>'; return; }
-        renderTeacherFinalTable(res.students, res.inputCols, res.calcCols);
-      }).catch(function(e) {
-        area.innerHTML = '<div class="state-card"><div class="state-icon">&#9203;</div><div class="state-title">Connection problem</div><div class="state-sub">' + e.message + '</div></div>';
-      });
-  } else {
-    apiGet({ action: 'getChapterScores', className: currentClass, chapter: currentChapter })
-      .then(function(res) {
-        if (res.error) { area.innerHTML = '<div class="state-card"><div class="state-icon">&#128580;</div><div class="state-title">Error</div><div class="state-sub">' + res.error + '</div></div>'; return; }
-        renderTeacherTable(res.students, res.inputCols);
-      }).catch(function(e) {
-        area.innerHTML = '<div class="state-card"><div class="state-icon">&#9203;</div><div class="state-title">Connection problem</div><div class="state-sub">' + e.message + '</div></div>';
-      });
-  }
-}
-
-function renderTeacherTable(students, inputCols) {
-  var area = document.getElementById('tTableArea');
-  if (!students || !students.length) { area.innerHTML = '<div class="state-card"><div class="state-icon">&#128203;</div><div class="state-title">No students found</div></div>'; return; }
-
-  var thead = '<thead><tr><th>Student</th>';
-  inputCols.forEach(function(col) { thead += '<th>' + col + '</th>'; });
-  thead += '<th class="col-calc">Average</th><th class="col-calc">Final</th><th class="col-calc">Grade</th></tr></thead>';
-
-  var tbody = '<tbody>';
-  students.forEach(function(s) {
-    tbody += '<tr>';
-    tbody += '<td><div>' + s.name + '</div><div class="student-nickname">' + (s.nickname || '') + '</div></td>';
-    inputCols.forEach(function(col) {
-      var val = s.scores[col] !== undefined ? s.scores[col] : '';
-      tbody += '<td><input class="score-input" type="number" min="0" max="100" value="' + val + '" data-no="' + s.no + '" data-col="' + col + '" onchange="saveScore(this)"/></td>';
-    });
-    var avg   = s.average   !== '' && s.average   !== undefined ? Number(s.average).toFixed(1)   : '-';
-    var final = s.finalScore !== '' && s.finalScore !== undefined ? Number(s.finalScore).toFixed(1) : '-';
-    var ind   = s.indicator || '-';
-    var indClass = ind && ind !== '-' ? 'ind-' + ind.charAt(0).toUpperCase() : 'ind-X';
-    tbody += '<td class="calc-val">' + avg + '</td><td class="calc-val">' + final + '</td>';
-    tbody += '<td><span class="ind-badge ' + indClass + '">' + ind + '</span></td></tr>';
-  });
-  tbody += '</tbody>';
-
-  area.innerHTML =
-    '<button class="btn-csv" onclick="downloadCSV()">&#11015;&#65039; Download CSV</button>' +
-    '<div class="table-wrap"><table>' + thead + tbody + '</table></div>' +
-    '<div id="leaderboardArea"></div>';
-  renderLeaderboard(currentClass);
-}
-
-function renderTeacherFinalTable(students, inputCols, calcCols) {
-  var area = document.getElementById('tTableArea');
-  if (!students || !students.length) { area.innerHTML = '<div class="state-card"><div class="state-icon">&#128203;</div><div class="state-title">No students found</div></div>'; return; }
-
-  var thead = '<thead><tr><th>Student</th>';
-  (inputCols || []).forEach(function(col) { thead += '<th>' + col + '</th>'; });
-  (calcCols  || []).forEach(function(col) { thead += '<th class="col-calc">' + col + '</th>'; });
-  thead += '</tr></thead>';
-
-  var tbody = '<tbody>';
-  students.forEach(function(s) {
-    tbody += '<tr>';
-    tbody += '<td><div>' + s.name + '</div><div class="student-nickname">' + (s.nickname || '') + '</div></td>';
-    (inputCols || []).forEach(function(col) {
-      var val = s.scores && s.scores[col] !== undefined ? s.scores[col] : '';
-      tbody += '<td><input class="score-input" type="number" min="0" max="100" value="' + val + '" data-no="' + s.no + '" data-col="' + col + '" onchange="saveFinalScoreCell(this)"/></td>';
-    });
-    (calcCols || []).forEach(function(col) {
-      var val = s.calc && s.calc[col] !== undefined ? s.calc[col] : '';
-      var isEmpty = val === '' || val === undefined;
-      var isGrade = /indicator|grade|indikator/i.test(col);
-      if (isGrade) {
-        var ind = isEmpty ? '-' : String(val);
-        var indClass = ind && ind !== '-' ? 'ind-' + ind.charAt(0).toUpperCase() : 'ind-X';
-        tbody += '<td><span class="ind-badge ' + indClass + '">' + ind + '</span></td>';
-      } else {
-        tbody += '<td class="calc-val">' + (isEmpty ? '-' : Number(val).toFixed(1)) + '</td>';
-      }
-    });
-    tbody += '</tr>';
-  });
-  tbody += '</tbody>';
-
-  area.innerHTML =
-    '<button class="btn-csv" onclick="downloadCSV()">&#11015;&#65039; Download CSV</button>' +
-    '<div class="table-wrap"><table>' + thead + tbody + '</table></div>' +
-    '<div id="leaderboardArea"></div>';
-  renderLeaderboard(currentClass);
-}
-
-function saveFinalScoreCell(input) {
-  var studentNo = input.getAttribute('data-no');
-  var col       = input.getAttribute('data-col');
-  var value     = input.value.trim();
-
-  if (value !== '' && (isNaN(value) || Number(value) < 0 || Number(value) > 100)) {
-    input.className = 'score-input error';
-    showBar('Value must be 0-100', 'red');
-    return;
-  }
-
-  input.className = 'score-input saving';
-  showBar('Saving...', '');
-
-  apiGet({ action: 'saveFinalScore', username: savedUser, password: savedPass, className: currentClass, studentNo: studentNo, column: col, value: value })
-    .then(function(res) {
-      if (res.success) {
-        input.className = 'score-input saved';
-        showBar('Saved!', 'green');
-        setTimeout(function() { input.className = 'score-input'; hideBar(); }, 1800);
-        // Update calculated cells in the same row
-        if (res.calc) {
-          var row = input.closest('tr');
-          if (row) {
-            Object.keys(res.calc).forEach(function(col) {
-              var val = res.calc[col];
-              var isGrade = /indicator|grade|indikator/i.test(col);
-              var cells = row.querySelectorAll('.calc-val, .ind-badge');
-              cells.forEach(function(cell) {
-                if (isGrade && cell.classList.contains('ind-badge')) {
-                  var ind = val === '' ? '-' : String(val);
-                  cell.textContent = ind;
-                  cell.className = 'ind-badge ' + (ind && ind !== '-' ? 'ind-' + ind.charAt(0).toUpperCase() : 'ind-X');
-                } else if (!isGrade && cell.classList.contains('calc-val')) {
-                  cell.textContent = val === '' ? '-' : Number(val).toFixed(1);
-                }
-              });
-            });
-          }
-        }
-      } else {
-        input.className = 'score-input error';
-        showBar('Error: ' + (res.error || 'Failed'), 'red');
-      }
-    }).catch(function() { input.className = 'score-input error'; showBar('Connection error', 'red'); });
-}
-
-function downloadCSV() {
-  var table = document.querySelector('#tTableArea table');
-  if (!table) return;
-
-  var rows = table.querySelectorAll('tr');
-  var csv  = [];
-  var chapterLabel = currentChapter === 'F' ? 'Final Score' : 'Chapter ' + currentChapter;
-  var classLabel   = CLASS_LABELS[currentClass] || currentClass;
-
-  rows.forEach(function(row) {
-    var cols = row.querySelectorAll('th, td');
-    var rowData = [];
-    cols.forEach(function(col) {
-      // Get text, skip input values via .value
-      var input = col.querySelector('input');
-      var text  = input ? input.value : col.innerText.trim();
-      // Wrap in quotes if contains comma or newline
-      if (text.indexOf(',') > -1 || text.indexOf('\n') > -1) text = '"' + text + '"';
-      rowData.push(text);
-    });
-    csv.push(rowData.join(','));
-  });
-
-  var blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
-  var url  = URL.createObjectURL(blob);
-  var a    = document.createElement('a');
-  a.href     = url;
-  a.download = 'EnglishQuest_' + classLabel + '_' + chapterLabel.replace(' ','') + '.csv';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-
-function saveScore(input) {
-  var studentNo = input.getAttribute('data-no');
-  var col       = input.getAttribute('data-col');
-  var value     = input.value.trim();
-
-  if (value !== '' && (isNaN(value) || Number(value) < 0 || Number(value) > 100)) {
-    input.className = 'score-input error';
-    showBar('Value must be 0-100', 'red');
-    return;
-  }
-
-  input.className = 'score-input saving';
-  showBar('Saving...', '');
-
-  apiGet({ action: 'saveChapterScore', username: savedUser, password: savedPass, className: currentClass, chapter: currentChapter, studentNo: studentNo, column: col, value: value })
-    .then(function(res) {
-      if (res.success) {
-        input.className = 'score-input saved';
-        showBar('Saved!', 'green');
-        setTimeout(function() { input.className = 'score-input'; hideBar(); }, 1800);
-        setTimeout(function() { refreshRow(studentNo); }, 700);
-      } else {
-        input.className = 'score-input error';
-        showBar('Error: ' + (res.error || 'Failed'), 'red');
-      }
-    }).catch(function() { input.className = 'score-input error'; showBar('Connection error', 'red'); });
-}
-
-function refreshRow(studentNo) {
-  apiGet({ action: 'getChapterScores', className: currentClass, chapter: currentChapter }).then(function(res) {
-    if (!res.students) return;
-    var s = res.students.find(function(x) { return String(x.no) === String(studentNo); });
-    if (!s) return;
-    var inputs = document.querySelectorAll('input[data-no="' + studentNo + '"]');
-    if (!inputs.length) return;
-    var row = inputs[0].closest('tr');
-    if (!row) return;
-    var calcCells = row.querySelectorAll('.calc-val');
-    if (calcCells[0]) calcCells[0].textContent = s.average   !== '' ? Number(s.average).toFixed(1)   : '-';
-    if (calcCells[1]) calcCells[1].textContent = s.finalScore !== '' ? Number(s.finalScore).toFixed(1) : '-';
-    var badge = row.querySelector('.ind-badge');
-    if (badge) {
-      var ind = s.indicator || '-';
-      badge.textContent = ind;
-      badge.className = 'ind-badge ' + (ind && ind !== '-' ? 'ind-' + ind.charAt(0).toUpperCase() : 'ind-X');
-    }
-  });
 }
 
 // ── LEADERBOARD ───────────────────────────────────────────────
