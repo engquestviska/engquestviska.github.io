@@ -23,33 +23,6 @@
     </div>
   </div>
 
-  <div class="sheet-overlay hidden" id="addOverlay">
-    <div class="sheet-panel">
-      <div class="sheet-handle"></div>
-      <div class="sheet-head">
-        <div class="sheet-title" id="amTitle">Add Assignment</div>
-        <button class="round-close" onclick="closeAddModal()" aria-label="Close add assignment form">x</button>
-      </div>
-      <div class="sheet-body">
-        <div class="field">
-          <label for="amName">Assignment Title</label>
-          <input type="text" id="amName" placeholder="e.g. Task 6 - Reading Comprehension"/>
-        </div>
-        <div class="field">
-          <label for="amTag">Topic / Tag</label>
-          <input type="text" id="amTag" placeholder="e.g. READING · COMPREHENSION"/>
-        </div>
-        <div class="field">
-          <label for="amFileId">Google Drive File ID or URL</label>
-          <input type="text" id="amFileId" placeholder="Paste Drive link or just the file ID"/>
-          <div class="field-hint">From your share link: <code>drive.google.com/file/d/COPY_THIS/view</code></div>
-        </div>
-        <div class="form-error" id="amErr"></div>
-        <button class="btn primary" id="amSubmitBtn">Add Assignment</button>
-      </div>
-    </div>
-  </div>
-
   <header class="subpage-header">
     <div class="topbar">
       <div class="brand">
@@ -83,7 +56,6 @@
 
       <div class="material-grid" id="grid-ch4">
         <article class="material-card assignment-card" data-fileid="1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8">
-          <button class="delete-material-btn" onclick="deleteAssignment(4,'1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8',this)">x</button>
           <div class="material-info">
             <div class="content-badge">Task 5</div>
             <div class="material-name">Present Perfect Exercise</div>
@@ -121,11 +93,6 @@
 
   <script>
     var SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
-    var savedUser = '';
-    var savedPass = '';
-    var isTeacher = false;
-    var amChapter = 4;
-
     function apiGet(params) {
       var url = SCORES_API + '?';
       var parts = [];
@@ -153,16 +120,6 @@
         script.src = url + '&callback=' + cb;
         document.head.appendChild(script);
       });
-    }
-
-    function showToast(msg) {
-      var toast = document.createElement('div');
-      toast.className = 'toast';
-      toast.textContent = msg;
-      document.body.appendChild(toast);
-      setTimeout(function() {
-        if (toast.parentNode) toast.parentNode.removeChild(toast);
-      }, 3000);
     }
 
     function openPDF(title, previewUrl, downloadUrl) {
@@ -196,11 +153,6 @@
       card.className = 'material-card assignment-card';
       card.setAttribute('data-fileid', fileId);
 
-      var delBtn = document.createElement('button');
-      delBtn.className = 'delete-material-btn';
-      delBtn.textContent = 'x';
-      delBtn.onclick = function() { deleteAssignment(ch, fileId, delBtn); };
-
       var info = document.createElement('div');
       info.className = 'material-info';
       var number = document.createElement('div');
@@ -233,7 +185,6 @@
       actions.appendChild(viewBtn);
       actions.appendChild(downloadBtn);
       info.appendChild(actions);
-      card.appendChild(delBtn);
       card.appendChild(info);
       document.getElementById('grid-ch' + ch).appendChild(card);
     }
@@ -262,93 +213,9 @@
       });
     }
 
-    function openAddModal(ch) {
-      amChapter = ch;
-      document.getElementById('amTitle').textContent = 'Add Assignment · Chapter ' + ch;
-      document.getElementById('amName').value = '';
-      document.getElementById('amTag').value = '';
-      document.getElementById('amFileId').value = '';
-      document.getElementById('amErr').className = 'form-error';
-      document.getElementById('amSubmitBtn').disabled = false;
-      document.getElementById('amSubmitBtn').textContent = 'Add Assignment';
-      document.getElementById('addOverlay').classList.remove('hidden');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeAddModal() {
-      document.getElementById('addOverlay').classList.add('hidden');
-      document.body.style.overflow = '';
-    }
-
-    document.getElementById('addOverlay').addEventListener('click', function(e) {
-      if (e.target === this) closeAddModal();
-    });
-
-    document.getElementById('amSubmitBtn').onclick = function() {
-      var raw = document.getElementById('amFileId').value.trim();
-      var name = document.getElementById('amName').value.trim();
-      var tag = document.getElementById('amTag').value.trim();
-      var err = document.getElementById('amErr');
-      var btn = document.getElementById('amSubmitBtn');
-      var fileId = raw;
-      var match = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      if (match) fileId = match[1];
-
-      if (!name) {
-        err.textContent = 'Please enter a title.';
-        err.className = 'form-error show';
-        return;
-      }
-      if (!fileId || fileId.length < 10) {
-        err.textContent = 'Please enter a valid Drive link or file ID.';
-        err.className = 'form-error show';
-        return;
-      }
-
-      err.className = 'form-error';
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner-sm"></span>Saving...';
-      apiGet({ action: 'addMaterial', username: savedUser, password: savedPass, chapter: 'assign' + amChapter, title: name, fileId: fileId, fileType: tag })
-        .then(function(res) {
-          if (res.success) {
-            appendCard(amChapter, name, fileId, tag);
-            closeAddModal();
-            showToast('Added: ' + name);
-          } else {
-            err.textContent = res.error || 'Failed to save.';
-            err.className = 'form-error show';
-            btn.disabled = false;
-            btn.textContent = 'Add Assignment';
-          }
-        }).catch(function() {
-          err.textContent = 'Network error. Please try again.';
-          err.className = 'form-error show';
-          btn.disabled = false;
-          btn.textContent = 'Add Assignment';
-        });
-    };
-
-    function deleteAssignment(ch, fileId, triggerEl) {
-      if (!confirm('Remove this assignment?')) return;
-      apiGet({ action: 'deleteMaterial', username: savedUser, password: savedPass, chapter: 'assign' + ch, fileId: fileId })
-        .then(function(res) {
-          if (res.success) {
-            var card = triggerEl.closest('.assignment-card');
-            if (card) card.remove();
-            if (ch === 5 && document.getElementById('grid-ch5').children.length === 0) {
-              document.getElementById('ch5-empty').classList.remove('hidden-state');
-            }
-            showToast('Removed!');
-          }
-        }).catch(function() {
-          showToast('Error removing.');
-        });
-    }
-
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         closePdfModal();
-        closeAddModal();
       }
     });
 

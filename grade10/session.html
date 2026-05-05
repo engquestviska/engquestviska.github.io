@@ -36,52 +36,6 @@
     </div>
   </div>
 
-  <div class="sheet-overlay hidden" id="addReadingOverlay">
-    <div class="sheet-panel">
-      <div class="sheet-handle"></div>
-      <div class="sheet-head">
-        <div class="sheet-title">Add Reading Material</div>
-        <button class="round-close" onclick="closeAddReading()" aria-label="Close add reading form">x</button>
-      </div>
-      <div class="sheet-body">
-        <div class="field">
-          <label for="rTitle">Title</label>
-          <input type="text" id="rTitle" placeholder="e.g. Chapter 5 Reading Text"/>
-        </div>
-        <div class="field">
-          <label for="rFileId">Google Drive File ID or URL</label>
-          <input type="text" id="rFileId" placeholder="Paste Drive link or file ID"/>
-          <div class="field-hint">From your share link: <code>drive.google.com/file/d/COPY_THIS/view</code></div>
-        </div>
-        <div class="form-error" id="rErr"></div>
-        <button class="btn primary" id="rSubmitBtn">Add Reading</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="sheet-overlay hidden" id="addVideoOverlay">
-    <div class="sheet-panel">
-      <div class="sheet-handle"></div>
-      <div class="sheet-head">
-        <div class="sheet-title">Add Video</div>
-        <button class="round-close" onclick="closeAddVideo()" aria-label="Close add video form">x</button>
-      </div>
-      <div class="sheet-body">
-        <div class="field">
-          <label for="vTitle">Title</label>
-          <input type="text" id="vTitle" placeholder="e.g. Chapter 5 Video Explanation"/>
-        </div>
-        <div class="field">
-          <label for="vVideoId">YouTube URL or Video ID</label>
-          <input type="text" id="vVideoId" placeholder="Paste YouTube link or just the video ID"/>
-          <div class="field-hint">From your share link: <code>youtube.com/watch?v=COPY_THIS</code></div>
-        </div>
-        <div class="form-error" id="vErr"></div>
-        <button class="btn primary" id="vSubmitBtn">Add Video</button>
-      </div>
-    </div>
-  </div>
-
   <header class="subpage-header">
     <div class="topbar">
       <div class="brand">
@@ -150,10 +104,6 @@
 
   <script>
     var SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
-    var savedUser = '';
-    var savedPass = '';
-    var isTeacher = false;
-
     function apiGet(params) {
       var url = SCORES_API + '?';
       var parts = [];
@@ -193,16 +143,6 @@
       }
 
       return attempt(1);
-    }
-
-    function showToast(msg) {
-      var toast = document.createElement('div');
-      toast.className = 'toast';
-      toast.textContent = msg;
-      document.body.appendChild(toast);
-      setTimeout(function() {
-        if (toast.parentNode) toast.parentNode.removeChild(toast);
-      }, 3000);
     }
 
     function openPdf(title, fileId) {
@@ -270,11 +210,6 @@
       card.className = 'material-card';
       card.setAttribute('data-reading-id', fileId);
 
-      var delBtn = document.createElement('button');
-      delBtn.className = 'delete-material-btn';
-      delBtn.textContent = 'x';
-      delBtn.onclick = function() { deleteReading(fileId, card); };
-
       var preview = document.createElement('div');
       preview.className = 'material-preview';
       preview.innerHTML = '<span class="material-icon">PDF</span><iframe src="' + previewUrl + '" title="' + title + '"></iframe><div class="material-overlay"><span>Read</span></div>';
@@ -301,24 +236,9 @@
       actions.appendChild(btnView);
       actions.appendChild(btnDownload);
 
-      card.appendChild(delBtn);
       card.appendChild(preview);
       card.appendChild(info);
       document.getElementById('readingGrid').appendChild(card);
-    }
-
-    function deleteReading(fileId, card) {
-      if (!confirm('Remove this reading material?')) return;
-      apiGet({ action: 'deleteMaterial', username: savedUser, password: savedPass, chapter: 'reading', fileId: fileId })
-        .then(function(res) {
-          if (res.success) {
-            card.remove();
-            showReadingEmptyIfNeeded();
-            showToast('Removed!');
-          }
-        }).catch(function() {
-          showToast('Error removing.');
-        });
     }
 
     function showReadingEmptyIfNeeded() {
@@ -341,11 +261,6 @@
       var card = document.createElement('article');
       card.className = 'material-card video-card';
       card.setAttribute('data-video-id', videoId);
-
-      var delBtn = document.createElement('button');
-      delBtn.className = 'delete-material-btn';
-      delBtn.textContent = 'x';
-      delBtn.onclick = function() { deleteVideo(videoId, card); };
 
       var preview = document.createElement('div');
       preview.className = 'video-preview';
@@ -373,24 +288,9 @@
       actions.appendChild(btnWatch);
       actions.appendChild(btnYt);
 
-      card.appendChild(delBtn);
       card.appendChild(preview);
       card.appendChild(info);
       document.getElementById('videoGrid').appendChild(card);
-    }
-
-    function deleteVideo(videoId, card) {
-      if (!confirm('Remove this video?')) return;
-      apiGet({ action: 'deleteMaterial', username: savedUser, password: savedPass, chapter: 'video', fileId: videoId })
-        .then(function(res) {
-          if (res.success) {
-            card.remove();
-            showVideoEmptyIfNeeded();
-            showToast('Removed!');
-          }
-        }).catch(function() {
-          showToast('Error removing.');
-        });
     }
 
     function showVideoEmptyIfNeeded() {
@@ -403,140 +303,10 @@
       grid.appendChild(empty);
     }
 
-    var addReadingBtn = document.getElementById('addReadingBtn');
-    if (addReadingBtn) addReadingBtn.onclick = function() {
-      document.getElementById('rTitle').value = '';
-      document.getElementById('rFileId').value = '';
-      document.getElementById('rErr').className = 'form-error';
-      document.getElementById('rSubmitBtn').disabled = false;
-      document.getElementById('rSubmitBtn').textContent = 'Add Reading';
-      document.getElementById('addReadingOverlay').classList.remove('hidden');
-      document.body.style.overflow = 'hidden';
-    };
-
-    function closeAddReading() {
-      document.getElementById('addReadingOverlay').classList.add('hidden');
-      document.body.style.overflow = '';
-    }
-
-    document.getElementById('addReadingOverlay').onclick = function(e) {
-      if (e.target === this) closeAddReading();
-    };
-
-    document.getElementById('rSubmitBtn').onclick = function() {
-      var raw = document.getElementById('rFileId').value.trim();
-      var title = document.getElementById('rTitle').value.trim();
-      var err = document.getElementById('rErr');
-      var btn = document.getElementById('rSubmitBtn');
-      var fileId = raw;
-      var match = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      if (match) fileId = match[1];
-
-      if (!title) {
-        err.textContent = 'Please enter a title.';
-        err.className = 'form-error show';
-        return;
-      }
-      if (!fileId || fileId.length < 10) {
-        err.textContent = 'Please enter a valid Drive link or file ID.';
-        err.className = 'form-error show';
-        return;
-      }
-
-      err.className = 'form-error';
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner-sm"></span>Saving...';
-
-      apiGet({ action: 'addMaterial', username: savedUser, password: savedPass, chapter: 'reading', title: title, fileId: fileId, fileType: 'PDF' })
-        .then(function(res) {
-          if (res.success) {
-            appendReadingCard(title, fileId);
-            closeAddReading();
-            showToast('Added: ' + title);
-          } else {
-            err.textContent = res.error || 'Failed to save.';
-            err.className = 'form-error show';
-            btn.disabled = false;
-            btn.textContent = 'Add Reading';
-          }
-        }).catch(function() {
-          err.textContent = 'Network error. Please try again.';
-          err.className = 'form-error show';
-          btn.disabled = false;
-          btn.textContent = 'Add Reading';
-        });
-    };
-
-    var addVideoBtn = document.getElementById('addVideoBtn');
-    if (addVideoBtn) addVideoBtn.onclick = function() {
-      document.getElementById('vTitle').value = '';
-      document.getElementById('vVideoId').value = '';
-      document.getElementById('vErr').className = 'form-error';
-      document.getElementById('vSubmitBtn').disabled = false;
-      document.getElementById('vSubmitBtn').textContent = 'Add Video';
-      document.getElementById('addVideoOverlay').classList.remove('hidden');
-      document.body.style.overflow = 'hidden';
-    };
-
-    function closeAddVideo() {
-      document.getElementById('addVideoOverlay').classList.add('hidden');
-      document.body.style.overflow = '';
-    }
-
-    document.getElementById('addVideoOverlay').onclick = function(e) {
-      if (e.target === this) closeAddVideo();
-    };
-
-    document.getElementById('vSubmitBtn').onclick = function() {
-      var raw = document.getElementById('vVideoId').value.trim();
-      var title = document.getElementById('vTitle').value.trim();
-      var err = document.getElementById('vErr');
-      var btn = document.getElementById('vSubmitBtn');
-      var videoId = raw;
-      var match = raw.match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
-      if (match) videoId = match[1];
-
-      if (!title) {
-        err.textContent = 'Please enter a title.';
-        err.className = 'form-error show';
-        return;
-      }
-      if (!videoId || videoId.length < 5) {
-        err.textContent = 'Please enter a valid YouTube link or video ID.';
-        err.className = 'form-error show';
-        return;
-      }
-
-      err.className = 'form-error';
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner-sm"></span>Saving...';
-
-      apiGet({ action: 'addMaterial', username: savedUser, password: savedPass, chapter: 'video', title: title, fileId: videoId, fileType: 'YT' })
-        .then(function(res) {
-          if (res.success) {
-            appendVideoCard(title, videoId);
-            closeAddVideo();
-            showToast('Added: ' + title);
-          } else {
-            err.textContent = res.error || 'Failed to save.';
-            err.className = 'form-error show';
-            btn.disabled = false;
-            btn.textContent = 'Add Video';
-          }
-        }).catch(function() {
-          err.textContent = 'Network error. Please try again.';
-          err.className = 'form-error show';
-          btn.disabled = false;
-          btn.textContent = 'Add Video';
-        });
-    };
-
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         closePdfModal();
         closeVideoModal();
-        closeAddReading();
-        closeAddVideo();
       }
     });
 

@@ -23,38 +23,6 @@
     </div>
   </div>
 
-  <div class="sheet-overlay hidden" id="amOverlay">
-    <div class="sheet-panel">
-      <div class="sheet-handle"></div>
-      <div class="sheet-head">
-        <div class="sheet-title" id="amTitle">Add Material</div>
-        <button class="round-close" id="amCloseBtn" aria-label="Close add material form">x</button>
-      </div>
-      <div class="sheet-body">
-        <div class="field">
-          <label for="amName">Material Title</label>
-          <input type="text" id="amName" placeholder="e.g. Analytical Exposition Structure"/>
-        </div>
-        <div class="field">
-          <label for="amFileId">Google Drive File ID or URL</label>
-          <input type="text" id="amFileId" placeholder="Paste Drive link or just the file ID"/>
-          <div class="field-hint">From your share link: <code>drive.google.com/file/d/COPY_THIS/view</code></div>
-        </div>
-        <div class="field">
-          <label for="amType">File Type</label>
-          <select id="amType">
-            <option value="PDF">PDF</option>
-            <option value="PPT">PPT / Slides</option>
-            <option value="DOC">Word Document</option>
-            <option value="IMG">Image</option>
-          </select>
-        </div>
-        <div class="form-error" id="amErr"></div>
-        <button class="btn primary" id="amSubmitBtn">Add Material</button>
-      </div>
-    </div>
-  </div>
-
   <header class="subpage-header">
     <div class="topbar">
       <div class="brand">
@@ -88,7 +56,6 @@
 
       <div class="material-grid" id="grid-ch4">
         <article class="material-card" data-fileid="12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx">
-          <button class="delete-material-btn" onclick="deleteMaterial(4,'12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx')">x</button>
           <div class="material-preview" onclick="openPDF('Fact vs Opinion','https://drive.google.com/file/d/12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx/preview','https://drive.google.com/uc?export=download&id=12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx')">
             <span class="material-icon">PDF</span>
             <iframe src="https://drive.google.com/file/d/12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx/preview" title="Fact vs Opinion"></iframe>
@@ -105,7 +72,6 @@
         </article>
 
         <article class="material-card" data-fileid="1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ">
-          <button class="delete-material-btn" onclick="deleteMaterial(4,'1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ')">x</button>
           <div class="material-preview" onclick="openPDF('Argument','https://drive.google.com/file/d/1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ/preview','https://drive.google.com/uc?export=download&id=1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ')">
             <span class="material-icon">PDF</span>
             <iframe src="https://drive.google.com/file/d/1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ/preview" title="Argument"></iframe>
@@ -148,11 +114,6 @@
 
   <script>
     var SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
-    var savedUser = '';
-    var savedPass = '';
-    var isTeacher = false;
-    var amChapter = 4;
-
     function apiGet(params) {
       var url = SCORES_API + '?';
       var parts = [];
@@ -225,11 +186,6 @@
       card.className = 'material-card';
       card.setAttribute('data-fileid', fileId);
 
-      var delBtn = document.createElement('button');
-      delBtn.className = 'delete-material-btn';
-      delBtn.textContent = 'x';
-      delBtn.onclick = function() { deleteMaterial(ch, fileId); };
-
       var preview = document.createElement('div');
       preview.className = 'material-preview';
       preview.innerHTML = '<span class="material-icon">PDF</span><iframe src="' + previewUrl + '" title="' + name + '"></iframe><div class="material-overlay"><span>View</span></div>';
@@ -257,95 +213,9 @@
       actions.appendChild(btnView);
       actions.appendChild(btnDownload);
 
-      card.appendChild(delBtn);
       card.appendChild(preview);
       card.appendChild(info);
       document.getElementById('grid-ch' + ch).appendChild(card);
-    }
-
-    var addBtn4 = document.getElementById('addBtn4');
-    var addBtn5 = document.getElementById('addBtn5');
-    if (addBtn4) addBtn4.onclick = function() { openAddMaterial(4); };
-    if (addBtn5) addBtn5.onclick = function() { openAddMaterial(5); };
-    document.getElementById('amCloseBtn').onclick = closeAddMaterial;
-    document.getElementById('amOverlay').onclick = function(e) {
-      if (e.target === this) closeAddMaterial();
-    };
-
-    function openAddMaterial(ch) {
-      amChapter = ch;
-      document.getElementById('amTitle').textContent = 'Add Material · Chapter ' + ch;
-      document.getElementById('amName').value = '';
-      document.getElementById('amFileId').value = '';
-      document.getElementById('amType').value = 'PDF';
-      document.getElementById('amErr').className = 'form-error';
-      document.getElementById('amSubmitBtn').disabled = false;
-      document.getElementById('amSubmitBtn').textContent = 'Add Material';
-      document.getElementById('amOverlay').classList.remove('hidden');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeAddMaterial() {
-      document.getElementById('amOverlay').classList.add('hidden');
-      document.body.style.overflow = '';
-    }
-
-    document.getElementById('amSubmitBtn').onclick = function() {
-      var raw = document.getElementById('amFileId').value.trim();
-      var name = document.getElementById('amName').value.trim();
-      var type = document.getElementById('amType').value;
-      var err = document.getElementById('amErr');
-      var btn = document.getElementById('amSubmitBtn');
-      var fileId = raw;
-      var match = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      if (match) fileId = match[1];
-
-      if (!name) {
-        err.textContent = 'Please enter a title.';
-        err.className = 'form-error show';
-        return;
-      }
-      if (!fileId || fileId.length < 10) {
-        err.textContent = 'Please enter a valid Drive file ID or link.';
-        err.className = 'form-error show';
-        return;
-      }
-
-      err.className = 'form-error';
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner-sm"></span>Saving...';
-
-      apiGet({ action: 'addMaterial', username: savedUser, password: savedPass, chapter: amChapter, title: name, fileId: fileId, fileType: type })
-        .then(function(res) {
-          if (res.success) {
-            appendCard(amChapter, name, fileId, type);
-            closeAddMaterial();
-            showToast('Added: ' + name);
-          } else {
-            err.textContent = res.error || 'Failed to save.';
-            err.className = 'form-error show';
-            btn.disabled = false;
-            btn.textContent = 'Add Material';
-          }
-        }).catch(function() {
-          err.textContent = 'Network error. Please try again.';
-          err.className = 'form-error show';
-          btn.disabled = false;
-          btn.textContent = 'Add Material';
-        });
-    };
-
-    function deleteMaterial(ch, fileId) {
-      if (!confirm('Remove this material?')) return;
-      apiGet({ action: 'deleteMaterial', username: savedUser, password: savedPass, chapter: ch, fileId: fileId })
-        .then(function(res) {
-          if (res.success) {
-            var card = document.querySelector('[data-fileid="' + fileId + '"]');
-            if (card) card.remove();
-            showEmptyStateIfNeeded(ch);
-            showToast('Removed!');
-          }
-        });
     }
 
     function showEmptyStateIfNeeded(ch) {
@@ -358,20 +228,9 @@
       grid.appendChild(empty);
     }
 
-    function showToast(msg) {
-      var toast = document.createElement('div');
-      toast.className = 'toast';
-      toast.textContent = msg;
-      document.body.appendChild(toast);
-      setTimeout(function() {
-        if (toast.parentNode) toast.parentNode.removeChild(toast);
-      }, 3000);
-    }
-
     document.addEventListener('keydown', function(e) {
       if (e.key === 'Escape') {
         closeModal();
-        closeAddMaterial();
       }
     });
 
