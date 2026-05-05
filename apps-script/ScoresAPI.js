@@ -347,6 +347,12 @@ function drivePreviewUrl(value) {
   return 'https://drive.google.com/file/d/' + idMatch[0] + '/preview';
 }
 
+function timestampMs(value, fallback) {
+  if (value instanceof Date) return value.getTime();
+  const parsed = Date.parse(String(value || ''));
+  return isNaN(parsed) ? fallback : parsed;
+}
+
 // ── CH4 FILE URLS FOR A SPECIFIC STUDENT ─────────────────────
 function getCh4StudentFiles(className, studentNo) {
   const SUBMISSION_SS_ID = '1VsAtQHxNcajOAuasAe5Aagr4XelqtO3xtN8TvQOcrNE';
@@ -394,20 +400,39 @@ function getCh4StudentFiles(className, studentNo) {
     .replace(/\s+/g, ' ')
     .trim();
 
-  let files = {};
+  const latestByTask = {};
   let submitted = false;
   let timestamp = '';
   for (let r = 1; r < respData.length; r++) {
     if (normCls(respData[r][clsCol]) !== normCls(className) || normName(respData[r][nameCol]) !== normName(studentName)) continue;
     submitted = true;
-    timestamp = String(respData[r][0] || timestamp);
+    const rowTimestamp = String(respData[r][0] || '');
+    const rowMs = timestampMs(respData[r][0], r);
     taskCols.forEach(function(col, i) {
       const val = String(respData[r][col] || '').trim();
-      if (val) files['C4T' + (i + 1)] = drivePreviewUrl(val);
+      if (!val || !/\.pdf|drive\.google|[-\w]{25,}/i.test(val)) return;
+      const taskKey = 'C4T' + (i + 1);
+      if (!latestByTask[taskKey] || rowMs >= latestByTask[taskKey].ms) {
+        latestByTask[taskKey] = {
+          ms: rowMs,
+          url: drivePreviewUrl(val),
+          timestamp: rowTimestamp
+        };
+      }
     });
   }
 
-  return { success: true, submitted, files, studentName, timestamp };
+  const files = {};
+  const fileTimestamps = {};
+  Object.keys(latestByTask).forEach(function(taskKey) {
+    files[taskKey] = latestByTask[taskKey].url;
+    fileTimestamps[taskKey] = latestByTask[taskKey].timestamp;
+    if (!timestamp || latestByTask[taskKey].ms >= timestampMs(timestamp, 0)) {
+      timestamp = latestByTask[taskKey].timestamp;
+    }
+  });
+
+  return { success: true, submitted, files, fileTimestamps, studentName, timestamp };
 }
 
 // ── CH5 FILE URLS FOR A SPECIFIC STUDENT (teacher viewer) ────

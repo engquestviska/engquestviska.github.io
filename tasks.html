@@ -456,8 +456,8 @@
       const [data, subData, ch4Files, ch5Files] = await Promise.all([
         cachedApiGet({ action: 'getTaskStatus', className: cls, studentNo: no }),
         cachedApiGet({ action: 'getSubmissions' }).catch(function() { return null; }),
-        cachedApiGet({ action: 'getCh4StudentFiles', className: cls, studentNo: no }).catch(function() { return null; }),
-        cachedApiGet({ action: 'getCh5StudentFiles', className: cls, studentNo: no }).catch(function() { return null; })
+        apiGet({ action: 'getCh4StudentFiles', className: cls, studentNo: no, _t: Date.now() }).catch(function() { return null; }),
+        apiGet({ action: 'getCh5StudentFiles', className: cls, studentNo: no, _t: Date.now() }).catch(function() { return null; })
       ]);
       if (data.error) { showToast(data.error, 'err'); document.getElementById('studentResult').innerHTML = ''; return; }
 
