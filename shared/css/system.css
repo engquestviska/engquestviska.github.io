@@ -149,9 +149,7 @@ footer {
   --line: #e8e1d6;
   --paper: #fbfaf7;
   color: #141225;
-  background:
-    linear-gradient(rgba(251, 250, 247, 0.92), rgba(251, 250, 247, 0.94)),
-    url('../../logo.jpg') center/420px auto no-repeat fixed;
+  background: #fbfaf7;
   display: flex;
   flex-direction: column;
 }
@@ -494,9 +492,7 @@ a.module:hover {
 }
 
 .subpage-header {
-  background:
-    linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(30, 58, 138, 0.95)),
-    url('../../logo.jpg') right 34px center/170px auto no-repeat;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.95), rgba(30, 58, 138, 0.95));
   color: #fff;
   padding: 22px;
 }
@@ -1983,9 +1979,7 @@ a.module:hover {
 }
 
 .teacher-page header {
-  background:
-    linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(30, 58, 138, 0.9)),
-    url('../../logo.jpg') center/360px auto no-repeat;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(30, 58, 138, 0.9));
   color: #fff;
   padding: 22px;
 }
