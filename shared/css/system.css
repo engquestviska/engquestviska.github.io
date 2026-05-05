@@ -314,9 +314,7 @@ footer {
   border-radius: 34px;
   padding: 34px;
   color: #fff;
-  background:
-    linear-gradient(135deg, rgba(37, 99, 235, 0.94), rgba(30, 58, 138, 0.94)),
-    url('../../logo.jpg') right 34px center/190px auto no-repeat;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.94), rgba(30, 58, 138, 0.94));
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
@@ -325,9 +323,7 @@ footer {
 }
 
 .grade11-page .hero-main {
-  background:
-    linear-gradient(135deg, rgba(15, 118, 110, 0.94), rgba(19, 78, 74, 0.94)),
-    url('../../logo.jpg') right 34px center/190px auto no-repeat;
+  background: linear-gradient(135deg, rgba(15, 118, 110, 0.94), rgba(19, 78, 74, 0.94));
 }
 
 .kicker {
