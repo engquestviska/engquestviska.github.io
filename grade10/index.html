@@ -100,6 +100,7 @@
         </div>
       </div>
       <nav class="nav" aria-label="Main navigation">
+        <a href="dashboard.html">My Statistics</a>
         <a href="../index.html">Choose Grade</a>
       </nav>
     </header>
@@ -140,6 +141,7 @@
           </div>
           <div class="profile-actions profile-login-actions">
             <button class="btn primary" type="button" id="confirmProfile" disabled>Confirm Profile</button>
+            <a class="btn ghost" href="dashboard.html" id="dashboardProfileLink">My Statistics</a>
             <button class="btn ghost" type="button" id="changeProfile">Change Name</button>
             <button class="btn danger" type="button" id="logoutProfile">Logout</button>
           </div>
@@ -189,6 +191,12 @@
           </div>
         </div>
         <div class="module-grid">
+          <a class="module" href="dashboard.html">
+            <div class="module-icon">ST</div>
+            <div class="module-title">My Statistics</div>
+            <p class="module-copy">Open your personal dashboard for scores, attendance, tasks, submissions, and activeness.</p>
+            <div class="module-link">Open dashboard -></div>
+          </a>
           <a class="module" href="students.html">
             <div class="module-icon">🎓</div>
             <div class="module-title">Student List</div>
@@ -282,6 +290,7 @@
       document.getElementById('studentClass').value = cls || '';
       document.getElementById('logoutProfile').disabled = !hasProfile;
       document.getElementById('changeProfile').disabled = !hasProfile;
+      document.getElementById('dashboardProfileLink').style.display = hasProfile ? 'inline-flex' : 'none';
     }
 
     function resetStudentSelect(message) {

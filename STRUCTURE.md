@@ -11,7 +11,8 @@ English Quest is being reorganized into three tracks.
 
 ## Grade 10
 
-- `grade10/index.html` - Grade 10 student dashboard.
+- `grade10/index.html` - Grade 10 student home and profile setup.
+- `grade10/dashboard.html` - My Statistics dashboard for the logged-in student.
 - `grade10/lessons.html` - Lesson Materials.
 - `grade10/assignments.html` - Assignments.
 - `grade10/submission.html` - Submission.

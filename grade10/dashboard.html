@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Statistics · English Quest</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css?v=20260505-dashboard"/>
+  <style>
+    .student-dashboard-page {
+      --primary: #2563eb;
+      --primary-dark: #1e3a8a;
+      --primary-soft: #dbeafe;
+      --line: #dbeafe;
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.14), transparent 32rem),
+        linear-gradient(180deg, #f8fafc 0%, #eef6ff 100%);
+      color: #0f172a;
+    }
+    .dashboard-shell {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 22px;
+    }
+    .dashboard-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: end;
+      border-radius: 34px;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 52%, #1e3a8a 100%);
+      color: #fff;
+      padding: clamp(28px, 5vw, 54px);
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+    .dashboard-hero h1 {
+      max-width: 720px;
+    }
+    .dashboard-hero .hero-copy {
+      max-width: 680px;
+    }
+    .student-chip {
+      min-width: 220px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.12);
+      padding: 18px;
+    }
+    .student-chip-label,
+    .card-label,
+    .mini-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .student-chip-label {
+      color: #bfdbfe;
+    }
+    .student-chip-name {
+      font: 800 1.35rem 'IBM Plex Sans', sans-serif;
+      margin-top: 8px;
+      overflow-wrap: anywhere;
+    }
+    .student-chip-meta {
+      color: rgba(255, 255, 255, 0.76);
+      line-height: 1.5;
+      margin-top: 6px;
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+    .stat-card {
+      grid-column: span 4;
+      min-height: 220px;
+      border: 1.5px solid #bfdbfe;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 22px 60px rgba(37, 99, 235, 0.09);
+      padding: 22px;
+      display: grid;
+      gap: 16px;
+    }
+    .stat-card.wide {
+      grid-column: span 8;
+    }
+    .stat-card.full {
+      grid-column: 1 / -1;
+    }
+    .stat-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .card-label {
+      color: #2563eb;
+      margin-bottom: 8px;
+    }
+    .stat-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.7rem, 3vw, 2.35rem);
+      line-height: 1;
+    }
+    .stat-value {
+      font: 800 clamp(2.5rem, 5vw, 4.2rem) 'IBM Plex Sans', sans-serif;
+      color: #0f172a;
+      line-height: 0.9;
+    }
+    .stat-sub {
+      color: #64748b;
+      line-height: 1.6;
+    }
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .mini-stat {
+      border-radius: 18px;
+      background: #f8fbff;
+      border: 1px solid #dbeafe;
+      padding: 14px;
+    }
+    .mini-label {
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+    .mini-value {
+      font: 800 1.35rem 'IBM Plex Sans', sans-serif;
+    }
+    .progress-track {
+      height: 12px;
+      border-radius: 999px;
+      background: #dbeafe;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #2563eb, #10b981);
+      transition: width 0.3s ease;
+    }
+    .link-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-self: end;
+    }
+    .state-note {
+      border: 1.5px dashed #bfdbfe;
+      border-radius: 20px;
+      background: #f8fbff;
+      color: #475569;
+      line-height: 1.6;
+      padding: 18px;
+    }
+    .loading-text {
+      color: #64748b;
+      font-weight: 700;
+    }
+    .quick-list {
+      display: grid;
+      gap: 10px;
+    }
+    .quick-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+      border: 1px solid #dbeafe;
+      border-radius: 18px;
+      background: #f8fbff;
+      padding: 14px;
+    }
+    .quick-title {
+      font-weight: 800;
+    }
+    .quick-meta {
+      color: #64748b;
+      font-size: 0.92rem;
+      margin-top: 3px;
+    }
+    .quick-status {
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font: 800 0.78rem 'IBM Plex Sans', sans-serif;
+      padding: 8px 12px;
+      white-space: nowrap;
+    }
+    .guard-card {
+      max-width: 760px;
+      margin: 42px auto;
+      border: 1.5px solid #bfdbfe;
+      border-radius: 28px;
+      background: #fff;
+      box-shadow: var(--shadow);
+      padding: 30px;
+      text-align: center;
+    }
+    .guard-card h1 {
+      color: #0f172a;
+      margin-bottom: 12px;
+    }
+    .guard-card p {
+      color: #64748b;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+    @media (max-width: 920px) {
+      .dashboard-hero,
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      .stat-card,
+      .stat-card.wide,
+      .stat-card.full {
+        grid-column: auto;
+      }
+    }
+    @media (max-width: 560px) {
+      .dashboard-shell {
+        padding: 18px;
+      }
+      .dashboard-hero,
+      .stat-card,
+      .guard-card {
+        border-radius: 24px;
+        padding: 22px;
+      }
+      .mini-grid {
+        grid-template-columns: 1fr;
+      }
+      .quick-item {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body class="student-dashboard-page">
+  <div class="dashboard-shell">
+    <header class="topbar">
+      <div class="brand">
+        <img src="../logo.jpg" alt="English Quest Logo"/>
+        <div>
+          <div class="brand-title">English Quest</div>
+          <div class="brand-sub">Grade 10 Student Track</div>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="index.html">Grade 10 Home</a>
+        <a href="../index.html">Choose Grade</a>
+      </nav>
+    </header>
+
+    <main id="app">
+      <section class="guard-card" id="guardCard">
+        <div class="section-kicker">My Statistics</div>
+        <h1>Choose your profile first.</h1>
+        <p>This dashboard is personal. Go back to Grade 10 Home, choose your class and name, then open My Statistics again.</p>
+        <a class="btn primary" href="index.html">Set Student Profile</a>
+      </section>
+
+      <div id="dashboardView" hidden>
+        <section class="dashboard-hero">
+          <div>
+            <div class="kicker">My Statistics</div>
+            <h1>Your personal English Quest dashboard.</h1>
+            <p class="hero-copy">A student-only view of your scores, attendance, task progress, submissions, and class activeness.</p>
+          </div>
+          <aside class="student-chip">
+            <div class="student-chip-label">Logged in as</div>
+            <div class="student-chip-name" id="studentName">Student</div>
+            <div class="student-chip-meta" id="studentMeta">Grade 10</div>
+          </aside>
+        </section>
+
+        <section class="dashboard-grid" aria-label="Student statistics">
+          <article class="stat-card" id="scoresCard">
+            <div class="stat-head">
+              <div>
+                <div class="card-label">Scores</div>
+                <div class="stat-title">Chapter progress</div>
+              </div>
+              <div class="stat-value" id="scoreValue">--</div>
+            </div>
+            <p class="stat-sub" id="scoreSub">Loading your scores...</p>
+            <div class="mini-grid">
+              <div class="mini-stat"><div class="mini-label">Chapter 4</div><div class="mini-value" id="scoreCh4">--</div></div>
+              <div class="mini-stat"><div class="mini-label">Chapter 5</div><div class="mini-value" id="scoreCh5">--</div></div>
+              <div class="mini-stat"><div class="mini-label">Final</div><div class="mini-value" id="scoreFinal">--</div></div>
+            </div>
+            <div class="link-row"><a class="btn ghost" href="scores.html">Open Scores</a></div>
+          </article>
+
+          <article class="stat-card" id="attendanceCard">
+            <div>
+              <div class="card-label">Attendance</div>
+              <div class="stat-title">Presence record</div>
+            </div>
+            <div class="stat-value" id="attendanceValue">--</div>
+            <div class="progress-track"><div class="progress-fill" id="attendanceBar"></div></div>
+            <p class="stat-sub" id="attendanceSub">Loading your attendance...</p>
+            <div class="link-row"><a class="btn ghost" href="attendance.html">Open Attendance</a></div>
+          </article>
+
+          <article class="stat-card" id="activenessCard">
+            <div>
+              <div class="card-label">Activeness</div>
+              <div class="stat-title">Participation</div>
+            </div>
+            <div class="stat-value" id="activeValue">--</div>
+            <p class="stat-sub" id="activeSub">Loading your activeness...</p>
+            <div class="link-row"><a class="btn ghost" href="activeness.html">Open Activeness</a></div>
+          </article>
+
+          <article class="stat-card wide" id="tasksCard">
+            <div class="stat-head">
+              <div>
+                <div class="card-label">Tasks</div>
+                <div class="stat-title">Completion status</div>
+              </div>
+              <div class="stat-value" id="taskValue">--</div>
+            </div>
+            <div class="progress-track"><div class="progress-fill" id="taskBar"></div></div>
+            <p class="stat-sub" id="taskSub">Loading your task status...</p>
+            <div class="mini-grid">
+              <div class="mini-stat"><div class="mini-label">Done</div><div class="mini-value" id="taskDone">--</div></div>
+              <div class="mini-stat"><div class="mini-label">Missing</div><div class="mini-value" id="taskMissing">--</div></div>
+              <div class="mini-stat"><div class="mini-label">Total</div><div class="mini-value" id="taskTotal">--</div></div>
+            </div>
+            <div class="link-row"><a class="btn ghost" href="tasks.html">Open Task Status</a></div>
+          </article>
+
+          <article class="stat-card" id="submissionCard">
+            <div>
+              <div class="card-label">Submission</div>
+              <div class="stat-title">Upload check</div>
+            </div>
+            <div class="stat-value" id="submissionValue">--</div>
+            <p class="stat-sub" id="submissionSub">Loading submission status...</p>
+            <div class="link-row"><a class="btn ghost" href="submission.html">Open Submission</a></div>
+          </article>
+
+          <article class="stat-card full">
+            <div class="stat-head">
+              <div>
+                <div class="card-label">Quick View</div>
+                <div class="stat-title">Where to go next</div>
+              </div>
+            </div>
+            <div class="quick-list" id="quickList">
+              <div class="state-note">Loading quick summary...</div>
+            </div>
+          </article>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <footer>© 2026 English Quest · My Statistics</footer>
+
+  <script>
+    var API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+    var ATTENDANCE_API = 'https://script.google.com/macros/s/AKfycbxHaOK1WSG5hVVrzOUwGI3QxY3eSbjaAseRVxVaMXU-b8k9Stn4exUUbvB56dYbKLfr/exec';
+    var studentProfile = {};
+    var summary = {
+      scores: 'Loading',
+      attendance: 'Loading',
+      tasks: 'Loading',
+      submission: 'Loading',
+      activeness: 'Loading'
+    };
+
+    localStorage.setItem('eq_grade', '10');
+
+    function apiGet(base, params) {
+      var url = base + '?' + new URLSearchParams(params);
+      return new Promise(function(resolve, reject) {
+        var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+        var p = Object.assign({}, params, { callback: cb, _t: Date.now() });
+        var script = document.createElement('script');
+        var timer = setTimeout(function() {
+          cleanup();
+          reject(new Error('Request timed out'));
+        }, 15000);
+        function cleanup() {
+          clearTimeout(timer);
+          delete window[cb];
+          try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
+        }
+        window[cb] = function(data) {
+          cleanup();
+          resolve(data);
+        };
+        script.onerror = function() {
+          cleanup();
+          reject(new Error('Network error'));
+        };
+        script.src = base + '?' + new URLSearchParams(p);
+        (document.body || document.head).appendChild(script);
+      });
+    }
+
+    function setText(id, value) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = value;
+    }
+
+    function pct(done, total) {
+      return total ? Math.round((done / total) * 100) : 0;
+    }
+
+    function fmtScore(value) {
+      if (value === undefined || value === null || value === '') return '--';
+      var num = Number(value);
+      return Number.isFinite(num) ? String(Math.round(num * 10) / 10) : String(value);
+    }
+
+    function findStudent(list) {
+      return (list || []).find(function(student) {
+        return String(student.no) === String(studentProfile.no);
+      }) || null;
+    }
+
+    function statusError(section, message) {
+      summary[section] = 'Not available';
+      renderQuickList();
+      return message || 'Could not load this data yet.';
+    }
+
+    function renderQuickList() {
+      var items = [
+        { title: 'Scores', meta: 'Chapter and final score overview', status: summary.scores, href: 'scores.html' },
+        { title: 'Attendance', meta: 'Meeting presence summary', status: summary.attendance, href: 'attendance.html' },
+        { title: 'Tasks', meta: 'Done and missing task count', status: summary.tasks, href: 'tasks.html' },
+        { title: 'Submissions', meta: 'Chapter upload status', status: summary.submission, href: 'submission.html' },
+        { title: 'Activeness', meta: 'Participation point summary', status: summary.activeness, href: 'activeness.html' }
+      ];
+      document.getElementById('quickList').innerHTML = items.map(function(item) {
+        return '<a class="quick-item" href="' + item.href + '">' +
+          '<div><div class="quick-title">' + item.title + '</div><div class="quick-meta">' + item.meta + '</div></div>' +
+          '<div class="quick-status">' + item.status + '</div>' +
+        '</a>';
+      }).join('');
+    }
+
+    function renderMissingProfile() {
+      document.getElementById('guardCard').hidden = false;
+      document.getElementById('dashboardView').hidden = true;
+    }
+
+    function renderProfile() {
+      document.getElementById('guardCard').hidden = true;
+      document.getElementById('dashboardView').hidden = false;
+      setText('studentName', studentProfile.name);
+      setText('studentMeta', studentProfile.cls.replace(/^XE/, 'XE-') + ' · No. ' + studentProfile.no);
+      renderQuickList();
+    }
+
+    async function loadScores() {
+      try {
+        var responses = await Promise.all([
+          apiGet(API, { action: 'getChapterScores', className: studentProfile.cls, chapter: 4 }),
+          apiGet(API, { action: 'getChapterScores', className: studentProfile.cls, chapter: 5 }),
+          apiGet(API, { action: 'getFinalScores', className: studentProfile.cls }).catch(function() { return {}; })
+        ]);
+        var ch4 = findStudent(responses[0].students);
+        var ch5 = findStudent(responses[1].students);
+        var fin = findStudent((responses[2] || {}).students);
+        var values = [ch4 && ch4.finalScore, ch5 && ch5.finalScore, fin && (fin.finalScore || fin.FinalScore || fin.average)];
+        var numeric = values.map(Number).filter(Number.isFinite);
+        var avg = numeric.length ? Math.round((numeric.reduce(function(a, b) { return a + b; }, 0) / numeric.length) * 10) / 10 : null;
+
+        setText('scoreValue', avg === null ? '--' : String(avg));
+        setText('scoreCh4', fmtScore(ch4 && ch4.finalScore));
+        setText('scoreCh5', fmtScore(ch5 && ch5.finalScore));
+        setText('scoreFinal', fmtScore(fin && (fin.finalScore || fin.FinalScore || fin.average)));
+        setText('scoreSub', numeric.length
+          ? 'Showing your available chapter/final score records.'
+          : 'No score records have been published for your profile yet.');
+        summary.scores = avg === null ? 'No data' : avg + ' avg';
+      } catch(e) {
+        setText('scoreSub', statusError('scores'));
+      }
+      renderQuickList();
+    }
+
+    async function loadAttendance() {
+      try {
+        var data = await apiGet(ATTENDANCE_API, { action: 'getClassData', className: studentProfile.cls });
+        var student = findStudent(data.students);
+        var meetings = (data.meetings || []).filter(function(meeting) {
+          return meeting.date && meeting.number !== undefined && meeting.number !== null && meeting.number !== '';
+        });
+        if (!student || !meetings.length) {
+          setText('attendanceValue', '--');
+          setText('attendanceSub', 'No dated attendance records have been published yet.');
+          summary.attendance = 'No data';
+          renderQuickList();
+          return;
+        }
+        var records = meetings.map(function(meeting) {
+          var status = (student.attendance && student.attendance['m' + meeting.number]) || 'Present';
+          return status;
+        });
+        var present = records.filter(function(status) { return status === 'Present'; }).length;
+        var rate = pct(present, records.length);
+        setText('attendanceValue', rate + '%');
+        document.getElementById('attendanceBar').style.width = rate + '%';
+        setText('attendanceSub', present + ' present out of ' + records.length + ' recorded meetings.');
+        summary.attendance = rate + '%';
+      } catch(e) {
+        setText('attendanceSub', statusError('attendance'));
+      }
+      renderQuickList();
+    }
+
+    async function loadTasks() {
+      try {
+        var data = await apiGet(API, { action: 'getTaskStatus', className: studentProfile.cls, studentNo: studentProfile.no });
+        var tasks = data.tasks || {};
+        var keys = Object.keys(tasks);
+        var done = keys.filter(function(key) { return !!tasks[key]; }).length;
+        var total = keys.length;
+        var missing = Math.max(total - done, 0);
+        var rate = pct(done, total);
+        setText('taskValue', total ? rate + '%' : '--');
+        setText('taskDone', String(done));
+        setText('taskMissing', String(missing));
+        setText('taskTotal', String(total));
+        document.getElementById('taskBar').style.width = rate + '%';
+        setText('taskSub', total ? done + ' of ' + total + ' tasks are recorded as done.' : 'No task tracker data has been published yet.');
+        summary.tasks = total ? done + '/' + total : 'No data';
+      } catch(e) {
+        setText('taskSub', statusError('tasks'));
+      }
+      renderQuickList();
+    }
+
+    async function loadSubmission() {
+      try {
+        var data = await apiGet(API, { action: 'getSubmissions' });
+        var classRows = data.students && data.students[studentProfile.cls] ? data.students[studentProfile.cls] : [];
+        var match = classRows.find(function(row) {
+          return String(row.name || '').toLowerCase() === String(studentProfile.name || '').toLowerCase();
+        });
+        var submitted = !!(match && match.submitted);
+        setText('submissionValue', submitted ? 'Yes' : 'No');
+        setText('submissionSub', submitted
+          ? 'At least one submission is recorded for your name.'
+          : 'No Chapter 4 submission is recorded for your name yet.');
+        summary.submission = submitted ? 'Submitted' : 'Not yet';
+      } catch(e) {
+        setText('submissionSub', statusError('submission'));
+      }
+      renderQuickList();
+    }
+
+    async function loadActiveness() {
+      try {
+        var data = await apiGet(API, { action: 'getAllActiveness', className: studentProfile.cls });
+        var student = findStudent(data.students);
+        var total = student ? Number(student.Total || 0) : null;
+        var indicator = student ? (student.Indicator || 'No indicator yet') : 'No activeness data found for your profile.';
+        setText('activeValue', total === null ? '--' : String(total));
+        setText('activeSub', indicator);
+        summary.activeness = total === null ? 'No data' : total + ' pts';
+      } catch(e) {
+        setText('activeSub', statusError('activeness'));
+      }
+      renderQuickList();
+    }
+
+    function init() {
+      studentProfile = {
+        cls: localStorage.getItem('eq_student_class') || '',
+        no: localStorage.getItem('eq_student_no') || '',
+        name: localStorage.getItem('eq_student_name') || ''
+      };
+
+      if (!studentProfile.cls || !studentProfile.no || !studentProfile.name) {
+        renderMissingProfile();
+        return;
+      }
+
+      renderProfile();
+      loadScores();
+      loadAttendance();
+      loadTasks();
+      loadSubmission();
+      loadActiveness();
+    }
+
+    init();
+  </script>
+</body>
+</html>
