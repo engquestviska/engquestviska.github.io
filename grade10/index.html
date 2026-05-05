@@ -7,6 +7,87 @@
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css"/>
+  <style>
+    .profile-login-card {
+      align-content: stretch;
+      gap: 18px;
+    }
+    .profile-status {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+      min-height: 32px;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      padding: 0 12px;
+      text-transform: uppercase;
+    }
+    .profile-form {
+      display: grid;
+      gap: 12px;
+    }
+    .profile-field {
+      display: grid;
+      gap: 7px;
+    }
+    .profile-field label {
+      color: #1d4ed8;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .profile-field select {
+      width: 100%;
+      min-height: 48px;
+      border: 1.5px solid #bfdbfe;
+      border-radius: 16px;
+      background: #f8fbff;
+      color: #0f172a;
+      font: 600 0.96rem 'IBM Plex Sans', sans-serif;
+      outline: none;
+      padding: 0 14px;
+    }
+    .profile-field select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+    .profile-message {
+      min-height: 22px;
+      color: #64748b;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .profile-login-actions {
+      display: grid;
+      gap: 10px;
+    }
+    .profile-login-actions .btn {
+      justify-content: center;
+      width: 100%;
+    }
+    .profile-login-actions .btn.danger {
+      background: #fff1f2;
+      border-color: #fecdd3;
+      color: #be123c;
+    }
+    .profile-login-actions .btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+    @media (max-width: 720px) {
+      .profile-login-actions {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body class="track-page grade10-page">
   <div class="shell">
@@ -32,15 +113,35 @@
             <p class="hero-copy">Everything Grade 10 students need for class materials, tasks, submissions, reading, progress, and class participation.</p>
           </div>
         </div>
-        <aside class="profile-card">
+        <aside class="profile-card profile-login-card">
           <div>
             <div class="profile-label">Student Profile</div>
             <div class="profile-title" id="profileTitle">Personalize your space</div>
-            <p class="profile-copy" id="profileCopy">Profile features will grow here. For now, your class and name are still used by scores, task status, and activeness pages.</p>
+            <p class="profile-copy" id="profileCopy">Choose your class and name so this browser can show your own scores, tasks, attendance, and activeness.</p>
           </div>
-          <div class="profile-actions">
-            <a class="btn primary" href="scores.html">View Scores</a>
-            <a class="btn ghost" href="tasks.html">Task Status</a>
+          <div class="profile-status" id="profileStatus">Not logged in</div>
+          <div class="profile-form">
+            <div class="profile-field">
+              <label for="studentClass">Class</label>
+              <select id="studentClass">
+                <option value="">Choose class</option>
+                <option>XE1</option><option>XE4</option><option>XE5</option>
+                <option>XE6</option><option>XE7</option><option>XE8</option>
+                <option>XE9</option><option>XE10</option><option>XE11</option>
+              </select>
+            </div>
+            <div class="profile-field">
+              <label for="studentName">Name</label>
+              <select id="studentName" disabled>
+                <option value="">Choose class first</option>
+              </select>
+            </div>
+            <div class="profile-message" id="profileMessage">Start by choosing your class.</div>
+          </div>
+          <div class="profile-actions profile-login-actions">
+            <button class="btn primary" type="button" id="confirmProfile" disabled>Confirm Profile</button>
+            <button class="btn ghost" type="button" id="changeProfile">Change Name</button>
+            <button class="btn danger" type="button" id="logoutProfile">Logout</button>
           </div>
         </aside>
       </section>
@@ -125,14 +226,160 @@
 
   <footer>© 2026 English Quest · Grade 10</footer>
   <script>
+    var STUDENT_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+    var studentsForClass = [];
+
     localStorage.setItem('eq_grade', '10');
-    (function renderProfile() {
-      var name = localStorage.getItem('eq_student_name');
-      var cls = localStorage.getItem('eq_student_class');
-      if (!name && !cls) return;
-      document.getElementById('profileTitle').textContent = name || 'Student Profile';
-      document.getElementById('profileCopy').textContent = (cls ? cls + ' · ' : '') + 'Your saved student profile is active on this browser.';
-    })();
+
+    function apiGet(params) {
+      var url = STUDENT_API + '?';
+      var parts = [];
+      for (var k in params) parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
+      url += parts.join('&');
+
+      return new Promise(function(resolve, reject) {
+        var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+        var script = document.createElement('script');
+        var timer = setTimeout(function() {
+          cleanup();
+          reject(new Error('Request timed out'));
+        }, 15000);
+
+        function cleanup() {
+          clearTimeout(timer);
+          delete window[cb];
+          try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
+        }
+
+        window[cb] = function(data) {
+          cleanup();
+          resolve(data);
+        };
+        script.onerror = function() {
+          cleanup();
+          reject(new Error('Network error'));
+        };
+        script.src = url + '&callback=' + cb;
+        document.head.appendChild(script);
+      });
+    }
+
+    function classLabel(value) {
+      return value ? value.replace(/^XE/, 'XE-') : '';
+    }
+
+    function refreshProfileDisplay() {
+      var cls = localStorage.getItem('eq_student_class') || '';
+      var no = localStorage.getItem('eq_student_no') || '';
+      var name = localStorage.getItem('eq_student_name') || '';
+      var hasProfile = !!(cls && no && name);
+
+      document.getElementById('profileStatus').textContent = hasProfile ? 'Logged in' : 'Not logged in';
+      document.getElementById('profileTitle').textContent = hasProfile ? name : 'Personalize your space';
+      document.getElementById('profileCopy').textContent = hasProfile
+        ? classLabel(cls) + ' · No. ' + no + '. Your saved student profile is active on this browser.'
+        : 'Choose your class and name so this browser can show your own scores, tasks, attendance, and activeness.';
+      document.getElementById('studentClass').value = cls || '';
+      document.getElementById('logoutProfile').disabled = !hasProfile;
+      document.getElementById('changeProfile').disabled = !hasProfile;
+    }
+
+    function resetStudentSelect(message) {
+      var nameSelect = document.getElementById('studentName');
+      nameSelect.innerHTML = '<option value="">' + message + '</option>';
+      nameSelect.disabled = true;
+      document.getElementById('confirmProfile').disabled = true;
+    }
+
+    function populateStudents(students) {
+      var nameSelect = document.getElementById('studentName');
+      var savedNo = localStorage.getItem('eq_student_no') || '';
+      nameSelect.innerHTML = '<option value="">Choose your name</option>';
+      students.forEach(function(student) {
+        var opt = document.createElement('option');
+        opt.value = String(student.no || '');
+        opt.textContent = (student.no ? student.no + ' · ' : '') + student.name;
+        opt.dataset.name = student.name || '';
+        nameSelect.appendChild(opt);
+      });
+      nameSelect.disabled = !students.length;
+      if (savedNo) nameSelect.value = savedNo;
+      document.getElementById('confirmProfile').disabled = !nameSelect.value;
+    }
+
+    async function loadStudentsForClass() {
+      var cls = document.getElementById('studentClass').value;
+      studentsForClass = [];
+      if (!cls) {
+        document.getElementById('profileMessage').textContent = 'Start by choosing your class.';
+        resetStudentSelect('Choose class first');
+        return;
+      }
+
+      document.getElementById('profileMessage').textContent = 'Loading names for ' + classLabel(cls) + '...';
+      resetStudentSelect('Loading names...');
+
+      try {
+        var data = await apiGet({ action: 'getStudents', className: cls });
+        studentsForClass = data.students || [];
+        populateStudents(studentsForClass);
+        document.getElementById('profileMessage').textContent = studentsForClass.length
+          ? 'Choose your name, then confirm. The page will refresh immediately.'
+          : 'No students found for this class yet.';
+      } catch(e) {
+        document.getElementById('profileMessage').textContent = 'Could not load names. Please try again.';
+        resetStudentSelect('Could not load names');
+      }
+    }
+
+    function confirmProfile() {
+      var cls = document.getElementById('studentClass').value;
+      var nameSelect = document.getElementById('studentName');
+      var no = nameSelect.value;
+      var selected = nameSelect.options[nameSelect.selectedIndex];
+      var name = selected ? selected.dataset.name : '';
+
+      if (!cls || !no || !name) {
+        document.getElementById('profileMessage').textContent = 'Please choose both your class and name first.';
+        return;
+      }
+
+      localStorage.setItem('eq_grade', '10');
+      localStorage.setItem('eq_student_class', cls);
+      localStorage.setItem('eq_student_no', no);
+      localStorage.setItem('eq_student_name', name);
+      localStorage.removeItem('eq_setup_skipped');
+      window.location.reload();
+    }
+
+    function changeProfile() {
+      localStorage.removeItem('eq_student_class');
+      localStorage.removeItem('eq_student_no');
+      localStorage.removeItem('eq_student_name');
+      window.location.reload();
+    }
+
+    function logoutProfile() {
+      localStorage.removeItem('eq_grade');
+      localStorage.removeItem('eq_student_class');
+      localStorage.removeItem('eq_student_no');
+      localStorage.removeItem('eq_student_name');
+      localStorage.removeItem('eq_setup_skipped');
+      window.location.reload();
+    }
+
+    document.getElementById('studentClass').addEventListener('change', loadStudentsForClass);
+    document.getElementById('studentName').addEventListener('change', function() {
+      document.getElementById('confirmProfile').disabled = !this.value;
+    });
+    document.getElementById('confirmProfile').addEventListener('click', confirmProfile);
+    document.getElementById('changeProfile').addEventListener('click', changeProfile);
+    document.getElementById('logoutProfile').addEventListener('click', logoutProfile);
+
+    refreshProfileDisplay();
+    if (document.getElementById('studentClass').value) {
+      loadStudentsForClass();
+    }
   </script>
 </body>
 </html>
