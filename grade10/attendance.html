@@ -32,16 +32,6 @@
     header h1 span { color: var(--accent); }
     .header-sub { color: rgba(255,255,255,0.75); font-size: 1rem; margin-top: 6px; position: relative; z-index: 1; }
     .header-right { position: absolute; top: 16px; right: 16px; z-index: 2; }
-    .login-btn {
-      background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.4);
-      color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.9rem;
-      font-weight: 600; padding: 10px 20px; border-radius: 999px; cursor: pointer;
-    }
-    .teacher-badge {
-      background: var(--accent); color: #fff; font-size: 0.88rem; font-weight: 700;
-      padding: 8px 16px; border-radius: 999px; display: flex; align-items: center; gap: 8px;
-    }
-    .logout-x { cursor: pointer; font-size: 1rem; }
     .wave { display: block; width: 100%; margin-top: -2px; }
 
     /* MAIN */
@@ -465,27 +455,6 @@
 </head>
 <body class="grade10-subpage attendance-page" data-page="attendance">
 
-<!-- LOGIN MODAL -->
-<div class="overlay hidden" id="loginModal">
-  <div class="modal">
-    <div class="modal-title">Teacher Login</div>
-    <div class="modal-sub">Enter your credentials to enable edit mode.</div>
-    <div class="modal-field">
-      <label>Username</label>
-      <input type="text" id="loginUser" autocomplete="off" placeholder="Username"/>
-    </div>
-    <div class="modal-field">
-      <label>Password</label>
-      <input type="password" id="loginPass" placeholder="Password" onkeydown="if(event.key==='Enter') doLogin()"/>
-    </div>
-    <div class="modal-error" id="loginError">Incorrect username or password.</div>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeLogin()">Cancel</button>
-      <button class="btn-login" onclick="doLogin()">Login</button>
-    </div>
-  </div>
-</div>
-
 <!-- HEADER -->
 <header class="subpage-header">
   <div class="topbar">
@@ -498,9 +467,6 @@
     </div>
     <nav class="nav" aria-label="Main navigation">
       <a href="index.html">Grade 10 Home</a>
-      <div class="header-right" id="headerRight">
-        <button class="login-btn" onclick="openLogin()">Teacher Login</button>
-      </div>
       <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
     </nav>
   </div>
@@ -508,7 +474,7 @@
   <section class="subpage-hero">
     <div class="kicker">Attendance</div>
     <h1>Track class attendance by meeting.</h1>
-    <p class="hero-copy">Students can view attendance records, while teacher mode unlocks marking, dates, saving, new meetings, and low-attendance summaries.</p>
+    <p class="hero-copy">Choose your class and meeting to review attendance records in a clean student view.</p>
   </section>
 </header>
 
@@ -538,7 +504,7 @@
   <!-- ATTENDANCE SECTION -->
   <div id="attendanceSection" class="hidden">
 
-    <div id="viewBadge" class="view-badge">👁️ View Only — Login as teacher to edit</div>
+    <div id="viewBadge" class="view-badge">View only attendance record</div>
 
     <!-- Meeting bar -->
     <div class="meeting-bar">
@@ -592,16 +558,13 @@
 
   // ── STATE ──────────────────────────────────────────────────
   let isTeacher       = false;
-  let savedUser       = sessionStorage.getItem('eq_u') || '';
-  let savedPass       = sessionStorage.getItem('eq_p') || '';
+  let savedUser       = '';
+  let savedPass       = '';
   let currentStudents = [];
   let currentMeetings = [];
   let studentStatuses = {};
   let currentClass    = '';
   let currentMeeting  = null;
-
-  // Restore session
-  if (savedUser && savedPass) verifyLogin(savedUser, savedPass, true);
 
   // ── API HELPERS (fetch first, JSONP fallback) ───────────────
   async function apiGet(params) {
@@ -647,50 +610,12 @@
     return apiGet(body);
   }
 
-  // ── LOGIN ──────────────────────────────────────────────────
-  function openLogin()  { document.getElementById('loginModal').classList.remove('hidden'); setTimeout(() => document.getElementById('loginUser').focus(), 100); }
-  function closeLogin() { document.getElementById('loginModal').classList.add('hidden'); document.getElementById('loginError').style.display = 'none'; }
-
-  async function doLogin() {
-    const u = document.getElementById('loginUser').value.trim();
-    const p = document.getElementById('loginPass').value.trim();
-    await verifyLogin(u, p, false);
-  }
-
-  async function verifyLogin(u, p, silent) {
-    try {
-      const data = await apiGet({ action: 'checkLogin', username: u, password: p });
-      if (data.ok) {
-        isTeacher = true; savedUser = u; savedPass = p;
-        sessionStorage.setItem('eq_u', u);
-        sessionStorage.setItem('eq_p', p);
-        closeLogin();
-        setTeacherUI(true);
-        if (!silent) showToast('✅ Logged in as Teacher', 'ok');
-        if (currentStudents.length) rerenderRows();
-      } else {
-        if (!silent) document.getElementById('loginError').style.display = 'block';
-      }
-    } catch(e) { if (!silent) showToast('Connection error', 'err'); }
-  }
-
-  function logout() {
-    isTeacher = false; savedUser = ''; savedPass = '';
-    sessionStorage.removeItem('eq_u'); sessionStorage.removeItem('eq_p');
-    setTeacherUI(false);
-    showToast('Logged out');
-    if (currentStudents.length) rerenderRows();
-  }
-
   function setTeacherUI(on) {
-    document.getElementById('headerRight').innerHTML = on
-      ? `<div class="teacher-badge">🎓 Teacher Mode <span class="logout-x" onclick="logout()">✕</span></div>`
-      : `<button class="login-btn" onclick="openLogin()">🔑 Teacher Login</button>`;
-    document.getElementById('viewBadge').classList.toggle('hidden', on);
-    document.getElementById('quickActions').classList.toggle('hidden', !on);
-    document.getElementById('submitCard').classList.toggle('hidden', !on);
-    document.getElementById('dateFieldWrap').classList.toggle('hidden', !on);
-    document.getElementById('loadBtn').textContent = on ? 'Load Attendance' : 'View Attendance';
+    document.getElementById('viewBadge').classList.remove('hidden');
+    document.getElementById('quickActions').classList.add('hidden');
+    document.getElementById('submitCard').classList.add('hidden');
+    document.getElementById('dateFieldWrap').classList.add('hidden');
+    document.getElementById('loadBtn').textContent = 'View Attendance';
   }
 
   // ── CONTROLS ──────────────────────────────────────────────
@@ -732,7 +657,7 @@
     } catch(e) { showToast('Failed to load. Check connection.', 'err'); }
     finally {
       document.getElementById('loadBtn').disabled    = false;
-      document.getElementById('loadBtn').textContent = isTeacher ? 'Load Attendance' : 'View Attendance';
+      document.getElementById('loadBtn').textContent = 'View Attendance';
     }
   }
 

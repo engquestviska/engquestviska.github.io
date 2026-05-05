@@ -93,7 +93,6 @@
       </div>
       <nav class="nav" aria-label="Main navigation">
         <a href="index.html">Grade 10 Home</a>
-        <a href="../teacher/">Teacher</a>
         <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
       </nav>
     </div>
@@ -101,7 +100,7 @@
     <section class="subpage-hero">
       <div class="kicker">Reading</div>
       <h1>Open class texts and video explanations in one place.</h1>
-      <p class="hero-copy">Reading materials and lesson videos stay organized for Grade 10 students. Teacher-only controls appear after teacher login.</p>
+      <p class="hero-copy">Reading materials and lesson videos stay organized for Grade 10 students.</p>
     </section>
   </header>
 
@@ -112,7 +111,6 @@
           <div class="content-badge">Reading</div>
           <h2 class="content-title" id="readingTitle">Reading Material</h2>
         </div>
-        <button class="teacher-only-btn" id="addReadingBtn">Add Reading</button>
       </div>
 
       <div class="material-grid" id="readingGrid">
@@ -120,7 +118,7 @@
           <div class="empty-material-icon">PDF</div>
           <div>
             <div class="empty-material-title">No Reading Yet</div>
-            <div class="empty-material-copy">Teacher will upload reading material soon.</div>
+            <div class="empty-material-copy">Reading material will appear here soon.</div>
           </div>
           <div class="empty-material-badge">Empty</div>
         </div>
@@ -133,7 +131,6 @@
           <div class="content-badge video-badge">Video</div>
           <h2 class="content-title" id="videoTitle">Video Lesson</h2>
         </div>
-        <button class="teacher-only-btn" id="addVideoBtn">Add Video</button>
       </div>
 
       <div class="material-grid" id="videoGrid">
@@ -141,7 +138,7 @@
           <div class="empty-material-icon">YT</div>
           <div>
             <div class="empty-material-title">No Video Yet</div>
-            <div class="empty-material-copy">Teacher will upload the lesson video soon.</div>
+            <div class="empty-material-copy">Lesson videos will appear here soon.</div>
           </div>
           <div class="empty-material-badge">Empty</div>
         </div>
@@ -153,13 +150,9 @@
 
   <script>
     var SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
-    var savedUser = localStorage.getItem('eq_tu') || '';
-    var savedPass = localStorage.getItem('eq_tp') || '';
-    var isTeacher = !!savedUser;
-
-    if (isTeacher) {
-      document.body.classList.add('teacher-active');
-    }
+    var savedUser = '';
+    var savedPass = '';
+    var isTeacher = false;
 
     function apiGet(params) {
       var url = SCORES_API + '?';
@@ -334,7 +327,7 @@
       var empty = document.createElement('div');
       empty.className = 'empty-material-card';
       empty.id = 'readingEmpty';
-      empty.innerHTML = '<div class="empty-material-icon">PDF</div><div><div class="empty-material-title">No Reading Yet</div><div class="empty-material-copy">Teacher will upload reading material soon.</div></div><div class="empty-material-badge">Empty</div>';
+      empty.innerHTML = '<div class="empty-material-icon">PDF</div><div><div class="empty-material-title">No Reading Yet</div><div class="empty-material-copy">Reading material will appear here soon.</div></div><div class="empty-material-badge">Empty</div>';
       grid.appendChild(empty);
     }
 
@@ -406,11 +399,12 @@
       var empty = document.createElement('div');
       empty.className = 'empty-material-card';
       empty.id = 'videoEmpty';
-      empty.innerHTML = '<div class="empty-material-icon">YT</div><div><div class="empty-material-title">No Video Yet</div><div class="empty-material-copy">Teacher will upload the lesson video soon.</div></div><div class="empty-material-badge">Empty</div>';
+      empty.innerHTML = '<div class="empty-material-icon">YT</div><div><div class="empty-material-title">No Video Yet</div><div class="empty-material-copy">Lesson videos will appear here soon.</div></div><div class="empty-material-badge">Empty</div>';
       grid.appendChild(empty);
     }
 
-    document.getElementById('addReadingBtn').onclick = function() {
+    var addReadingBtn = document.getElementById('addReadingBtn');
+    if (addReadingBtn) addReadingBtn.onclick = function() {
       document.getElementById('rTitle').value = '';
       document.getElementById('rFileId').value = '';
       document.getElementById('rErr').className = 'form-error';
@@ -473,7 +467,8 @@
         });
     };
 
-    document.getElementById('addVideoBtn').onclick = function() {
+    var addVideoBtn = document.getElementById('addVideoBtn');
+    if (addVideoBtn) addVideoBtn.onclick = function() {
       document.getElementById('vTitle').value = '';
       document.getElementById('vVideoId').value = '';
       document.getElementById('vErr').className = 'form-error';

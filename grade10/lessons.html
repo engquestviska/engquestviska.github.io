@@ -66,7 +66,6 @@
       </div>
       <nav class="nav" aria-label="Main navigation">
         <a href="index.html">Grade 10 Home</a>
-        <a href="../teacher/">Teacher</a>
         <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
       </nav>
     </div>
@@ -74,7 +73,7 @@
     <section class="subpage-hero">
       <div class="kicker">Lesson Materials</div>
       <h1>Open the class materials for each chapter.</h1>
-      <p class="hero-copy">Grade 10 lesson files stay here for students to view or download. Teacher-only material controls appear after teacher login.</p>
+      <p class="hero-copy">Grade 10 lesson files stay here for students to view, preview, or download by chapter.</p>
     </section>
   </header>
 
@@ -85,7 +84,6 @@
           <div class="content-badge">Chapter 4</div>
           <h2 class="content-title" id="chapter4Title">Analytical Exposition</h2>
         </div>
-        <button class="teacher-only-btn" id="addBtn4">Add Material</button>
       </div>
 
       <div class="material-grid" id="grid-ch4">
@@ -131,7 +129,6 @@
           <div class="content-badge">Chapter 5</div>
           <h2 class="content-title" id="chapter5Title">Narrative Text</h2>
         </div>
-        <button class="teacher-only-btn" id="addBtn5">Add Material</button>
       </div>
 
       <div class="material-grid" id="grid-ch5">
@@ -151,9 +148,9 @@
 
   <script>
     var SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
-    var savedUser = localStorage.getItem('eq_tu') || '';
-    var savedPass = localStorage.getItem('eq_tp') || '';
-    var isTeacher = !!savedUser;
+    var savedUser = '';
+    var savedPass = '';
+    var isTeacher = false;
     var amChapter = 4;
 
     function apiGet(params) {
@@ -202,10 +199,6 @@
     document.getElementById('pdfModal').addEventListener('click', function(e) {
       if (e.target === this) closeModal();
     });
-
-    if (isTeacher) {
-      document.body.classList.add('teacher-active');
-    }
 
     function loadSavedMaterials() {
       [4, 5].forEach(function(ch) {
@@ -270,8 +263,10 @@
       document.getElementById('grid-ch' + ch).appendChild(card);
     }
 
-    document.getElementById('addBtn4').onclick = function() { openAddMaterial(4); };
-    document.getElementById('addBtn5').onclick = function() { openAddMaterial(5); };
+    var addBtn4 = document.getElementById('addBtn4');
+    var addBtn5 = document.getElementById('addBtn5');
+    if (addBtn4) addBtn4.onclick = function() { openAddMaterial(4); };
+    if (addBtn5) addBtn5.onclick = function() { openAddMaterial(5); };
     document.getElementById('amCloseBtn').onclick = closeAddMaterial;
     document.getElementById('amOverlay').onclick = function(e) {
       if (e.target === this) closeAddMaterial();

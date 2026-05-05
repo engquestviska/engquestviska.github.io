@@ -61,7 +61,6 @@
       </div>
       <nav class="nav" aria-label="Main navigation">
         <a href="index.html">Grade 10 Home</a>
-        <a href="../teacher/">Teacher</a>
         <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
       </nav>
     </div>
@@ -69,7 +68,7 @@
     <section class="subpage-hero">
       <div class="kicker">Assignments</div>
       <h1>Find every task file for the current chapters.</h1>
-      <p class="hero-copy">Grade 10 assignments are organized by chapter. Students can view or download task files, while teacher-only controls appear after teacher login.</p>
+      <p class="hero-copy">Grade 10 assignments are organized by chapter so students can open each task file quickly.</p>
     </section>
   </header>
 
@@ -80,7 +79,6 @@
           <div class="content-badge">Chapter 4</div>
           <h2 class="content-title" id="chapter4Title">Analytical Exposition</h2>
         </div>
-        <button class="teacher-only-btn" id="addBtn4" onclick="openAddModal(4)">Add Assignment</button>
       </div>
 
       <div class="material-grid" id="grid-ch4">
@@ -105,7 +103,6 @@
           <div class="content-badge">Chapter 5</div>
           <h2 class="content-title" id="chapter5Title">Narrative Text</h2>
         </div>
-        <button class="teacher-only-btn" id="addBtn5" onclick="openAddModal(5)">Add Assignment</button>
       </div>
 
       <div class="material-grid" id="grid-ch5"></div>
@@ -124,14 +121,10 @@
 
   <script>
     var SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
-    var savedUser = localStorage.getItem('eq_tu') || '';
-    var savedPass = localStorage.getItem('eq_tp') || '';
-    var isTeacher = !!savedUser;
+    var savedUser = '';
+    var savedPass = '';
+    var isTeacher = false;
     var amChapter = 4;
-
-    if (isTeacher) {
-      document.body.classList.add('teacher-active');
-    }
 
     function apiGet(params) {
       var url = SCORES_API + '?';
