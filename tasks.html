@@ -83,6 +83,10 @@
     .task-chip.missing .task-chip-label { color: #991B1B; }
     .task-preview-link { display:inline-flex; align-items:center; justify-content:center; width:100%; margin-top:10px; padding:7px 8px; border-radius:10px; background:#fff; border:1.5px solid rgba(16,185,129,0.35); color:#065F46; font-size:0.72rem; font-weight:800; font-family:'IBM Plex Mono',monospace; text-decoration:none; }
     .task-preview-link:hover { border-color:#10B981; background:#ECFDF5; }
+    .sync-strip { margin:0 24px 16px; padding:14px 16px; border-radius:14px; border:1.5px solid #93C5FD; background:#EFF6FF; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .sync-strip-text { flex:1; min-width:190px; font-size:0.84rem; color:#1E3A8A; line-height:1.45; font-weight:600; }
+    .sync-strip-btn { padding:9px 14px; border:none; border-radius:10px; background:linear-gradient(135deg,#0EA5E9,#0369A1); color:#fff; font-family:'IBM Plex Sans',sans-serif; font-size:0.82rem; font-weight:800; cursor:pointer; }
+    .sync-strip-btn:disabled { opacity:0.55; cursor:not-allowed; }
 
     /* ── CHAPTER TABS (inside student card) ── */
     .ch-tabs-inner { display:flex; border-bottom:1.5px solid var(--border); }
@@ -476,12 +480,12 @@
       renderStudentTasks(data, clsLabel, hasSubmitted, {
         ch4: ch4Files && ch4Files.success ? (ch4Files.files || {}) : {},
         ch5: ch5Files && ch5Files.success ? (ch5Files.files || {}) : {}
-      });
+      }, cls, no);
     } catch(e) { showToast('Failed to load tasks', 'err'); document.getElementById('studentResult').innerHTML = ''; }
     finally { document.getElementById('sViewBtn').disabled = false; document.getElementById('sViewBtn').textContent = 'View My Tasks'; }
   }
 
-  function renderStudentTasks(data, clsLabel, hasSubmitted, submittedFiles) {
+  function renderStudentTasks(data, clsLabel, hasSubmitted, submittedFiles, cls, no) {
     const tasks   = data.tasks;
     const keys    = Object.keys(tasks);
     const initial = data.nickname ? data.nickname[0].toUpperCase() : data.name[0].toUpperCase();
@@ -526,6 +530,10 @@
 
     const ch5Panel = ch5Keys.length
       ? makeProgress(ch5Keys, 'Chapter 5') +
+        `<div class="sync-strip">
+          <div class="sync-strip-text">If your submitted files appear here but the tasks are still marked missing, sync Chapter 5 with the submission data.</div>
+          <button class="sync-strip-btn" id="syncCh5StudentBtn" onclick="syncMyCh5('${escapeAttr(cls)}','${escapeAttr(no)}')">Sync Chapter 5</button>
+        </div>` +
         `<div class="tasks-section"><div class="tasks-grid">${makeChips(ch5Keys, files.ch5)}</div></div>`
       : '<div style="padding:32px;text-align:center;"><div style="font-size:2rem;margin-bottom:8px;">🔄</div><div style="font-weight:700;margin-bottom:4px;">Chapter 5 Tasks Coming Soon</div><div style="font-size:0.85rem;color:var(--text-muted);">Check back when Chapter 5 begins.</div></div>';
 
@@ -552,6 +560,26 @@
     document.getElementById('ctab5').className = 'ch-tab-inner' + (ch === 5 ? ' active' : '');
     document.getElementById('ctabPanel4').style.display = ch === 4 ? '' : 'none';
     document.getElementById('ctabPanel5').style.display = ch === 5 ? '' : 'none';
+  }
+
+  async function syncMyCh5(cls, no) {
+    const btn = document.getElementById('syncCh5StudentBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Syncing...'; }
+    try {
+      const res = await apiGet({ action: 'syncCh5Student', className: cls, studentNo: no, _t: Date.now() });
+      if (res.error || !res.tasks) {
+        showToast(res.error || 'No Chapter 5 submission found', 'err');
+        if (btn) { btn.disabled = false; btn.textContent = 'Sync Chapter 5'; }
+        return;
+      }
+      localStorage.removeItem(cacheKey({ action: 'getTaskStatus', className: cls, studentNo: no }));
+      showToast('Chapter 5 status synced', 'ok');
+      await viewTaskStatus();
+      setTimeout(function() { switchChapterTab(5); }, 0);
+    } catch(e) {
+      showToast('Sync failed. Try again.', 'err');
+      if (btn) { btn.disabled = false; btn.textContent = 'Sync Chapter 5'; }
+    }
   }
 
   // ── TEACHER — LOAD CLASS ──────────────────────────────────────
