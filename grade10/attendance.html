@@ -5,824 +5,677 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Attendance · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css?v=20260505-attendance-student"/>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --purple: #2563EB; --purple-light: #60A5FA; --purple-soft: #DBEAFE;
-      --purple-mid: #93C5FD; --white: #FFFFFF; --off-white: #F8FAFC;
-      --text-dark: #0F172A; --text-muted: #475569; --border: #DBEAFE;
-      --accent: #F59E0B; --green: #10B981; --red: #EF4444;
+    *, *::before, *::after { box-sizing: border-box; }
+    body.attendance-page {
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 30rem),
+        linear-gradient(180deg, #eff6ff 0%, #f8fafc 42%, #f8fafc 100%) !important;
+      color: #0f172a;
     }
-    body { font-family: 'IBM Plex Sans', sans-serif; background: var(--off-white); color: var(--text-dark); min-height: 100vh; font-size: 16px; }
-
-    /* HEADER */
-    .back-btn { position: absolute; top: 20px; left: 20px; z-index: 2; background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #fff; font-size: 0.88rem; font-weight: 600; padding: 8px 18px; border-radius: 999px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-family: inherit; }
-    .back-btn:hover { background: rgba(255,255,255,0.25); }
-    header {
-      background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 50%, #1E3A8A 100%);
-      padding: 28px 20px 44px; text-align: center; position: relative; overflow: hidden;
+    body.attendance-page .subpage-header {
+      text-align: left !important;
+      padding: 22px 22px 82px !important;
+      min-height: 430px !important;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 52%, #1e3a8a 100%) !important;
+      overflow: hidden !important;
     }
-    header::before {
-      content: ''; position: absolute; inset: 0;
-      background-image: radial-gradient(circle, rgba(255,255,255,0.10) 1px, transparent 1px);
-      background-size: 28px 28px; pointer-events: none;
+    body.attendance-page .subpage-header::after {
+      content: "" !important;
+      position: absolute !important;
+      right: max(24px, calc((100vw - 1180px) / 2 + 24px)) !important;
+      bottom: 58px !important;
+      width: min(170px, 24vw) !important;
+      aspect-ratio: 1 !important;
+      background: url("../logo.jpg") center/cover no-repeat !important;
+      opacity: 0.12 !important;
     }
-    header h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem,5vw,2.6rem); font-weight: 800; color: #fff; position: relative; z-index: 1; }
-    header h1 span { color: var(--accent); }
-    .header-sub { color: rgba(255,255,255,0.75); font-size: 1rem; margin-top: 6px; position: relative; z-index: 1; }
-    .header-right { position: absolute; top: 16px; right: 16px; z-index: 2; }
-    .wave { display: block; width: 100%; margin-top: -2px; }
-
-    /* MAIN */
-    main { max-width: 860px; margin: 0 auto; padding: 24px 16px 80px; }
-
-    /* CARD */
-    .card {
-      background: var(--white); border: 1.5px solid var(--border);
-      border-radius: 20px; padding: 24px 20px; margin-bottom: 20px;
+    body.attendance-page .topbar,
+    body.attendance-page .subpage-hero {
+      position: relative !important;
+      z-index: 2 !important;
+      width: min(1180px, 100%) !important;
+      margin-inline: auto !important;
     }
-    .card-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 18px; }
-
-    /* CONTROLS */
-    .field { margin-bottom: 14px; }
-    .field label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
-    .field select, .field input[type="date"] {
-      width: 100%; padding: 14px 16px; border: 1.5px solid var(--border);
-      border-radius: 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 1rem;
-      background: var(--off-white); color: var(--text-dark); outline: none;
+    body.attendance-page .topbar { margin-bottom: 74px !important; }
+    body.attendance-page .brand-title,
+    body.attendance-page .brand-sub,
+    body.attendance-page .subpage-hero,
+    body.attendance-page .subpage-hero h1,
+    body.attendance-page .hero-copy { color: #fff !important; }
+    body.attendance-page .nav a,
+    body.attendance-page .nav button {
+      color: #fff !important;
+      background: rgba(255, 255, 255, 0.12) !important;
+      border-color: rgba(255, 255, 255, 0.35) !important;
     }
-    .field select:focus, .field input:focus { border-color: var(--purple-light); }
-    .btn-primary {
-      width: 100%; padding: 15px; background: linear-gradient(135deg, var(--purple), #1D4ED8);
-      color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-weight: 700;
-      font-size: 1rem; border: none; border-radius: 12px; cursor: pointer; margin-top: 4px;
+    body.attendance-page .subpage-hero h1 {
+      max-width: 790px !important;
+      font-size: clamp(3.1rem, 7vw, 6.3rem) !important;
+      line-height: 0.9 !important;
+      margin: 12px 0 20px !important;
+      letter-spacing: 0 !important;
     }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    /* VIEW BADGE */
-    .view-badge {
-      background: var(--purple-soft); color: var(--purple);
-      font-size: 0.85rem; font-weight: 600; padding: 10px 16px;
-      border-radius: 12px; margin-bottom: 16px; text-align: center;
+    body.attendance-page .kicker { color: #bfdbfe !important; }
+    body.attendance-page .hero-copy {
+      max-width: 650px !important;
+      font-size: 1.05rem !important;
+      line-height: 1.8 !important;
+      opacity: 0.88 !important;
     }
-
-    /* MEETING INFO BAR */
-    .meeting-bar {
-      background: var(--purple-soft); border: 1.5px solid var(--purple-mid);
-      border-radius: 16px; padding: 16px 20px; margin-bottom: 16px;
-    }
-    .meeting-bar-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; color: var(--purple); }
-    .meeting-bar-counts { display: flex; gap: 16px; margin-top: 10px; font-size: 0.9rem; font-weight: 600; flex-wrap: wrap; }
-    .count-present { color: #059669; }
-    .count-absent  { color: #DC2626; }
-    .count-other   { color: var(--text-muted); }
-    .day-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 4px; }
-
-    /* DATE INPUT (teacher) */
-    .date-field { margin-top: 12px; }
-    .date-field label { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-bottom: 6px; }
-    .date-field input[type="date"] {
-      width: 100%; padding: 12px 16px; border: 1.5px solid var(--purple-mid);
-      border-radius: 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 1rem;
-      background: var(--white); color: var(--text-dark); outline: none;
-    }
-
-    /* QUICK ACTIONS */
-    .quick-actions { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
-    .btn-quick {
-      flex: 1; min-width: 120px; padding: 12px; border-radius: 12px; border: 1.5px solid;
-      font-size: 0.9rem; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif;
-      text-align: center;
-    }
-    .btn-all-present { background: #D1FAE5; border-color: #34D399; color: #065F46; }
-    .btn-all-absent  { background: #FEE2E2; border-color: #F87171; color: #991B1B; }
-
-    /* STUDENT LIST */
-    .list-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; margin-bottom: 20px; }
-    .list-header { padding: 16px 20px; background: var(--off-white); border-bottom: 1.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-    .list-header-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; }
-    .list-count { font-size: 0.82rem; color: var(--text-muted); }
-
-    /* STUDENT ROW */
-    .s-row { border-bottom: 1.5px solid var(--border); }
-    .s-row:last-child { border-bottom: none; }
-    .s-top { display: flex; align-items: center; gap: 12px; padding: 14px 20px 10px; }
-    .s-no { font-size: 0.85rem; font-weight: 700; color: var(--purple-light); width: 28px; flex-shrink: 0; }
-    .s-name { font-size: 1rem; font-weight: 600; flex: 1; line-height: 1.3; }
-    /* Status buttons — segmented bar */
-    .s-btns { display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1.5px solid var(--border); }
-    .s-btn {
-      padding: 13px 4px; font-size: 0.8rem; font-weight: 700; text-align: center;
-      border: none; border-right: 1px solid var(--border); background: #F8FAFC;
-      color: #9CA3AF; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif;
-      transition: background 0.15s, color 0.15s;
-    }
-    .s-btn:last-child { border-right: none; }
-    .s-btn.on-Present    { background: #D1FAE5; color: #065F46; }
-    .s-btn.on-Absent     { background: #FEE2E2; color: #991B1B; }
-    .s-btn.on-Sick       { background: #FEF3C7; color: #78350F; }
-    .s-btn.on-Permission { background: #DBEAFE; color: #1E3A8A; }
-    .s-btn.on-Dispen     { background: #DBEAFE; color: #1E3A5F; }
-    /* View mode pill */
-    .s-pill { display: inline-block; font-size: 0.85rem; font-weight: 700; padding: 6px 18px; border-radius: 999px; margin: 0 20px 14px; }
-    .pill-Present    { background: #D1FAE5; color: #065F46; }
-    .pill-Absent     { background: #FEE2E2; color: #991B1B; }
-    .pill-Sick       { background: #FEF3C7; color: #78350F; }
-    .pill-Permission { background: #DBEAFE; color: #1E3A8A; }
-    .pill-Dispen     { background: #DBEAFE; color: #1E3A5F; }
-    .pill-empty      { background: #F3F4F6; color: #9CA3AF; }
-
-    /* SUBMIT */
-    .submit-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 20px; }
-    .submit-info { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 14px; text-align: center; }
-    .btn-save {
-      width: 100%; padding: 16px; background: linear-gradient(135deg, #10B981, #059669);
-      color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-weight: 700;
-      font-size: 1rem; border: none; border-radius: 12px; cursor: pointer;
-    }
-    .btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-add-meeting {
-      width: 100%; padding: 13px; background: var(--purple-soft); border: 1.5px solid var(--purple-mid);
-      color: var(--purple); font-family: 'IBM Plex Sans', sans-serif; font-weight: 700;
-      font-size: 0.95rem; border-radius: 12px; cursor: pointer; margin-top: 10px;
-    }
-
-    /* LOGIN MODAL */
-    .overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
-    .modal { background: var(--white); border-radius: 24px; padding: 36px 28px; width: 100%; max-width: 400px; }
-    .modal-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 800; margin-bottom: 6px; }
-    .modal-sub { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 28px; }
-    .modal-field { margin-bottom: 18px; }
-    .modal-field label { display: block; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
-    .modal-field input { width: 100%; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 1rem; outline: none; }
-    .modal-field input:focus { border-color: var(--purple-light); }
-    .modal-error { font-size: 0.85rem; color: var(--red); margin-bottom: 16px; display: none; }
-    .modal-btns { display: flex; gap: 10px; }
-    .btn-login { flex: 1; padding: 14px; background: linear-gradient(135deg, var(--purple), #1D4ED8); color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 1rem; border: none; border-radius: 12px; cursor: pointer; }
-    .btn-cancel { padding: 14px 20px; background: var(--off-white); border: 1.5px solid var(--border); border-radius: 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 1rem; cursor: pointer; color: var(--text-muted); }
-
-    /* TOAST */
-    .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text-dark); color: #fff; padding: 14px 28px; border-radius: 999px; font-size: 0.92rem; font-weight: 500; transition: transform 0.3s ease; z-index: 999; white-space: nowrap; pointer-events: none; }
-    .toast.show { transform: translateX(-50%) translateY(0); }
-    .toast.ok  { background: #059669; }
-    .toast.err { background: #DC2626; }
-
-    /* SPINNER */
-    .spinner-wrap { padding: 48px; text-align: center; color: var(--text-muted); }
-    .spinner { display: inline-block; width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--purple); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .hidden { display: none !important; }
-    footer { background: var(--text-dark); color: rgba(255,255,255,0.5); text-align: center; padding: 20px; font-size: 0.85rem; }
-    footer strong { color: var(--purple-light); }
-
-    .logout-btn { position: absolute; top: 20px; right: 20px; z-index: 2; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.85); font-size: 0.78rem; font-weight: 600; padding: 6px 14px; border-radius: 999px; cursor: pointer; font-family: inherit; display: none; align-items: center; gap: 5px; }
-    .logout-btn:hover { background: rgba(255,255,255,0.22); }
-    .teacher-active .logout-btn { display: flex; }
-
-    /* ── SIDEBAR (shared) ───────────────────────────────────── */
-    .hamburger { position:absolute; top:20px; right:20px; z-index:10; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); border-radius:10px; width:40px; height:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; cursor:pointer; padding:0; }
-    .hamburger span { display:block; width:18px; height:2px; background:#fff; border-radius:999px; transition:all 0.3s; }
-    .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
-    .hamburger.open span:nth-child(2) { opacity:0; }
-    .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
-    .sidebar-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.6); backdrop-filter:blur(6px); z-index:300; opacity:0; pointer-events:none; transition:opacity 0.3s; }
-    .sidebar-overlay.open { opacity:1; pointer-events:all; }
-    .sidebar { position:fixed; top:0; right:0; height:100%; width:min(320px,85vw); background:#0F172A; z-index:301; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.34,1.1,0.64,1); display:flex; flex-direction:column; overflow-y:auto; }
-    .sidebar.open { transform:translateX(0); }
-    .sidebar-head { padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; gap:12px; }
-    .sidebar-logo { width:36px; height:36px; border-radius:10px; object-fit:cover; }
-    .sidebar-head-text { flex:1; }
-    .sidebar-head-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:800; color:#fff; }
-    .sidebar-head-sub { font-size:0.7rem; color:rgba(255,255,255,0.45); margin-top:1px; }
-    .sidebar-close { width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,0.08); border:none; color:rgba(255,255,255,0.5); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
-    .sidebar-section { padding:14px 16px 4px; }
-    .sidebar-section-label { font-size:0.65rem; font-weight:700; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.12em; font-family:'IBM Plex Mono',monospace; padding:0 4px; margin-bottom:6px; }
-    .sidebar-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; text-decoration:none; transition:background 0.15s; margin-bottom:2px; }
-    .sidebar-item:hover, .sidebar-item:active { background:rgba(255,255,255,0.08); }
-    .sidebar-item.active { background:rgba(255,255,255,0.12); border-left:3px solid #60A5FA; padding-left:9px; }
-    .sidebar-item-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0; }
-    .sidebar-item-name { font-size:0.88rem; font-weight:600; color:#fff; flex:1; }
-    .sidebar-item-badge { font-size:0.6rem; font-weight:800; padding:2px 7px; border-radius:999px; font-family:'IBM Plex Mono',monospace; background:#F59E0B; color:#fff; }
-    .sidebar-divider { height:1px; background:rgba(255,255,255,0.07); margin:8px 16px; }
-    .sidebar-teacher { margin:12px 16px 20px; background:rgba(37,99,235,0.2); border:1px solid rgba(37,99,235,0.35); border-radius:14px; padding:12px 14px; }
-    .sidebar-teacher-label { font-size:0.68rem; font-weight:700; color:#60A5FA; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
-    .sidebar-teacher-logged { font-size:0.82rem; color:#60A5FA; font-weight:600; display:flex; align-items:center; gap:8px; }
-    .sidebar-teacher-logged span { cursor:pointer; color:rgba(255,255,255,0.4); font-size:0.75rem; margin-left:auto; }
-    .sidebar-home-btn { display:flex; align-items:center; gap:10px; margin:12px 16px 4px; padding:11px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:12px; text-decoration:none; }
-    .sidebar-home-btn:hover { background:rgba(255,255,255,0.1); }
-    .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
-    .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
-
-  </style>
-  <link rel="stylesheet" href="../shared/css/system.css?v=20260504-attendance-revamp"/>
-  <style>
     body.attendance-page main {
-      width: min(1040px, 100%) !important;
+      width: min(1120px, calc(100% - 44px)) !important;
       max-width: none !important;
-      padding: 42px 22px 86px !important;
+      margin: -46px auto 0 !important;
+      padding: 0 0 88px !important;
+      position: relative !important;
+      z-index: 5 !important;
     }
-    body.attendance-page .attendance-control-card {
-      display: grid !important;
-      grid-template-columns: minmax(180px, 1fr) minmax(220px, 1fr) auto !important;
-      align-items: end !important;
-      gap: 14px !important;
-      padding: 22px !important;
-      border-radius: 26px !important;
-      background: rgba(255, 255, 255, 0.94) !important;
-      box-shadow: 0 18px 56px rgba(15, 23, 42, 0.08) !important;
+    body.attendance-page .sidebar-teacher { display: none !important; }
+    .attendance-picker,
+    .profile-card,
+    .stat-card,
+    .record-card,
+    .empty-card {
+      border: 1.5px solid #bfdbfe;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 22px 64px rgba(37, 99, 235, 0.10);
     }
-    body.attendance-page .attendance-control-card .card-title {
-      grid-column: 1 / -1 !important;
-      margin-bottom: 0 !important;
-      font-size: clamp(1.35rem, 2vw, 1.7rem) !important;
-    }
-    body.attendance-page .attendance-control-card .btn-primary {
-      width: auto !important;
-      min-width: 180px !important;
-      min-height: 50px !important;
-      margin-top: 0 !important;
-    }
-    body.attendance-page #attendanceSection {
+    .attendance-picker {
       display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      gap: 18px;
+      grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
+      gap: 24px;
+      align-items: center;
+      padding: clamp(22px, 4vw, 34px);
+      margin-bottom: 22px;
+    }
+    .picker-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+    .picker-copy {
+      color: #475569;
+      line-height: 1.7;
+      max-width: 440px;
+    }
+    .picker-form {
+      display: grid;
+      grid-template-columns: 0.72fr 1.28fr;
+      gap: 12px;
+    }
+    .field {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+    .field label {
+      color: #1d4ed8;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .field select {
+      width: 100%;
+      min-height: 52px;
+      border: 1.5px solid #bfdbfe;
+      border-radius: 16px;
+      background: #f8fbff;
+      color: #0f172a;
+      font: 600 0.98rem 'IBM Plex Sans', sans-serif;
+      padding: 0 14px;
+      outline: none;
+    }
+    .field select:focus { border-color: #2563eb; }
+    .hint {
+      grid-column: 1 / -1;
+      color: #64748b;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    .dashboard {
+      display: grid;
+      grid-template-columns: minmax(270px, 0.82fr) minmax(0, 1.18fr);
+      gap: 22px;
       align-items: start;
     }
-    body.attendance-page #attendanceSection.hidden {
-      display: none !important;
+    .profile-card {
+      padding: 24px;
+      position: sticky;
+      top: 18px;
     }
-    body.attendance-page .view-badge,
-    body.attendance-page .meeting-bar,
-    body.attendance-page .quick-actions,
-    body.attendance-page .list-card,
-    body.attendance-page .submit-card {
-      grid-column: 1;
+    .avatar {
+      width: 76px;
+      height: 76px;
+      border-radius: 24px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #2563eb, #1e40af);
+      color: #fff;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 18px;
     }
-    body.attendance-page .meeting-bar {
-      display: grid !important;
-      grid-template-columns: minmax(0, 1fr) auto !important;
-      gap: 16px !important;
-      padding: 22px !important;
-      border-radius: 26px !important;
-      background:
-        linear-gradient(135deg, rgba(239, 246, 255, 0.96), rgba(255, 255, 255, 0.98)) !important;
-      box-shadow: 0 18px 50px rgba(37, 99, 235, 0.08) !important;
+    .student-name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3.1rem);
+      line-height: 0.98;
+      margin-bottom: 12px;
+      overflow-wrap: anywhere;
     }
-    body.attendance-page .meeting-bar-title {
-      font-size: clamp(1.5rem, 2vw, 2rem) !important;
-      color: #0f172a !important;
+    .student-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 22px;
     }
-    body.attendance-page .day-label {
-      color: #64748b !important;
-      font-weight: 700 !important;
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      padding: 0 11px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
     }
-    body.attendance-page .meeting-bar-counts {
-      grid-column: 1 / -1 !important;
-      display: grid !important;
-      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-      gap: 10px !important;
-      margin-top: 0 !important;
+    .rate-box {
+      border-radius: 24px;
+      background: linear-gradient(135deg, #eff6ff, #ffffff);
+      border: 1.5px solid #dbeafe;
+      padding: 20px;
     }
-    body.attendance-page .meeting-bar-counts span {
-      display: grid !important;
-      place-items: center !important;
-      min-height: 54px !important;
-      border-radius: 18px !important;
-      background: #fff !important;
-      border: 1.5px solid #dbeafe !important;
-      font-family: 'IBM Plex Mono', monospace !important;
-      font-size: 0.76rem !important;
-      font-weight: 800 !important;
+    .rate-label {
+      color: #64748b;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
-    body.attendance-page .date-field {
-      grid-column: 1 / -1 !important;
-      margin-top: 0 !important;
+    .rate-value {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 7vw, 4.6rem);
+      line-height: 1;
+      margin: 8px 0 10px;
     }
-    body.attendance-page .quick-actions {
-      display: grid !important;
-      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      gap: 12px !important;
-      margin-bottom: 0 !important;
+    .rate-note {
+      color: #475569;
+      font-size: 0.92rem;
+      line-height: 1.6;
     }
-    body.attendance-page .quick-actions.hidden {
-      display: none !important;
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 22px;
     }
-    body.attendance-page .quick-actions .btn-quick {
-      min-height: 48px !important;
-      border-radius: 16px !important;
+    .stat-card {
+      min-height: 118px;
+      padding: 18px;
+      box-shadow: 0 14px 34px rgba(37, 99, 235, 0.07);
     }
-    body.attendance-page .list-card {
-      border-radius: 28px !important;
-      background: rgba(255, 255, 255, 0.94) !important;
-      padding: 0 18px 18px !important;
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.45rem;
+      line-height: 1;
+      margin-bottom: 10px;
     }
-    body.attendance-page .list-header {
-      margin: 0 -18px 16px !important;
-      padding: 18px 22px !important;
-      border-bottom: 1.5px solid #dbeafe !important;
-      background: #f8fafc !important;
+    .stat-label {
+      color: #475569;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
     }
-    body.attendance-page #studentRows {
-      display: grid !important;
-      gap: 10px !important;
+    .record-card {
+      overflow: hidden;
+      box-shadow: 0 18px 48px rgba(37, 99, 235, 0.08);
     }
-    body.attendance-page .s-row {
-      overflow: hidden !important;
-      border: 1.5px solid #dbeafe !important;
-      border-radius: 20px !important;
-      background: linear-gradient(135deg, #ffffff, #f8fbff) !important;
-      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04) !important;
+    .record-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 22px 24px;
+      border-bottom: 1.5px solid #dbeafe;
     }
-    body.attendance-page .s-top {
-      display: grid !important;
-      grid-template-columns: 48px minmax(0, 1fr) auto !important;
-      gap: 14px !important;
-      align-items: center !important;
-      padding: 14px 16px !important;
+    .record-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.7rem;
+      line-height: 1;
     }
-    body.attendance-page .s-avatar {
-      width: 48px !important;
-      height: 48px !important;
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      border-radius: 16px !important;
-      background: #2563eb !important;
-      color: #fff !important;
-      font-family: 'IBM Plex Mono', monospace !important;
-      font-size: 0.78rem !important;
-      font-weight: 800 !important;
+    .record-sub {
+      color: #64748b;
+      font-size: 0.88rem;
+      margin-top: 6px;
     }
-    body.attendance-page .s-main {
-      display: grid !important;
-      gap: 5px !important;
-      min-width: 0 !important;
+    .record-list {
+      display: grid;
+      gap: 0;
     }
-    body.attendance-page .s-name {
-      color: #0f172a !important;
-      font-size: 0.98rem !important;
-      font-weight: 800 !important;
-      line-height: 1.3 !important;
-      overflow-wrap: anywhere !important;
+    .record-row {
+      display: grid;
+      grid-template-columns: 120px minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+      padding: 16px 24px;
+      border-bottom: 1px solid #e2e8f0;
     }
-    body.attendance-page .s-meta {
-      display: flex !important;
-      flex-wrap: wrap !important;
-      gap: 6px !important;
+    .record-row:last-child { border-bottom: 0; }
+    .meeting-no {
+      color: #1d4ed8;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
     }
-    body.attendance-page .s-meta span,
-    body.attendance-page .s-status {
-      display: inline-flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      border-radius: 999px !important;
-      background: #eef6ff !important;
-      color: #475569 !important;
-      padding: 5px 9px !important;
-      font-family: 'IBM Plex Mono', monospace !important;
-      font-size: 0.66rem !important;
-      font-weight: 800 !important;
-      white-space: nowrap !important;
+    .meeting-date {
+      color: #475569;
+      font-size: 0.95rem;
+      font-weight: 600;
     }
-    body.attendance-page .s-status.status-Present { background: #dcfce7 !important; color: #166534 !important; }
-    body.attendance-page .s-status.status-Absent { background: #fee2e2 !important; color: #991b1b !important; }
-    body.attendance-page .s-status.status-Sick { background: #fef3c7 !important; color: #92400e !important; }
-    body.attendance-page .s-status.status-Permission,
-    body.attendance-page .s-status.status-Dispen { background: #dbeafe !important; color: #1e3a8a !important; }
-    body.attendance-page .s-status.status-empty { background: #f1f5f9 !important; color: #64748b !important; }
-    body.attendance-page .s-btns {
-      display: grid !important;
-      grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
-      gap: 8px !important;
-      border-top: 1.5px solid #dbeafe !important;
-      padding: 12px 14px 14px !important;
-      background: #f8fafc !important;
+    .status-chip {
+      justify-self: end;
+      min-width: 110px;
+      border-radius: 999px;
+      padding: 8px 12px;
+      text-align: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
     }
-    body.attendance-page .s-btn {
-      min-height: 40px !important;
-      border: 1.5px solid #dbeafe !important;
-      border-radius: 12px !important;
-      background: #fff !important;
-      color: #64748b !important;
-      font-size: 0.72rem !important;
-      font-weight: 800 !important;
+    .status-Present { background: #dcfce7; color: #166534; }
+    .status-Absent { background: #fee2e2; color: #991b1b; }
+    .status-Sick { background: #fef3c7; color: #92400e; }
+    .status-Permission,
+    .status-Dispen { background: #dbeafe; color: #1e3a8a; }
+    .empty-card {
+      padding: 42px 28px;
+      text-align: center;
+      color: #475569;
     }
-    body.attendance-page .s-btn.on-Present { background: #dcfce7 !important; border-color: #86efac !important; color: #166534 !important; }
-    body.attendance-page .s-btn.on-Absent { background: #fee2e2 !important; border-color: #fca5a5 !important; color: #991b1b !important; }
-    body.attendance-page .s-btn.on-Sick { background: #fef3c7 !important; border-color: #fcd34d !important; color: #92400e !important; }
-    body.attendance-page .s-btn.on-Permission,
-    body.attendance-page .s-btn.on-Dispen { background: #dbeafe !important; border-color: #93c5fd !important; color: #1e3a8a !important; }
-    body.attendance-page .submit-card {
-      position: static !important;
-      border-radius: 26px !important;
-      padding: 18px !important;
-      margin-bottom: 0 !important;
+    .empty-title {
+      color: #0f172a;
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+    .loading {
+      padding: 42px;
+      text-align: center;
+      color: #64748b;
+    }
+    .spinner {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 3px solid #dbeafe;
+      border-top-color: #2563eb;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hidden { display: none !important; }
+    footer {
+      text-align: center;
+      padding: 26px;
+      color: #64748b;
+      font-size: 0.84rem;
     }
     @media (max-width: 900px) {
-      body.attendance-page .attendance-control-card,
-      body.attendance-page #attendanceSection {
-        grid-template-columns: 1fr !important;
+      .attendance-picker,
+      .dashboard {
+        grid-template-columns: 1fr;
       }
-      body.attendance-page .attendance-control-card .btn-primary,
-      body.attendance-page .view-badge,
-      body.attendance-page .meeting-bar,
-      body.attendance-page .quick-actions,
-      body.attendance-page .list-card,
-      body.attendance-page .submit-card {
-        grid-column: 1 !important;
+      .profile-card {
+        position: static;
       }
-      body.attendance-page .submit-card {
-        position: static !important;
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
     @media (max-width: 620px) {
-      body.attendance-page .meeting-bar-counts,
-      body.attendance-page .s-btns {
-        grid-template-columns: 1fr !important;
+      body.attendance-page main {
+        width: min(100% - 28px, 1120px) !important;
       }
-      body.attendance-page .s-top {
-        grid-template-columns: 44px minmax(0, 1fr) !important;
+      body.attendance-page .subpage-header {
+        min-height: 380px !important;
       }
-      body.attendance-page .s-status {
-        grid-column: 2 !important;
-        justify-self: start !important;
+      .picker-form,
+      .stats-grid,
+      .record-row {
+        grid-template-columns: 1fr;
+      }
+      .record-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .status-chip {
+        justify-self: start;
       }
     }
   </style>
   <script src="../shared/js/sidebar.js"></script>
 </head>
 <body class="grade10-subpage attendance-page" data-page="attendance">
+  <header class="subpage-header">
+    <div class="topbar">
+      <div class="brand">
+        <img src="../logo.jpg" alt="English Quest Logo"/>
+        <div>
+          <div class="brand-title">English Quest</div>
+          <div class="brand-sub">Grade 10 Student Track</div>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="index.html">Grade 10 Home</a>
+        <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
+      </nav>
+    </div>
 
-<!-- HEADER -->
-<header class="subpage-header">
-  <div class="topbar">
-    <div class="brand">
-      <img src="../logo.jpg" alt="English Quest Logo"/>
+    <section class="subpage-hero">
+      <div class="kicker">Attendance</div>
+      <h1>Check your attendance record.</h1>
+      <p class="hero-copy">Choose your class and name to see your attendance percentage, totals, and meeting-by-meeting history.</p>
+    </section>
+  </header>
+
+  <main>
+    <section class="attendance-picker" aria-labelledby="pickerTitle">
       <div>
-        <div class="brand-title">English Quest</div>
-        <div class="brand-sub">Grade 10 Student Track</div>
+        <h2 class="picker-title" id="pickerTitle">Find your record.</h2>
+        <p class="picker-copy">The page is read-only and focuses on your personal attendance data.</p>
       </div>
-    </div>
-    <nav class="nav" aria-label="Main navigation">
-      <a href="index.html">Grade 10 Home</a>
-      <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
-    </nav>
-  </div>
-
-  <section class="subpage-hero">
-    <div class="kicker">Attendance</div>
-    <h1>Track class attendance by meeting.</h1>
-    <p class="hero-copy">Choose your class and meeting to review attendance records in a clean student view.</p>
-  </section>
-</header>
-
-<main>
-
-  <!-- CONTROLS -->
-  <div class="card attendance-control-card">
-    <div class="card-title">Select Class & Meeting</div>
-    <div class="field">
-      <label>Class</label>
-      <select id="classSelect" onchange="onClassChange()">
-        <option value="">— Choose Class —</option>
-        <option>XE1</option><option>XE4</option><option>XE5</option>
-        <option>XE6</option><option>XE7</option><option>XE8</option>
-        <option>XE9</option><option>XE10</option><option>XE11</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>Meeting</label>
-      <select id="meetingSelect" onchange="onMeetingChange()">
-        <option>— Choose class first —</option>
-      </select>
-    </div>
-    <button class="btn-primary" id="loadBtn" onclick="loadClass()" disabled>View Attendance</button>
-  </div>
-
-  <!-- ATTENDANCE SECTION -->
-  <div id="attendanceSection" class="hidden">
-
-    <div id="viewBadge" class="view-badge">View only attendance record</div>
-
-    <!-- Meeting bar -->
-    <div class="meeting-bar">
-      <div class="meeting-bar-title" id="meetingBarTitle">Meeting –</div>
-      <div class="day-label" id="dayLabel"></div>
-      <div class="meeting-bar-counts">
-        <span class="count-present" id="presentCount">0 Present</span>
-        <span class="count-absent"  id="absentCount">0 Absent</span>
-        <span class="count-other"   id="otherCount">0 Other</span>
+      <div class="picker-form">
+        <div class="field">
+          <label for="classSelect">Class</label>
+          <select id="classSelect">
+            <option value="">Choose class</option>
+            <option>XE1</option><option>XE4</option><option>XE5</option>
+            <option>XE6</option><option>XE7</option><option>XE8</option>
+            <option>XE9</option><option>XE10</option><option>XE11</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="studentSelect">Student</label>
+          <select id="studentSelect" disabled>
+            <option value="">Choose class first</option>
+          </select>
+        </div>
+        <p class="hint" id="pickerHint">Start by choosing your class.</p>
       </div>
-      <div class="date-field hidden" id="dateFieldWrap">
-        <label>Meeting Date</label>
-        <input type="date" id="meetingDateInput" onchange="onDateChange()"/>
+    </section>
+
+    <section class="empty-card" id="emptyState">
+      <div class="empty-title">No student selected yet.</div>
+      <p>Your personal attendance dashboard will appear here after you choose your name.</p>
+    </section>
+
+    <section class="loading hidden" id="loadingState">
+      <div class="spinner"></div>
+      <p>Loading attendance data...</p>
+    </section>
+
+    <section class="dashboard hidden" id="dashboard" aria-live="polite">
+      <aside class="profile-card">
+        <div class="avatar" id="studentAvatar">EQ</div>
+        <h2 class="student-name" id="studentName">Student Name</h2>
+        <div class="student-meta">
+          <span class="pill" id="studentClass">Class</span>
+          <span class="pill" id="studentNo">No.</span>
+          <span class="pill" id="studentMeetings">0 meetings</span>
+        </div>
+        <div class="rate-box">
+          <div class="rate-label">Attendance Rate</div>
+          <div class="rate-value" id="attendanceRate">0%</div>
+          <p class="rate-note" id="attendanceNote">Choose a student to see the latest record.</p>
+        </div>
+      </aside>
+
+      <div>
+        <div class="stats-grid">
+          <article class="stat-card">
+            <div class="stat-number" id="presentCount">0</div>
+            <div class="stat-label">Present</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-number" id="absentCount">0</div>
+            <div class="stat-label">Absent</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-number" id="otherCount">0</div>
+            <div class="stat-label">Sick / Permission</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-number" id="totalCount">0</div>
+            <div class="stat-label">Recorded</div>
+          </article>
+        </div>
+
+        <article class="record-card">
+          <div class="record-head">
+            <div>
+              <h3 class="record-title">Meeting History</h3>
+              <p class="record-sub" id="recordSub">Latest recorded attendance first.</p>
+            </div>
+            <span class="pill" id="lastStatus">Latest: -</span>
+          </div>
+          <div class="record-list" id="recordList"></div>
+        </article>
       </div>
-    </div>
+    </section>
+  </main>
 
-    <!-- Quick actions (teacher) -->
-    <div class="quick-actions hidden" id="quickActions">
-      <button class="btn-quick btn-all-present" onclick="markAll('Present')">✅ All Present</button>
-      <button class="btn-quick btn-all-absent"  onclick="markAll('Absent')">❌ All Absent</button>
-    </div>
+  <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built by <strong>LaksMedia</strong></footer>
 
-    <!-- Student list -->
-    <div class="list-card">
-      <div class="list-header">
-        <div class="list-header-title" id="listTitle">Students</div>
-        <div class="list-count" id="listCount"></div>
-      </div>
-      <div id="studentRows">
-        <div class="spinner-wrap"><div class="spinner"></div><br/>Loading...</div>
-      </div>
-    </div>
+  <script>
+    const API = 'https://script.google.com/macros/s/AKfycbxHaOK1WSG5hVVrzOUwGI3QxY3eSbjaAseRVxVaMXU-b8k9Stn4exUUbvB56dYbKLfr/exec';
+    const classSelect = document.getElementById('classSelect');
+    const studentSelect = document.getElementById('studentSelect');
+    const pickerHint = document.getElementById('pickerHint');
+    const emptyState = document.getElementById('emptyState');
+    const loadingState = document.getElementById('loadingState');
+    const dashboard = document.getElementById('dashboard');
 
-    <!-- Submit (teacher) -->
-    <div class="submit-card hidden" id="submitCard">
-      <div class="submit-info">Unmarked students are saved as <strong>Present</strong>.</div>
-      <button class="btn-save" id="saveBtn" onclick="submitAttendance()">💾 Save Attendance</button>
-      <button class="btn-add-meeting hidden" id="addMeetingBtn" onclick="addNewMeeting()">＋ Add New Meeting</button>
-    </div>
+    let currentClass = '';
+    let currentStudents = [];
+    let currentMeetings = [];
 
-  </div>
-</main>
+    function apiGet(params) {
+      const url = API + '?' + new URLSearchParams(params);
+      return new Promise((resolve, reject) => {
+        const cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+        const script = document.createElement('script');
+        const timer = setTimeout(() => {
+          cleanup();
+          reject(new Error('Request timed out'));
+        }, 15000);
 
-<footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
-<div class="toast" id="toast"></div>
+        function cleanup() {
+          clearTimeout(timer);
+          delete window[cb];
+          try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
+        }
 
-<script>
-  // ── CONFIG ─────────────────────────────────────────────────
-  // IMPORTANT: Replace this with your NEW Apps Script deployment URL
-  const API = 'https://script.google.com/macros/s/AKfycbxHaOK1WSG5hVVrzOUwGI3QxY3eSbjaAseRVxVaMXU-b8k9Stn4exUUbvB56dYbKLfr/exec';
-
-  // ── STATE ──────────────────────────────────────────────────
-  let isTeacher       = false;
-  let savedUser       = '';
-  let savedPass       = '';
-  let currentStudents = [];
-  let currentMeetings = [];
-  let studentStatuses = {};
-  let currentClass    = '';
-  let currentMeeting  = null;
-
-  // ── API HELPERS (fetch first, JSONP fallback) ───────────────
-  async function apiGet(params) {
-    const url = API + '?' + new URLSearchParams(params);
-    // Try fetch first
-    try {
-      const res = await fetch(url);
-      if (res.ok) return await res.json();
-    } catch(e) { /* fall through to JSONP */ }
-
-    // JSONP fallback
-    return new Promise((resolve, reject) => {
-      const cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-      const p  = { ...params, callback: cb, _t: Date.now() };
-      const jsonpUrl = API + '?' + new URLSearchParams(p);
-      const script = document.createElement('script');
-      script.async = true;
-      const timer = setTimeout(() => { cleanup(); reject(new Error('Timeout')); }, 15000);
-      function cleanup() {
-        delete window[cb];
-        try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
-        clearTimeout(timer);
-      }
-      window[cb]     = data => { cleanup(); resolve(data); };
-      script.onerror = ()   => { cleanup(); reject(new Error('Network error')); };
-      script.src = jsonpUrl;
-      (document.body || document.head).appendChild(script);
-    });
-  }
-
-  async function apiPost(body) {
-    // Try fetch POST first (more reliable for saving data)
-    try {
-      const res = await fetch(API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        window[cb] = data => {
+          cleanup();
+          resolve(data);
+        };
+        script.onerror = () => {
+          cleanup();
+          reject(new Error('Network error'));
+        };
+        script.src = url + '&callback=' + cb;
+        (document.body || document.head).appendChild(script);
       });
-      if (res.ok) return await res.json();
-    } catch(e) { /* fall through to GET */ }
+    }
 
-    // Fall back to GET with params
-    return apiGet(body);
-  }
+    function setLoading(on) {
+      loadingState.classList.toggle('hidden', !on);
+      emptyState.classList.add('hidden');
+      dashboard.classList.add('hidden');
+    }
 
-  function setTeacherUI(on) {
-    document.getElementById('viewBadge').classList.remove('hidden');
-    document.getElementById('quickActions').classList.add('hidden');
-    document.getElementById('submitCard').classList.add('hidden');
-    document.getElementById('dateFieldWrap').classList.add('hidden');
-    document.getElementById('loadBtn').textContent = 'View Attendance';
-  }
+    function showEmpty(title, copy) {
+      emptyState.querySelector('.empty-title').textContent = title;
+      emptyState.querySelector('p').textContent = copy;
+      emptyState.classList.remove('hidden');
+      loadingState.classList.add('hidden');
+      dashboard.classList.add('hidden');
+    }
 
-  // ── CONTROLS ──────────────────────────────────────────────
-  function onClassChange() {
-    const cls = document.getElementById('classSelect').value;
-    document.getElementById('loadBtn').disabled = !cls;
-    document.getElementById('meetingSelect').innerHTML = '<option>— Choose class first —</option>';
-    document.getElementById('attendanceSection').classList.add('hidden');
-  }
+    function initials(name) {
+      return (name || 'EQ').split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase() || 'EQ';
+    }
 
-  async function loadClass() {
-    currentClass = document.getElementById('classSelect').value;
-    if (!currentClass) return;
-    document.getElementById('loadBtn').disabled    = true;
-    document.getElementById('loadBtn').textContent = '⏳ Loading...';
-    document.getElementById('studentRows').innerHTML = '<div class="spinner-wrap"><div class="spinner"></div><br/>Loading...</div>';
-    document.getElementById('attendanceSection').classList.remove('hidden');
+    function normalizeStatus(value) {
+      return value || 'Present';
+    }
 
-    try {
-      const data = await apiGet({ action: 'getClassData', className: currentClass });
-      if (data.error) { showToast(data.error, 'err'); return; }
-
-      currentStudents = data.students;
-      currentMeetings = data.meetings;
-
-      const sel = document.getElementById('meetingSelect');
-      sel.innerHTML = '';
-      data.meetings.forEach(m => {
-        const opt = document.createElement('option');
-        opt.value = m.number;
-        opt.textContent = 'Meeting ' + m.number + (m.date ? ' · ' + m.date : ' · no date') + (m.number === data.nextMeeting.number ? ' ← next' : '');
-        sel.appendChild(opt);
+    function usableMeetings() {
+      return currentMeetings.filter(meeting => {
+        const hasDate = !!meeting.date;
+        const hasNumber = meeting.number !== undefined && meeting.number !== null && meeting.number !== '';
+        return hasNumber && hasDate;
       });
-      sel.value = data.nextMeeting.number;
-
-      renderMeeting(data.nextMeeting);
-      setTeacherUI(isTeacher);
-
-    } catch(e) { showToast('Failed to load. Check connection.', 'err'); }
-    finally {
-      document.getElementById('loadBtn').disabled    = false;
-      document.getElementById('loadBtn').textContent = 'View Attendance';
     }
-  }
 
-  function onMeetingChange() {
-    const m = currentMeetings.find(x => x.number == document.getElementById('meetingSelect').value);
-    if (m) renderMeeting(m);
-  }
-
-  function renderMeeting(meeting) {
-    currentMeeting = meeting;
-    document.getElementById('meetingBarTitle').textContent = 'Meeting ' + meeting.number + ' · ' + currentClass;
-    document.getElementById('listTitle').textContent  = currentClass + ' · Meeting ' + meeting.number;
-    document.getElementById('listCount').textContent  = currentStudents.length + ' students';
-
-    // Date input
-    if (meeting.date) {
-      const parts = meeting.date.split('/');
-      if (parts.length === 3) {
-        const yr = parts[2].length === 2 ? '20' + parts[2] : parts[2];
-        document.getElementById('meetingDateInput').value = yr + '-' + parts[1].padStart(2,'0') + '-' + parts[0].padStart(2,'0');
-      }
-    } else {
-      document.getElementById('meetingDateInput').value = '';
+    function statusLabel(status) {
+      if (status === 'Dispen') return 'Dispensation';
+      return status;
     }
-    updateDayLabel();
 
-    // Show/hide add meeting button
-    const isLast = meeting.number === currentMeetings[currentMeetings.length - 1].number;
-    document.getElementById('addMeetingBtn').classList.toggle('hidden', !isLast);
+    function formatDate(date) {
+      return date || 'No date';
+    }
 
-    // Init statuses
-    studentStatuses = {};
-    currentStudents.forEach(s => { studentStatuses[s.no] = s.attendance['m' + meeting.number] || ''; });
-    rerenderRows();
-  }
+    function attendanceRecords(student) {
+      return usableMeetings().map(meeting => {
+        const key = 'm' + meeting.number;
+        const status = normalizeStatus(student.attendance && student.attendance[key]);
+        return {
+          number: meeting.number,
+          date: meeting.date,
+          status
+        };
+      });
+    }
 
-  function onDateChange() { updateDayLabel(); }
-  function updateDayLabel() {
-    const val = document.getElementById('meetingDateInput').value;
-    const el  = document.getElementById('dayLabel');
-    if (val) {
-      const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-      el.textContent = days[new Date(val + 'T00:00:00').getDay()];
-    } else { el.textContent = ''; }
-  }
+    function renderStudent(student) {
+      const records = attendanceRecords(student);
+      const present = records.filter(item => item.status === 'Present').length;
+      const absent = records.filter(item => item.status === 'Absent').length;
+      const other = records.filter(item => item.status !== 'Present' && item.status !== 'Absent').length;
+      const total = records.length;
+      const rate = total ? Math.round((present / total) * 100) : 0;
+      const latest = records[records.length - 1];
 
-  // ── RENDER ROWS ────────────────────────────────────────────
-  function rerenderRows() {
-    const container = document.getElementById('studentRows');
-    const html = [];
+      document.getElementById('studentAvatar').textContent = initials(student.name);
+      document.getElementById('studentName').textContent = student.name || 'Student';
+      document.getElementById('studentClass').textContent = currentClass;
+      document.getElementById('studentNo').textContent = 'No. ' + (student.no || '-');
+      document.getElementById('studentMeetings').textContent = total + ' meetings';
+      document.getElementById('attendanceRate').textContent = rate + '%';
+      document.getElementById('attendanceNote').textContent = total
+        ? present + ' present out of ' + total + ' recorded meetings.'
+        : 'No dated attendance records have been published yet.';
+      document.getElementById('presentCount').textContent = present;
+      document.getElementById('absentCount').textContent = absent;
+      document.getElementById('otherCount').textContent = other;
+      document.getElementById('totalCount').textContent = total;
+      document.getElementById('lastStatus').textContent = latest ? 'Latest: ' + statusLabel(latest.status) : 'Latest: -';
+      document.getElementById('recordSub').textContent = total
+        ? 'Showing ' + total + ' dated meetings for ' + currentClass + '.'
+        : 'No dated meetings are available yet.';
 
-    currentStudents.forEach(s => {
-      const st = studentStatuses[s.no] || '';
-      const initials = (s.name || '').split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase() || '?';
-      const statusClass = st ? 'status-' + st : 'status-empty';
-      html.push(`<div class="s-row ${statusClass}" data-row-no="${s.no}">`);
-      html.push(`  <div class="s-top">`);
-      html.push(`    <span class="s-avatar">${initials}</span>`);
-      html.push(`    <span class="s-main"><span class="s-name">${s.name}</span><span class="s-meta"><span>No. ${s.no}</span><span>${currentClass}</span></span></span>`);
-      html.push(`    <span class="s-status ${statusClass}">${st || 'Unmarked'}</span>`);
-      html.push(`  </div>`);
-
-      if (isTeacher) {
-        html.push(`  <div class="s-btns" id="btns-${s.no}">`);
-        ['Present','Absent','Sick','Permission','Dispen'].forEach(btn => {
-          const on = st === btn ? ' on-' + btn : '';
-          html.push(`    <button class="s-btn${on}" data-no="${s.no}" data-status="${btn}">${btn}</button>`);
-        });
-        html.push(`  </div>`);
+      const list = document.getElementById('recordList');
+      if (!records.length) {
+        list.innerHTML = '<div class="empty-card"><div class="empty-title">No records yet.</div><p>Attendance will appear here after meetings are published.</p></div>';
+      } else {
+        list.innerHTML = records.slice().reverse().map(item => (
+          '<div class="record-row">' +
+            '<div class="meeting-no">Meeting ' + item.number + '</div>' +
+            '<div class="meeting-date">' + formatDate(item.date) + '</div>' +
+            '<div class="status-chip status-' + item.status + '">' + statusLabel(item.status) + '</div>' +
+          '</div>'
+        )).join('');
       }
-      html.push(`</div>`);
+
+      loadingState.classList.add('hidden');
+      emptyState.classList.add('hidden');
+      dashboard.classList.remove('hidden');
+    }
+
+    function populateStudents(students) {
+      studentSelect.innerHTML = '<option value="">Choose your name</option>';
+      students.forEach((student, index) => {
+        const option = document.createElement('option');
+        option.value = String(index);
+        option.textContent = (student.no ? student.no + ' · ' : '') + student.name;
+        studentSelect.appendChild(option);
+      });
+      studentSelect.disabled = students.length === 0;
+    }
+
+    async function loadClass(className) {
+      currentClass = className;
+      currentStudents = [];
+      currentMeetings = [];
+      studentSelect.disabled = true;
+      studentSelect.innerHTML = '<option value="">Loading students...</option>';
+      pickerHint.textContent = 'Loading attendance data for ' + className + '...';
+      setLoading(true);
+
+      try {
+        const data = await apiGet({ action: 'getClassData', className });
+        if (data.error) throw new Error(data.error);
+        currentStudents = data.students || [];
+        currentMeetings = data.meetings || [];
+        populateStudents(currentStudents);
+        pickerHint.textContent = currentStudents.length
+          ? currentStudents.length + ' students found. Choose your name to view your record.'
+          : 'No students found for this class yet.';
+        showEmpty('Choose your name.', 'Your attendance dashboard will appear after you select a student.');
+      } catch (error) {
+        studentSelect.innerHTML = '<option value="">Could not load students</option>';
+        pickerHint.textContent = 'Could not load attendance data. Please try again later.';
+        showEmpty('Could not load data.', 'Please check your connection and reload this page.');
+      }
+    }
+
+    classSelect.addEventListener('change', function() {
+      const className = classSelect.value;
+      if (!className) {
+        studentSelect.disabled = true;
+        studentSelect.innerHTML = '<option value="">Choose class first</option>';
+        pickerHint.textContent = 'Start by choosing your class.';
+        showEmpty('No student selected yet.', 'Your personal attendance dashboard will appear here after you choose your name.');
+        return;
+      }
+      loadClass(className);
     });
 
-    container.innerHTML = html.join('');
-    updateCounts();
-  }
-
-  function setStatus(no, status) {
-    studentStatuses[no] = status;
-    const row = document.querySelector('[data-row-no="' + no + '"]');
-    if (row) {
-      row.className = 's-row status-' + status;
-      const badge = row.querySelector('.s-status');
-      if (badge) {
-        badge.className = 's-status status-' + status;
-        badge.textContent = status;
+    studentSelect.addEventListener('change', function() {
+      const index = Number(studentSelect.value);
+      const student = currentStudents[index];
+      if (!student) {
+        showEmpty('Choose your name.', 'Your attendance dashboard will appear after you select a student.');
+        return;
       }
-    }
-    const btns = document.getElementById('btns-' + no);
-    if (!btns) return;
-    btns.querySelectorAll('.s-btn').forEach(b => {
-      const st = b.textContent.trim();
-      b.className = 's-btn' + (st === status ? ' on-' + st : '');
+      renderStudent(student);
     });
-    updateCounts();
-  }
-
-  function markAll(status) {
-    currentStudents.forEach(s => setStatus(s.no, status));
-  }
-
-  function updateCounts() {
-    const vals = Object.values(studentStatuses);
-    const unmarked = vals.filter(v => !v).length;
-    document.getElementById('presentCount').textContent = vals.filter(v => v === 'Present').length + ' Present';
-    document.getElementById('absentCount').textContent  = vals.filter(v => v === 'Absent').length + ' Absent';
-    document.getElementById('otherCount').textContent   = vals.filter(v => v && v !== 'Present' && v !== 'Absent').length + ' Other';
-    document.getElementById('listCount').textContent    = currentStudents.length + ' students' + (unmarked > 0 ? ' · ' + unmarked + ' unmarked' : '');
-  }
-
-  // ── SUBMIT ─────────────────────────────────────────────────
-  async function submitAttendance() {
-    const rawDate = document.getElementById('meetingDateInput').value;
-    if (!rawDate) { showToast('Please select a date first!', 'err'); return; }
-
-    const dp = rawDate.split('-');
-    const meetingDate = parseInt(dp[2]) + '/' + parseInt(dp[1]) + '/' + dp[0].slice(-2);
-    const meetingNo   = parseInt(document.getElementById('meetingSelect').value);
-    const flagged     = currentStudents
-      .filter(s => studentStatuses[s.no] && studentStatuses[s.no] !== 'Present')
-      .map(s => ({ studentNo: s.no, status: studentStatuses[s.no] }));
-
-    document.getElementById('saveBtn').disabled    = true;
-    document.getElementById('saveBtn').textContent = '⏳ Saving...';
-
-    try {
-      const res = await apiGet({ action: 'saveAttendance', username: savedUser, password: savedPass, className: currentClass, meetingNumber: meetingNo, meetingDate, flaggedRecords: JSON.stringify(flagged) });
-      if (res.success) {
-        showToast('✅ Attendance saved!', 'ok');
-        loadClass();
-      } else { showToast('Error: ' + res.error, 'err'); }
-    } catch(e) { showToast('Failed to save. Check connection.', 'err'); }
-    finally {
-      document.getElementById('saveBtn').disabled    = false;
-      document.getElementById('saveBtn').textContent = '💾 Save Attendance';
-    }
-  }
-
-  // ── ADD MEETING ────────────────────────────────────────────
-  async function addNewMeeting() {
-    if (!confirm('Add a new meeting column to ' + currentClass + '?')) return;
-    document.getElementById('addMeetingBtn').textContent = '⏳ Adding...';
-    try {
-      const res = await apiGet({ action: 'addMeeting', username: savedUser, password: savedPass, className: currentClass });
-      if (res.success) { showToast('✅ Meeting ' + res.newMeetingNumber + ' added!', 'ok'); loadClass(); }
-      else showToast('Error: ' + res.error, 'err');
-    } catch(e) { showToast('Failed. Check connection.', 'err'); }
-    finally { document.getElementById('addMeetingBtn').textContent = '＋ Add New Meeting'; }
-  }
-
-  // ── TOAST ──────────────────────────────────────────────────
-  function showToast(msg, type) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className   = 'toast ' + (type || '');
-    setTimeout(() => t.classList.add('show'), 10);
-    setTimeout(() => t.classList.remove('show'), 3500);
-  }
-
-  document.getElementById('studentRows').addEventListener('click', function(e) {
-    const btn = e.target.closest('.s-btn');
-    if (!btn) return;
-    setStatus(+btn.dataset.no, btn.dataset.status);
-  });
-</script>
-
+  </script>
 </body>
 </html>
