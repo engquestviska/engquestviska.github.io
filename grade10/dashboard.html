@@ -196,6 +196,47 @@
       padding: 8px 12px;
       white-space: nowrap;
     }
+    .strike-dots {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .strike-dot {
+      width: 46px;
+      height: 46px;
+      border: 2px solid #bfdbfe;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8fbff;
+      color: #93a4b8;
+      font: 800 1rem 'IBM Plex Sans', sans-serif;
+    }
+    .strike-dot.active {
+      background: #fee2e2;
+      border-color: #fca5a5;
+      color: #dc2626;
+    }
+    .eligibility-note {
+      border-radius: 18px;
+      border: 1.5px solid #bbf7d0;
+      background: #f0fdf4;
+      color: #166534;
+      font-weight: 800;
+      line-height: 1.45;
+      padding: 14px 16px;
+    }
+    .eligibility-note.warning {
+      border-color: #fcd34d;
+      background: #fffbeb;
+      color: #92400e;
+    }
+    .eligibility-note.danger {
+      border-color: #fca5a5;
+      background: #fef2f2;
+      color: #991b1b;
+    }
     .guard-card {
       max-width: 760px;
       margin: 42px auto;
@@ -322,6 +363,20 @@
             <div class="link-row"><a class="btn ghost" href="activeness.html">Open Activeness</a></div>
           </article>
 
+          <article class="stat-card" id="strikesCard">
+            <div>
+              <div class="card-label">Strikes</div>
+              <div class="stat-title">Eligibility warning</div>
+            </div>
+            <div class="stat-value" id="strikeValue">--</div>
+            <div class="strike-dots" id="strikeDots">
+              <div class="strike-dot">1</div><div class="strike-dot">2</div><div class="strike-dot">3</div>
+            </div>
+            <div class="eligibility-note" id="eligibilityNote">Loading your strike record...</div>
+            <p class="stat-sub" id="strikeSub">Checking your current warning status.</p>
+            <div class="link-row"><a class="btn ghost" href="../strikes.html">Open Strikes</a></div>
+          </article>
+
           <article class="stat-card wide" id="tasksCard">
             <div class="stat-head">
               <div>
@@ -377,7 +432,8 @@
       attendance: 'Loading',
       tasks: 'Loading',
       submission: 'Loading',
-      activeness: 'Loading'
+      activeness: 'Loading',
+      strikes: 'Loading'
     };
 
     localStorage.setItem('eq_grade', '10');
@@ -443,7 +499,8 @@
         { title: 'Attendance', meta: 'Meeting presence summary', status: summary.attendance, href: 'attendance.html' },
         { title: 'Tasks', meta: 'Done and missing task count', status: summary.tasks, href: 'tasks.html' },
         { title: 'Submissions', meta: 'Chapter upload status', status: summary.submission, href: 'submission.html' },
-        { title: 'Activeness', meta: 'Participation point summary', status: summary.activeness, href: 'activeness.html' }
+        { title: 'Activeness', meta: 'Participation point summary', status: summary.activeness, href: 'activeness.html' },
+        { title: 'Strikes', meta: 'Summative and class eligibility', status: summary.strikes, href: '../strikes.html' }
       ];
       document.getElementById('quickList').innerHTML = items.map(function(item) {
         return '<a class="quick-item" href="' + item.href + '">' +
@@ -580,6 +637,54 @@
       renderQuickList();
     }
 
+    function strikeStatus(total) {
+      if (total >= 3) {
+        return {
+          label: 'Class blocked',
+          cls: 'danger',
+          copy: 'You have 3 strikes. You cannot join class until this is cleared with your teacher.'
+        };
+      }
+      if (total >= 1) {
+        return {
+          label: 'Summative blocked',
+          cls: 'warning',
+          copy: 'You have ' + total + ' strike' + (total === 1 ? '' : 's') + '. You cannot join the summative test.'
+        };
+      }
+      return {
+        label: 'Clear',
+        cls: '',
+        copy: 'You have no strikes. You are clear for class and summative test.'
+      };
+    }
+
+    async function loadStrikes() {
+      try {
+        var data = await apiGet(API, { action: 'getStudentStrikes', className: studentProfile.cls, studentNo: studentProfile.no });
+        if (data.error) throw new Error(data.error);
+        var total = Number(data.total || 0);
+        var status = strikeStatus(total);
+        var dots = [1, 2, 3].map(function(num) {
+          return '<div class="strike-dot' + (num <= total ? ' active' : '') + '">' + num + '</div>';
+        }).join('');
+
+        setText('strikeValue', String(total));
+        document.getElementById('strikeDots').innerHTML = dots;
+        document.getElementById('eligibilityNote').className = 'eligibility-note' + (status.cls ? ' ' + status.cls : '');
+        setText('eligibilityNote', status.copy);
+        setText('strikeSub', data.reason
+          ? 'Latest reason: ' + data.reason + (data.date ? ' · ' + data.date : '')
+          : 'Strike rule: 1 strike blocks summative test, 3 strikes block class.');
+        summary.strikes = status.label;
+      } catch(e) {
+        setText('strikeSub', statusError('strikes'));
+        document.getElementById('eligibilityNote').className = 'eligibility-note warning';
+        setText('eligibilityNote', 'Could not load strike eligibility yet.');
+      }
+      renderQuickList();
+    }
+
     function init() {
       studentProfile = {
         cls: localStorage.getItem('eq_student_class') || '',
@@ -598,6 +703,7 @@
       loadTasks();
       loadSubmission();
       loadActiveness();
+      loadStrikes();
     }
 
     init();
