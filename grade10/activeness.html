@@ -6,6 +6,7 @@
   <title>Activeness · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css?v=20260505-activeness-revamp"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -161,19 +162,345 @@
     .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
     .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
 
+    /* ACTIVENESS REVAMP */
+    body.activeness-page {
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 30rem),
+        linear-gradient(180deg, #eff6ff 0%, #f8fafc 38%, #f8fafc 100%) !important;
+      color: #0f172a !important;
+    }
+    body.activeness-page .subpage-header {
+      text-align: left !important;
+      padding: 22px 22px 78px !important;
+      min-height: 430px !important;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e3a8a 100%) !important;
+      overflow: hidden !important;
+    }
+    body.activeness-page .subpage-header::before {
+      content: "" !important;
+      position: absolute !important;
+      inset: 0 !important;
+      background-image: none !important;
+    }
+    body.activeness-page .subpage-header::after {
+      content: "" !important;
+      position: absolute !important;
+      right: max(24px, calc((100vw - 1180px) / 2 + 24px)) !important;
+      bottom: 58px !important;
+      width: min(170px, 24vw) !important;
+      aspect-ratio: 1 !important;
+      background: url("../logo.jpg") center/cover no-repeat !important;
+      opacity: 0.12 !important;
+    }
+    body.activeness-page .topbar {
+      position: relative !important;
+      z-index: 2 !important;
+      width: min(1180px, 100%) !important;
+      margin-inline: auto !important;
+      margin-bottom: 70px !important;
+    }
+    body.activeness-page .brand-title,
+    body.activeness-page .brand-sub,
+    body.activeness-page .subpage-hero,
+    body.activeness-page .subpage-hero h1,
+    body.activeness-page .hero-copy {
+      color: #fff !important;
+    }
+    body.activeness-page .nav a,
+    body.activeness-page .nav button {
+      color: #fff !important;
+      background: rgba(255, 255, 255, 0.12) !important;
+      border-color: rgba(255, 255, 255, 0.35) !important;
+    }
+    body.activeness-page .subpage-hero {
+      position: relative !important;
+      z-index: 1 !important;
+      width: min(1180px, 100%) !important;
+      margin-inline: auto !important;
+    }
+    body.activeness-page .subpage-hero h1 {
+      max-width: 760px !important;
+      font-size: clamp(3.1rem, 7vw, 6.3rem) !important;
+      line-height: 0.9 !important;
+      margin: 12px 0 20px !important;
+      letter-spacing: 0 !important;
+    }
+    body.activeness-page .kicker { color: #bfdbfe !important; }
+    body.activeness-page .hero-copy {
+      max-width: 670px !important;
+      font-size: 1.05rem !important;
+      line-height: 1.8 !important;
+      opacity: 0.86 !important;
+    }
+    body.activeness-page .wave,
+    body.activeness-page .sidebar-teacher {
+      display: none !important;
+    }
+    body.activeness-page main {
+      width: min(1120px, calc(100% - 44px)) !important;
+      max-width: none !important;
+      margin: -44px auto 0 !important;
+      padding: 0 0 88px !important;
+      position: relative !important;
+      z-index: 5 !important;
+    }
+    body.activeness-page .picker-card,
+    body.activeness-page .activeness-dashboard,
+    body.activeness-page .loading {
+      border: 1.5px solid #bfdbfe !important;
+      border-radius: 28px !important;
+      background: rgba(255, 255, 255, 0.96) !important;
+      box-shadow: 0 22px 64px rgba(37, 99, 235, 0.1) !important;
+    }
+    body.activeness-page .picker-card {
+      padding: clamp(22px, 4vw, 34px) !important;
+      display: grid !important;
+      grid-template-columns: minmax(0, 0.85fr) minmax(320px, 1.15fr) !important;
+      gap: 24px !important;
+      align-items: center !important;
+      margin-bottom: 22px !important;
+    }
+    body.activeness-page .picker-title {
+      font-family: 'Playfair Display', serif !important;
+      font-size: clamp(1.55rem, 3vw, 2.15rem) !important;
+      font-weight: 800 !important;
+      line-height: 1 !important;
+      margin-bottom: 10px !important;
+    }
+    body.activeness-page .picker-copy {
+      color: #64748b !important;
+      line-height: 1.7 !important;
+      max-width: 380px !important;
+    }
+    body.activeness-page .picker-panel {
+      display: grid !important;
+      gap: 12px !important;
+      padding: 18px !important;
+      border: 1.5px solid #dbeafe !important;
+      border-radius: 24px !important;
+      background: linear-gradient(135deg, #ffffff, #f8fbff) !important;
+    }
+    body.activeness-page .field label {
+      display: block !important;
+      margin-bottom: 8px !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.72rem !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.12em !important;
+      text-transform: uppercase !important;
+      color: #64748b !important;
+    }
+    body.activeness-page .class-select {
+      width: 100% !important;
+      min-height: 52px !important;
+      border-radius: 16px !important;
+      background: #f8fafc !important;
+      border-color: #bfdbfe !important;
+      color: #0f172a !important;
+      font-weight: 600 !important;
+    }
+    body.activeness-page .btn-primary {
+      width: 100% !important;
+      min-height: 54px !important;
+      border: none !important;
+      border-radius: 16px !important;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+      color: #fff !important;
+      font: inherit !important;
+      font-weight: 800 !important;
+      cursor: pointer !important;
+      box-shadow: 0 16px 34px rgba(37, 99, 235, 0.18) !important;
+    }
+    body.activeness-page .btn-primary:disabled {
+      opacity: 0.42 !important;
+      cursor: not-allowed !important;
+    }
+    body.activeness-page .activeness-dashboard {
+      overflow: hidden !important;
+    }
+    body.activeness-page .dash-head {
+      display: grid !important;
+      grid-template-columns: auto minmax(0, 1fr) auto !important;
+      gap: 16px !important;
+      align-items: center !important;
+      padding: 24px !important;
+      background:
+        radial-gradient(circle at right, rgba(255, 255, 255, 0.22), transparent 15rem),
+        linear-gradient(135deg, #2563eb, #1e40af) !important;
+      color: #fff !important;
+    }
+    body.activeness-page .dash-avatar {
+      width: 58px !important;
+      height: 58px !important;
+      border-radius: 18px !important;
+      display: grid !important;
+      place-items: center !important;
+      background: rgba(255, 255, 255, 0.18) !important;
+      border: 1.5px solid rgba(255, 255, 255, 0.34) !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-weight: 800 !important;
+    }
+    body.activeness-page .dash-name {
+      font-family: 'Playfair Display', serif !important;
+      font-size: clamp(1.35rem, 2.3vw, 1.9rem) !important;
+      font-weight: 800 !important;
+      line-height: 1.05 !important;
+    }
+    body.activeness-page .dash-meta {
+      margin-top: 4px !important;
+      font-size: 0.8rem !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.08em !important;
+      opacity: 0.78 !important;
+      font-weight: 800 !important;
+    }
+    body.activeness-page .dash-summary {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(86px, 1fr)) !important;
+      gap: 8px !important;
+      min-width: min(250px, 34vw) !important;
+    }
+    body.activeness-page .summary-pill {
+      min-height: 62px !important;
+      border: 1px solid rgba(255, 255, 255, 0.25) !important;
+      border-radius: 18px !important;
+      background: rgba(255, 255, 255, 0.12) !important;
+      display: grid !important;
+      place-items: center !important;
+      text-align: center !important;
+      padding: 8px !important;
+    }
+    body.activeness-page .summary-pill strong {
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 1.15rem !important;
+      line-height: 1 !important;
+    }
+    body.activeness-page .summary-pill span {
+      font-size: 0.66rem !important;
+      opacity: 0.78 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.08em !important;
+      font-weight: 800 !important;
+    }
+    body.activeness-page .indicator-strip {
+      padding: 18px 24px !important;
+      border-bottom: 1.5px solid #dbeafe !important;
+      background: #f8fbff !important;
+    }
+    body.activeness-page .indicator-badge {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 10px !important;
+      border-radius: 999px !important;
+      padding: 10px 16px !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-weight: 800 !important;
+      font-size: 0.78rem !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.06em !important;
+    }
+    body.activeness-page .activity-grid {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)) !important;
+      gap: 14px !important;
+      padding: 24px !important;
+    }
+    body.activeness-page .activity-card {
+      min-height: 138px !important;
+      display: grid !important;
+      align-content: space-between !important;
+      padding: 16px !important;
+      border: 1.5px solid #dbeafe !important;
+      border-radius: 22px !important;
+      background: linear-gradient(135deg, #fff, #f8fbff) !important;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04) !important;
+    }
+    body.activeness-page .activity-top {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: flex-start !important;
+      gap: 12px !important;
+    }
+    body.activeness-page .activity-icon {
+      width: 42px !important;
+      height: 42px !important;
+      border-radius: 15px !important;
+      display: grid !important;
+      place-items: center !important;
+      color: #fff !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.75rem !important;
+      font-weight: 800 !important;
+    }
+    body.activeness-page .activity-value {
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 1.8rem !important;
+      font-weight: 800 !important;
+      color: #0f172a !important;
+    }
+    body.activeness-page .activity-name {
+      margin-top: 12px !important;
+      font-weight: 800 !important;
+      color: #0f172a !important;
+    }
+    body.activeness-page .activity-weight {
+      color: #64748b !important;
+      font-size: 0.78rem !important;
+      margin-top: 3px !important;
+    }
+    body.activeness-page footer {
+      background: #0f172a !important;
+      color: rgba(255, 255, 255, 0.55) !important;
+      border-top: 0 !important;
+    }
+    @media (max-width: 720px) {
+      body.activeness-page .subpage-header {
+        min-height: 400px !important;
+        padding-bottom: 64px !important;
+      }
+      body.activeness-page .topbar {
+        margin-bottom: 54px !important;
+      }
+      body.activeness-page .subpage-hero h1 {
+        font-size: clamp(2.7rem, 13vw, 4.2rem) !important;
+      }
+      body.activeness-page main {
+        width: min(100% - 28px, 1120px) !important;
+      }
+      body.activeness-page .picker-card,
+      body.activeness-page .dash-head {
+        grid-template-columns: 1fr !important;
+      }
+      body.activeness-page .dash-summary {
+        min-width: 0 !important;
+        width: 100% !important;
+      }
+    }
   </style>
   <script src="../shared/js/sidebar.js"></script>
 </head>
-<body data-page="activeness">
+<body class="grade10-subpage activeness-page" data-page="activeness">
 
-<header>
-  <a class="back-btn" href="index.html">← Back</a>
-  <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
-  <h1>Activeness</h1>
-  <p class="header-sub">English Quest · Real-time tracker</p>
-  <div class="header-right" id="headerRight">
-    <!-- filled by JS -->
+<header class="subpage-header">
+  <div class="topbar">
+    <div class="brand">
+      <img src="../logo.jpg" alt="English Quest Logo"/>
+      <div>
+        <div class="brand-title">English Quest</div>
+        <div class="brand-sub">Grade 10 Student Track</div>
+      </div>
+    </div>
+    <nav class="nav" aria-label="Main navigation">
+      <a href="index.html">Grade 10 Home</a>
+      <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
+    </nav>
   </div>
+
+  <section class="subpage-hero">
+    <div class="kicker">Activeness</div>
+    <h1>Track participation points without opening the class sheet.</h1>
+    <p class="hero-copy">Students can view their own activeness total, indicator, and activity breakdown in a read-only dashboard.</p>
+  </section>
 </header>
 <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
   <path fill="#1E3A8A" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
@@ -181,57 +508,41 @@
 </svg>
 
 <main>
-
-
-
-
-  <!-- LOGIN WALL -->
-  <div class="login-wall" id="loginWall">
-    <div class="login-box">
-      <div class="login-icon">🔐</div>
-      <div class="login-title">Teacher Access</div>
-      <div class="login-sub">This page is for teachers only.</div>
-      <input class="input-field" type="text" id="loginUser" placeholder="Username"/>
-      <input class="input-field" type="password" id="loginPass" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()"/>
-      <div class="login-error" id="loginError">Incorrect username or password.</div>
-      <button class="btn-login" onclick="doLogin()">Login</button>
+  <div class="picker-card">
+    <div>
+      <div class="picker-title">Open your activeness profile.</div>
+      <p class="picker-copy">Choose your class and name to see participation points, weighted total, and current activeness indicator.</p>
+    </div>
+    <div class="picker-panel">
+      <div class="field">
+        <label for="classSelect">Your Class</label>
+        <select class="class-select" id="classSelect" onchange="loadClass()">
+          <option value="">— Select your class —</option>
+          <option value="XE1">X E-1</option>
+          <option value="XE4">X E-4</option>
+          <option value="XE5">X E-5</option>
+          <option value="XE6">X E-6</option>
+          <option value="XE7">X E-7</option>
+          <option value="XE8">X E-8</option>
+          <option value="XE9">X E-9</option>
+          <option value="XE10">X E-10</option>
+          <option value="XE11">X E-11</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="studentSelect">Your Name</label>
+        <select class="class-select" id="studentSelect" onchange="onStudentChange()" disabled>
+          <option value="">— Select class first —</option>
+        </select>
+      </div>
+      <button class="btn-primary" id="viewBtn" onclick="viewActiveness()" disabled>View Activeness</button>
     </div>
   </div>
-
-  <!-- MAIN PANEL (hidden until logged in) -->
-  <div id="mainPanel" class="hidden">
-    <div class="top-bar">
-      <select class="class-select" id="classSelect" onchange="loadClass()">
-        <option value="">— Select a class —</option>
-        <option value="XE1">X E-1</option>
-        <option value="XE4">X E-4</option>
-        <option value="XE5">X E-5</option>
-        <option value="XE6">X E-6</option>
-        <option value="XE7">X E-7</option>
-        <option value="XE8">X E-8</option>
-        <option value="XE9">X E-9</option>
-        <option value="XE10">X E-10</option>
-        <option value="XE11">X E-11</option>
-      </select>
-      <span class="class-info" id="classInfo"></span>
-    </div>
-
-    <!-- Activity legend -->
-    <div class="legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#8B5CF6"></div>VB · Vocab Box</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#3B82F6"></div>ANS · Answering</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#10B981"></div>PRE · Presenting</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#F59E0B"></div>DTO · Task On Time</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#EC4899"></div>HH · Helping Hand</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#14B8A6"></div>QZ · Quiz</div>
-    </div>
-
-    <div id="studentsList"></div>
-  </div>
+  <div id="activenessResult"></div>
 
 </main>
 
-<footer>© 2025 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
+<footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built by <strong>LaksMedia</strong></footer>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -246,13 +557,8 @@
     { key: 'Quiz',               short: 'QZ',  col: '#14B8A6' },
   ];
 
-  let savedUser = '', savedPass = '', currentClass = '';
+  let currentClass = '';
   let studentsData = [];
-
-  // Restore session
-  savedUser = localStorage.getItem('eq_tu') || '';
-  savedPass = localStorage.getItem('eq_tp') || '';
-  if (savedUser && savedPass) verifyLogin(savedUser, savedPass, true);
 
   // ── API ───────────────────────────────────────────────────
   async function apiGet(params) {
@@ -272,256 +578,109 @@
     });
   }
 
-  // ── LOGIN ─────────────────────────────────────────────────
-  async function doLogin() {
-    const u = document.getElementById('loginUser').value.trim();
-    const p = document.getElementById('loginPass').value.trim();
-    await verifyLogin(u, p, false);
-  }
-
-  async function verifyLogin(u, p, silent) {
-    try {
-      const data = await apiGet({ action: 'checkLogin', username: u, password: p });
-      if (data.ok) {
-        savedUser = u; savedPass = p;
-        localStorage.setItem('eq_tu', u); localStorage.setItem('eq_tp', p);
-        document.getElementById('loginWall').classList.add('hidden');
-        document.getElementById('mainPanel').classList.remove('hidden');
-        document.getElementById('headerRight').innerHTML = `<div class="teacher-badge">🎓 Teacher <span class="logout-x" onclick="logout()">✕</span></div>`;
-        if (!silent) showToast('✅ Logged in!', 'ok');
-      } else {
-        if (!silent) document.getElementById('loginError').style.display = 'block';
-      }
-    } catch(e) { if (!silent) showToast('Connection error', 'err'); }
-  }
-
-  function logout() {
-    savedUser = ''; savedPass = '';
-    localStorage.removeItem('eq_tu'); localStorage.removeItem('eq_tp');
-    document.getElementById('loginWall').classList.remove('hidden');
-    document.getElementById('mainPanel').classList.add('hidden');
-    document.getElementById('headerRight').innerHTML = '';
-  }
-
   // ── LOAD CLASS ────────────────────────────────────────────
   async function loadClass() {
     currentClass = document.getElementById('classSelect').value;
-    if (!currentClass) { document.getElementById('studentsList').innerHTML = ''; document.getElementById('classInfo').textContent = ''; return; }
-    document.getElementById('studentsList').innerHTML = '<div class="loading"><div class="spinner"></div><br/>Loading students...</div>';
-    document.getElementById('classInfo').textContent = '';
+    const studentSelect = document.getElementById('studentSelect');
+    const viewBtn = document.getElementById('viewBtn');
+    studentsData = [];
+    studentSelect.innerHTML = '<option value="">Loading...</option>';
+    studentSelect.disabled = true;
+    viewBtn.disabled = true;
+    document.getElementById('activenessResult').innerHTML = '';
+    if (!currentClass) {
+      studentSelect.innerHTML = '<option value="">— Select class first —</option>';
+      return;
+    }
     try {
       const data = await apiGet({ action: 'getAllActiveness', className: currentClass });
-      if (data.error) { showToast(data.error, 'err'); document.getElementById('studentsList').innerHTML = ''; return; }
+      if (data.error) { showToast(data.error, 'err'); studentSelect.innerHTML = '<option value="">Failed to load</option>'; return; }
       studentsData = data.students;
-      document.getElementById('classInfo').textContent = studentsData.length + ' students';
-      renderStudents();
-    } catch(e) { showToast('Failed to load class', 'err'); document.getElementById('studentsList').innerHTML = ''; }
+      studentSelect.innerHTML = '<option value="">— Select your name —</option>';
+      studentsData.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.no;
+        opt.textContent = (s.name || '') + (s.nickname ? ' (' + s.nickname + ')' : '');
+        studentSelect.appendChild(opt);
+      });
+      studentSelect.disabled = false;
+    } catch(e) { showToast('Failed to load class', 'err'); studentSelect.innerHTML = '<option value="">— Select class first —</option>'; }
   }
 
-  // ── RENDER STUDENTS ───────────────────────────────────────
-  function renderStudents() {
-    const grid = document.createElement('div');
-    grid.className = 'students-grid';
+  function onStudentChange() {
+    document.getElementById('viewBtn').disabled = !document.getElementById('studentSelect').value;
+  }
 
-    studentsData.forEach(s => {
-      const total = (s.Total || 0);
-      const totalClass = total >= 100 ? 'high' : total >= 25 ? 'mid' : 'low';
-      const indClass   = s.Indicator.includes('Pro Maxxing') ? 'ind-promax' :
-        s.Indicator.includes('Ultra Pro') ? 'ind-ultrapro' :
-        s.Indicator.includes('Plus Ultra') ? 'ind-ultra' :
-        s.Indicator.includes('Hyperactive') ? 'ind-hyper' :
-        s.Indicator.includes('Super') ? 'ind-super' :
-        s.Indicator.includes('Active') && !s.Indicator.includes('Not') ? 'ind-active' :
-        s.Indicator.includes('Okay') ? 'ind-okay' : 'ind-not';
+  function indicatorClass(indicator) {
+    const value = indicator || '';
+    return value.includes('Pro Maxxing') ? 'ind-promax' :
+      value.includes('Ultra Pro') ? 'ind-ultrapro' :
+      value.includes('Plus Ultra') ? 'ind-ultra' :
+      value.includes('Hyperactive') ? 'ind-hyper' :
+      value.includes('Super') ? 'ind-super' :
+      value.includes('Active') && !value.includes('Not') ? 'ind-active' :
+      value.includes('Okay') ? 'ind-okay' : 'ind-not';
+  }
 
-      const vals = {
-        'Vocabulary Box':     s.VocabularyBox    || 0,
-        'Answering':          s.Answering        || 0,
-        'Presenting':         s.Presenting       || 0,
-        'Doing Task On Time': s.DoingTaskOnTime  || 0,
-        'Helping Hand':       s.HelpingHand      || 0,
-        'Quiz':               s.Quiz             || 0,
-      };
+  function activityValue(student, key) {
+    return Number(student[key.replace(/\s/g, '')] || 0);
+  }
 
-      const actRows = ACTS.map(a => `
-        <div class="act-row">
-          <span class="act-label" style="color:${a.col}">${a.short}</span>
-          <div class="act-controls">
-            <button class="act-btn minus" data-no="${s.no}" data-key="${a.key}" data-delta="-1" ${vals[a.key] <= 0 ? 'disabled' : ''}>−</button>
-            <span class="act-val" id="val-${s.no}-${a.key.replace(/\s/g,'_')}">${vals[a.key]}</span>
-            <button class="act-btn plus" data-no="${s.no}" data-key="${a.key}" data-delta="1">+</button>
-            <input type="number" class="act-input" min="0" placeholder="set"
-              data-no="${s.no}" data-key="${a.key}"
-              onfocus="this.select()"
-              title="Type a number to set directly"/>
-          </div>
-        </div>`).join('');
+  function viewActiveness() {
+    const no = document.getElementById('studentSelect').value;
+    if (!no) return;
+    const student = studentsData.find(s => String(s.no) === String(no));
+    if (!student) return;
 
-      const card = document.createElement('div');
-      card.className = 'student-card';
-      card.id = 'card-' + s.no;
-      card.innerHTML = `
-        <div class="card-top">
-          <span class="card-no">${s.no}</span>
-          <span class="card-name">${s.nickname || s.name}</span>
-          <span class="card-total ${totalClass}" id="total-${s.no}">${total}</span>
+    localStorage.setItem('eq_student_class', currentClass);
+    localStorage.setItem('eq_student_no', no);
+    localStorage.setItem('eq_student_name', student.name || '');
+
+    const classLabel = document.getElementById('classSelect').options[document.getElementById('classSelect').selectedIndex].text;
+    const total = Number(student.Total || 0);
+    const indicator = student.Indicator || 'Not Active (+0 bonus)';
+    const indClass = indicatorClass(indicator);
+    const initial = (student.nickname || student.name || '?').charAt(0).toUpperCase();
+
+    const activityCards = ACTS.map(a => {
+      const raw = activityValue(student, a.key);
+      const weighted = raw * (ACT_PTS[a.key] || 1);
+      return `<article class="activity-card">
+        <div class="activity-top">
+          <div class="activity-icon" style="background:${a.col}">${a.short}</div>
+          <div class="activity-value">${raw}</div>
         </div>
-        <div class="card-activities">${actRows}</div>
-        <div class="card-indicator ${indClass}" id="ind-${s.no}">${s.Indicator || '—'}</div>`;
+        <div>
+          <div class="activity-name">${a.key}</div>
+          <div class="activity-weight">${weighted} weighted point${weighted === 1 ? '' : 's'}</div>
+        </div>
+      </article>`;
+    }).join('');
 
-      grid.appendChild(card);
-    });
-
-    document.getElementById('studentsList').innerHTML = '';
-    document.getElementById('studentsList').appendChild(grid);
-  }
-
-  // ── CHANGE VALUE ──────────────────────────────────────────
-  async function changeVal(studentNo, column, delta, btn) {
-    const valKey  = 'val-' + studentNo + '-' + column.replace(/\s/g, '_');
-    const valEl   = document.getElementById(valKey);
-    const totalEl = document.getElementById('total-' + studentNo);
-    if (!valEl) return;
-
-    const current  = parseInt(valEl.textContent) || 0;
-    const newValue = Math.max(0, current + delta);
-    if (newValue === current) return;
-
-    // Optimistic update
-    valEl.textContent = newValue;
-    valEl.classList.add('changed');
-    setTimeout(() => valEl.classList.remove('changed'), 600);
-
-    // Update total display
-    recalcTotal(studentNo);
-
-    // Disable buttons briefly
-    const card = document.getElementById('card-' + studentNo);
-    card.querySelectorAll('.act-btn').forEach(b => b.disabled = true);
-
-    try {
-      const res = await apiGet({ action: 'incrementActiveness', username: savedUser, password: savedPass, className: currentClass, studentNo: String(studentNo), column, delta: String(delta) });
-      if (res.success) {
-        showToast(`+1 ${column.split(' ')[0]} → ${res.newValue}`, 'ok');
-        // Update minus btn state
-        const minusBtn = valEl.previousElementSibling;
-        if (minusBtn) minusBtn.disabled = res.newValue <= 0;
-      } else {
-        // Revert
-        valEl.textContent = current;
-        recalcTotal(studentNo);
-        showToast('Error: ' + res.error, 'err');
-      }
-    } catch(e) {
-      valEl.textContent = current;
-      recalcTotal(studentNo);
-      showToast('Failed to save', 'err');
-    }
-
-    card.querySelectorAll('.act-btn').forEach(b => b.disabled = false);
-    // Re-check minus buttons
-    card.querySelectorAll('.act-val').forEach(v => {
-      v.previousElementSibling.disabled = parseInt(v.textContent) <= 0;
-    });
+    document.getElementById('activenessResult').innerHTML = `
+      <section class="activeness-dashboard">
+        <div class="dash-head">
+          <div class="dash-avatar">${initial}</div>
+          <div>
+            <div class="dash-name">${student.nickname || student.name}</div>
+            <div class="dash-meta">${student.name} · ${classLabel}</div>
+          </div>
+          <div class="dash-summary">
+            <div class="summary-pill"><strong>${total}</strong><span>Total</span></div>
+            <div class="summary-pill"><strong>${ACTS.length}</strong><span>Areas</span></div>
+          </div>
+        </div>
+        <div class="indicator-strip">
+          <div class="indicator-badge ${indClass}">${indicator}</div>
+        </div>
+        <div class="activity-grid">${activityCards}</div>
+      </section>`;
   }
 
   // Weights match spreadsheet: VB×1, ANS×2, PRE×5, DTO×2, HH×1, Quiz×1
   const ACT_PTS = { 'Vocabulary Box': 1, 'Answering': 2, 'Presenting': 5, 'Doing Task On Time': 2, 'Helping Hand': 1, 'Quiz': 1 };
 
-  function recalcTotal(studentNo) {
-    const totalEl = document.getElementById('total-' + studentNo);
-    if (!totalEl) return;
-    let sum = 0;
-    ACTS.forEach(a => {
-      const el = document.getElementById('val-' + studentNo + '-' + a.key.replace(/\s/g, '_'));
-      if (el) sum += (parseInt(el.textContent) || 0) * (ACT_PTS[a.key] || 1);
-    });
-    totalEl.textContent = sum;
-    totalEl.className = 'card-total ' + (sum >= 100 ? 'high' : sum >= 25 ? 'mid' : 'low');
-    // Update indicator
-    const indEl = document.getElementById('ind-' + studentNo);
-    if (indEl) {
-      const tier = sum >= 200 ? ['ind-promax',  'Pro Maxxing Active (+35 bonus)'] :
-                   sum >= 150 ? ['ind-ultrapro', 'Ultra Pro Active (+30 bonus)'] :
-                   sum >= 100 ? ['ind-ultra',    'Plus Ultra Active (+25 bonus)'] :
-                   sum >= 75  ? ['ind-hyper',    'Hyperactive (+20 bonus)'] :
-                   sum >= 50  ? ['ind-super',    'Super Active (+15 bonus)'] :
-                   sum >= 25  ? ['ind-active',   'Active (+10 bonus)'] :
-                   sum >= 10  ? ['ind-okay',     'Okay (+5 bonus)'] :
-                                ['ind-not',      'Not Active (+0 bonus)'];
-      indEl.className = 'card-indicator ' + tier[0];
-      indEl.textContent = tier[1];
-    }
-  }
-
-  // ── SET VALUE (bulk input) ────────────────────────────────
-  async function setVal(studentNo, column, inputEl) {
-    const newValue = Math.max(0, parseInt(inputEl.value) || 0);
-    inputEl.value = ''; // clear after use
-    const valKey = 'val-' + studentNo + '-' + column.replace(/\s/g, '_');
-    const valEl  = document.getElementById(valKey);
-    if (!valEl) return;
-    const current = parseInt(valEl.textContent) || 0;
-    const delta = newValue - current;
-    if (delta === 0) return;
-
-    // Optimistic update
-    valEl.textContent = newValue;
-    valEl.classList.add('changed');
-    setTimeout(() => valEl.classList.remove('changed'), 600);
-    recalcTotal(studentNo);
-
-    const card = document.getElementById('card-' + studentNo);
-    card.querySelectorAll('.act-btn').forEach(b => b.disabled = true);
-
-    try {
-      const res = await apiGet({ action: 'incrementActiveness', username: savedUser, password: savedPass, className: currentClass, studentNo: String(studentNo), column, delta: String(delta) });
-      if (res.success) {
-        showToast(`Set ${column.split(' ')[0]} → ${res.newValue}`, 'ok');
-        const minusBtn = valEl.previousElementSibling;
-        if (minusBtn) minusBtn.disabled = res.newValue <= 0;
-      } else {
-        valEl.textContent = current;
-        recalcTotal(studentNo);
-        showToast('Error: ' + res.error, 'err');
-      }
-    } catch(e) {
-      valEl.textContent = current;
-      recalcTotal(studentNo);
-      showToast('Failed to save', 'err');
-    }
-    card.querySelectorAll('.act-btn').forEach(b => b.disabled = false);
-    card.querySelectorAll('.act-val').forEach(v => {
-      v.previousElementSibling.disabled = parseInt(v.textContent) <= 0;
-    });
-  }
-
   // ── TOAST ─────────────────────────────────────────────────
-  // ── SETUP QUIZ COLUMN ────────────────────────────────────────
-  async function setupQuizColumn() {
-    if (!savedUser || !savedPass) { showToast('Not logged in', 'err'); return; }
-    const btn = document.getElementById('setupQuizBtn');
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ Setting up...'; }
-    try {
-      const res = await apiGet({ action: 'setupQuizColumn', username: savedUser, password: savedPass });
-      if (res.success) {
-        const results = res.results || {};
-        const done    = Object.values(results).filter(v => v === 'done').length;
-        const already = Object.values(results).filter(v => v === 'already exists').length;
-        let msg = '✅ Quiz column: ' + done + ' updated, ' + already + ' already had it';
-        showToast(msg, 'ok');
-        if (btn) btn.textContent = '✅ Done';
-        if (currentClass) setTimeout(loadClass, 1000);
-      } else {
-        showToast('Error: ' + (res.error || 'Unknown'), 'err');
-        if (btn) { btn.disabled = false; btn.textContent = '⚙️ Setup Quiz Column'; }
-      }
-    } catch(e) {
-      showToast('Failed: ' + e.message, 'err');
-      if (btn) { btn.disabled = false; btn.textContent = '⚙️ Setup Quiz Column'; }
-    }
-  }
-
   function showToast(msg, type) {
     const t = document.getElementById('toast');
     t.textContent = msg; t.className = 'toast ' + (type || '');
@@ -529,15 +688,18 @@
     setTimeout(() => t.classList.remove('show'), 2500);
   }
 
-  document.getElementById('studentsList').addEventListener('click', function(e) {
-    const btn = e.target.closest('.act-btn');
-    if (!btn) return;
-    changeVal(+btn.dataset.no, btn.dataset.key, +btn.dataset.delta, btn);
-  });
-  document.getElementById('studentsList').addEventListener('change', function(e) {
-    const inp = e.target.closest('.act-input');
-    if (!inp) return;
-    setVal(+inp.dataset.no, inp.dataset.key, inp);
+  document.addEventListener('DOMContentLoaded', function() {
+    const cls = localStorage.getItem('eq_student_class');
+    const no = localStorage.getItem('eq_student_no');
+    if (!cls || !no) return;
+    const classSelect = document.getElementById('classSelect');
+    classSelect.value = cls;
+    loadClass().then(function() {
+      const studentSelect = document.getElementById('studentSelect');
+      studentSelect.value = no;
+      onStudentChange();
+      if (studentSelect.value) viewActiveness();
+    }).catch(function(){});
   });
 
 </script>
