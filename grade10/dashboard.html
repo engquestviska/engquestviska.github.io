@@ -374,7 +374,7 @@
             </div>
             <div class="eligibility-note" id="eligibilityNote">Loading your strike record...</div>
             <p class="stat-sub" id="strikeSub">Checking your current warning status.</p>
-            <div class="link-row"><a class="btn ghost" href="../strikes.html">Open Strikes</a></div>
+            <div class="link-row"><a class="btn ghost" href="strikes.html">Open Strikes</a></div>
           </article>
 
           <article class="stat-card wide" id="tasksCard">
@@ -500,7 +500,7 @@
         { title: 'Tasks', meta: 'Done and missing task count', status: summary.tasks, href: 'tasks.html' },
         { title: 'Submissions', meta: 'Chapter upload status', status: summary.submission, href: 'submission.html' },
         { title: 'Activeness', meta: 'Participation point summary', status: summary.activeness, href: 'activeness.html' },
-        { title: 'Strikes', meta: 'Summative and class eligibility', status: summary.strikes, href: '../strikes.html' }
+        { title: 'Strikes', meta: 'Summative and class eligibility', status: summary.strikes, href: 'strikes.html' }
       ];
       document.getElementById('quickList').innerHTML = items.map(function(item) {
         return '<a class="quick-item" href="' + item.href + '">' +

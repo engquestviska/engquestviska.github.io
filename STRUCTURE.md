@@ -22,6 +22,7 @@ English Quest is being reorganized into three tracks.
 - `grade10/scores.html` - Student Scores.
 - `grade10/tasks.html` - Task Status.
 - `grade10/activeness.html` - Activeness.
+- `grade10/strikes.html` - Student-facing strike tracker.
 
 ## Grade 11
 
@@ -49,3 +50,4 @@ English Quest is being reorganized into three tracks.
 ## Legacy Root Pages
 
 Some older pages still live at the root while the revamp is in progress. They should either be moved into the correct track or removed later.
+- `strikes.html` currently remains as the teacher strike management tool until it is rebuilt inside `teacher/`.
