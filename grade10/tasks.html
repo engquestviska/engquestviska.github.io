@@ -287,11 +287,28 @@
     }
     body.tasks-page .card {
       padding: clamp(22px, 4vw, 34px) !important;
+      display: grid !important;
+      grid-template-columns: minmax(0, 0.85fr) minmax(320px, 1.15fr) !important;
+      gap: 24px !important;
+      align-items: center !important;
     }
     body.tasks-page .card-title {
       font-size: clamp(1.55rem, 3vw, 2.15rem) !important;
       line-height: 1 !important;
-      margin-bottom: 22px !important;
+      margin-bottom: 10px !important;
+    }
+    body.tasks-page .picker-copy {
+      color: #64748b !important;
+      line-height: 1.7 !important;
+      max-width: 360px !important;
+    }
+    body.tasks-page .picker-panel {
+      display: grid !important;
+      gap: 12px !important;
+      padding: 18px !important;
+      border: 1.5px solid #dbeafe !important;
+      border-radius: 24px !important;
+      background: linear-gradient(135deg, #ffffff, #f8fbff) !important;
     }
     body.tasks-page .field label {
       font-family: 'IBM Plex Mono', monospace !important;
@@ -315,8 +332,14 @@
       overflow: hidden !important;
     }
     body.tasks-page .profile-strip {
-      background: linear-gradient(135deg, #2563eb, #1e40af) !important;
+      background:
+        radial-gradient(circle at right, rgba(255, 255, 255, 0.22), transparent 15rem),
+        linear-gradient(135deg, #2563eb, #1e40af) !important;
       padding: 24px !important;
+      display: grid !important;
+      grid-template-columns: auto minmax(0, 1fr) auto !important;
+      align-items: center !important;
+      gap: 16px !important;
     }
     body.tasks-page .avatar {
       width: 58px !important;
@@ -328,6 +351,35 @@
     body.tasks-page .profile-name {
       font-size: clamp(1.35rem, 2.3vw, 1.9rem) !important;
       line-height: 1.05 !important;
+    }
+    body.tasks-page .profile-summary {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(76px, 1fr)) !important;
+      gap: 8px !important;
+      min-width: min(310px, 38vw) !important;
+    }
+    body.tasks-page .summary-pill {
+      min-height: 62px !important;
+      border: 1px solid rgba(255, 255, 255, 0.25) !important;
+      border-radius: 18px !important;
+      background: rgba(255, 255, 255, 0.12) !important;
+      color: #fff !important;
+      display: grid !important;
+      place-items: center !important;
+      text-align: center !important;
+      padding: 8px !important;
+    }
+    body.tasks-page .summary-pill strong {
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 1.1rem !important;
+      line-height: 1 !important;
+    }
+    body.tasks-page .summary-pill span {
+      font-size: 0.66rem !important;
+      opacity: 0.78 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.08em !important;
+      font-weight: 800 !important;
     }
     body.tasks-page .ch-tabs-inner {
       gap: 10px !important;
@@ -349,6 +401,10 @@
     body.tasks-page .progress-section {
       border-bottom: 1.5px solid #dbeafe !important;
       padding: 22px 24px !important;
+      background: #f8fbff !important;
+    }
+    body.tasks-page .progress-label {
+      gap: 14px !important;
     }
     body.tasks-page .progress-bar-wrap {
       background: #dbeafe !important;
@@ -360,16 +416,39 @@
     body.tasks-page .tasks-section {
       padding: 22px 24px 26px !important;
     }
-    body.tasks-page .tasks-grid {
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+    body.tasks-page .task-status-note {
+      display: flex !important;
+      align-items: center !important;
       gap: 12px !important;
+      margin: 18px 24px 0 !important;
+      padding: 14px 16px !important;
+      border: 1.5px solid #86efac !important;
+      border-radius: 18px !important;
+      background: linear-gradient(135deg, #ecfdf5, #d1fae5) !important;
+      color: #065f46 !important;
+      font-weight: 800 !important;
+    }
+    body.tasks-page .task-status-note span {
+      width: 34px !important;
+      height: 34px !important;
+      border-radius: 12px !important;
+      display: grid !important;
+      place-items: center !important;
+      background: #10b981 !important;
+      color: #fff !important;
+      flex: 0 0 auto !important;
+    }
+    body.tasks-page .tasks-grid {
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)) !important;
+      gap: 14px !important;
     }
     body.tasks-page .task-chip {
       border-radius: 20px !important;
-      padding: 18px 14px !important;
-      min-height: 118px !important;
+      padding: 16px !important;
+      min-height: 132px !important;
       display: grid !important;
-      align-content: center !important;
+      align-content: space-between !important;
+      text-align: left !important;
       box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04) !important;
     }
     body.tasks-page .task-chip.done {
@@ -379,6 +458,71 @@
     body.tasks-page .task-chip.missing {
       background: linear-gradient(135deg, #fff7ed, #fee2e2) !important;
       border-color: #fca5a5 !important;
+    }
+    body.tasks-page .task-chip-top {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: flex-start !important;
+      gap: 12px !important;
+    }
+    body.tasks-page .task-chip-icon {
+      width: 38px !important;
+      height: 38px !important;
+      border-radius: 14px !important;
+      display: grid !important;
+      place-items: center !important;
+      margin: 0 !important;
+      color: #fff !important;
+      font-size: 1rem !important;
+    }
+    body.tasks-page .task-chip.done .task-chip-icon {
+      background: #10b981 !important;
+    }
+    body.tasks-page .task-chip.missing .task-chip-icon {
+      background: #ef4444 !important;
+    }
+    body.tasks-page .task-chip-badge {
+      border-radius: 999px !important;
+      padding: 5px 9px !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.64rem !important;
+      font-weight: 800 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.08em !important;
+      white-space: nowrap !important;
+    }
+    body.tasks-page .task-chip.done .task-chip-badge {
+      color: #065f46 !important;
+      background: rgba(16, 185, 129, 0.16) !important;
+    }
+    body.tasks-page .task-chip.missing .task-chip-badge {
+      color: #991b1b !important;
+      background: rgba(239, 68, 68, 0.14) !important;
+    }
+    body.tasks-page .task-chip-name {
+      font-size: 1.02rem !important;
+      margin: 16px 0 4px !important;
+    }
+    body.tasks-page .task-chip-label {
+      color: #64748b !important;
+      font-size: 0.78rem !important;
+    }
+    body.tasks-page .empty-chapter {
+      margin: 0 !important;
+      padding: 38px 24px !important;
+      text-align: center !important;
+      color: #64748b !important;
+    }
+    body.tasks-page .empty-chapter-icon {
+      width: 58px !important;
+      height: 58px !important;
+      display: grid !important;
+      place-items: center !important;
+      margin: 0 auto 14px !important;
+      border-radius: 20px !important;
+      background: #dbeafe !important;
+      color: #1d4ed8 !important;
+      font-size: 1.4rem !important;
     }
     body.tasks-page footer {
       background: #0f172a !important;
@@ -396,6 +540,14 @@
       }
       body.tasks-page main {
         width: min(100% - 28px, 1120px) !important;
+      }
+      body.tasks-page .card,
+      body.tasks-page .profile-strip {
+        grid-template-columns: 1fr !important;
+      }
+      body.tasks-page .profile-summary {
+        min-width: 0 !important;
+        width: 100% !important;
       }
     }
   </style>
@@ -435,21 +587,26 @@
   <!-- ── STUDENT TAB ── -->
   <div id="studentTab">
     <div class="card">
-      <div class="card-title">📋 Check Your Task Status</div>
-      <div class="field"><label>Your Class</label>
-        <select id="sClassSelect" onchange="onSClassChange()">
-          <option value="">— Select your class —</option>
-          <option value="XE1">X E-1</option><option value="XE4">X E-4</option>
-          <option value="XE5">X E-5</option><option value="XE6">X E-6</option>
-          <option value="XE7">X E-7</option><option value="XE8">X E-8</option>
-          <option value="XE9">X E-9</option><option value="XE10">X E-10</option>
-          <option value="XE11">X E-11</option>
-        </select>
+      <div>
+        <div class="card-title">Open your task tracker.</div>
+        <p class="picker-copy">Choose your class and name to see chapter progress, missing work, and submitted tasks in one student-only view.</p>
       </div>
-      <div class="field"><label>Your Name</label>
-        <select id="sNameSelect" disabled><option>— Select class first —</option></select>
+      <div class="picker-panel">
+        <div class="field"><label>Your Class</label>
+          <select id="sClassSelect" onchange="onSClassChange()">
+            <option value="">— Select your class —</option>
+            <option value="XE1">X E-1</option><option value="XE4">X E-4</option>
+            <option value="XE5">X E-5</option><option value="XE6">X E-6</option>
+            <option value="XE7">X E-7</option><option value="XE8">X E-8</option>
+            <option value="XE9">X E-9</option><option value="XE10">X E-10</option>
+            <option value="XE11">X E-11</option>
+          </select>
+        </div>
+        <div class="field"><label>Your Name</label>
+          <select id="sNameSelect" disabled><option>— Select class first —</option></select>
+        </div>
+        <button class="btn-primary" id="sViewBtn" onclick="viewTaskStatus()" disabled>View My Tasks</button>
       </div>
-      <button class="btn-primary" id="sViewBtn" onclick="viewTaskStatus()" disabled>View My Tasks</button>
     </div>
     <div id="studentResult"></div>
   </div>
@@ -581,6 +738,10 @@
 
     const ch4Keys = keys.filter(k => /^C4T/i.test(k));
     const ch5Keys = keys.filter(k => /^C5T/i.test(k));
+    const allDone = keys.filter(k => tasks[k]).length;
+    const allTotal = keys.length;
+    const allMissing = Math.max(allTotal - allDone, 0);
+    const overallPct = allTotal > 0 ? Math.round((allDone / allTotal) * 100) : 0;
 
     const makeProgress = (ckeys, label) => {
       const done  = ckeys.filter(k => tasks[k]).length;
@@ -600,22 +761,27 @@
       const isDone = tasks[k];
       const m = k.match(/^C\d+T(\d+)$/i);
       return `<div class="task-chip ${isDone ? 'done' : 'missing'}">
-        <div class="task-chip-icon">${isDone ? '✅' : '❌'}</div>
-        <div class="task-chip-name">${m ? 'Task ' + m[1] : k}</div>
-        <div class="task-chip-label">${isDone ? 'Done' : 'Missing'}</div>
+        <div class="task-chip-top">
+          <div class="task-chip-icon">${isDone ? '&#10003;' : '!'}</div>
+          <div class="task-chip-badge">${isDone ? 'Done' : 'Missing'}</div>
+        </div>
+        <div>
+          <div class="task-chip-name">${m ? 'Task ' + m[1] : k}</div>
+          <div class="task-chip-label">${isDone ? 'Recorded as complete' : 'Needs attention'}</div>
+        </div>
       </div>`;
     }).join('');
 
     const ch4Panel = ch4Keys.length
       ? makeProgress(ch4Keys, 'Chapter 4') +
-        (hasSubmitted ? '<div style="background:#D1FAE5;border:1.5px solid #6EE7B7;border-radius:12px;padding:12px 16px;margin:0 24px 16px;font-size:0.85rem;color:#065F46;font-weight:600;">&#10003; You submitted Chapter 4 — all tasks marked done.</div>' : '') +
+        (hasSubmitted ? '<div class="task-status-note"><span>&#10003;</span><div>You submitted Chapter 4, so every Chapter 4 task is recorded as done.</div></div>' : '') +
         `<div class="tasks-section"><div class="tasks-grid">${makeChips(ch4Keys)}</div></div>`
-      : '<div style="padding:32px;text-align:center;color:var(--text-muted)">No Chapter 4 tasks found.</div>';
+      : '<div class="empty-chapter"><div class="empty-chapter-icon">&#128203;</div><div>No Chapter 4 tasks found.</div></div>';
 
     const ch5Panel = ch5Keys.length
       ? makeProgress(ch5Keys, 'Chapter 5') +
         `<div class="tasks-section"><div class="tasks-grid">${makeChips(ch5Keys)}</div></div>`
-      : '<div style="padding:32px;text-align:center;"><div style="font-size:2rem;margin-bottom:8px;">🔄</div><div style="font-weight:700;margin-bottom:4px;">Chapter 5 Tasks Coming Soon</div><div style="font-size:0.85rem;color:var(--text-muted);">Check back when Chapter 5 begins.</div></div>';
+      : '<div class="empty-chapter"><div class="empty-chapter-icon">&#8635;</div><div style="font-weight:800;margin-bottom:4px;color:#0f172a">Chapter 5 Tasks Coming Soon</div><div>Check back when Chapter 5 begins.</div></div>';
 
     document.getElementById('studentResult').innerHTML = `
       <div class="status-card">
@@ -624,6 +790,11 @@
           <div>
             <div class="profile-name">${data.nickname || data.name}</div>
             <div class="profile-meta">${data.name} · ${clsLabel}</div>
+          </div>
+          <div class="profile-summary">
+            <div class="summary-pill"><strong>${overallPct}%</strong><span>Overall</span></div>
+            <div class="summary-pill"><strong>${allDone}</strong><span>Done</span></div>
+            <div class="summary-pill"><strong>${allMissing}</strong><span>Missing</span></div>
           </div>
         </div>
         <div class="ch-tabs-inner">
