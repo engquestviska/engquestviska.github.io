@@ -6,6 +6,7 @@
   <title>Task Status · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css?v=20260505-tasks-revamp"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -191,49 +192,243 @@
     .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
     .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
 
+    /* TASKS REVAMP */
+    body.tasks-page {
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 30rem),
+        linear-gradient(180deg, #eff6ff 0%, #f8fafc 38%, #f8fafc 100%) !important;
+      color: #0f172a !important;
+    }
+    body.tasks-page .subpage-header {
+      text-align: left !important;
+      padding: 22px 22px 78px !important;
+      min-height: 430px !important;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e3a8a 100%) !important;
+      overflow: hidden !important;
+    }
+    body.tasks-page .subpage-header::before {
+      content: "" !important;
+      position: absolute !important;
+      inset: 0 !important;
+      background-image: none !important;
+    }
+    body.tasks-page .subpage-header::after {
+      content: "" !important;
+      position: absolute !important;
+      right: max(24px, calc((100vw - 1180px) / 2 + 24px)) !important;
+      bottom: 58px !important;
+      width: min(170px, 24vw) !important;
+      aspect-ratio: 1 !important;
+      background: url("../logo.jpg") center/cover no-repeat !important;
+      opacity: 0.12 !important;
+    }
+    body.tasks-page .topbar {
+      position: relative !important;
+      z-index: 2 !important;
+      width: min(1180px, 100%) !important;
+      margin-inline: auto !important;
+      margin-bottom: 70px !important;
+    }
+    body.tasks-page .brand-title,
+    body.tasks-page .brand-sub,
+    body.tasks-page .subpage-hero,
+    body.tasks-page .subpage-hero h1,
+    body.tasks-page .hero-copy {
+      color: #fff !important;
+    }
+    body.tasks-page .nav a,
+    body.tasks-page .nav button {
+      color: #fff !important;
+      background: rgba(255, 255, 255, 0.12) !important;
+      border-color: rgba(255, 255, 255, 0.35) !important;
+    }
+    body.tasks-page .subpage-hero {
+      position: relative !important;
+      z-index: 1 !important;
+      width: min(1180px, 100%) !important;
+      margin-inline: auto !important;
+    }
+    body.tasks-page .subpage-hero h1 {
+      max-width: 760px !important;
+      font-size: clamp(3.1rem, 7vw, 6.3rem) !important;
+      line-height: 0.9 !important;
+      margin: 12px 0 20px !important;
+      letter-spacing: 0 !important;
+    }
+    body.tasks-page .kicker {
+      color: #bfdbfe !important;
+    }
+    body.tasks-page .hero-copy {
+      max-width: 670px !important;
+      font-size: 1.05rem !important;
+      line-height: 1.8 !important;
+      opacity: 0.86 !important;
+    }
+    body.tasks-page .wave,
+    body.tasks-page .tab-bar,
+    body.tasks-page .sidebar-teacher {
+      display: none !important;
+    }
+    body.tasks-page main {
+      width: min(1120px, calc(100% - 44px)) !important;
+      max-width: none !important;
+      margin: -44px auto 0 !important;
+      padding: 0 0 88px !important;
+      position: relative !important;
+      z-index: 5 !important;
+    }
+    body.tasks-page .card,
+    body.tasks-page .status-card,
+    body.tasks-page .loading {
+      border: 1.5px solid #bfdbfe !important;
+      border-radius: 28px !important;
+      background: rgba(255, 255, 255, 0.96) !important;
+      box-shadow: 0 22px 64px rgba(37, 99, 235, 0.1) !important;
+    }
+    body.tasks-page .card {
+      padding: clamp(22px, 4vw, 34px) !important;
+    }
+    body.tasks-page .card-title {
+      font-size: clamp(1.55rem, 3vw, 2.15rem) !important;
+      line-height: 1 !important;
+      margin-bottom: 22px !important;
+    }
+    body.tasks-page .field label {
+      font-family: 'IBM Plex Mono', monospace !important;
+      color: #64748b !important;
+    }
+    body.tasks-page .field select {
+      min-height: 52px !important;
+      border-radius: 16px !important;
+      background: #f8fafc !important;
+      border-color: #bfdbfe !important;
+      color: #0f172a !important;
+      font-weight: 600 !important;
+    }
+    body.tasks-page .btn-primary {
+      min-height: 54px !important;
+      border-radius: 16px !important;
+      margin-top: 12px !important;
+      box-shadow: 0 16px 34px rgba(37, 99, 235, 0.18) !important;
+    }
+    body.tasks-page .status-card {
+      overflow: hidden !important;
+    }
+    body.tasks-page .profile-strip {
+      background: linear-gradient(135deg, #2563eb, #1e40af) !important;
+      padding: 24px !important;
+    }
+    body.tasks-page .avatar {
+      width: 58px !important;
+      height: 58px !important;
+      border-radius: 18px !important;
+      background: rgba(255, 255, 255, 0.2) !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+    }
+    body.tasks-page .profile-name {
+      font-size: clamp(1.35rem, 2.3vw, 1.9rem) !important;
+      line-height: 1.05 !important;
+    }
+    body.tasks-page .ch-tabs-inner {
+      gap: 10px !important;
+      border-bottom: 1.5px solid #dbeafe !important;
+      padding: 16px 18px 0 !important;
+    }
+    body.tasks-page .ch-tab-inner {
+      min-height: 44px !important;
+      border: 1.5px solid #bfdbfe !important;
+      border-radius: 999px 999px 0 0 !important;
+      background: #fff !important;
+      margin-bottom: -1.5px !important;
+    }
+    body.tasks-page .ch-tab-inner.active {
+      background: #2563eb !important;
+      color: #fff !important;
+      border-color: #2563eb !important;
+    }
+    body.tasks-page .progress-section {
+      border-bottom: 1.5px solid #dbeafe !important;
+      padding: 22px 24px !important;
+    }
+    body.tasks-page .progress-bar-wrap {
+      background: #dbeafe !important;
+      height: 12px !important;
+    }
+    body.tasks-page .progress-bar-fill {
+      height: 12px !important;
+    }
+    body.tasks-page .tasks-section {
+      padding: 22px 24px 26px !important;
+    }
+    body.tasks-page .tasks-grid {
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+      gap: 12px !important;
+    }
+    body.tasks-page .task-chip {
+      border-radius: 20px !important;
+      padding: 18px 14px !important;
+      min-height: 118px !important;
+      display: grid !important;
+      align-content: center !important;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04) !important;
+    }
+    body.tasks-page .task-chip.done {
+      background: linear-gradient(135deg, #ecfdf5, #d1fae5) !important;
+      border-color: #86efac !important;
+    }
+    body.tasks-page .task-chip.missing {
+      background: linear-gradient(135deg, #fff7ed, #fee2e2) !important;
+      border-color: #fca5a5 !important;
+    }
+    body.tasks-page footer {
+      background: #0f172a !important;
+    }
+    @media (max-width: 720px) {
+      body.tasks-page .subpage-header {
+        min-height: 400px !important;
+        padding-bottom: 64px !important;
+      }
+      body.tasks-page .topbar {
+        margin-bottom: 54px !important;
+      }
+      body.tasks-page .subpage-hero h1 {
+        font-size: clamp(2.7rem, 13vw, 4.2rem) !important;
+      }
+      body.tasks-page main {
+        width: min(100% - 28px, 1120px) !important;
+      }
+    }
   </style>
   <script src="../shared/js/sidebar.js"></script>
 </head>
-<body data-page="tasks">
+<body class="grade10-subpage tasks-page" data-page="tasks">
 
-<!-- LOGIN MODAL -->
-<div class="overlay hidden" id="loginModal">
-  <div class="modal">
-    <div class="modal-title">Teacher Login</div>
-    <div class="modal-sub">Login to edit task status for all classes.</div>
-    <div class="modal-field"><label>Username</label><input type="text" id="loginUser" placeholder="Username"/></div>
-    <div class="modal-field"><label>Password</label><input type="password" id="loginPass" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
-    <div class="modal-error" id="loginError">Incorrect username or password.</div>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeLogin()">Cancel</button>
-      <button class="btn-login" onclick="doLogin()">Login</button>
+<header class="subpage-header">
+  <div class="topbar">
+    <div class="brand">
+      <img src="../logo.jpg" alt="English Quest Logo"/>
+      <div>
+        <div class="brand-title">English Quest</div>
+        <div class="brand-sub">Grade 10 Student Track</div>
+      </div>
     </div>
+    <nav class="nav" aria-label="Main navigation">
+      <a href="index.html">Grade 10 Home</a>
+      <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
+    </nav>
   </div>
-</div>
 
-<!-- HEADER -->
-<header>
-  <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
-
-
-  <a class="back-btn" href="index.html">← Back</a>
-  <div id="headerRight">
-    <button class="teacher-btn" onclick="openLogin()">🔑 Teacher</button>
-  </div>
-  <h1>Task <span>Status</span></h1>
-  <p class="header-sub">English Quest · SMA Negeri 6 Surakarta</p>
+  <section class="subpage-hero">
+    <div class="kicker">Task Status</div>
+    <h1>See which tasks are done and what still needs attention.</h1>
+    <p class="hero-copy">Students can check Chapter 4 and Chapter 5 task progress from a clean, read-only status view.</p>
+  </section>
 </header>
 
 <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
   <path fill="#1E3A8A" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
   <path fill="#F8FAFC" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
 </svg>
-
-<!-- TABS -->
-<div class="tab-bar">
-  <button class="tab-btn active" id="tabStudent" onclick="switchTab('student')">🎓 My Tasks</button>
-  <button class="tab-btn hidden"  id="tabTeacher" onclick="switchTab('teacher')">📝 Teacher Panel</button>
-</div>
 
 <main>
 
@@ -259,53 +454,15 @@
     <div id="studentResult"></div>
   </div>
 
-  <!-- ── TEACHER TAB ── -->
-  <div id="teacherTab" class="hidden">
-    <div class="teacher-selector">
-      <div class="teacher-selector-title">📝 Edit Task Status</div>
-      <div class="field"><label>Class</label>
-        <select id="tClassSelect" onchange="loadTeacherClass()">
-          <option value="">— Select a class —</option>
-          <option value="XE1">X E-1</option><option value="XE4">X E-4</option>
-          <option value="XE5">X E-5</option><option value="XE6">X E-6</option>
-          <option value="XE7">X E-7</option><option value="XE8">X E-8</option>
-          <option value="XE9">X E-9</option><option value="XE10">X E-10</option>
-          <option value="XE11">X E-11</option>
-        </select>
-      </div>
-    </div>
-    <div id="teacherList"></div>
-  </div>
-
 </main>
 
 <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
 <div class="toast" id="toast"></div>
 
-<!-- Ch5 Files Modal -->
-<div id="ch5FilesOverlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.6);backdrop-filter:blur(6px);z-index:500;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#fff;border-radius:20px;padding:28px 24px;width:100%;max-width:420px;box-shadow:0 8px 40px rgba(37,99,235,0.18)">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-      <div>
-        <div style="font-size:0.7rem;font-weight:700;color:var(--purple-light);text-transform:uppercase;letter-spacing:0.1em;font-family:'IBM Plex Mono',monospace">Chapter 5 Files</div>
-        <div id="ch5FilesName" style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:800;color:var(--text-dark)"></div>
-      </div>
-      <button onclick="closeFilesModal()" style="background:var(--off-white);border:1.5px solid var(--border);border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:1rem;color:var(--text-muted)">✕</button>
-    </div>
-    <div id="ch5FilesList"></div>
-  </div>
-</div>
-
 <script>
   const API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
 
-  let isTeacher = false, savedUser = '', savedPass = '';
-  let studentsCache = {}, currentTeacherClass = '';
-
-  // Restore session
-  savedUser = localStorage.getItem('eq_tu') || '';
-  savedPass = localStorage.getItem('eq_tp') || '';
-  if (savedUser && savedPass) verifyLogin(savedUser, savedPass, true);
+  let studentsCache = {};
 
   // ── API ──────────────────────────────────────────────────────
   async function apiGet(params) {
@@ -357,63 +514,6 @@
     return data;
   }
 
-
-  async function apiPost(body) {
-    try {
-      const res = await fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-      if (res.ok) return await res.json();
-    } catch(e) {}
-    return apiGet(body);
-  }
-
-  // ── TABS ─────────────────────────────────────────────────────
-  function switchTab(tab) {
-    document.getElementById('studentTab').classList.toggle('hidden', tab !== 'student');
-    document.getElementById('teacherTab').classList.toggle('hidden', tab !== 'teacher');
-    document.getElementById('tabStudent').classList.toggle('active', tab === 'student');
-    document.getElementById('tabTeacher').classList.toggle('active', tab === 'teacher');
-  }
-
-  // ── LOGIN ────────────────────────────────────────────────────
-  async function hashPass(plain) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(plain));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-  }
-  function openLogin()  { document.getElementById('loginModal').classList.remove('hidden'); setTimeout(() => document.getElementById('loginUser').focus(), 100); }
-  function closeLogin() { document.getElementById('loginModal').classList.add('hidden'); document.getElementById('loginError').style.display = 'none'; }
-
-  async function doLogin() {
-    const u = document.getElementById('loginUser').value.trim();
-    const p = document.getElementById('loginPass').value.trim();
-    await verifyLogin(u, p, false);
-  }
-
-  async function verifyLogin(u, p, silent) {
-    try {
-      const data = await apiGet({ action: 'checkLogin', username: u, password: p });
-      if (data.ok) {
-        // If silent (auto-login from localStorage), p is already a hash — don't re-hash
-        const hashed = silent ? p : await hashPass(p);
-        isTeacher = true; savedUser = u; savedPass = hashed;
-        localStorage.setItem('eq_tu', u); localStorage.setItem('eq_tp', hashed);
-        closeLogin();
-        document.getElementById('headerRight').innerHTML = `<div class="teacher-badge">🎓 Teacher <span class="logout-x" onclick="logout()">✕</span></div>`;
-        document.getElementById('tabTeacher').classList.remove('hidden');
-        if (!silent) { showToast('✅ Logged in as Teacher', 'ok'); switchTab('teacher'); }
-      } else {
-        if (!silent) document.getElementById('loginError').style.display = 'block';
-      }
-    } catch(e) { if (!silent) showToast('Connection error', 'err'); }
-  }
-
-  function logout() {
-    isTeacher = false; savedUser = ''; savedPass = '';
-    localStorage.removeItem('eq_tu'); localStorage.removeItem('eq_tp');
-    document.getElementById('headerRight').innerHTML = `<button class="teacher-btn" onclick="openLogin()">🔑 Teacher</button>`;
-    document.getElementById('tabTeacher').classList.add('hidden');
-    switchTab('student');
-    showToast('Logged out');
-  }
 
   // ── STUDENT — LOAD NAMES ──────────────────────────────────────
   async function onSClassChange() {
@@ -542,262 +642,6 @@
     document.getElementById('ctabPanel5').style.display = ch === 5 ? '' : 'none';
   }
 
-  // ── TEACHER — LOAD CLASS ──────────────────────────────────────
-  async function loadTeacherClass() {
-    const cls = document.getElementById('tClassSelect').value;
-    if (!cls) { document.getElementById('teacherList').innerHTML = ''; return; }
-    currentTeacherClass = cls;
-    document.getElementById('teacherList').innerHTML = '<div class="loading"><div class="spinner"></div><br/>Loading class...</div>';
-    try {
-      const data = await apiGet({ action: 'getAllTasks', className: cls });
-      if (data.error) { showToast(data.error, 'err'); document.getElementById('teacherList').innerHTML = ''; return; }
-      renderTeacherPanel(data, cls);
-    } catch(e) { showToast('Failed to load class', 'err'); document.getElementById('teacherList').innerHTML = ''; }
-  }
-
-  function renderTeacherPanel(data, cls) {
-    const { students, taskKeys } = data;
-    const ch4Keys = taskKeys.filter(k => /^C4T/i.test(k));
-    const ch5Keys = taskKeys.filter(k => /^C5T/i.test(k));
-
-    const makeBtns = (s, keys) => keys.map(k => `
-      <button class="task-toggle ${s.tasks[k] ? 'on' : ''}" id="toggle-${s.no}-${k}"
-        data-no="${s.no}" data-key="${k}" data-cls="${cls}">${k}</button>`).join('');
-
-    const rows = students.map(s => {
-      const done = taskKeys.filter(k => s.tasks[k]).length;
-      const ch4done = ch4Keys.filter(k => s.tasks[k]).length;
-      const ch5done = ch5Keys.filter(k => s.tasks[k]).length;
-
-      const ch4Section = ch4Keys.length ? `
-        <div class="str-chapter-label">Chapter 4</div>
-        <div class="str-tasks">${makeBtns(s, ch4Keys)}</div>` : '';
-
-      const ch5Section = ch5Keys.length ? `
-        <div class="str-chapter-label" style="margin-top:8px;display:flex;align-items:center;gap:8px">Chapter 5
-          <button onclick="viewCh5Files(${s.no},'${cls}')" style="background:none;border:1px solid rgba(37,99,235,0.35);border-radius:6px;padding:1px 8px;cursor:pointer;font-size:0.65rem;color:var(--purple);font-family:inherit;font-weight:700;line-height:1.6">&#128196; Files</button>
-        </div>
-        <div class="str-tasks">${makeBtns(s, ch5Keys)}</div>` : '';
-
-      return `
-        <div class="student-task-row">
-          <div class="str-top">
-            <span class="str-no">${s.no}</span>
-            <span class="str-name">${s.nickname || s.name}</span>
-            <span class="str-progress">${ch4done}/${ch4Keys.length} &nbsp;|&nbsp; ${ch5done}/${ch5Keys.length}</span>
-          </div>
-          ${ch4Section}${ch5Section}
-        </div>`;
-    }).join('');
-
-    document.getElementById('teacherList').innerHTML = `
-      <div class="student-list-panel">
-        <div class="panel-header">
-          <div class="panel-header-title">${cls} · Task Status</div>
-          <div class="panel-header-sub">Tap to toggle ✓ / ✗</div>
-          <div style="display:flex;gap:8px;margin-left:auto;flex-wrap:wrap">
-            <button onclick="syncSubmissionsToTasks('${cls}')" style="padding:7px 16px;background:linear-gradient(135deg,#10B981,#059669);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:0.8rem;font-weight:700;cursor:pointer;">&#9889; Sync Ch4</button>
-            <button id="bulkCh5Btn" onclick="bulkSyncCh5('${cls}')" style="padding:7px 16px;background:linear-gradient(135deg,#0EA5E9,#0369A1);color:#fff;border:none;border-radius:10px;font-family:inherit;font-size:0.8rem;font-weight:700;cursor:pointer;">&#128260; Sync Ch5 All</button>
-          </div>
-        </div>
-        ${rows}
-      </div>`;
-  }
-
-  // ── TOGGLE TASK ───────────────────────────────────────────────
-  async function toggleTask(studentNo, taskKey, className) {
-    const btn = document.getElementById('toggle-' + studentNo + '-' + taskKey);
-    if (!btn || btn.classList.contains('saving')) return;
-    const newVal = !btn.classList.contains('on');
-    btn.classList.add('saving');
-    btn.textContent = '...';
-    try {
-      const res = await apiGet({
-        action: 'saveTaskStatus', username: savedUser, password: savedPass,
-        className, studentNo: String(studentNo), tasks: JSON.stringify({ [taskKey]: newVal })
-      });
-      if (res.success) {
-        btn.classList.toggle('on', newVal);
-        btn.textContent = taskKey;
-        // Update progress counter (split Ch4 / Ch5)
-        const row = btn.closest('.student-task-row');
-        const allBtns = [...row.querySelectorAll('.task-toggle')];
-        const ch4Btns = allBtns.filter(b => /^C4T/i.test(b.dataset.key));
-        const ch5Btns = allBtns.filter(b => /^C5T/i.test(b.dataset.key));
-        const ch4Done = ch4Btns.filter(b => b.classList.contains('on')).length;
-        const ch5Done = ch5Btns.filter(b => b.classList.contains('on')).length;
-        const prog = row.querySelector('.str-progress');
-        if (ch4Btns.length && ch5Btns.length) {
-          prog.textContent = ch4Done + '/' + ch4Btns.length + ' | ' + ch5Done + '/' + ch5Btns.length;
-        } else {
-          const done = allBtns.filter(b => b.classList.contains('on')).length;
-          prog.textContent = done + '/' + allBtns.length;
-        }
-        showToast(newVal ? '✅ Marked as done' : '❌ Marked as missing', newVal ? 'ok' : '');
-      } else {
-        showToast('Error: ' + res.error, 'err');
-        btn.textContent = taskKey;
-      }
-    } catch(e) {
-      showToast('Failed to save', 'err');
-      btn.textContent = taskKey;
-    }
-    btn.classList.remove('saving');
-  }
-
-  // ── SYNC SUBMISSIONS → TASK STATUS ──────────────────────────
-  async function syncSubmissionsToTasks(cls) {
-    if (!savedUser || !savedPass) { showToast('Not logged in as teacher', 'err'); return; }
-
-    // Find and disable the sync button, show progress
-    const syncBtn = document.querySelector('[onclick*="syncSubmissionsToTasks"]');
-    const origText = syncBtn ? syncBtn.textContent : '';
-    if (syncBtn) { syncBtn.disabled = true; syncBtn.textContent = '⏳ Loading data...'; }
-
-    try {
-      // Get submissions and all tasks in parallel
-      const [subData, taskData] = await Promise.all([
-        apiGet({ action: 'getSubmissions' }),
-        apiGet({ action: 'getAllTasks', className: cls })
-      ]);
-
-      if (subData.error || !subData.students) {
-        showToast('Could not load submissions', 'err');
-        if (syncBtn) { syncBtn.disabled = false; syncBtn.textContent = origText; }
-        return;
-      }
-      if (taskData.error || !taskData.students) {
-        showToast('Could not load task data', 'err');
-        if (syncBtn) { syncBtn.disabled = false; syncBtn.textContent = origText; }
-        return;
-      }
-
-      const submitted = subData.students[cls] || [];
-      const ch4Keys   = taskData.taskKeys.filter(k => k.match(/^C4T/i));
-
-      if (!ch4Keys.length) {
-        showToast('No Chapter 4 task keys found', 'err');
-        if (syncBtn) { syncBtn.disabled = false; syncBtn.textContent = origText; }
-        return;
-      }
-
-      const tasksToSet = {};
-      ch4Keys.forEach(k => { tasksToSet[k] = true; });
-
-      // Only include students who fully submitted AND still have unchecked Ch4 tasks
-      const toUpdate = [];
-      taskData.students.forEach(function(s) {
-        var sub = submitted.find(function(r) {
-          return r.name.toLowerCase() === s.name.toLowerCase() && r.submitted === true;
-        });
-        if (!sub) return; // not submitted — skip
-        // Skip if all Ch4 tasks already done
-        var alreadyDone = ch4Keys.every(function(k) { return !!s.tasks[k]; });
-        if (alreadyDone) return;
-        toUpdate.push({ s: s, tasksToSet: tasksToSet });
-      });
-
-      if (!toUpdate.length) {
-        showToast('All submitted students already up to date ✅', 'ok');
-        if (syncBtn) { syncBtn.disabled = false; syncBtn.textContent = origText; }
-        return;
-      }
-
-      // Save one by one with live progress on button
-      let done = 0;
-      for (const item of toUpdate) {
-        if (syncBtn) syncBtn.textContent = '⏳ Saving ' + (done + 1) + '/' + toUpdate.length + '...';
-        try {
-          await apiGet({
-            action: 'saveTaskStatus',
-            username: savedUser, password: savedPass,
-            className: cls, studentNo: String(item.s.no),
-            tasks: JSON.stringify(item.tasksToSet)
-          });
-          done++;
-        } catch(e) {}
-      }
-
-      if (syncBtn) { syncBtn.textContent = '✅ Done! Reloading...'; }
-      showToast('✅ Synced ' + done + ' student(s) in ' + cls, 'ok');
-
-      // Reload to show updated state
-      setTimeout(function() {
-        loadTeacherClass();
-        if (syncBtn) { syncBtn.disabled = false; syncBtn.textContent = origText; }
-      }, 1000);
-
-    } catch(e) {
-      showToast('Sync failed: ' + e.message, 'err');
-      if (syncBtn) { syncBtn.disabled = false; syncBtn.textContent = origText; }
-    }
-  }
-
-  // ── BULK CH5 SYNC ─────────────────────────────────────────────
-  async function bulkSyncCh5(cls) {
-    if (!savedUser || !savedPass) { showToast('Not logged in as teacher', 'err'); return; }
-    const btn = document.getElementById('bulkCh5Btn');
-    if (btn) { btn.disabled = true; btn.textContent = '⏳ Syncing...'; }
-    try {
-      const res = await apiGet({ action: 'syncCh5Class', className: cls, username: savedUser, password: savedPass });
-      if (res.success) {
-        showToast('✅ Ch5 synced — ' + res.synced + ' updated, ' + res.notFound + ' no submission', 'ok');
-        setTimeout(function() {
-          loadTeacherClass();
-          if (btn) { btn.disabled = false; btn.textContent = '🔄 Sync Ch5 All'; }
-        }, 1000);
-      } else {
-        showToast('Ch5 sync failed: ' + (res.error || 'unknown error'), 'err');
-        if (btn) { btn.disabled = false; btn.textContent = '🔄 Sync Ch5 All'; }
-      }
-    } catch(e) {
-      showToast('Ch5 sync failed: ' + e.message, 'err');
-      if (btn) { btn.disabled = false; btn.textContent = '🔄 Sync Ch5 All'; }
-    }
-  }
-
-  // ── CH5 FILE VIEWER ───────────────────────────────────────────
-  async function viewCh5Files(studentNo, cls) {
-    const overlay = document.getElementById('ch5FilesOverlay');
-    const nameEl  = document.getElementById('ch5FilesName');
-    const listEl  = document.getElementById('ch5FilesList');
-    nameEl.textContent = 'Loading...';
-    listEl.innerHTML   = '<div style="text-align:center;padding:20px;color:var(--text-muted)">⏳ Fetching files...</div>';
-    overlay.style.display = 'flex';
-    try {
-      const res = await apiGet({ action: 'getCh5StudentFiles', className: cls, studentNo: String(studentNo) });
-      nameEl.textContent = res.studentName || 'Student';
-      if (!res.success || !res.submitted) {
-        listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.88rem">No Ch5 submission found for this student.</div>';
-        return;
-      }
-      const tasks = ['C5T1','C5T2','C5T3','C5T4','C5T5'];
-      const items = tasks.map(function(k) {
-        const url = (res.files || {})[k];
-        const num = k.replace('C5T','');
-        if (url) {
-          return '<a href="' + url + '" target="_blank" style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--off-white);border:1.5px solid var(--border);border-radius:12px;margin-bottom:8px;text-decoration:none;color:var(--text-dark);font-weight:600;font-size:0.88rem;transition:border-color 0.15s" onmouseover="this.style.borderColor=\'#60A5FA\'" onmouseout="this.style.borderColor=\'var(--border)\'">' +
-            '<span style="background:#D1FAE5;color:#065F46;border-radius:8px;padding:4px 10px;font-size:0.72rem;font-weight:700;font-family:\'IBM Plex Mono\',monospace;flex-shrink:0">Task ' + num + '</span>' +
-            '<span style="flex:1">View file ↗</span>' +
-            '</a>';
-        }
-        return '<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:#F9FAFB;border:1.5px solid #E5E7EB;border-radius:12px;margin-bottom:8px;color:#9CA3AF;font-size:0.88rem">' +
-          '<span style="background:#F3F4F6;color:#9CA3AF;border-radius:8px;padding:4px 10px;font-size:0.72rem;font-weight:700;font-family:\'IBM Plex Mono\',monospace;flex-shrink:0">Task ' + num + '</span>' +
-          '<span>Not submitted</span></div>';
-      }).join('');
-      listEl.innerHTML = items;
-    } catch(e) {
-      listEl.innerHTML = '<div style="color:var(--red);font-size:0.88rem;padding:12px 0">Failed to load files.</div>';
-    }
-  }
-
-  function closeFilesModal() {
-    document.getElementById('ch5FilesOverlay').style.display = 'none';
-  }
-  document.getElementById('ch5FilesOverlay').addEventListener('click', function(e) {
-    if (e.target === this) closeFilesModal();
-  });
-
   // ── TOAST ─────────────────────────────────────────────────────
   function showToast(msg, type) {
     const t = document.getElementById('toast');
@@ -807,12 +651,6 @@
   }
 
   // Auto-select saved student — waits for page to be fully ready
-  document.getElementById('teacherList').addEventListener('click', function(e) {
-    const btn = e.target.closest('.task-toggle');
-    if (!btn) return;
-    toggleTask(+btn.dataset.no, btn.dataset.key, btn.dataset.cls);
-  });
-
   document.addEventListener('DOMContentLoaded', function() {
     var cls = localStorage.getItem('eq_student_class');
     var no  = localStorage.getItem('eq_student_no');
