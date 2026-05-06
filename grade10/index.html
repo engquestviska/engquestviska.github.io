@@ -101,6 +101,7 @@
       </div>
       <nav class="nav" aria-label="Main navigation">
         <a href="dashboard.html">My Statistics</a>
+        <a href="strikes.html">My Strikes</a>
         <a href="../index.html">Choose Grade</a>
       </nav>
     </header>
@@ -142,6 +143,7 @@
           <div class="profile-actions profile-login-actions">
             <button class="btn primary" type="button" id="confirmProfile" disabled>Confirm Profile</button>
             <a class="btn ghost" href="dashboard.html" id="dashboardProfileLink">My Statistics</a>
+            <a class="btn ghost" href="strikes.html" id="strikesProfileLink">My Strikes</a>
             <button class="btn ghost" type="button" id="changeProfile">Change Name</button>
             <button class="btn danger" type="button" id="logoutProfile">Logout</button>
           </div>
@@ -197,6 +199,12 @@
             <p class="module-copy">Open your personal dashboard for scores, attendance, tasks, submissions, and activeness.</p>
             <div class="module-link">Open dashboard -></div>
           </a>
+          <a class="module amber" href="strikes.html">
+            <div class="module-icon">WR</div>
+            <div class="module-title">My Strikes</div>
+            <p class="module-copy">Check your warning status and summative or class eligibility.</p>
+            <div class="module-link">Check strikes -></div>
+          </a>
           <a class="module" href="students.html">
             <div class="module-icon">🎓</div>
             <div class="module-title">Student List</div>
@@ -226,12 +234,6 @@
             <div class="module-title">Activeness</div>
             <p class="module-copy">Track classroom participation and activity points.</p>
             <div class="module-link">View activeness →</div>
-          </a>
-          <a class="module amber" href="strikes.html">
-            <div class="module-icon">WR</div>
-            <div class="module-title">My Strikes</div>
-            <p class="module-copy">Check your warning status and summative or class eligibility.</p>
-            <div class="module-link">Check strikes -></div>
           </a>
         </div>
       </section>
@@ -297,6 +299,7 @@
       document.getElementById('logoutProfile').disabled = !hasProfile;
       document.getElementById('changeProfile').disabled = !hasProfile;
       document.getElementById('dashboardProfileLink').style.display = hasProfile ? 'inline-flex' : 'none';
+      document.getElementById('strikesProfileLink').style.display = hasProfile ? 'inline-flex' : 'none';
     }
 
     function resetStudentSelect(message) {
