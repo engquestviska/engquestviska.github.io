@@ -68,6 +68,8 @@
     .score-tile-val.empty { color: var(--border); font-size: 1.2rem; }
     .score-tile.highlight { background: linear-gradient(135deg, var(--purple-soft), #F3E8FF); border-color: var(--purple-mid); }
     .score-tile.highlight .score-tile-val { color: var(--purple); }
+    .score-preview-link { display:inline-flex; align-items:center; justify-content:center; width:100%; margin-top:10px; padding:7px 8px; border-radius:10px; background:#fff; border:1.5px solid rgba(16,185,129,0.35); color:#065F46; font-size:0.72rem; font-weight:800; font-family:'IBM Plex Mono',monospace; text-decoration:none; }
+    .score-preview-link:hover { border-color:#10B981; background:#ECFDF5; }
 
     /* FINAL SUMMARY */
     .final-summary { display: flex; gap: 12px; flex-wrap: wrap; }
@@ -286,6 +288,15 @@ function apiGet(params) {
   return attempt(1);
 }
 
+function escapeAttr(value) {
+  return String(value || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+function taskKeyForScoreColumn(col, chapter) {
+  var m = String(col || '').match(/^Task\s*(\d+)$/i);
+  return m ? 'C' + chapter + 'T' + m[1] : '';
+}
+
 function init() {
   if (isTeacher) {
     renderTeacherMode();
@@ -358,15 +369,19 @@ function autoLoadStudentScores(cls, no, name) {
   Promise.all([
     cachedApiGet({ action: 'getChapterScores', className: cls, chapter: 4 }),
     cachedApiGet({ action: 'getChapterScores', className: cls, chapter: 5 }),
+    apiGet({ action: 'getCh4StudentFiles', className: cls, studentNo: no, _t: Date.now() }).catch(function() { return null; }),
+    apiGet({ action: 'getCh5StudentFiles', className: cls, studentNo: no, _t: Date.now() }).catch(function() { return null; }),
     cachedApiGet({ action: 'getFinalScores', className: cls }).then(function(r) { return r && !r.error ? r : {}; }).catch(function() { return {}; })
   ]).then(function(responses) {
     var ch4 = responses[0].students ? responses[0].students.find(function(s) { return String(s.no) === String(no); }) : null;
     var ch5 = responses[1].students ? responses[1].students.find(function(s) { return String(s.no) === String(no); }) : null;
-    var finRes = responses[2] || {};
+    var ch4Files = responses[2] && responses[2].success ? (responses[2].files || {}) : {};
+    var ch5Files = responses[3] && responses[3].success ? (responses[3].files || {}) : {};
+    var finRes = responses[4] || {};
     var fin = finRes.students ? finRes.students.find(function(s) { return String(s.no) === String(no); }) : null;
 
-    var ch4Html = buildStudentChapterHTML(ch4, responses[0].inputCols, 4);
-    var ch5Html = buildStudentChapterHTML(ch5, responses[1].inputCols, 5);
+    var ch4Html = buildStudentChapterHTML(ch4, responses[0].inputCols, 4, ch4Files);
+    var ch5Html = buildStudentChapterHTML(ch5, responses[1].inputCols, 5, ch5Files);
     var finHtml = buildStudentFinalHTML(fin, finRes.inputCols, finRes.calcCols);
 
     var result = document.getElementById('sResult');
@@ -424,22 +439,26 @@ function viewStudentScores() {
   Promise.all([
     cachedApiGet({ action: 'getChapterScores', className: currentClass, chapter: 4 }),
     cachedApiGet({ action: 'getChapterScores', className: currentClass, chapter: 5 }),
+    apiGet({ action: 'getCh4StudentFiles', className: currentClass, studentNo: studentNo, _t: Date.now() }).catch(function() { return null; }),
+    apiGet({ action: 'getCh5StudentFiles', className: currentClass, studentNo: studentNo, _t: Date.now() }).catch(function() { return null; }),
     cachedApiGet({ action: 'getFinalScores', className: currentClass }).then(function(r) { return r && !r.error ? r : {}; }).catch(function() { return {}; })
   ]).then(function(responses) {
     var ch4Data = responses[0];
     var ch5Data = responses[1];
-    var finData = responses[2];
+    var ch4Files = responses[2] && responses[2].success ? (responses[2].files || {}) : {};
+    var ch5Files = responses[3] && responses[3].success ? (responses[3].files || {}) : {};
+    var finData = responses[4];
 
     var ch4Student = ch4Data.students ? ch4Data.students.find(function(s) { return String(s.no) === String(studentNo); }) : null;
     var ch5Student = ch5Data.students ? ch5Data.students.find(function(s) { return String(s.no) === String(studentNo); }) : null;
     var finData2 = finData || {};
     var finStudent = finData2.students ? finData2.students.find(function(s) { return String(s.no) === String(studentNo); }) : null;
 
-    renderStudentScoreCard(student, ch4Student, ch5Student, finStudent, ch4Data.inputCols, ch5Data.inputCols, finData2.inputCols, finData2.calcCols);
+    renderStudentScoreCard(student, ch4Student, ch5Student, finStudent, ch4Data.inputCols, ch5Data.inputCols, finData2.inputCols, finData2.calcCols, ch4Files, ch5Files);
   });
 }
 
-function renderStudentScoreCard(student, ch4, ch5, fin, cols4, cols5, colsF, calcColsF) {
+function renderStudentScoreCard(student, ch4, ch5, fin, cols4, cols5, colsF, calcColsF, ch4Files, ch5Files) {
   var result = document.getElementById('sResult');
   var initial = student ? student.name.charAt(0).toUpperCase() : '?';
 
@@ -447,8 +466,8 @@ function renderStudentScoreCard(student, ch4, ch5, fin, cols4, cols5, colsF, cal
   html += '<div class="score-card-header"><div class="score-card-avatar">' + initial + '</div><div class="score-card-name"><div class="name">' + (student ? student.name : '') + '</div><div class="meta">' + CLASS_LABELS[currentClass] + ' &middot; ' + (student && student.nickname ? student.nickname : '') + '</div></div></div>';
   html += '<div class="score-card-body">';
   html += '<div class="chapter-tabs"><button class="ch-tab active" id="stab4" onclick="switchStudentTab(4)">Chapter 4</button><button class="ch-tab" id="stab5" onclick="switchStudentTab(5)">Chapter 5</button><button class="ch-tab" id="stabF" onclick="switchStudentTab(&apos;F&apos;)">&#127942; Final Score</button></div>';
-  html += '<div id="sScoreCh4">' + buildStudentChapterHTML(ch4, cols4, 4) + '</div>';
-  html += '<div id="sScoreCh5" style="display:none">' + buildStudentChapterHTML(ch5, cols5, 5) + '</div>';
+  html += '<div id="sScoreCh4">' + buildStudentChapterHTML(ch4, cols4, 4, ch4Files || {}) + '</div>';
+  html += '<div id="sScoreCh5" style="display:none">' + buildStudentChapterHTML(ch5, cols5, 5, ch5Files || {}) + '</div>';
   html += '<div id="sScoreF" style="display:none">' + buildStudentFinalHTML(fin, colsF, calcColsF) + '</div>';
   html += '</div></div>';
   html += '<div id="leaderboardArea"></div>';
@@ -456,7 +475,7 @@ function renderStudentScoreCard(student, ch4, ch5, fin, cols4, cols5, colsF, cal
   renderLeaderboard(currentClass);
 }
 
-function buildStudentChapterHTML(chData, cols, ch) {
+function buildStudentChapterHTML(chData, cols, ch, files) {
   if (!chData) return '<div class="state-card"><div class="state-icon">&#128203;</div><div class="state-title">No data yet</div><div class="state-sub">Chapter ' + ch + ' scores haven\'t been entered yet.</div></div>';
 
   var html = '<div class="score-grid">';
@@ -464,7 +483,11 @@ function buildStudentChapterHTML(chData, cols, ch) {
     cols.forEach(function(col) {
       var val = chData.scores[col];
       var isEmpty = val === '' || val === undefined || val === null;
-      html += '<div class="score-tile"><div class="score-tile-label">' + col + '</div><div class="score-tile-val' + (isEmpty ? ' empty' : '') + '">' + (isEmpty ? '-' : val) + '</div></div>';
+      var taskKey = taskKeyForScoreColumn(col, ch);
+      var fileUrl = taskKey && files ? files[taskKey] : '';
+      html += '<div class="score-tile"><div class="score-tile-label">' + col + '</div><div class="score-tile-val' + (isEmpty ? ' empty' : '') + '">' + (isEmpty ? '-' : val) + '</div>' +
+        (fileUrl ? '<a class="score-preview-link" href="' + escapeAttr(fileUrl) + '" target="_blank" rel="noopener">Preview</a>' : '') +
+        '</div>';
     });
   }
   html += '</div>';
