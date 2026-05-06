@@ -123,7 +123,7 @@
       <div class="content-section-head">
         <div class="content-title-row">
           <div class="content-badge">Chapter 5</div>
-          <h2 class="content-title" id="chapter5StatusTitle">Submission Status and Sync</h2>
+          <h2 class="content-title" id="chapter5StatusTitle">Chapter 5 Submission Status</h2>
         </div>
       </div>
       <div class="status-picker">
@@ -148,8 +148,8 @@
             <option value="">Select class first</option>
           </select>
         </div>
-        <button class="btn primary sync-btn" id="ch5SyncBtn" onclick="checkAndSyncCh5()">Check and Sync Task Status</button>
-        <div class="field-hint">Checks your Chapter 5 submission and automatically updates your task status.</div>
+        <button class="btn primary sync-btn" id="ch5SyncBtn" onclick="checkCh5Status()">Check Submission Status</button>
+        <div class="field-hint">Checks whether your Chapter 5 PDF submission has been received.</div>
       </div>
       <div class="status-result" id="ch5Result"></div>
     </section>
@@ -269,7 +269,7 @@
       }
     }
 
-    async function checkAndSyncCh5() {
+    async function checkCh5Status() {
       var cls = document.getElementById('ch5ClassSel').value;
       var no = document.getElementById('ch5NameSel').value;
       var result = document.getElementById('ch5Result');
@@ -286,27 +286,27 @@
       result.innerHTML = '<div class="status-loading"><span class="spinner-sm"></span>Checking your submission...</div>';
       result.classList.add('show');
       try {
-        var data = await apiGet({ action: 'syncCh5Student', className: cls, studentNo: no });
-        if (data.error || !data.tasks) {
-          var students = ch5Students[cls] || [];
-          var s = students.find(function(st) { return String(st.no) === String(no); });
-          var displayName = s ? (s.nickname || s.name) : 'Student';
+        var data = await apiGet({ action: 'getCh5StudentFiles', className: cls, studentNo: no });
+        var students = ch5Students[cls] || [];
+        var s = students.find(function(st) { return String(st.no) === String(no); });
+        var displayName = (data && data.studentName) || (s ? (s.nickname || s.name) : 'Student');
+        var files = data && data.files ? data.files : {};
+        var fileKeys = Object.keys(files).filter(function(k) { return /^C5T/i.test(k); }).sort();
+        if (!data || data.error || !data.submitted || !fileKeys.length) {
           result.innerHTML =
             '<div class="status-student-name">' + displayName + '</div>' +
             '<div class="status-badge-big status-missing">Not Submitted Yet</div>' +
             '<div class="status-sub-note">We could not find a Chapter 5 submission for you. Make sure you used the submission form above and uploaded at least one PDF.</div>';
         } else {
-          var ch5Keys = Object.keys(data.tasks).filter(function(k) { return /^C5T/i.test(k); }).sort();
-          var doneCount = ch5Keys.filter(function(k) { return data.tasks[k]; }).length;
-          var chips = ch5Keys.map(function(k) {
-            var done = data.tasks[k];
-            var num = k.replace(/^C5T/i, '');
-            return '<span class="task-chip ' + (done ? 'done' : '') + '">' + (done ? 'Done' : 'Open') + ' Task ' + num + '</span>';
+          var chips = [1, 2, 3, 4, 5].map(function(num) {
+            var key = 'C5T' + num;
+            var hasFile = !!files[key];
+            return '<span class="task-chip ' + (hasFile ? 'done' : '') + '">' + (hasFile ? 'Received' : 'Missing') + ' Task ' + num + '</span>';
           }).join('');
           result.innerHTML =
-            '<div class="status-student-name">' + (data.nickname || data.name) + '</div>' +
-            '<div class="status-badge-big status-submitted">Submission Synced</div>' +
-            '<div class="status-sub-note">' + doneCount + ' of ' + ch5Keys.length + ' tasks marked as done in your task status.</div>' +
+            '<div class="status-student-name">' + displayName + '</div>' +
+            '<div class="status-badge-big status-submitted">Submission Received</div>' +
+            '<div class="status-sub-note">' + fileKeys.length + ' of 5 Chapter 5 task files were found. Task status can only be changed by the teacher dashboard.</div>' +
             '<div class="task-chip-row">' + chips + '</div>';
         }
       } catch(e) {
@@ -314,7 +314,7 @@
       }
       if (btn) {
         btn.disabled = false;
-        btn.textContent = 'Check and Sync Task Status';
+        btn.textContent = 'Check Submission Status';
       }
     }
 
