@@ -41,6 +41,7 @@ English Quest is being reorganized into three tracks.
 ## Teacher
 
 - `teacher/index.html` - Teacher dashboard and future management hub for both grades.
+- `teacher/strikes.html` - Teacher strike management for Grade 10.
 
 ## Shared
 
@@ -50,4 +51,4 @@ English Quest is being reorganized into three tracks.
 ## Legacy Root Pages
 
 Some older pages still live at the root while the revamp is in progress. They should either be moved into the correct track or removed later.
-- `strikes.html` currently remains as the teacher strike management tool until it is rebuilt inside `teacher/`.
+- `strikes.html` redirects to `teacher/strikes.html` for old links.
