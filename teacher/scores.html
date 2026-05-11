@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teacher Scores · English Quest</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css"/>
+  <style>
+    :root {
+      --blue:#2563eb; --blue-dark:#1e3a8a; --blue-soft:#dbeafe; --line:#bfdbfe;
+      --ink:#0f172a; --muted:#64748b; --paper:#fff; --wash:#eff6ff;
+      --green:#10b981; --green-soft:#d1fae5; --red:#ef4444; --red-soft:#fee2e2;
+      --amber:#f59e0b; --amber-soft:#fef3c7;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'IBM Plex Sans', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(37,99,235,0.14), transparent 30rem),
+        linear-gradient(180deg, #eff6ff 0%, #f8fafc 42%, #f8fafc 100%);
+    }
+    header {
+      min-height: 390px;
+      padding: 24px 22px 82px;
+      color: #fff;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 48%, #1e3a8a 100%);
+    }
+    .topbar {
+      width: min(1180px, 100%);
+      margin: 0 auto 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand img {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      object-fit: cover;
+      box-shadow: 0 16px 34px rgba(15,23,42,0.18);
+    }
+    .brand-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 800;
+      font-size: 1.15rem;
+      line-height: 0.95;
+    }
+    .brand-sub {
+      color: rgba(255,255,255,0.72);
+      font-size: 0.82rem;
+      margin-top: 4px;
+    }
+    .nav-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .nav-actions a,
+    .nav-actions button {
+      min-height: 42px;
+      padding: 0 17px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid rgba(255,255,255,0.35);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      font: inherit;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .hero {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+    .kicker {
+      color: #bfdbfe;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    h1 {
+      max-width: 760px;
+      margin: 12px 0 18px;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 7vw, 6.2rem);
+      line-height: 0.9;
+      letter-spacing: 0;
+    }
+    .hero-copy {
+      max-width: 700px;
+      margin: 0;
+      color: rgba(255,255,255,0.84);
+      font-size: 1.05rem;
+      line-height: 1.75;
+    }
+    main {
+      width: min(1180px, calc(100% - 44px));
+      margin: -48px auto 0;
+      padding-bottom: 88px;
+      position: relative;
+      z-index: 2;
+    }
+    .panel,
+    .access-card,
+    .score-shell,
+    .empty-card {
+      border: 1.5px solid var(--line);
+      border-radius: 28px;
+      background: rgba(255,255,255,0.96);
+      box-shadow: 0 22px 64px rgba(37,99,235,0.1);
+    }
+    .panel {
+      padding: clamp(20px, 4vw, 32px);
+      margin-bottom: 22px;
+    }
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+    .panel-title {
+      margin: 0;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.55rem);
+      line-height: 1;
+    }
+    .panel-copy {
+      max-width: 720px;
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .status-pill {
+      flex: 0 0 auto;
+      border: 1.5px solid var(--line);
+      border-radius: 999px;
+      padding: 9px 14px;
+      color: #1d4ed8;
+      background: var(--blue-soft);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: minmax(150px, 0.45fr) minmax(220px, 1fr) auto;
+      gap: 12px;
+      align-items: end;
+    }
+    label {
+      display: block;
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    select,
+    input {
+      width: 100%;
+      min-height: 52px;
+      border: 1.5px solid var(--line);
+      border-radius: 16px;
+      padding: 0 16px;
+      background: #f8fafc;
+      color: var(--ink);
+      font: inherit;
+      font-weight: 700;
+      outline: none;
+    }
+    select:focus,
+    input:focus { border-color: #60a5fa; background: #fff; }
+    .btn {
+      min-height: 52px;
+      border: 0;
+      border-radius: 16px;
+      padding: 0 20px;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #fff;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .summary-card {
+      border: 1.5px solid #dbeafe;
+      border-radius: 22px;
+      padding: 17px;
+      background: linear-gradient(135deg, #fff, #f8fbff);
+    }
+    .summary-card strong {
+      display: block;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 1.65rem;
+      line-height: 1;
+      margin-bottom: 7px;
+    }
+    .summary-card span {
+      color: var(--muted);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 22px 0 16px;
+      flex-wrap: wrap;
+    }
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tab {
+      min-height: 42px;
+      border: 1.5px solid var(--line);
+      border-radius: 999px;
+      padding: 0 17px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .tab.active { border-color: #2563eb; background: #2563eb; color: #fff; }
+    .score-shell {
+      overflow: hidden;
+    }
+    .table-wrap {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      min-width: 900px;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      padding: 14px 12px;
+      background: #1d4ed8;
+      color: #fff;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.74rem;
+      text-align: left;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+    th.calc { background: #0f172a; }
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #dbeafe;
+      background: rgba(255,255,255,0.94);
+      vertical-align: middle;
+    }
+    tr:nth-child(even) td { background: #f8fbff; }
+    .student-cell {
+      min-width: 230px;
+      font-weight: 800;
+    }
+    .student-meta {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .score-input {
+      width: 92px;
+      min-height: 42px;
+      border-radius: 12px;
+      padding: 0 10px;
+      text-align: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 800;
+      background: #fff;
+    }
+    .score-input.saved { border-color: #34d399; background: var(--green-soft); }
+    .score-input.error { border-color: #f87171; background: var(--red-soft); }
+    .score-input.saving { border-color: var(--amber); background: var(--amber-soft); }
+    .calc-pill {
+      display: inline-flex;
+      min-width: 72px;
+      min-height: 34px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 0 12px;
+      background: var(--blue-soft);
+      color: #1d4ed8;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .empty-card,
+    .access-card {
+      padding: clamp(24px, 5vw, 42px);
+      text-align: center;
+    }
+    .empty-title,
+    .access-title {
+      margin: 0 0 8px;
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      line-height: 1;
+    }
+    .empty-copy,
+    .access-copy {
+      max-width: 560px;
+      margin: 0 auto 18px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 26px;
+      z-index: 50;
+      transform: translateX(-50%) translateY(90px);
+      border-radius: 999px;
+      padding: 13px 22px;
+      background: var(--ink);
+      color: #fff;
+      font-weight: 800;
+      box-shadow: 0 18px 40px rgba(15,23,42,0.18);
+      transition: transform 0.25s ease;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.ok { background: #059669; }
+    .toast.err { background: #dc2626; }
+    footer { padding: 28px; color: var(--muted); text-align: center; }
+    @media (max-width: 760px) {
+      .topbar,
+      .panel-head { align-items: flex-start; flex-direction: column; display: flex; }
+      .nav-actions { justify-content: flex-start; }
+      .controls,
+      .summary-grid { grid-template-columns: 1fr; }
+      main { width: min(100% - 28px, 1180px); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <img src="../logo.jpg" alt="English Quest Logo"/>
+        <div>
+          <div class="brand-title">English Quest</div>
+          <div class="brand-sub">Teacher Control Room</div>
+        </div>
+      </div>
+      <nav class="nav-actions" aria-label="Teacher navigation">
+        <a href="index.html">Dashboard</a>
+        <a href="../grade10/scores.html">Student View</a>
+        <button type="button" onclick="teacherLogout()">Logout</button>
+      </nav>
+    </div>
+    <section class="hero">
+      <div class="kicker">Scores Manager</div>
+      <h1>Edit chapter and final scores in one table.</h1>
+      <p class="hero-copy">Load a Grade 10 class, switch between Chapter 4, Chapter 5, and Final Scores, then update editable score cells directly from the teacher room.</p>
+    </section>
+  </header>
+
+  <main>
+    <section class="access-card" id="accessCard" hidden>
+      <h2 class="access-title">Teacher login required.</h2>
+      <p class="access-copy">Open the teacher dashboard and log in first. This page uses the saved teacher session to write score changes.</p>
+      <a class="btn" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none;">Open Teacher Login</a>
+    </section>
+
+    <section id="appPanel" hidden>
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2 class="panel-title">Grade 10 Score Sheet</h2>
+            <p class="panel-copy">Editable cells save immediately when changed. Calculated columns stay read-only and refresh when the class is loaded again.</p>
+          </div>
+          <div class="status-pill" id="loginPill">Teacher</div>
+        </div>
+
+        <div class="controls">
+          <div>
+            <label for="classSelect">Class</label>
+            <select id="classSelect">
+              <option value="XE1">X E-1</option>
+              <option value="XE4">X E-4</option>
+              <option value="XE5">X E-5</option>
+              <option value="XE6">X E-6</option>
+              <option value="XE7">X E-7</option>
+              <option value="XE8">X E-8</option>
+              <option value="XE9">X E-9</option>
+              <option value="XE10">X E-10</option>
+              <option value="XE11">X E-11</option>
+            </select>
+          </div>
+          <div>
+            <label for="searchInput">Search student</label>
+            <input id="searchInput" type="search" placeholder="Type name, nickname, or number"/>
+          </div>
+          <button class="btn" type="button" id="loadBtn" onclick="loadScores()">Load Scores</button>
+        </div>
+
+        <div class="summary-grid" id="summaryGrid">
+          <div class="summary-card"><strong>0</strong><span>Students</span></div>
+          <div class="summary-card"><strong>0</strong><span>Editable Columns</span></div>
+          <div class="summary-card"><strong>0</strong><span>Filled Cells</span></div>
+          <div class="summary-card"><strong>0</strong><span>Empty Cells</span></div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="tabs" id="tabs">
+          <button class="tab active" type="button" onclick="setMode('4')">Chapter 4</button>
+          <button class="tab" type="button" onclick="setMode('5')">Chapter 5</button>
+          <button class="tab" type="button" onclick="setMode('final')">Final Scores</button>
+        </div>
+      </div>
+
+      <div id="scoreArea"></div>
+    </section>
+  </main>
+
+  <footer>© 2026 English Quest · Teacher Scores Manager</footer>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    var API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+    var CLASS_LABELS = {
+      XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7',
+      XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11'
+    };
+    var mode = '4';
+    var scoreData = { students: [], inputCols: [], calcCols: [] };
+
+    function auth() {
+      return {
+        username: localStorage.getItem('eq_tu') || '',
+        password: localStorage.getItem('eq_tp') || ''
+      };
+    }
+
+    function apiGet(params) {
+      var url = API + '?' + new URLSearchParams(params);
+      return fetch(url).then(function(res) {
+        if (!res.ok) throw new Error('Network error');
+        return res.json();
+      }).catch(function() {
+        return new Promise(function(resolve, reject) {
+          var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+          var p = Object.assign({}, params, { callback: cb, _t: Date.now() });
+          var script = document.createElement('script');
+          var timer = setTimeout(function() { cleanup(); reject(new Error('Connection timed out')); }, 15000);
+          function cleanup() {
+            delete window[cb];
+            clearTimeout(timer);
+            if (script.parentNode) script.parentNode.removeChild(script);
+          }
+          window[cb] = function(data) { cleanup(); resolve(data); };
+          script.onerror = function() { cleanup(); reject(new Error('Network error')); };
+          script.src = API + '?' + new URLSearchParams(p);
+          document.body.appendChild(script);
+        });
+      });
+    }
+
+    function setMode(nextMode) {
+      mode = nextMode;
+      document.querySelectorAll('.tab').forEach(function(tab) {
+        var text = tab.textContent.toLowerCase();
+        var active = nextMode === 'final' ? text.indexOf('final') > -1 : text.indexOf(nextMode) > -1;
+        tab.classList.toggle('active', active);
+      });
+      loadScores();
+    }
+
+    function loadScores() {
+      var cls = document.getElementById('classSelect').value;
+      var btn = document.getElementById('loadBtn');
+      btn.disabled = true;
+      btn.textContent = 'Loading...';
+      document.getElementById('scoreArea').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading scores...</h2><p class="empty-copy">Fetching ' + (CLASS_LABELS[cls] || cls) + ' from the spreadsheet.</p></div>';
+      var params = mode === 'final'
+        ? { action: 'getFinalScores', className: cls }
+        : { action: 'getChapterScores', className: cls, chapter: mode };
+      apiGet(params).then(function(data) {
+        if (data.error) throw new Error(data.error);
+        scoreData = {
+          students: data.students || [],
+          inputCols: data.inputCols || [],
+          calcCols: data.calcCols || []
+        };
+        renderScores();
+        showToast('Scores loaded', 'ok');
+      }).catch(function(err) {
+        document.getElementById('scoreArea').innerHTML = '<div class="empty-card"><h2 class="empty-title">Could not load scores.</h2><p class="empty-copy">' + err.message + '</p></div>';
+        showToast(err.message, 'err');
+      }).finally(function() {
+        btn.disabled = false;
+        btn.textContent = 'Load Scores';
+        updateSummary();
+      });
+    }
+
+    function renderScores() {
+      var query = document.getElementById('searchInput').value.trim().toLowerCase();
+      var students = scoreData.students.filter(function(student) {
+        var searchable = [student.no, student.name, student.nickname].join(' ').toLowerCase();
+        return !query || searchable.indexOf(query) > -1;
+      });
+      if (!scoreData.students.length) {
+        document.getElementById('scoreArea').innerHTML = '<div class="empty-card"><h2 class="empty-title">No score data yet.</h2><p class="empty-copy">Try another class or tab.</p></div>';
+        updateSummary();
+        return;
+      }
+      if (!students.length) {
+        document.getElementById('scoreArea').innerHTML = '<div class="empty-card"><h2 class="empty-title">No matching students.</h2><p class="empty-copy">Try a different search.</p></div>';
+        updateSummary();
+        return;
+      }
+
+      var calcCols = mode === 'final' ? scoreData.calcCols : ['Average', 'Final Score', 'Indicator'];
+      var head = '<tr><th>Student</th>' +
+        scoreData.inputCols.map(function(col) { return '<th>' + col + '</th>'; }).join('') +
+        calcCols.map(function(col) { return '<th class="calc">' + col + '</th>'; }).join('') +
+        '</tr>';
+      var rows = students.map(function(student) {
+        return '<tr>' +
+          '<td class="student-cell">' + student.name + '<span class="student-meta">No. ' + student.no + (student.nickname ? ' · ' + student.nickname : '') + '</span></td>' +
+          scoreData.inputCols.map(function(col) {
+            var val = student.scores && student.scores[col] !== undefined ? student.scores[col] : '';
+            return '<td><input class="score-input" type="number" inputmode="decimal" min="0" max="100" step="0.01" value="' + val + '" data-no="' + student.no + '" data-col="' + col + '" onchange="saveScore(this)"/></td>';
+          }).join('') +
+          calcCols.map(function(col) {
+            var val = calcValue(student, col);
+            return '<td><span class="calc-pill">' + (val === '' || val === undefined || val === null ? '-' : val) + '</span></td>';
+          }).join('') +
+        '</tr>';
+      }).join('');
+
+      document.getElementById('scoreArea').innerHTML =
+        '<section class="score-shell"><div class="table-wrap"><table><thead>' + head + '</thead><tbody>' + rows + '</tbody></table></div></section>';
+      updateSummary();
+    }
+
+    function calcValue(student, col) {
+      if (mode === 'final') return student.calc ? student.calc[col] : '';
+      if (col === 'Average') return student.average;
+      if (col === 'Final Score') return student.finalScore;
+      if (col === 'Indicator') return student.indicator;
+      return '';
+    }
+
+    function saveScore(input) {
+      var credentials = auth();
+      if (!credentials.username || !credentials.password) {
+        showAccess();
+        return;
+      }
+      var value = input.value;
+      if (value !== '' && (Number(value) < 0 || Number(value) > 100)) {
+        input.className = 'score-input error';
+        showToast('Score must be between 0 and 100', 'err');
+        return;
+      }
+      input.className = 'score-input saving';
+      input.disabled = true;
+      var cls = document.getElementById('classSelect').value;
+      var params = mode === 'final'
+        ? {
+            action: 'saveFinalScore',
+            username: credentials.username,
+            password: credentials.password,
+            className: cls,
+            studentNo: input.getAttribute('data-no'),
+            column: input.getAttribute('data-col'),
+            value: value
+          }
+        : {
+            action: 'saveChapterScore',
+            username: credentials.username,
+            password: credentials.password,
+            className: cls,
+            chapter: mode,
+            studentNo: input.getAttribute('data-no'),
+            column: input.getAttribute('data-col'),
+            value: value
+          };
+      apiGet(params).then(function(data) {
+        if (!data || data.error || data.success === false) throw new Error((data && data.error) || 'Save failed');
+        updateLocalValue(input.getAttribute('data-no'), input.getAttribute('data-col'), value, data.calc);
+        input.className = 'score-input saved';
+        showToast('Score saved', 'ok');
+        setTimeout(function() { input.className = 'score-input'; }, 900);
+        updateSummary();
+      }).catch(function(err) {
+        input.className = 'score-input error';
+        showToast(err.message, 'err');
+      }).finally(function() {
+        input.disabled = false;
+      });
+    }
+
+    function updateLocalValue(studentNo, column, value, calc) {
+      var student = scoreData.students.find(function(item) { return String(item.no) === String(studentNo); });
+      if (!student) return;
+      if (!student.scores) student.scores = {};
+      student.scores[column] = value;
+      if (mode === 'final' && calc) student.calc = Object.assign(student.calc || {}, calc);
+    }
+
+    function updateSummary() {
+      var filled = 0;
+      var editable = scoreData.students.length * scoreData.inputCols.length;
+      scoreData.students.forEach(function(student) {
+        scoreData.inputCols.forEach(function(col) {
+          var value = student.scores ? student.scores[col] : '';
+          if (value !== '' && value !== undefined && value !== null) filled++;
+        });
+      });
+      document.getElementById('summaryGrid').innerHTML =
+        '<div class="summary-card"><strong>' + scoreData.students.length + '</strong><span>Students</span></div>' +
+        '<div class="summary-card"><strong>' + scoreData.inputCols.length + '</strong><span>Editable Columns</span></div>' +
+        '<div class="summary-card"><strong>' + filled + '</strong><span>Filled Cells</span></div>' +
+        '<div class="summary-card"><strong>' + Math.max(editable - filled, 0) + '</strong><span>Empty Cells</span></div>';
+    }
+
+    function showAccess() {
+      document.getElementById('accessCard').hidden = false;
+      document.getElementById('appPanel').hidden = true;
+    }
+
+    function showApp() {
+      var credentials = auth();
+      document.getElementById('loginPill').textContent = credentials.username || 'Teacher';
+      document.getElementById('accessCard').hidden = true;
+      document.getElementById('appPanel').hidden = false;
+    }
+
+    function teacherLogout() {
+      localStorage.removeItem('eq_tu');
+      localStorage.removeItem('eq_tp');
+      location.href = 'index.html';
+    }
+
+    function showToast(message, type) {
+      var toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast ' + (type || '');
+      setTimeout(function() { toast.classList.add('show'); }, 10);
+      setTimeout(function() { toast.classList.remove('show'); }, 2600);
+    }
+
+    document.getElementById('classSelect').addEventListener('change', loadScores);
+    document.getElementById('searchInput').addEventListener('input', renderScores);
+
+    (function init() {
+      var credentials = auth();
+      if (!credentials.username || !credentials.password) {
+        showAccess();
+        return;
+      }
+      showApp();
+      loadScores();
+    })();
+  </script>
+</body>
+</html>
