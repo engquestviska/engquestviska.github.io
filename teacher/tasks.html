@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teacher Tasks · English Quest</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css"/>
+  <style>
+    :root {
+      --blue: #2563eb;
+      --blue-dark: #1e3a8a;
+      --blue-soft: #dbeafe;
+      --line: #bfdbfe;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --paper: #ffffff;
+      --wash: #eff6ff;
+      --green: #10b981;
+      --green-soft: #d1fae5;
+      --red: #ef4444;
+      --red-soft: #fee2e2;
+      --amber: #f59e0b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'IBM Plex Sans', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.14), transparent 30rem),
+        linear-gradient(180deg, #eff6ff 0%, #f8fafc 42%, #f8fafc 100%);
+    }
+    header {
+      min-height: 390px;
+      padding: 24px 22px 82px;
+      color: #fff;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 48%, #1e3a8a 100%);
+    }
+    .topbar {
+      width: min(1180px, 100%);
+      margin: 0 auto 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand img {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      object-fit: cover;
+      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.18);
+    }
+    .brand-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 800;
+      font-size: 1.15rem;
+      line-height: 0.95;
+    }
+    .brand-sub {
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 0.82rem;
+      margin-top: 4px;
+    }
+    .nav-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .nav-actions a,
+    .nav-actions button {
+      min-height: 42px;
+      padding: 0 17px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      font: inherit;
+      font-weight: 800;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .hero {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+    .kicker {
+      color: #bfdbfe;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    h1 {
+      max-width: 760px;
+      margin: 12px 0 18px;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 7vw, 6.2rem);
+      line-height: 0.9;
+      letter-spacing: 0;
+    }
+    .hero-copy {
+      max-width: 700px;
+      margin: 0;
+      color: rgba(255, 255, 255, 0.84);
+      font-size: 1.05rem;
+      line-height: 1.75;
+    }
+    main {
+      width: min(1180px, calc(100% - 44px));
+      margin: -48px auto 0;
+      padding-bottom: 88px;
+      position: relative;
+      z-index: 2;
+    }
+    .panel,
+    .access-card,
+    .student-card,
+    .empty-card {
+      border: 1.5px solid var(--line);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 22px 64px rgba(37, 99, 235, 0.1);
+    }
+    .panel {
+      padding: clamp(20px, 4vw, 32px);
+      margin-bottom: 22px;
+    }
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+    .panel-title {
+      margin: 0;
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.55rem);
+      line-height: 1;
+    }
+    .panel-copy {
+      max-width: 680px;
+      margin: 8px 0 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+    .status-pill {
+      flex: 0 0 auto;
+      border: 1.5px solid var(--line);
+      border-radius: 999px;
+      padding: 9px 14px;
+      color: #1d4ed8;
+      background: var(--blue-soft);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: minmax(150px, 0.45fr) minmax(220px, 1fr) auto;
+      gap: 12px;
+      align-items: end;
+    }
+    label {
+      display: block;
+      margin: 0 0 8px;
+      color: var(--muted);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    select,
+    input {
+      width: 100%;
+      min-height: 52px;
+      border: 1.5px solid var(--line);
+      border-radius: 16px;
+      padding: 0 16px;
+      background: #f8fafc;
+      color: var(--ink);
+      font: inherit;
+      font-weight: 700;
+      outline: none;
+    }
+    select:focus,
+    input:focus {
+      border-color: #60a5fa;
+      background: #fff;
+    }
+    .btn {
+      min-height: 52px;
+      border: 0;
+      border-radius: 16px;
+      padding: 0 20px;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #fff;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .btn.ghost {
+      border: 1.5px solid var(--line);
+      background: #fff;
+      color: #1d4ed8;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .summary-card {
+      border: 1.5px solid #dbeafe;
+      border-radius: 22px;
+      padding: 17px;
+      background: linear-gradient(135deg, #fff, #f8fbff);
+    }
+    .summary-card strong {
+      display: block;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 1.65rem;
+      line-height: 1;
+      margin-bottom: 7px;
+    }
+    .summary-card span {
+      color: var(--muted);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 22px 0 16px;
+      flex-wrap: wrap;
+    }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .tab {
+      min-height: 42px;
+      border: 1.5px solid var(--line);
+      border-radius: 999px;
+      padding: 0 17px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .tab.active {
+      border-color: #2563eb;
+      background: #2563eb;
+      color: #fff;
+    }
+    .bulk-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .bulk-actions .btn {
+      min-height: 42px;
+      border-radius: 999px;
+      font-size: 0.86rem;
+    }
+    .student-list {
+      display: grid;
+      gap: 12px;
+    }
+    .student-card {
+      overflow: hidden;
+    }
+    .student-row {
+      display: grid;
+      grid-template-columns: 54px minmax(180px, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      padding: 18px;
+      border-bottom: 1.5px solid #dbeafe;
+    }
+    .avatar {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: #2563eb;
+      color: #fff;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 800;
+    }
+    .student-name {
+      font-weight: 800;
+      line-height: 1.25;
+    }
+    .student-meta {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 600;
+    }
+    .student-stats {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .progress-pill {
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: var(--blue-soft);
+      color: #1d4ed8;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .save-btn {
+      min-height: 40px;
+      border-radius: 999px;
+      padding: 0 16px;
+      font-size: 0.86rem;
+    }
+    .save-btn.dirty {
+      background: linear-gradient(135deg, var(--amber), #d97706);
+    }
+    .task-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+      gap: 10px;
+      padding: 16px 18px 18px;
+      background: #f8fbff;
+    }
+    .task-toggle {
+      min-height: 54px;
+      border: 1.5px solid #dbeafe;
+      border-radius: 16px;
+      background: #fff;
+      color: var(--muted);
+      font: inherit;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .task-toggle.done {
+      border-color: #34d399;
+      background: var(--green-soft);
+      color: #065f46;
+    }
+    .task-toggle.missing {
+      border-color: #fecaca;
+      background: #fff;
+      color: #991b1b;
+    }
+    .empty-card,
+    .access-card {
+      padding: clamp(24px, 5vw, 42px);
+      text-align: center;
+    }
+    .empty-title,
+    .access-title {
+      margin: 0 0 8px;
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      line-height: 1;
+    }
+    .empty-copy,
+    .access-copy {
+      max-width: 560px;
+      margin: 0 auto 18px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 26px;
+      z-index: 50;
+      transform: translateX(-50%) translateY(90px);
+      border-radius: 999px;
+      padding: 13px 22px;
+      background: var(--ink);
+      color: #fff;
+      font-weight: 800;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+      transition: transform 0.25s ease;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.ok { background: #059669; }
+    .toast.err { background: #dc2626; }
+    footer {
+      padding: 28px;
+      color: var(--muted);
+      text-align: center;
+    }
+    @media (max-width: 760px) {
+      .topbar,
+      .panel-head,
+      .student-row {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .topbar,
+      .panel-head {
+        display: flex;
+      }
+      .nav-actions {
+        justify-content: flex-start;
+      }
+      .controls,
+      .summary-grid,
+      .student-row {
+        grid-template-columns: 1fr;
+      }
+      .student-stats {
+        justify-content: flex-start;
+      }
+      main {
+        width: min(100% - 28px, 1180px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <img src="../logo.jpg" alt="English Quest Logo"/>
+        <div>
+          <div class="brand-title">English Quest</div>
+          <div class="brand-sub">Teacher Control Room</div>
+        </div>
+      </div>
+      <nav class="nav-actions" aria-label="Teacher navigation">
+        <a href="index.html">Dashboard</a>
+        <a href="../grade10/tasks.html">Student View</a>
+        <button type="button" onclick="teacherLogout()">Logout</button>
+      </nav>
+    </div>
+    <section class="hero">
+      <div class="kicker">Task Status Manager</div>
+      <h1>Update student task progress from one room.</h1>
+      <p class="hero-copy">Choose a Grade 10 class, review Chapter 4 or Chapter 5 task status, and save changes directly to the task sheet. Students only see the read-only result.</p>
+    </section>
+  </header>
+
+  <main>
+    <section class="access-card" id="accessCard" hidden>
+      <h2 class="access-title">Teacher login required.</h2>
+      <p class="access-copy">Open the teacher dashboard and log in first. This page uses the saved teacher session to write task changes.</p>
+      <a class="btn" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none;">Open Teacher Login</a>
+    </section>
+
+    <section id="appPanel" hidden>
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2 class="panel-title">Grade 10 Task Sheet</h2>
+            <p class="panel-copy">Toggle tasks for each student, then save the row. Unsaved rows turn amber so it is clear what still needs writing.</p>
+          </div>
+          <div class="status-pill" id="loginPill">Teacher</div>
+        </div>
+
+        <div class="controls">
+          <div>
+            <label for="classSelect">Class</label>
+            <select id="classSelect">
+              <option value="XE1">X E-1</option>
+              <option value="XE4">X E-4</option>
+              <option value="XE5">X E-5</option>
+              <option value="XE6">X E-6</option>
+              <option value="XE7">X E-7</option>
+              <option value="XE8">X E-8</option>
+              <option value="XE9">X E-9</option>
+              <option value="XE10">X E-10</option>
+              <option value="XE11">X E-11</option>
+            </select>
+          </div>
+          <div>
+            <label for="searchInput">Search student</label>
+            <input id="searchInput" type="search" placeholder="Type name, nickname, or number"/>
+          </div>
+          <button class="btn" type="button" id="loadBtn" onclick="loadTasks()">Load Tasks</button>
+        </div>
+
+        <div class="summary-grid" id="summaryGrid">
+          <div class="summary-card"><strong>0</strong><span>Students</span></div>
+          <div class="summary-card"><strong>0</strong><span>Tasks</span></div>
+          <div class="summary-card"><strong>0%</strong><span>Average Done</span></div>
+          <div class="summary-card"><strong>0</strong><span>Unsaved Rows</span></div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="tabs" id="chapterTabs">
+          <button class="tab active" type="button" onclick="setChapter('4')">Chapter 4</button>
+          <button class="tab" type="button" onclick="setChapter('5')">Chapter 5</button>
+          <button class="tab" type="button" onclick="setChapter('all')">All Tasks</button>
+        </div>
+        <div class="bulk-actions">
+          <button class="btn ghost" type="button" onclick="showOnly('missing')">Show Missing</button>
+          <button class="btn ghost" type="button" onclick="showOnly('all')">Show All</button>
+        </div>
+      </div>
+
+      <div id="taskList" class="student-list"></div>
+    </section>
+  </main>
+
+  <footer>© 2026 English Quest · Teacher Task Manager</footer>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    var API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+    var CLASS_LABELS = {
+      XE1: 'X E-1', XE4: 'X E-4', XE5: 'X E-5', XE6: 'X E-6', XE7: 'X E-7',
+      XE8: 'X E-8', XE9: 'X E-9', XE10: 'X E-10', XE11: 'X E-11'
+    };
+    var taskData = { students: [], taskKeys: [] };
+    var currentChapter = '4';
+    var filterMode = 'all';
+    var dirtyRows = {};
+
+    function auth() {
+      return {
+        username: localStorage.getItem('eq_tu') || '',
+        password: localStorage.getItem('eq_tp') || ''
+      };
+    }
+
+    function apiGet(params) {
+      var url = API + '?' + new URLSearchParams(params);
+      return fetch(url).then(function(res) {
+        if (!res.ok) throw new Error('Network error');
+        return res.json();
+      }).catch(function() {
+        return new Promise(function(resolve, reject) {
+          var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+          var p = Object.assign({}, params, { callback: cb, _t: Date.now() });
+          var script = document.createElement('script');
+          var timer = setTimeout(function() { cleanup(); reject(new Error('Connection timed out')); }, 15000);
+          function cleanup() {
+            delete window[cb];
+            clearTimeout(timer);
+            if (script.parentNode) script.parentNode.removeChild(script);
+          }
+          window[cb] = function(data) { cleanup(); resolve(data); };
+          script.onerror = function() { cleanup(); reject(new Error('Network error')); };
+          script.src = API + '?' + new URLSearchParams(p);
+          document.body.appendChild(script);
+        });
+      });
+    }
+
+    function getVisibleTaskKeys() {
+      if (currentChapter === 'all') return taskData.taskKeys.slice();
+      return taskData.taskKeys.filter(function(key) {
+        return key.indexOf('C' + currentChapter + 'T') === 0;
+      });
+    }
+
+    function taskLabel(key) {
+      var match = key.match(/^C(\d+)T(\d+)$/i);
+      return match ? 'C' + match[1] + ' Task ' + match[2] : key;
+    }
+
+    function setChapter(chapter) {
+      currentChapter = chapter;
+      document.querySelectorAll('.tab').forEach(function(tab) {
+        var text = tab.textContent.toLowerCase();
+        var active = chapter === 'all' ? text.indexOf('all') > -1 : text.indexOf(chapter) > -1;
+        tab.classList.toggle('active', active);
+      });
+      renderTasks();
+    }
+
+    function showOnly(mode) {
+      filterMode = mode;
+      renderTasks();
+    }
+
+    function loadTasks() {
+      var cls = document.getElementById('classSelect').value;
+      var btn = document.getElementById('loadBtn');
+      btn.disabled = true;
+      btn.textContent = 'Loading...';
+      dirtyRows = {};
+      document.getElementById('taskList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading task status...</h2><p class="empty-copy">Fetching ' + (CLASS_LABELS[cls] || cls) + ' from the task sheet.</p></div>';
+
+      apiGet({ action: 'getAllTasks', className: cls }).then(function(data) {
+        if (data.error) throw new Error(data.error);
+        taskData = {
+          students: data.students || [],
+          taskKeys: data.taskKeys || []
+        };
+        renderTasks();
+        showToast('Tasks loaded', 'ok');
+      }).catch(function(err) {
+        document.getElementById('taskList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Could not load tasks.</h2><p class="empty-copy">' + err.message + '</p></div>';
+        showToast(err.message, 'err');
+      }).finally(function() {
+        btn.disabled = false;
+        btn.textContent = 'Load Tasks';
+        updateSummary();
+      });
+    }
+
+    function renderTasks() {
+      var list = document.getElementById('taskList');
+      var query = document.getElementById('searchInput').value.trim().toLowerCase();
+      var keys = getVisibleTaskKeys();
+      var students = taskData.students.filter(function(student) {
+        var searchable = [student.no, student.name, student.nickname].join(' ').toLowerCase();
+        if (query && searchable.indexOf(query) === -1) return false;
+        if (filterMode === 'missing') {
+          return keys.some(function(key) { return !student.tasks[key]; });
+        }
+        return true;
+      });
+
+      if (!taskData.students.length) {
+        list.innerHTML = '<div class="empty-card"><h2 class="empty-title">Load a class to begin.</h2><p class="empty-copy">Choose a class and open its Task_Status sheet from the controls above.</p></div>';
+        updateSummary();
+        return;
+      }
+      if (!students.length) {
+        list.innerHTML = '<div class="empty-card"><h2 class="empty-title">No matching students.</h2><p class="empty-copy">Try a different search or switch back to Show All.</p></div>';
+        updateSummary();
+        return;
+      }
+
+      list.innerHTML = students.map(function(student) {
+        var done = keys.filter(function(key) { return student.tasks[key]; }).length;
+        var total = keys.length || 0;
+        var pct = total ? Math.round(done / total * 100) : 0;
+        var initial = (student.nickname || student.name || '?').charAt(0).toUpperCase();
+        var cardClass = dirtyRows[student.no] ? 'student-card dirty' : 'student-card';
+        return '<article class="' + cardClass + '" data-no="' + student.no + '">' +
+          '<div class="student-row">' +
+            '<div class="avatar">' + initial + '</div>' +
+            '<div>' +
+              '<div class="student-name">' + student.name + '</div>' +
+              '<div class="student-meta">No. ' + student.no + (student.nickname ? ' · ' + student.nickname : '') + '</div>' +
+            '</div>' +
+            '<div class="student-stats">' +
+              '<span class="progress-pill">' + done + '/' + total + ' · ' + pct + '%</span>' +
+              '<button class="btn save-btn' + (dirtyRows[student.no] ? ' dirty' : '') + '" type="button" onclick="saveStudentTasks(&quot;' + student.no + '&quot;)">' + (dirtyRows[student.no] ? 'Save Changes' : 'Saved') + '</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="task-grid">' + keys.map(function(key) {
+            var isDone = !!student.tasks[key];
+            return '<button class="task-toggle ' + (isDone ? 'done' : 'missing') + '" type="button" onclick="toggleTask(&quot;' + student.no + '&quot;,&quot;' + key + '&quot;)">' +
+              (isDone ? 'Done · ' : 'Missing · ') + taskLabel(key) +
+            '</button>';
+          }).join('') + '</div>' +
+        '</article>';
+      }).join('');
+      updateSummary();
+    }
+
+    function toggleTask(studentNo, key) {
+      var student = taskData.students.find(function(item) { return String(item.no) === String(studentNo); });
+      if (!student) return;
+      student.tasks[key] = !student.tasks[key];
+      dirtyRows[studentNo] = true;
+      renderTasks();
+    }
+
+    function saveStudentTasks(studentNo) {
+      var student = taskData.students.find(function(item) { return String(item.no) === String(studentNo); });
+      if (!student) return;
+      var credentials = auth();
+      if (!credentials.username || !credentials.password) {
+        showAccess();
+        return;
+      }
+      var cls = document.getElementById('classSelect').value;
+      var btn = document.querySelector('[data-no="' + studentNo + '"] .save-btn');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Saving...';
+      }
+      apiGet({
+        action: 'saveTaskStatus',
+        username: credentials.username,
+        password: credentials.password,
+        className: cls,
+        studentNo: studentNo,
+        tasks: JSON.stringify(student.tasks)
+      }).then(function(data) {
+        if (!data || data.error || data.success === false) throw new Error((data && data.error) || 'Save failed');
+        delete dirtyRows[studentNo];
+        renderTasks();
+        showToast('Saved ' + (student.nickname || student.name), 'ok');
+      }).catch(function(err) {
+        showToast(err.message, 'err');
+        renderTasks();
+      });
+    }
+
+    function updateSummary() {
+      var totalStudents = taskData.students.length;
+      var totalTasks = taskData.taskKeys.length;
+      var totalSlots = totalStudents * totalTasks;
+      var doneSlots = 0;
+      taskData.students.forEach(function(student) {
+        taskData.taskKeys.forEach(function(key) {
+          if (student.tasks[key]) doneSlots++;
+        });
+      });
+      var average = totalSlots ? Math.round(doneSlots / totalSlots * 100) : 0;
+      var unsaved = Object.keys(dirtyRows).length;
+      document.getElementById('summaryGrid').innerHTML =
+        '<div class="summary-card"><strong>' + totalStudents + '</strong><span>Students</span></div>' +
+        '<div class="summary-card"><strong>' + totalTasks + '</strong><span>Tasks</span></div>' +
+        '<div class="summary-card"><strong>' + average + '%</strong><span>Average Done</span></div>' +
+        '<div class="summary-card"><strong>' + unsaved + '</strong><span>Unsaved Rows</span></div>';
+    }
+
+    function showAccess() {
+      document.getElementById('accessCard').hidden = false;
+      document.getElementById('appPanel').hidden = true;
+    }
+
+    function showApp() {
+      var credentials = auth();
+      document.getElementById('loginPill').textContent = credentials.username || 'Teacher';
+      document.getElementById('accessCard').hidden = true;
+      document.getElementById('appPanel').hidden = false;
+    }
+
+    function teacherLogout() {
+      localStorage.removeItem('eq_tu');
+      localStorage.removeItem('eq_tp');
+      location.href = 'index.html';
+    }
+
+    function showToast(message, type) {
+      var toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast ' + (type || '');
+      setTimeout(function() { toast.classList.add('show'); }, 10);
+      setTimeout(function() { toast.classList.remove('show'); }, 2600);
+    }
+
+    document.getElementById('classSelect').addEventListener('change', loadTasks);
+    document.getElementById('searchInput').addEventListener('input', renderTasks);
+
+    (function init() {
+      var credentials = auth();
+      if (!credentials.username || !credentials.password) {
+        showAccess();
+        return;
+      }
+      showApp();
+      loadTasks();
+    })();
+  </script>
+</body>
+</html>
