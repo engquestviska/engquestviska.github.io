@@ -35,27 +35,13 @@
     '    <a href="tasks.html" class="sidebar-item" data-page="tasks"><div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#128204;</div><div class="sidebar-item-name">Task Status</div></a>',
     '    <a href="activeness.html" class="sidebar-item" data-page="activeness"><div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#9889;</div><div class="sidebar-item-name">Activeness</div></a>',
     '  </div>',
-    '  <div class="sidebar-teacher">',
-    '    <div class="sidebar-teacher-label">&#128273; Teacher Access</div>',
-    '    <div id="sbTeacherLoggedOut">',
-    '      <button style="width:100%;padding:10px;background:linear-gradient(135deg,#2563EB,#1D4ED8);color:#fff;font-family:inherit;font-weight:700;font-size:0.85rem;border:none;border-radius:10px;cursor:pointer;" onclick="closeSidebar();window.location.href=\'../teacher/\';">Login as Teacher</button>',
-    '    </div>',
-    '    <div id="sbTeacherLoggedIn" style="display:none;">',
-    '      <div class="sidebar-teacher-logged">&#127891; Logged in as Teacher <span onclick="localStorage.removeItem(\'eq_tu\');localStorage.removeItem(\'eq_tp\');location.reload();">Logout</span></div>',
-    '    </div>',
-    '  </div>',
     '</nav>'
   ].join('\n');
 
-  /* Push teacher section to bottom of sidebar */
+  /* Keep shared sidebars consistent on secondary student pages. */
   var style = document.createElement('style');
   style.textContent =
-    '.sidebar { display:flex !important; flex-direction:column !important; overflow-y:auto !important; }' +
-    '.sidebar-teacher { margin-top:auto; border-top:1px solid rgba(255,255,255,0.1); padding:16px; }' +
-    /* Push teacher badge / login button left of the hamburger (40px wide at right:20px) */
-    'header .header-right { right:70px !important; }' +
-    'header .teacher-badge { right:70px !important; }' +
-    'header .teacher-btn { right:70px !important; }';
+    '.sidebar { display:flex !important; flex-direction:column !important; overflow-y:auto !important; }';
   document.head.appendChild(style);
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -65,8 +51,6 @@
     var wrap = document.createElement('div');
     wrap.innerHTML = HTML;
     while (wrap.firstChild) document.body.appendChild(wrap.firstChild);
-
-    updateSidebarTeacher();
 
     /* Set active nav item */
     var page = document.body.getAttribute('data-page') || '';
@@ -84,7 +68,6 @@
     if (ov) ov.classList.toggle('open', open);
     if (hb) hb.classList.toggle('open', open);
     document.body.style.overflow = open ? 'hidden' : '';
-    updateSidebarTeacher();
     var page = document.body.getAttribute('data-page') || '';
     document.querySelectorAll('.sidebar-item[data-page]').forEach(function (el) {
       el.classList.toggle('active', el.getAttribute('data-page') === page);
@@ -99,16 +82,6 @@
     if (ov) ov.classList.remove('open');
     if (hb) hb.classList.remove('open');
     document.body.style.overflow = '';
-  };
-
-  window.updateSidebarTeacher = function () {
-    var loggedIn = !!localStorage.getItem('eq_tu');
-    var out = document.getElementById('sbTeacherLoggedOut');
-    var inn = document.getElementById('sbTeacherLoggedIn');
-    if (out) out.style.display = loggedIn ? 'none' : 'block';
-    if (inn) inn.style.display = loggedIn ? 'block' : 'none';
-    var gw  = document.getElementById('sbGuessWho');
-    if (gw)  gw.style.display  = loggedIn ? 'flex'  : 'none';
   };
 
   document.addEventListener('keydown', function (e) {

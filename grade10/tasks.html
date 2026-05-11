@@ -23,20 +23,10 @@
     header::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px); background-size: 28px 28px; pointer-events: none; }
     .back-btn { position: absolute; top: 20px; left: 20px; z-index: 2; background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.88rem; font-weight: 600; padding: 8px 18px; border-radius: 999px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
     .back-btn:hover { background: rgba(255,255,255,0.25); }
-    .teacher-btn { position: absolute; top: 20px; right: 20px; z-index: 2; background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.88rem; font-weight: 600; padding: 8px 18px; border-radius: 999px; cursor: pointer; }
-    .teacher-btn:hover { background: rgba(255,255,255,0.25); }
-    .teacher-badge { position: absolute; top: 20px; right: 20px; z-index: 2; background: var(--accent); color: #fff; font-size: 0.85rem; font-weight: 700; padding: 8px 16px; border-radius: 999px; display: flex; align-items: center; gap: 8px; }
-    .logout-x { cursor: pointer; }
     header h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem,5vw,2.8rem); font-weight: 800; color: #fff; position: relative; z-index: 1; }
     header h1 span { color: var(--accent); font-style: italic; }
     .header-sub { color: rgba(255,255,255,0.75); font-size: 0.95rem; margin-top: 8px; position: relative; z-index: 1; }
     .wave { display: block; width: 100%; margin-top: -2px; }
-
-    /* TABS */
-    .tab-bar { display: flex; background: var(--white); border-bottom: 2px solid var(--border); max-width: 860px; margin: 0 auto; }
-    .tab-btn { flex: 1; padding: 16px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.92rem; font-weight: 700; border: none; background: none; cursor: pointer; color: var(--text-muted); border-bottom: 3px solid transparent; margin-bottom: -2px; transition: all 0.2s; }
-    .tab-btn.active { color: var(--purple); border-bottom-color: var(--purple); }
-    .tab-btn.hidden { display: none; }
 
     main { max-width: 860px; margin: 0 auto; padding: 28px 16px 80px; }
 
@@ -88,45 +78,6 @@
     .ch-tab-inner { flex:1; padding:12px 8px; font-family:'IBM Plex Sans',sans-serif; font-size:0.88rem; font-weight:700; border:none; background:none; cursor:pointer; color:var(--text-muted); border-bottom:3px solid transparent; margin-bottom:-2px; transition:all 0.2s; }
     .ch-tab-inner.active { color:var(--purple); border-bottom-color:var(--purple); }
 
-    /* ── TEACHER PANEL ── */
-    .teacher-selector { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; padding: 24px 20px; margin-bottom: 20px; }
-    .teacher-selector-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 18px; }
-
-    .student-list-panel { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; margin-bottom: 20px; }
-    .panel-header { padding: 16px 20px; background: var(--off-white); border-bottom: 1.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-    .panel-header-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; }
-    .panel-header-sub { font-size: 0.8rem; color: var(--text-muted); }
-
-    .student-task-row { padding: 16px 20px; border-bottom: 1px solid var(--border); }
-    .student-task-row:last-child { border-bottom: none; }
-    .str-top { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-    .str-no { font-size: 0.8rem; font-weight: 700; color: var(--purple-light); width: 24px; flex-shrink: 0; }
-    .str-name { font-size: 0.95rem; font-weight: 600; flex: 1; }
-    .str-progress { font-size: 0.78rem; font-family: 'IBM Plex Mono', monospace; color: var(--text-muted); }
-    .str-chapter-label { font-size: 0.7rem; font-weight: 700; color: var(--purple-light); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'IBM Plex Mono', monospace; margin-bottom: 6px; }
-    .str-tasks { display: flex; flex-wrap: wrap; gap: 8px; }
-    .task-toggle {
-      padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--border);
-      font-size: 0.78rem; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Mono', monospace;
-      background: var(--off-white); color: var(--text-muted); transition: all 0.15s;
-    }
-    .task-toggle.on  { background: var(--green-soft); border-color: #34D399; color: #065F46; }
-    .task-toggle.saving { opacity: 0.5; cursor: not-allowed; }
-
-    /* LOGIN MODAL */
-    .overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
-    .overlay.hidden { display: none; }
-    .modal { background: var(--white); border-radius: 24px; padding: 36px 28px; width: 100%; max-width: 400px; }
-    .modal-title { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 800; margin-bottom: 6px; }
-    .modal-sub { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 24px; }
-    .modal-field { margin-bottom: 16px; }
-    .modal-field label { display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
-    .modal-field input { width: 100%; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 1rem; outline: none; }
-    .modal-field input:focus { border-color: var(--purple-light); }
-    .modal-error { font-size: 0.85rem; color: var(--red); margin-bottom: 14px; display: none; }
-    .modal-btns { display: flex; gap: 10px; }
-    .btn-cancel { padding: 14px 20px; background: var(--off-white); border: 1.5px solid var(--border); border-radius: 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 1rem; cursor: pointer; color: var(--text-muted); }
-
     /* LOADING */
     .loading { text-align: center; padding: 48px; color: var(--text-muted); }
     .spinner { display: inline-block; width: 26px; height: 26px; border: 3px solid var(--border); border-top-color: var(--purple); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 10px; }
@@ -146,11 +97,6 @@
       .tasks-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
       .profile-strip { padding: 18px 16px; }
       .progress-section, .tasks-section { padding: 16px; }
-      .panel-header { flex-wrap: wrap; gap: 8px; }
-      .panel-header-sub { display: none; }
-      .panel-header button { width: 100%; margin-left: 0 !important; }
-      .student-task-row { padding: 12px 14px; }
-      .str-name { font-size: 0.88rem; }
     }
 
     /* ── SIDEBAR (shared) ───────────────────────────────────── */
@@ -178,10 +124,6 @@
     .sidebar-item-name { font-size:0.88rem; font-weight:600; color:#fff; flex:1; }
     .sidebar-item-badge { font-size:0.6rem; font-weight:800; padding:2px 7px; border-radius:999px; font-family:'IBM Plex Mono',monospace; background:#F59E0B; color:#fff; }
     .sidebar-divider { height:1px; background:rgba(255,255,255,0.07); margin:8px 16px; }
-    .sidebar-teacher { margin:12px 16px 20px; background:rgba(37,99,235,0.2); border:1px solid rgba(37,99,235,0.35); border-radius:14px; padding:12px 14px; }
-    .sidebar-teacher-label { font-size:0.68rem; font-weight:700; color:#60A5FA; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
-    .sidebar-teacher-logged { font-size:0.82rem; color:#60A5FA; font-weight:600; display:flex; align-items:center; gap:8px; }
-    .sidebar-teacher-logged span { cursor:pointer; color:rgba(255,255,255,0.4); font-size:0.75rem; margin-left:auto; }
     .sidebar-home-btn { display:flex; align-items:center; gap:10px; margin:12px 16px 4px; padding:11px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:12px; text-decoration:none; }
     .sidebar-home-btn:hover { background:rgba(255,255,255,0.1); }
     .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
@@ -249,9 +191,7 @@
       line-height: 1.8 !important;
       opacity: 0.86 !important;
     }
-    body.tasks-page .wave,
-    body.tasks-page .tab-bar,
-    body.tasks-page .sidebar-teacher {
+    body.tasks-page .wave {
       display: none !important;
     }
     body.tasks-page main {

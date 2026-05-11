@@ -30,7 +30,6 @@
 
     /* MODE BADGE */
     .mode-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; font-family: 'IBM Plex Mono', monospace; margin-bottom: 20px; }
-    .mode-badge.teacher { background: #FEF3C7; color: #92400E; border: 1.5px solid #FCD34D; }
     .mode-badge.student { background: var(--purple-soft); color: var(--purple); border: 1.5px solid var(--purple-mid); }
 
     /* FILTERS */
@@ -79,25 +78,6 @@
     .grade-badge { display: inline-block; font-size: 1.6rem; font-weight: 800; font-family: 'IBM Plex Mono', monospace; }
     .grade-A { color: #065F46; } .grade-B { color: #1E40AF; } .grade-C { color: #92400E; } .grade-D { color: #991B1B; }
 
-    /* TEACHER TABLE */
-    .table-wrap { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; min-width: 600px; }
-    thead th { background: linear-gradient(135deg, var(--purple), #1D4ED8); color: #fff; padding: 12px 14px; font-size: 0.78rem; font-family: 'IBM Plex Mono', monospace; font-weight: 600; letter-spacing: 0.04em; text-align: center; white-space: nowrap; }
-    thead th:first-child { text-align: left; min-width: 160px; }
-    thead th.col-calc { background: rgba(255,255,255,0.15); }
-    tbody tr { border-bottom: 1px solid var(--border); }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: var(--off-white); }
-    tbody td { padding: 10px 14px; font-size: 0.88rem; text-align: center; }
-    tbody td:first-child { text-align: left; font-weight: 600; }
-    .student-nickname { font-size: 0.75rem; color: var(--text-muted); font-weight: 400; }
-    .score-input { width: 58px; padding: 6px 8px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 0.88rem; text-align: center; color: var(--text-dark); background: var(--off-white); outline: none; transition: all 0.15s; }
-    .score-input:focus { border-color: var(--purple-light); background: #fff; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
-    .score-input.saving { border-color: var(--accent); background: #FFFBEB; }
-    .score-input.saved { border-color: var(--green); background: #ECFDF5; }
-    .score-input.error { border-color: var(--red); background: #FEF2F2; }
-    .calc-val { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; color: var(--text-muted); }
-    .ind-badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; font-family: 'IBM Plex Mono', monospace; }
     .ind-A { background: #D1FAE5; color: #065F46; } .ind-B { background: #DBEAFE; color: #1E40AF; }
     .ind-C { background: #FEF3C7; color: #92400E; } .ind-D { background: #FEE2E2; color: #991B1B; }
     .ind-X { background: var(--off-white); color: var(--text-muted); }
@@ -109,13 +89,6 @@
     .state-sub { font-size: 0.85rem; color: var(--text-muted); }
     .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--purple); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    .btn-csv { display: inline-flex; align-items: center; gap: 7px; padding: 8px 18px; background: var(--green); color: #fff; border: none; border-radius: 10px; font-size: 0.82rem; font-weight: 700; cursor: pointer; font-family: inherit; margin-bottom: 14px; }
-    .btn-csv:hover { opacity: 0.88; }
-    .save-bar { position: fixed; bottom: 24px; right: 24px; background: var(--text-dark); color: #fff; padding: 12px 20px; border-radius: 14px; font-size: 0.85rem; font-weight: 600; z-index: 100; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
-    .save-bar.show { display: block; }
-    .save-bar.green { background: var(--green); }
-    .save-bar.red { background: var(--red); }
 
     footer { background: var(--text-dark); color: rgba(255,255,255,0.5); text-align: center; padding: 20px; font-size: 0.85rem; }
     footer strong { color: var(--purple-light); }
@@ -172,10 +145,6 @@
     .sidebar-item-name { font-size:0.88rem; font-weight:600; color:#fff; flex:1; }
     .sidebar-item-badge { font-size:0.6rem; font-weight:800; padding:2px 7px; border-radius:999px; font-family:'IBM Plex Mono',monospace; background:#F59E0B; color:#fff; }
     .sidebar-divider { height:1px; background:rgba(255,255,255,0.07); margin:8px 16px; }
-    .sidebar-teacher { margin:12px 16px 20px; background:rgba(37,99,235,0.2); border:1px solid rgba(37,99,235,0.35); border-radius:14px; padding:12px 14px; }
-    .sidebar-teacher-label { font-size:0.68rem; font-weight:700; color:#60A5FA; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
-    .sidebar-teacher-logged { font-size:0.82rem; color:#60A5FA; font-weight:600; display:flex; align-items:center; gap:8px; }
-    .sidebar-teacher-logged span { cursor:pointer; color:rgba(255,255,255,0.4); font-size:0.75rem; margin-left:auto; }
     .sidebar-home-btn { display:flex; align-items:center; gap:10px; margin:12px 16px 4px; padding:11px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:12px; text-decoration:none; }
     .sidebar-home-btn:hover { background:rgba(255,255,255,0.1); }
     .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
@@ -225,9 +194,6 @@
       background: rgba(255, 255, 255, 0.12) !important;
       border-color: rgba(255, 255, 255, 0.35) !important;
     }
-    body.scores-page .sidebar-teacher {
-      display: none !important;
-    }
     body.scores-page .subpage-hero {
       position: relative !important;
       z-index: 1 !important;
@@ -272,7 +238,6 @@
     }
     body.scores-page .identity-card,
     body.scores-page .student-score-card,
-    body.scores-page .table-wrap,
     body.scores-page .leaderboard,
     body.scores-page .state-card {
       border: 1.5px solid #bfdbfe !important;
@@ -353,8 +318,7 @@
       flex-wrap: wrap !important;
     }
     body.scores-page .ch-tab,
-    body.scores-page .lb-filter-btn,
-    body.scores-page .btn-csv {
+    body.scores-page .lb-filter-btn {
       min-height: 42px !important;
       border-radius: 999px !important;
       font-weight: 800 !important;
@@ -389,31 +353,6 @@
       display: grid !important;
       grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
       gap: 12px !important;
-    }
-    body.scores-page .table-wrap {
-      padding: 12px !important;
-      overflow: auto !important;
-    }
-    body.scores-page table {
-      border-collapse: separate !important;
-      border-spacing: 0 !important;
-      min-width: 780px !important;
-    }
-    body.scores-page thead th {
-      background: #1d4ed8 !important;
-      padding: 14px !important;
-    }
-    body.scores-page tbody tr {
-      border-bottom: 0 !important;
-    }
-    body.scores-page tbody td {
-      border-bottom: 1px solid #dbeafe !important;
-      padding: 13px 14px !important;
-    }
-    body.scores-page .score-input {
-      min-height: 38px !important;
-      border-radius: 12px !important;
-      background: #fff !important;
     }
     body.scores-page .leaderboard {
       overflow: hidden !important;
@@ -489,8 +428,6 @@
 </svg>
 
 <main id="mainContent"></main>
-
-<div class="save-bar" id="saveBar"></div>
 
 <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
 
@@ -690,7 +627,7 @@ function loadStudentList() {
 
 function viewStudentScores() {
   var studentNo = document.getElementById('sStudent').value;
-  if (!studentNo) { showBar('Please select your name first', 'red'); setTimeout(hideBar, 2000); return; }
+  if (!studentNo) return;
   var student = allStudents.find(function(s) { return String(s.no) === String(studentNo); });
   var result = document.getElementById('sResult');
   result.innerHTML = '<div class="state-card"><div class="spinner"></div><div class="state-title">Loading scores...</div></div>';
@@ -931,26 +868,6 @@ function loadLbRankings(cls) {
     if (rankings) rankings.innerHTML = '<div class="lb-empty">Could not load leaderboard.</div>';
   });
 }
-
-function clearScoreCache() {
-  var keys = [];
-  for (var i = 0; i < localStorage.length; i++) {
-    var k = localStorage.key(i);
-    if (k && k.startsWith('eq_cache_')) keys.push(k);
-  }
-  keys.forEach(function(k) { localStorage.removeItem(k); });
-  showBar('Cache cleared! Reloading...', 'green');
-  setTimeout(function() { location.reload(); }, 1000);
-}
-
-var barTimer = null;
-function showBar(msg, type) {
-  var bar = document.getElementById('saveBar');
-  bar.textContent = msg;
-  bar.className = 'save-bar show' + (type ? ' ' + type : '');
-  if (barTimer) clearTimeout(barTimer);
-}
-function hideBar() { document.getElementById('saveBar').className = 'save-bar'; }
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
