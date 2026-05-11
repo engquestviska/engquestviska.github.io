@@ -206,20 +206,20 @@ function syncCh5Student(className, studentNo) {
   // Columns: [Timestamp, Class, Student Name, Task 1 File, Task 2 File, Task 3 File, Task 4 File, Task 5 File]
   const norm = s => String(s).toLowerCase().replace(/[-]/g, ' ').replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
   const normCls = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, ''); // "X E-1" → "xe1"
-  let submissionRow = null;
+  const tasksToSet = {};
+  let hasSubmission = false;
   for (let r = 1; r < respData.length; r++) {
     if (normCls(respData[r][1]) === normCls(className) && norm(respData[r][2]) === norm(studentName)) {
-      submissionRow = respData[r];
+      hasSubmission = true;
+      for (let t = 1; t <= 5; t++) {
+        const fileVal = String(respData[r][2 + t] || '').trim();
+        if (fileVal) tasksToSet['C5T' + t] = true;
+      }
     }
   }
-  if (!submissionRow) return { success: false, error: 'No Ch5 submission found — make sure you submitted via the Chapter 5 form first.' };
+  if (!hasSubmission) return { success: false, error: 'No Ch5 submission found — make sure you submitted via the Chapter 5 form first.' };
 
-  // Map Task 1-5 file columns (index 3-7) → C5T1-C5T5, mark TRUE if file link exists
-  const tasksToSet = {};
-  for (let t = 1; t <= 5; t++) {
-    const fileVal = String(submissionRow[2 + t] || '').trim();
-    if (fileVal) tasksToSet['C5T' + t] = true;
-  }
+  // Map Task 1-5 file columns (index 3-7) → C5T1-C5T5, mark TRUE if any matching row has a file.
   if (Object.keys(tasksToSet).length === 0) return { success: false, error: 'Submission found but no files were recorded.' };
 
   // Write to Task_Status sheet
@@ -461,20 +461,41 @@ function getCh5StudentFiles(className, studentNo) {
   const normCls  = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
   const normName = s => String(s).toLowerCase().replace(/[-]/g, ' ').replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
 
-  let submissionRow = null;
+  const latestByTask = {};
+  let submitted = false;
+  let timestamp = '';
   for (let r = 1; r < respData.length; r++) {
     if (normCls(respData[r][1]) === normCls(className) && normName(respData[r][2]) === normName(studentName)) {
-      submissionRow = respData[r];
+      submitted = true;
+      const rowTimestamp = String(respData[r][0] || '');
+      const rowMs = timestampMs(respData[r][0], r);
+      for (let t = 1; t <= 5; t++) {
+        const val = String(respData[r][2 + t] || '').trim();
+        if (!val) continue;
+        const taskKey = 'C5T' + t;
+        if (!latestByTask[taskKey] || rowMs >= latestByTask[taskKey].ms) {
+          latestByTask[taskKey] = {
+            ms: rowMs,
+            url: drivePreviewUrl(val),
+            timestamp: rowTimestamp
+          };
+        }
+      }
     }
   }
-  if (!submissionRow) return { success: true, submitted: false, files: {}, studentName };
+  if (!submitted && Object.keys(latestByTask).length === 0) return { success: true, submitted: false, files: {}, studentName };
+  if (Object.keys(latestByTask).length > 0) submitted = true;
 
   const files = {};
-  for (let t = 1; t <= 5; t++) {
-    const val = String(submissionRow[2 + t] || '').trim();
-    if (val) files['C5T' + t] = drivePreviewUrl(val);
-  }
-  return { success: true, submitted: true, files, studentName, timestamp: String(submissionRow[0]) };
+  const fileTimestamps = {};
+  Object.keys(latestByTask).forEach(function(taskKey) {
+    files[taskKey] = latestByTask[taskKey].url;
+    fileTimestamps[taskKey] = latestByTask[taskKey].timestamp;
+    if (!timestamp || latestByTask[taskKey].ms >= timestampMs(timestamp, 0)) {
+      timestamp = latestByTask[taskKey].timestamp;
+    }
+  });
+  return { success: true, submitted: true, files, fileTimestamps, studentName, timestamp };
 }
 
 // ── CH5 SUBMISSION OVERVIEW (teacher dashboard) ───────────────

@@ -6,7 +6,7 @@ const FOLDER_ID = '1mrV8NBGb8SyxX6oyxU_GNSJM_Q9GF3bP';
 const SHEET_NAME = 'Students';
 const RESPONSES_SHEET = 'Responses';
 
-function doGet() {
+function doGet(e) {
   return HtmlService.createHtmlOutputFromFile('Index')
     .setTitle('Chapter 5 Task Submission')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
@@ -123,6 +123,10 @@ function submitForm(className, studentName, taskFileIds) {
     }
 
     if (existingRow !== -1) {
+      var existingValues = sheet.getRange(existingRow, 1, 1, row.length).getValues()[0];
+      for (var keep = 3; keep < row.length; keep++) {
+        if (!row[keep] && existingValues[keep]) row[keep] = existingValues[keep];
+      }
       sheet.getRange(existingRow, 1, 1, row.length).setValues([row]);
     } else {
       sheet.appendRow(row);
@@ -150,6 +154,85 @@ function submitForm(className, studentName, taskFileIds) {
     } catch(mailErr) { /* email is optional — never fail the submission */ }
 
     return { success: true };
+  } catch(e) {
+    return { success: false, error: e.toString() };
+  }
+}
+
+function normKey(value) {
+  return String(value || '').toLowerCase()
+    .replace(/[-]/g, ' ')
+    .replace(/['\u2018\u2019\u201A\u201B\u0060\u00B4]/g, '')
+    .replace(/[^a-z0-9\s]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function repairResponseLinksFromDrive() {
+  try {
+    var ss = getSpreadsheet();
+    var sheet = ss.getSheetByName(RESPONSES_SHEET);
+    if (!sheet) return { success: false, error: 'Responses sheet not found' };
+
+    var data = sheet.getDataRange().getValues();
+    var rowByKey = {};
+    for (var r = 1; r < data.length; r++) {
+      var rowClass = String(data[r][1] || '').trim();
+      var rowName = String(data[r][2] || '').trim();
+      if (rowClass && rowName) rowByKey[normKey(rowClass) + '|' + normKey(rowName)] = r + 1;
+    }
+
+    var root = DriveApp.getFolderById(FOLDER_ID);
+    var classFolders = root.getFolders();
+    var repaired = 0;
+    var scannedStudents = 0;
+    var missingRows = 0;
+
+    while (classFolders.hasNext()) {
+      var classFolder = classFolders.next();
+      var className = classFolder.getName();
+      var studentFolders = classFolder.getFolders();
+      while (studentFolders.hasNext()) {
+        var studentFolder = studentFolders.next();
+        var studentName = studentFolder.getName();
+        var rowIndex = rowByKey[normKey(className) + '|' + normKey(studentName)];
+        scannedStudents++;
+        if (!rowIndex) {
+          missingRows++;
+          continue;
+        }
+
+        var latest = {};
+        var files = studentFolder.getFiles();
+        while (files.hasNext()) {
+          var file = files.next();
+          var match = file.getName().match(/^Task\s*(\d+)/i);
+          if (!match) continue;
+          var taskNum = parseInt(match[1], 10);
+          if (taskNum < 1 || taskNum > 5) continue;
+          var updated = file.getLastUpdated();
+          var ms = updated ? updated.getTime() : 0;
+          if (!latest[taskNum] || ms >= latest[taskNum].ms) {
+            latest[taskNum] = {
+              ms: ms,
+              url: 'https://drive.google.com/file/d/' + file.getId() + '/view'
+            };
+          }
+        }
+
+        for (var task = 1; task <= 5; task++) {
+          var col = 3 + task;
+          var existing = String(sheet.getRange(rowIndex, col).getValue() || '').trim();
+          if (!existing && latest[task]) {
+            sheet.getRange(rowIndex, col).setValue(latest[task].url);
+            repaired++;
+          }
+        }
+      }
+    }
+
+    SpreadsheetApp.flush();
+    return { success: true, scannedStudents: scannedStudents, missingRows: missingRows, repaired: repaired };
   } catch(e) {
     return { success: false, error: e.toString() };
   }
