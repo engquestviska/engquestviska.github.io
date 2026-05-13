@@ -311,8 +311,10 @@
   <script>
     const CLASSES = ['XE1','XE4','XE5','XE6','XE7','XE8','XE9','XE10','XE11'];
     const CLASS_LABELS = { XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
+    const API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
     const assignments = window.ASAT_ASSIGNMENTS || [];
     const packageFiles = window.ASAT_PACKAGES || {};
+    const liveNamesCache = {};
 
     function init() {
       const classSelect = document.getElementById('classSelect');
@@ -327,9 +329,23 @@
       const savedNo = params.get('no') || localStorage.getItem('asat_no') || localStorage.getItem('eq_student_no') || '';
       if (savedClass) {
         classSelect.value = savedClass;
-        loadNames(savedNo);
-        if (savedNo) setTimeout(showPackage, 0);
+        loadNames(savedNo).then(() => {
+          if (savedNo) showPackage();
+        });
       }
+    }
+
+    function apiGet(params) {
+      const url = API + '?' + new URLSearchParams(params).toString();
+      return fetch(url).then(res => res.json());
+    }
+
+    function fallbackNames(cls) {
+      return assignments
+        .filter(item => item.className === cls)
+        .slice()
+        .sort((a, b) => Number(a.no) - Number(b.no))
+        .map(item => ({ no: item.no, name: item.name, nickname: '' }));
     }
 
     function loadNames(preselectNo) {
@@ -341,20 +357,33 @@
         nameSelect.disabled = true;
         nameSelect.innerHTML = '<option value="">Select class first</option>';
         updateButton();
-        return;
+        return Promise.resolve();
       }
-      const rows = assignments
-        .filter(item => item.className === cls)
-        .slice()
-        .sort((a, b) => Number(a.no) - Number(b.no));
-      nameSelect.appendChild(new Option('Select your name', ''));
-      rows.forEach(item => {
-        const opt = new Option(item.name, String(item.no));
-        nameSelect.appendChild(opt);
+      nameSelect.disabled = true;
+      nameSelect.innerHTML = '<option value="">Loading names...</option>';
+      const load = liveNamesCache[cls]
+        ? Promise.resolve(liveNamesCache[cls])
+        : apiGet({ action: 'getStudents', className: cls, _t: Date.now() })
+          .then(data => {
+            const rows = data && data.students && data.students.length ? data.students : fallbackNames(cls);
+            liveNamesCache[cls] = rows;
+            return rows;
+          })
+          .catch(() => fallbackNames(cls));
+
+      return load.then(rows => {
+        nameSelect.innerHTML = '';
+        nameSelect.appendChild(new Option('Select your name', ''));
+        rows.slice().sort((a, b) => Number(a.no) - Number(b.no)).forEach(item => {
+          const label = item.nickname ? item.name + ' (' + item.nickname + ')' : item.name;
+          const opt = new Option(label, String(item.no));
+          opt.setAttribute('data-name', item.name);
+          nameSelect.appendChild(opt);
+        });
+        nameSelect.disabled = false;
+        if (preselectNo) nameSelect.value = String(preselectNo);
+        updateButton();
       });
-      nameSelect.disabled = false;
-      if (preselectNo) nameSelect.value = String(preselectNo);
-      updateButton();
     }
 
     function updateButton() {
@@ -373,6 +402,8 @@
       const cls = document.getElementById('classSelect').value;
       const no = document.getElementById('nameSelect').value;
       const student = assignments.find(item => item.className === cls && String(item.no) === String(no));
+      const selectedOpt = document.getElementById('nameSelect').options[document.getElementById('nameSelect').selectedIndex];
+      const displayName = selectedOpt ? (selectedOpt.getAttribute('data-name') || selectedOpt.textContent.split(' (')[0]) : (student ? student.name : '');
       const result = document.getElementById('resultCard');
       localStorage.setItem('asat_cls', cls);
       localStorage.setItem('asat_no', no);
@@ -386,9 +417,9 @@
       const pkg = packageFiles[student.package];
       const profile = `
         <div class="profile-strip">
-          <div class="avatar">${escapeHtml(initialFor(student.name))}</div>
+          <div class="avatar">${escapeHtml(initialFor(displayName))}</div>
           <div>
-            <div class="profile-name">${escapeHtml(student.name)}</div>
+            <div class="profile-name">${escapeHtml(displayName)}</div>
             <div class="profile-meta">${escapeHtml(CLASS_LABELS[student.className] || student.className)} · No. ${escapeHtml(student.no)}</div>
           </div>
         </div>`;
