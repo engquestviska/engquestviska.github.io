@@ -1935,15 +1935,7 @@ async function doHeaderLogin() {
       const hashed = await hashPass(p);
       localStorage.setItem('eq_tu', u);
       localStorage.setItem('eq_tp', hashed);
-      closeHeaderLogin();
-      showTeacherBadge();
-      // Trigger summative float button if exists
-      if (typeof summTeacher !== 'undefined') {
-        summTeacher = true; summUser = u; summPass = hashed;
-        document.getElementById('summFloatBtn').style.display = 'flex';
-        document.getElementById('summEditBtn').classList.add('visible');
-      }
-      showSummToast('✅ Logged in as Teacher!', 'ok');
+      window.location.reload();
     } else {
       document.getElementById('hlError').style.display = 'block';
     }
@@ -1959,14 +1951,7 @@ function showTeacherBadge() {
 function headerLogout() {
   localStorage.removeItem('eq_tu');
   localStorage.removeItem('eq_tp');
-  document.getElementById('headerLoginBtn').style.display = 'inline-block';
-  document.getElementById('headerTeacherBadge').style.display = 'none';
-  // Hide summative controls
-  if (typeof summTeacher !== 'undefined') {
-    summTeacher = false;
-    document.getElementById('summFloatBtn').style.display = 'none';
-    document.getElementById('summEditBtn').classList.remove('visible');
-  }
+  window.location.reload();
 }
 </script>
 
@@ -2544,9 +2529,7 @@ function logoutStudent() {
   localStorage.removeItem('eq_student_no');
   localStorage.removeItem('eq_student_name');
   localStorage.removeItem('eq_setup_skipped');
-  document.getElementById('studentGreeting').classList.remove('show');
-  // Show setup modal so they can pick again or skip
-  openSetup(false);
+  window.location.reload();
 }
 
 function skipSetup() {
