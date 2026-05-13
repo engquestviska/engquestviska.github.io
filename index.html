@@ -2614,22 +2614,7 @@ document.getElementById('setupSubmit').addEventListener('click', function() {
   localStorage.setItem('eq_student_name',  name);
   localStorage.removeItem('eq_setup_skipped');
 
-  document.getElementById('setupOverlay').classList.add('hidden');
-  document.body.style.overflow = '';
-
-  var greeting = document.getElementById('studentGreeting');
-  greeting.classList.add('show');
-  greeting.style.justifyContent = '';
-  greeting.innerHTML =
-    '<div class="sg-avatar" id="sgAvatar">' + name.charAt(0).toUpperCase() + '</div>' +
-    '<div class="sg-info">' +
-      '<div class="sg-name" id="sgName">' + name.split(' ')[0] + '</div>' +
-      '<div class="sg-class" id="sgClass">' + (CLASS_LABELS_FULL[cls] || cls) + '</div>' +
-    '</div>' +
-    '<div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0;">' +
-      '<span class="sg-change" onclick="openSetup(true)">Change</span>' +
-      '<span class="sg-change" onclick="logoutStudent()" style="color:rgba(255,100,100,0.7);">Sign out</span>' +
-    '</div>';
+  window.location.reload();
 });
 
 // Run on load
