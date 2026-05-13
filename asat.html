@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ASAT Package - English Quest</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --purple:#7C3AED;
+      --purple-dark:#4C1D95;
+      --purple-soft:#EDE9FE;
+      --purple-mid:#C4B5FD;
+      --white:#FFFFFF;
+      --off-white:#F9F7FF;
+      --text-dark:#1E1040;
+      --text-muted:#6B5B95;
+      --border:#E5DEFF;
+      --green:#10B981;
+      --blue:#0EA5E9;
+      --amber:#F59E0B;
+      --shadow:0 10px 28px rgba(76,29,149,0.10);
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      font-family:'IBM Plex Sans', sans-serif;
+      background:var(--off-white);
+      color:var(--text-dark);
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+    }
+    header {
+      background:linear-gradient(135deg,var(--purple),var(--purple-dark));
+      color:#fff;
+      padding:30px 20px 82px;
+      text-align:center;
+      position:relative;
+      overflow:hidden;
+    }
+    header::after {
+      content:'';
+      position:absolute;
+      left:-5%;
+      right:-5%;
+      bottom:-34px;
+      height:70px;
+      background:var(--off-white);
+      border-radius:50% 50% 0 0;
+    }
+    .hamburger {
+      position:fixed;
+      top:18px;
+      right:20px;
+      z-index:300;
+      width:42px;
+      height:42px;
+      border:0;
+      border-radius:12px;
+      background:rgba(255,255,255,0.16);
+      color:#fff;
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      gap:5px;
+      backdrop-filter:blur(8px);
+    }
+    .hamburger span { width:20px; height:2px; background:#fff; border-radius:2px; }
+    .brand { position:relative; z-index:1; display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:12px; }
+    .brand img { width:46px; height:46px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,0.45); }
+    .brand-text { text-align:left; }
+    .brand-title { font-family:'Playfair Display', serif; font-size:1.42rem; font-weight:800; line-height:1; }
+    .brand-sub { font-size:0.75rem; opacity:0.82; margin-top:4px; }
+    .page-title { position:relative; z-index:1; font-family:'Playfair Display', serif; font-size:2rem; font-weight:800; }
+    .page-sub { position:relative; z-index:1; margin-top:8px; font-size:0.9rem; opacity:0.86; }
+    main {
+      width:min(920px, calc(100% - 28px));
+      margin:-46px auto 0;
+      position:relative;
+      z-index:2;
+      flex:1;
+    }
+    .panel {
+      background:#fff;
+      border:1.5px solid var(--border);
+      border-radius:20px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      margin-bottom:22px;
+    }
+    .panel-inner { padding:24px; }
+    .panel-title {
+      font-family:'Playfair Display', serif;
+      font-size:1.2rem;
+      font-weight:800;
+      margin-bottom:18px;
+    }
+    .form-grid { display:grid; gap:16px; }
+    label {
+      display:block;
+      font-size:0.72rem;
+      font-weight:800;
+      color:var(--text-muted);
+      letter-spacing:0.14em;
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
+    select {
+      width:100%;
+      padding:14px 16px;
+      border:1.5px solid var(--border);
+      border-radius:14px;
+      background:#FBFAFF;
+      color:#16083A;
+      font:500 0.98rem 'IBM Plex Sans', sans-serif;
+      outline:none;
+    }
+    select:focus { border-color:var(--purple-mid); box-shadow:0 0 0 4px rgba(124,58,237,0.10); }
+    .primary-btn {
+      width:100%;
+      border:0;
+      border-radius:14px;
+      padding:14px 18px;
+      margin-top:4px;
+      background:linear-gradient(135deg,var(--purple),#5B21B6);
+      color:#fff;
+      font-weight:800;
+      font-size:0.98rem;
+      font-family:inherit;
+      cursor:pointer;
+    }
+    .primary-btn:disabled { opacity:0.55; cursor:not-allowed; }
+    .result-card {
+      border-top:1.5px solid var(--border);
+      display:none;
+    }
+    .profile-strip {
+      background:linear-gradient(135deg,#8B5CF6,#5B21B6);
+      color:#fff;
+      padding:22px 24px;
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+    .avatar {
+      width:52px;
+      height:52px;
+      border-radius:50%;
+      border:2px solid rgba(255,255,255,0.42);
+      background:rgba(255,255,255,0.18);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family:'Playfair Display', serif;
+      font-size:1.35rem;
+      font-weight:800;
+      flex:0 0 auto;
+    }
+    .profile-name { font-family:'Playfair Display', serif; font-size:1.25rem; font-weight:800; }
+    .profile-meta { font-size:0.8rem; opacity:0.86; margin-top:3px; }
+    .package-body { padding:24px; }
+    .package-card {
+      border:1.5px solid #BFDBFE;
+      border-radius:18px;
+      background:linear-gradient(135deg,#EFF6FF,#F8FAFC);
+      padding:22px;
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:18px;
+      align-items:center;
+    }
+    .pkg-kicker {
+      font-family:'IBM Plex Mono', monospace;
+      font-size:0.72rem;
+      font-weight:800;
+      color:#1D4ED8;
+      letter-spacing:0.12em;
+      text-transform:uppercase;
+      margin-bottom:6px;
+    }
+    .pkg-title {
+      font-family:'Playfair Display', serif;
+      font-size:1.42rem;
+      font-weight:800;
+      color:#172554;
+    }
+    .pkg-file { margin-top:8px; font-size:0.85rem; color:#475569; overflow-wrap:anywhere; }
+    .pkg-actions {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .download-btn, .preview-btn {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      border-radius:12px;
+      padding:11px 16px;
+      min-width:132px;
+      font-weight:800;
+      font-size:0.86rem;
+      font-family:'IBM Plex Mono', monospace;
+      border:1.5px solid transparent;
+    }
+    .download-btn { background:linear-gradient(135deg,var(--green),#059669); color:#fff; }
+    .preview-btn { background:#fff; color:#1D4ED8; border-color:#BFDBFE; }
+    .answer-note {
+      margin-top:16px;
+      padding:14px 16px;
+      border:1.5px solid #FDE68A;
+      border-radius:14px;
+      background:#FFFBEB;
+      color:#7C2D12;
+      font-size:0.88rem;
+      font-weight:700;
+      line-height:1.5;
+    }
+    .empty-state {
+      padding:30px 24px;
+      text-align:center;
+      color:var(--text-muted);
+    }
+    .empty-state strong { color:var(--text-dark); display:block; margin-bottom:6px; }
+    footer {
+      background:#1E1040;
+      color:rgba(255,255,255,0.62);
+      text-align:center;
+      padding:22px;
+      margin-top:46px;
+      font-size:0.82rem;
+    }
+    footer strong { color:#C4B5FD; }
+    .sidebar-overlay { position:fixed; inset:0; background:rgba(15,8,35,0.45); backdrop-filter:blur(4px); z-index:240; opacity:0; pointer-events:none; transition:opacity 0.25s; }
+    .sidebar-overlay.open { opacity:1; pointer-events:auto; }
+    .sidebar { position:fixed; top:0; right:-340px; width:320px; max-width:86vw; height:100vh; background:#1E1040; z-index:260; transition:right 0.28s ease; box-shadow:-12px 0 35px rgba(30,16,64,0.30); }
+    .sidebar.open { right:0; }
+    .sidebar-head { padding:18px 16px; display:flex; gap:12px; align-items:center; border-bottom:1px solid rgba(255,255,255,0.10); }
+    .sidebar-logo { width:42px; height:42px; border-radius:50%; object-fit:cover; }
+    .sidebar-head-text { flex:1; }
+    .sidebar-head-title { color:#fff; font-family:'Playfair Display',serif; font-size:1.08rem; font-weight:800; }
+    .sidebar-head-sub { color:rgba(255,255,255,0.50); font-size:0.72rem; }
+    .sidebar-close { background:none; border:0; color:#fff; font-size:1.1rem; cursor:pointer; }
+    .sidebar-home-btn { display:flex; align-items:center; gap:10px; margin:12px 16px 4px; padding:11px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:12px; text-decoration:none; }
+    .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
+    .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
+    .sidebar-divider { height:1px; background:rgba(255,255,255,0.1); margin:12px 16px; }
+    .sidebar-section { padding:0 12px; }
+    .sidebar-section-label { color:rgba(255,255,255,0.45); font-size:0.68rem; text-transform:uppercase; letter-spacing:0.12em; font-weight:800; margin:0 4px 8px; }
+    .sidebar-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:10px; color:#fff; text-decoration:none; }
+    .sidebar-item:hover, .sidebar-item.active { background:rgba(255,255,255,0.08); }
+    .sidebar-item-icon { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; }
+    .sidebar-item-name { font-size:0.88rem; font-weight:600; color:#fff; flex:1; }
+    @media (max-width:720px) {
+      header { padding-top:24px; }
+      .page-title { font-size:1.65rem; }
+      main { width:min(100% - 20px, 920px); }
+      .panel-inner, .package-body { padding:18px; }
+      .package-card { grid-template-columns:1fr; }
+      .pkg-actions { justify-content:stretch; }
+      .download-btn, .preview-btn { width:100%; }
+      .brand { justify-content:flex-start; padding-right:54px; }
+    }
+  </style>
+</head>
+<body data-page="asat">
+  <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Open menu"><span></span><span></span><span></span></button>
+  <header>
+    <div class="brand">
+      <img src="logo.jpg" alt="English Quest logo"/>
+      <div class="brand-text">
+        <div class="brand-title">English Quest</div>
+        <div class="brand-sub">SMA Negeri 6 Surakarta</div>
+      </div>
+    </div>
+    <div class="page-title">ASAT Exercise Package</div>
+    <div class="page-sub">Semester 2 summative practice route</div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <div class="panel-inner">
+        <div class="panel-title">Find Your Package</div>
+        <div class="form-grid">
+          <div>
+            <label for="classSelect">Your Class</label>
+            <select id="classSelect" onchange="loadNames()">
+              <option value="">Select class</option>
+            </select>
+          </div>
+          <div>
+            <label for="nameSelect">Your Name</label>
+            <select id="nameSelect" disabled onchange="updateButton()">
+              <option value="">Select class first</option>
+            </select>
+          </div>
+          <button class="primary-btn" id="viewBtn" disabled onclick="showPackage()">View My Package</button>
+        </div>
+      </div>
+      <div class="result-card" id="resultCard"></div>
+    </section>
+  </main>
+
+  <footer>&copy; 2026 <strong>English Quest</strong> · Built with love by <strong>LaksMedia</strong></footer>
+
+  <script src="asat-data.js"></script>
+  <script src="sidebar.js"></script>
+  <script>
+    const CLASSES = ['XE1','XE4','XE5','XE6','XE7','XE8','XE9','XE10','XE11'];
+    const CLASS_LABELS = { XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
+    const assignments = window.ASAT_ASSIGNMENTS || [];
+    const packageFiles = window.ASAT_PACKAGES || {};
+
+    function init() {
+      const classSelect = document.getElementById('classSelect');
+      CLASSES.forEach(cls => {
+        const opt = document.createElement('option');
+        opt.value = cls;
+        opt.textContent = CLASS_LABELS[cls] || cls;
+        classSelect.appendChild(opt);
+      });
+      const savedClass = localStorage.getItem('asat_cls') || '';
+      const savedNo = localStorage.getItem('asat_no') || '';
+      if (savedClass) {
+        classSelect.value = savedClass;
+        loadNames(savedNo);
+      }
+    }
+
+    function loadNames(preselectNo) {
+      const cls = document.getElementById('classSelect').value;
+      const nameSelect = document.getElementById('nameSelect');
+      document.getElementById('resultCard').style.display = 'none';
+      nameSelect.innerHTML = '';
+      if (!cls) {
+        nameSelect.disabled = true;
+        nameSelect.innerHTML = '<option value="">Select class first</option>';
+        updateButton();
+        return;
+      }
+      const rows = assignments
+        .filter(item => item.className === cls)
+        .slice()
+        .sort((a, b) => Number(a.no) - Number(b.no));
+      nameSelect.appendChild(new Option('Select your name', ''));
+      rows.forEach(item => {
+        const opt = new Option(item.name, String(item.no));
+        nameSelect.appendChild(opt);
+      });
+      nameSelect.disabled = false;
+      if (preselectNo) nameSelect.value = String(preselectNo);
+      updateButton();
+    }
+
+    function updateButton() {
+      document.getElementById('viewBtn').disabled = !document.getElementById('classSelect').value || !document.getElementById('nameSelect').value;
+    }
+
+    function escapeHtml(value) {
+      return String(value || '').replace(/[&<>"']/g, ch => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch]));
+    }
+
+    function initialFor(name) {
+      return String(name || '?').trim().charAt(0).toUpperCase() || '?';
+    }
+
+    function showPackage() {
+      const cls = document.getElementById('classSelect').value;
+      const no = document.getElementById('nameSelect').value;
+      const student = assignments.find(item => item.className === cls && String(item.no) === String(no));
+      const result = document.getElementById('resultCard');
+      localStorage.setItem('asat_cls', cls);
+      localStorage.setItem('asat_no', no);
+
+      if (!student) {
+        result.innerHTML = '<div class="empty-state"><strong>No package found</strong>Check your class and name again.</div>';
+        result.style.display = 'block';
+        return;
+      }
+
+      const pkg = packageFiles[student.package];
+      const profile = `
+        <div class="profile-strip">
+          <div class="avatar">${escapeHtml(initialFor(student.name))}</div>
+          <div>
+            <div class="profile-name">${escapeHtml(student.name)}</div>
+            <div class="profile-meta">${escapeHtml(CLASS_LABELS[student.className] || student.className)} · No. ${escapeHtml(student.no)}</div>
+          </div>
+        </div>`;
+
+      if (!pkg) {
+        result.innerHTML = profile + '<div class="empty-state"><strong>Package not available yet</strong>Contact Mr. Laksma for your ASAT exercise route.</div>';
+        result.style.display = 'block';
+        return;
+      }
+
+      const previewUrl = 'https://drive.google.com/file/d/' + encodeURIComponent(pkg.fileId) + '/view';
+      const downloadUrl = 'https://drive.google.com/uc?export=download&id=' + encodeURIComponent(pkg.fileId);
+      result.innerHTML = profile + `
+        <div class="package-body">
+          <div class="package-card">
+            <div>
+              <div class="pkg-kicker">${escapeHtml(pkg.label)}</div>
+              <div class="pkg-title">${escapeHtml(pkg.title)}</div>
+              <div class="pkg-file">${escapeHtml(pkg.fileName)}</div>
+            </div>
+            <div class="pkg-actions">
+              <a class="download-btn" href="${downloadUrl}" target="_blank" rel="noopener">Download PDF</a>
+              <a class="preview-btn" href="${previewUrl}" target="_blank" rel="noopener">Open</a>
+            </div>
+          </div>
+          <div class="answer-note">After finishing the exercise, contact Mr. Laksma on WhatsApp to request the answer key.</div>
+        </div>`;
+      result.style.display = 'block';
+      result.scrollIntoView({ behavior:'smooth', block:'nearest' });
+    }
+
+    init();
+  </script>
+</body>
+</html>

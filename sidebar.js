@@ -34,6 +34,7 @@
     '    <a href="attendance.html" class="sidebar-item" data-page="attendance"><div class="sidebar-item-icon" style="background:rgba(20,184,166,0.2)">&#9989;</div><div class="sidebar-item-name">Attendance</div></a>',
     '    <a href="scores.html" class="sidebar-item" data-page="scores"><div class="sidebar-item-icon" style="background:rgba(249,115,22,0.2)">&#127942;</div><div class="sidebar-item-name">Student Scores</div></a>',
     '    <a href="tasks.html" class="sidebar-item" data-page="tasks"><div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#128204;</div><div class="sidebar-item-name">Task Status</div></a>',
+    '    <a href="asat.html" class="sidebar-item" data-page="asat"><div class="sidebar-item-icon" style="background:rgba(59,130,246,0.2)">&#128230;</div><div class="sidebar-item-name">ASAT Package</div></a>',
     '    <a href="activeness.html" class="sidebar-item" data-page="activeness"><div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#9889;</div><div class="sidebar-item-name">Activeness</div></a>',
     '    <a href="strikes.html" class="sidebar-item" data-page="strikes"><div class="sidebar-item-icon" style="background:rgba(220,38,38,0.2)">&#9888;&#65039;</div><div class="sidebar-item-name">Strikes</div></a>',
     '  </div>',
