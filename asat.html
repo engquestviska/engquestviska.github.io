@@ -322,11 +322,13 @@
         opt.textContent = CLASS_LABELS[cls] || cls;
         classSelect.appendChild(opt);
       });
-      const savedClass = localStorage.getItem('asat_cls') || '';
-      const savedNo = localStorage.getItem('asat_no') || '';
+      const params = new URLSearchParams(window.location.search);
+      const savedClass = params.get('cls') || localStorage.getItem('asat_cls') || localStorage.getItem('eq_student_class') || '';
+      const savedNo = params.get('no') || localStorage.getItem('asat_no') || localStorage.getItem('eq_student_no') || '';
       if (savedClass) {
         classSelect.value = savedClass;
         loadNames(savedNo);
+        if (savedNo) setTimeout(showPackage, 0);
       }
     }
 

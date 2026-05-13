@@ -1231,10 +1231,14 @@
   if (!cls || !no || !name) return;
 
   var clsLabels = { XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
+  var asatHref = 'asat.html?cls=' + encodeURIComponent(cls) + '&no=' + encodeURIComponent(no);
 
-  var card = document.createElement('div');
-  card.style.cssText = 'background:linear-gradient(135deg,#7C3AED,#4C1D95);border-radius:20px;padding:18px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:0 8px 24px rgba(124,58,237,0.25);';
-  card.innerHTML =
+  var wrap = document.createElement('div');
+  wrap.style.cssText = 'display:grid;gap:12px;margin-bottom:20px;';
+
+  var scoreCard = document.createElement('div');
+  scoreCard.style.cssText = 'background:linear-gradient(135deg,#7C3AED,#4C1D95);border-radius:20px;padding:18px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:0 8px 24px rgba(124,58,237,0.25);';
+  scoreCard.innerHTML =
     '<div style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-family:serif;font-weight:800;font-size:1.2rem;color:#fff;flex-shrink:0;">' + name.charAt(0) + '</div>' +
     '<div style="flex:1;">' +
       '<div style="font-size:0.72rem;color:rgba(255,255,255,0.65);font-family:monospace;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">My Scores</div>' +
@@ -1242,10 +1246,24 @@
       '<div style="font-size:0.78rem;color:rgba(255,255,255,0.65);">' + (clsLabels[cls] || cls) + ' · Tap to view your scores</div>' +
     '</div>' +
     '<div style="font-size:1.3rem;color:rgba(255,255,255,0.5);">›</div>';
-  card.onclick = function() { window.location.href = 'scores.html'; };
+  scoreCard.onclick = function() { window.location.href = 'scores.html'; };
+
+  var asatCard = document.createElement('div');
+  asatCard.style.cssText = 'background:linear-gradient(135deg,#0EA5E9,#1D4ED8);border-radius:18px;padding:15px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:0 8px 22px rgba(14,165,233,0.20);';
+  asatCard.innerHTML =
+    '<div style="width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-size:1.25rem;color:#fff;flex-shrink:0;">📦</div>' +
+    '<div style="flex:1;">' +
+      '<div style="font-size:0.7rem;color:rgba(255,255,255,0.72);font-family:monospace;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">ASAT Package</div>' +
+      '<div style="font-weight:800;font-size:0.96rem;color:#fff;">Open my practice PDF</div>' +
+      '<div style="font-size:0.76rem;color:rgba(255,255,255,0.72);">' + (clsLabels[cls] || cls) + ' · Your assigned route only</div>' +
+    '</div>' +
+    '<div style="font-size:1.25rem;color:rgba(255,255,255,0.62);">›</div>';
+  asatCard.onclick = function() { window.location.href = asatHref; };
+  wrap.appendChild(scoreCard);
+  wrap.appendChild(asatCard);
 
   var main = document.querySelector('main');
-  if (main) main.insertBefore(card, main.firstChild);
+  if (main) main.insertBefore(wrap, main.firstChild);
 })();
 </script>
 
