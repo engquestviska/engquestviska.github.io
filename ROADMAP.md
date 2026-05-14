@@ -50,6 +50,7 @@ This roadmap keeps the next-year rebuild focused. The goal is one English Quest 
    - Move teacher login/session helpers into `shared/js/auth.js`.
    - Refactor newest teacher tools first: `teacher/tasks.html` and `teacher/scores.html`.
    - Then extract repeated teacher layout styles into shared CSS.
+   - Initial API/auth and teacher tool shell extraction is in place; continue this pattern for new manager pages.
    - Do this before building more manager pages, otherwise the site will become harder to maintain.
 
 2. Create Grade 11 page equivalents.
