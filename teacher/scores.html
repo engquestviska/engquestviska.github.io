@@ -370,6 +370,8 @@
       main { width: min(100% - 28px, 1180px); }
     }
   </style>
+  <script src="../shared/js/api.js"></script>
+  <script src="../shared/js/auth.js"></script>
 </head>
 <body>
   <header>
@@ -457,44 +459,8 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    var API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
-    var CLASS_LABELS = {
-      XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7',
-      XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11'
-    };
     var mode = '4';
     var scoreData = { students: [], inputCols: [], calcCols: [] };
-
-    function auth() {
-      return {
-        username: localStorage.getItem('eq_tu') || '',
-        password: localStorage.getItem('eq_tp') || ''
-      };
-    }
-
-    function apiGet(params) {
-      var url = API + '?' + new URLSearchParams(params);
-      return fetch(url).then(function(res) {
-        if (!res.ok) throw new Error('Network error');
-        return res.json();
-      }).catch(function() {
-        return new Promise(function(resolve, reject) {
-          var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-          var p = Object.assign({}, params, { callback: cb, _t: Date.now() });
-          var script = document.createElement('script');
-          var timer = setTimeout(function() { cleanup(); reject(new Error('Connection timed out')); }, 15000);
-          function cleanup() {
-            delete window[cb];
-            clearTimeout(timer);
-            if (script.parentNode) script.parentNode.removeChild(script);
-          }
-          window[cb] = function(data) { cleanup(); resolve(data); };
-          script.onerror = function() { cleanup(); reject(new Error('Network error')); };
-          script.src = API + '?' + new URLSearchParams(p);
-          document.body.appendChild(script);
-        });
-      });
-    }
 
     function setMode(nextMode) {
       mode = nextMode;
@@ -511,11 +477,11 @@
       var btn = document.getElementById('loadBtn');
       btn.disabled = true;
       btn.textContent = 'Loading...';
-      document.getElementById('scoreArea').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading scores...</h2><p class="empty-copy">Fetching ' + (CLASS_LABELS[cls] || cls) + ' from the spreadsheet.</p></div>';
+      document.getElementById('scoreArea').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading scores...</h2><p class="empty-copy">Fetching ' + (EQApi.classLabels[cls] || cls) + ' from the spreadsheet.</p></div>';
       var params = mode === 'final'
         ? { action: 'getFinalScores', className: cls }
         : { action: 'getChapterScores', className: cls, chapter: mode };
-      apiGet(params).then(function(data) {
+      EQApi.get(params).then(function(data) {
         if (data.error) throw new Error(data.error);
         scoreData = {
           students: data.students || [],
@@ -584,7 +550,7 @@
     }
 
     function saveScore(input) {
-      var credentials = auth();
+      var credentials = EQAuth.getTeacher();
       if (!credentials.username || !credentials.password) {
         showAccess();
         return;
@@ -618,7 +584,7 @@
             column: input.getAttribute('data-col'),
             value: value
           };
-      apiGet(params).then(function(data) {
+      EQApi.get(params).then(function(data) {
         if (!data || data.error || data.success === false) throw new Error((data && data.error) || 'Save failed');
         updateLocalValue(input.getAttribute('data-no'), input.getAttribute('data-col'), value, data.calc);
         input.className = 'score-input saved';
@@ -658,21 +624,15 @@
     }
 
     function showAccess() {
-      document.getElementById('accessCard').hidden = false;
-      document.getElementById('appPanel').hidden = true;
+      EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' });
     }
 
     function showApp() {
-      var credentials = auth();
-      document.getElementById('loginPill').textContent = credentials.username || 'Teacher';
-      document.getElementById('accessCard').hidden = true;
-      document.getElementById('appPanel').hidden = false;
+      EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' });
     }
 
     function teacherLogout() {
-      localStorage.removeItem('eq_tu');
-      localStorage.removeItem('eq_tp');
-      location.href = 'index.html';
+      EQAuth.logoutTeacher('index.html');
     }
 
     function showToast(message, type) {
@@ -687,12 +647,7 @@
     document.getElementById('searchInput').addEventListener('input', renderScores);
 
     (function init() {
-      var credentials = auth();
-      if (!credentials.username || !credentials.password) {
-        showAccess();
-        return;
-      }
-      showApp();
+      if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
       loadScores();
     })();
   </script>

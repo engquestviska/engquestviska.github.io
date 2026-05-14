@@ -45,22 +45,29 @@ This roadmap keeps the next-year rebuild focused. The goal is one English Quest 
 
 ## Important Next
 
-1. Create Grade 11 page equivalents.
+1. Technical consolidation before more feature pages.
+   - Move repeated API helpers into `shared/js/api.js`.
+   - Move teacher login/session helpers into `shared/js/auth.js`.
+   - Refactor newest teacher tools first: `teacher/tasks.html` and `teacher/scores.html`.
+   - Then extract repeated teacher layout styles into shared CSS.
+   - Do this before building more manager pages, otherwise the site will become harder to maintain.
+
+2. Create Grade 11 page equivalents.
    - Use the same structure as Grade 10 first.
    - Keep data/content as placeholders until real Grade 11 data exists.
    - Avoid mixing Grade 10 data into Grade 11.
 
-2. Improve Teacher Dashboard.
+3. Improve Teacher Dashboard.
    - Manage Grade 10 and Grade 11 from one place.
    - Add sections for content, scores, attendance, tasks, submissions, activeness, and announcements.
    - Make it clear which grade is being edited.
 
-3. Plan data separation.
+4. Plan data separation.
    - Decide how Google Sheets and Apps Script will separate Grade 10 and Grade 11.
    - Keep the current Apps Script as Grade 10 for now.
    - Add Grade 11 only when real data exists.
 
-4. Improve mobile UX.
+5. Improve mobile UX.
    - Larger tap targets.
    - Simpler navigation.
    - Cleaner cards.

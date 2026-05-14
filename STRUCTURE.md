@@ -47,6 +47,8 @@ English Quest is being reorganized into three tracks.
 
 ## Shared
 
+- `shared/js/api.js` - shared Apps Script API helper and class labels.
+- `shared/js/auth.js` - shared teacher session helpers.
 - `shared/js/sidebar.js` - shared sidebar for Grade 10 secondary pages.
 - `shared/css/` - reserved for shared styles as pages are cleaned up.
 
