@@ -5,691 +5,583 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Teacher Strikes · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css"/>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --purple:#2563EB; --purple-light:#60A5FA; --purple-soft:#DBEAFE;
-      --purple-mid:#93C5FD; --white:#fff; --off-white:#F8FAFC;
-      --text-dark:#0F172A; --text-muted:#475569; --border:#DBEAFE;
-      --accent:#F59E0B; --green:#10B981; --red:#EF4444; --red-soft:#FEE2E2;
+    .strike-board {
+      display: grid;
+      gap: 12px;
     }
-    body { font-family:'IBM Plex Sans',sans-serif; background:var(--off-white); color:var(--text-dark); min-height:100vh; display:flex; flex-direction:column; }
-    main { flex:1; max-width:760px; margin:0 auto; padding:28px 16px 80px; width:100%; }
-
-    /* HEADER */
-    header { background:linear-gradient(135deg,#2563EB 0%,#1D4ED8 50%,#1E3A8A 100%); padding:36px 20px 52px; text-align:center; position:relative; overflow:hidden; }
-    header::before { content:''; position:absolute; inset:0; background-image:radial-gradient(circle,rgba(255,255,255,0.08) 1px,transparent 1px); background-size:28px 28px; pointer-events:none; }
-    .back-btn { position:absolute; top:20px; left:20px; z-index:2; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); color:#fff; font-family:'IBM Plex Sans',sans-serif; font-size:0.88rem; font-weight:600; padding:8px 18px; border-radius:999px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
-    .back-btn:hover { background:rgba(255,255,255,0.25); }
-    .teacher-btn { position:absolute; top:20px; right:20px; z-index:2; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); color:#fff; font-family:'IBM Plex Sans',sans-serif; font-size:0.88rem; font-weight:600; padding:8px 18px; border-radius:999px; cursor:pointer; }
-    .teacher-badge { position:absolute; top:20px; right:20px; z-index:2; background:var(--accent); color:#fff; font-size:0.85rem; font-weight:700; padding:8px 16px; border-radius:999px; display:flex; align-items:center; gap:8px; }
-    header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.8rem,5vw,2.8rem); font-weight:800; color:#fff; position:relative; z-index:1; }
-    header h1 span { color:var(--accent); font-style:italic; }
-    .header-sub { color:rgba(255,255,255,0.75); font-size:0.95rem; margin-top:8px; position:relative; z-index:1; }
-    .wave { display:block; width:100%; margin-top:-2px; }
-
-    /* TABS */
-    .tab-bar { display:flex; background:var(--white); border-bottom:2px solid var(--border); max-width:760px; margin:0 auto; }
-    .tab-btn { flex:1; padding:15px; font-family:'IBM Plex Sans',sans-serif; font-size:0.92rem; font-weight:700; border:none; background:none; cursor:pointer; color:var(--text-muted); border-bottom:3px solid transparent; margin-bottom:-2px; transition:all 0.2s; }
-    .tab-btn.active { color:var(--purple); border-bottom-color:var(--purple); }
-
-    /* CARDS */
-    .card { background:var(--white); border:1.5px solid var(--border); border-radius:20px; padding:24px 20px; margin-bottom:20px; }
-    .card-title { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; margin-bottom:18px; }
-    .field { margin-bottom:14px; }
-    .field label { display:block; font-size:0.78rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; }
-    .field select { width:100%; padding:14px 16px; border:1.5px solid var(--border); border-radius:12px; font-family:'IBM Plex Sans',sans-serif; font-size:1rem; background:var(--off-white); color:var(--text-dark); outline:none; }
-    .field select:focus { border-color:var(--purple-light); }
-    .btn-primary { width:100%; padding:15px; background:linear-gradient(135deg,var(--purple),#1D4ED8); color:#fff; font-family:'IBM Plex Sans',sans-serif; font-weight:700; font-size:1rem; border:none; border-radius:12px; cursor:pointer; margin-top:4px; transition:opacity 0.2s; }
-    .btn-primary:disabled { opacity:0.4; cursor:not-allowed; }
-
-    /* STRIKE DISPLAY CARD */
-    .strike-card { background:var(--white); border:1.5px solid var(--border); border-radius:20px; overflow:hidden; margin-bottom:20px; animation:slideUp 0.3s ease; }
-    @keyframes slideUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-    .profile-strip { background:linear-gradient(135deg,#2563EB,#1D4ED8); padding:22px 24px; display:flex; align-items:center; gap:16px; }
-    .avatar { width:54px; height:54px; border-radius:50%; background:rgba(255,255,255,0.2); border:2px solid rgba(255,255,255,0.4); display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0; font-family:'Playfair Display',serif; font-weight:700; color:#fff; }
-    .profile-name { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; color:#fff; }
-    .profile-meta { font-size:0.82rem; color:rgba(255,255,255,0.7); margin-top:3px; }
-
-    /* Strike dots */
-    .strike-body { padding:24px; }
-    .strike-dots-label { font-size:0.78rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:14px; font-family:'IBM Plex Mono',monospace; }
-    .strike-dots { display:flex; gap:12px; margin-bottom:20px; }
-    .strike-dot { width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; border:2.5px solid; flex-shrink:0; }
-    .strike-dot.hit  { background:#FEE2E2; border-color:#FCA5A5; }
-    .strike-dot.miss { background:var(--off-white); border-color:var(--border); }
-
-    /* Status banner */
-    .strike-status { padding:14px 18px; border-radius:14px; display:flex; align-items:center; gap:12px; margin-bottom:16px; }
-    .strike-status.safe     { background:#D1FAE5; border:1.5px solid #34D399; }
-    .strike-status.warning  { background:#FEF3C7; border:1.5px solid #FCD34D; }
-    .strike-status.danger   { background:#FEE2E2; border:1.5px solid #FCA5A5; }
-    .strike-status.out      { background:#2563EB; border:1.5px solid #1D4ED8; }
-    .strike-status-icon { font-size:1.4rem; flex-shrink:0; }
-    .strike-status-text { font-weight:700; font-size:0.95rem; }
-    .strike-status.safe    .strike-status-text { color:#065F46; }
-    .strike-status.warning .strike-status-text { color:#92400E; }
-    .strike-status.danger  .strike-status-text { color:#991B1B; }
-    .strike-status.out     .strike-status-text { color:#fff; }
-    .strike-status-sub { font-size:0.78rem; margin-top:2px; }
-    .strike-status.safe    .strike-status-sub { color:#065F46; opacity:0.7; }
-    .strike-status.warning .strike-status-sub { color:#92400E; opacity:0.7; }
-    .strike-status.danger  .strike-status-sub { color:#991B1B; opacity:0.7; }
-    .strike-status.out     .strike-status-sub { color:rgba(255,255,255,0.7); }
-
-    /* Strike detail */
-    .strike-detail { background:var(--off-white); border:1.5px solid var(--border); border-radius:12px; padding:14px 16px; }
-    .strike-detail-row { display:flex; gap:10px; align-items:flex-start; margin-bottom:8px; }
-    .strike-detail-row:last-child { margin-bottom:0; }
-    .strike-detail-label { font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.06em; min-width:60px; flex-shrink:0; padding-top:1px; font-family:'IBM Plex Mono',monospace; }
-    .strike-detail-val { font-size:0.88rem; color:var(--text-dark); font-weight:500; }
-
-    /* TEACHER PANEL */
-    .teacher-class-bar { background:var(--white); border:1.5px solid var(--border); border-radius:20px; padding:20px; margin-bottom:20px; }
-    .student-strike-row { background:var(--white); border:1.5px solid var(--border); border-radius:16px; padding:16px 18px; margin-bottom:10px; display:flex; align-items:center; gap:12px; transition:box-shadow 0.15s; }
-    .student-strike-row:hover { box-shadow:0 4px 16px rgba(37,99,235,0.08); }
-    .str-no { font-size:0.75rem; font-weight:700; color:var(--purple-light); width:22px; flex-shrink:0; font-family:'IBM Plex Mono',monospace; }
-    .str-name { flex:1; font-size:0.95rem; font-weight:600; }
-    .str-dots { display:flex; gap:5px; }
-    .str-dot { width:18px; height:18px; border-radius:50%; font-size:0.7rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-    .str-dot.hit  { background:#FEE2E2; }
-    .str-dot.miss { background:var(--border); }
-    .str-actions { display:flex; gap:6px; flex-shrink:0; }
-    .btn-add-strike { padding:7px 14px; background:linear-gradient(135deg,var(--red),#DC2626); color:#fff; border:none; border-radius:999px; font-size:0.78rem; font-weight:700; cursor:pointer; font-family:'IBM Plex Sans',sans-serif; transition:opacity 0.15s; }
-    .btn-add-strike:hover { opacity:0.85; }
-    .btn-add-strike:disabled { opacity:0.4; cursor:not-allowed; }
-    .btn-rm-strike { padding:7px 12px; background:var(--off-white); border:1.5px solid var(--border); color:var(--text-muted); border-radius:999px; font-size:0.78rem; font-weight:700; cursor:pointer; font-family:'IBM Plex Sans',sans-serif; }
-    .btn-rm-strike:hover { border-color:var(--red); color:var(--red); }
-    .btn-rm-strike:disabled { opacity:0.3; cursor:not-allowed; }
-
-    /* REASON MODAL */
-    .overlay { position:fixed; inset:0; background:rgba(15,23,42,0.6); backdrop-filter:blur(6px); display:flex; align-items:center; justify-content:center; z-index:100; padding:20px; }
-    .overlay.hidden { display:none; }
-    .modal { background:var(--white); border-radius:24px; padding:32px 24px; width:100%; max-width:420px; }
-    .modal-title { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:800; margin-bottom:6px; }
-    .modal-sub { font-size:0.85rem; color:var(--text-muted); margin-bottom:20px; }
-    .modal-field label { display:block; font-size:0.78rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; }
-    .modal-field textarea { width:100%; padding:14px 16px; border:1.5px solid var(--border); border-radius:12px; font-family:'IBM Plex Sans',sans-serif; font-size:0.95rem; outline:none; resize:none; height:100px; }
-    .modal-field textarea:focus { border-color:var(--purple-light); }
-
-    /* Quick reasons */
-    .quick-reasons { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:16px; }
-    .quick-btn { padding:6px 12px; background:var(--off-white); border:1.5px solid var(--border); border-radius:999px; font-size:0.78rem; font-weight:600; cursor:pointer; color:var(--text-muted); font-family:'IBM Plex Sans',sans-serif; transition:all 0.15s; }
-    .quick-btn:hover { background:var(--red-soft); border-color:#FCA5A5; color:#991B1B; }
-
-    .modal-btns { display:flex; gap:10px; margin-top:18px; }
-    .btn-confirm { flex:1; padding:13px; background:linear-gradient(135deg,var(--red),#DC2626); color:#fff; font-family:'IBM Plex Sans',sans-serif; font-weight:700; border:none; border-radius:12px; cursor:pointer; font-size:0.95rem; }
-    .btn-cancel-m { padding:13px 20px; background:var(--off-white); border:1.5px solid var(--border); border-radius:12px; font-family:'IBM Plex Sans',sans-serif; cursor:pointer; color:var(--text-muted); font-size:0.95rem; }
-
-    /* LOADING */
-    .loading { text-align:center; padding:48px; color:var(--text-muted); }
-    .spinner { display:inline-block; width:26px; height:26px; border:3px solid var(--border); border-top-color:var(--purple); border-radius:50%; animation:spin 0.8s linear infinite; margin-bottom:10px; }
-    @keyframes spin { to{transform:rotate(360deg)} }
-
-    /* TOAST */
-    .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--text-dark); color:#fff; padding:12px 24px; border-radius:999px; font-size:0.9rem; font-weight:500; transition:transform 0.3s; z-index:999; white-space:nowrap; pointer-events:none; }
-    .toast.show { transform:translateX(-50%) translateY(0); }
-    .toast.ok  { background:#059669; }
-    .toast.err { background:#DC2626; }
-
-
-    /* ── STRIKE CLEARANCE GUIDE ── */
-    .clearance-guide { background:var(--white); border:1.5px solid var(--border); border-radius:20px; overflow:hidden; margin-top:16px; }
-    .clearance-header { background:linear-gradient(135deg,#2563EB,#1D4ED8); padding:16px 20px; display:flex; align-items:center; gap:12px; }
-    .clearance-header-icon { font-size:1.4rem; }
-    .clearance-header-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:700; color:#fff; }
-    .clearance-header-sub { font-size:0.75rem; color:rgba(255,255,255,0.7); margin-top:2px; }
-
-    .clearance-body { padding:20px; }
-    .clearance-intro { font-size:0.88rem; color:var(--text-muted); line-height:1.6; margin-bottom:18px; padding-bottom:18px; border-bottom:1.5px solid var(--border); }
-    .clearance-intro strong { color:var(--text-dark); }
-
-    /* Chapter badge */
-    .chapter-badge { display:inline-flex; align-items:center; gap:8px; background:var(--purple-soft); border:1.5px solid var(--purple-mid); border-radius:12px; padding:8px 14px; margin-bottom:18px; }
-    .chapter-badge-label { font-size:0.7rem; font-weight:700; color:var(--purple-light); text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; }
-    .chapter-badge-val { font-size:0.95rem; font-weight:700; color:var(--purple); font-family:'Playfair Display',serif; }
-
-    /* Requirements */
-    .req-title { font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:10px; }
-    .req-item { display:flex; gap:12px; align-items:flex-start; padding:10px 0; border-bottom:1px solid var(--border); }
-    .req-item:last-child { border-bottom:none; }
-    .req-num { width:24px; height:24px; border-radius:50%; background:var(--purple-soft); color:var(--purple); font-size:0.75rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-family:'IBM Plex Mono',monospace; }
-    .req-text { font-size:0.88rem; color:var(--text-dark); line-height:1.5; }
-    .req-text span { color:var(--text-muted); font-size:0.8rem; display:block; margin-top:2px; }
-
-    /* Structure section */
-    .structure-wrap { background:var(--off-white); border:1.5px solid var(--border); border-radius:14px; padding:16px; margin-top:16px; }
-    .structure-title { font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:12px; }
-    .structure-item { display:flex; gap:10px; align-items:flex-start; margin-bottom:10px; }
-    .structure-item:last-child { margin-bottom:0; }
-    .structure-tag { font-size:0.68rem; font-weight:800; padding:3px 10px; border-radius:999px; white-space:nowrap; flex-shrink:0; font-family:'IBM Plex Mono',monospace; }
-    .structure-tag.thesis    { background:#DBEAFE; color:#1D4ED8; }
-    .structure-tag.arg       { background:#DBEAFE; color:#1D4ED8; }
-    .structure-tag.reit      { background:#D1FAE5; color:#065F46; }
-    .structure-tag.orient    { background:#FEF3C7; color:#92400E; }
-    .structure-tag.compl     { background:#FCE7F3; color:#9D174D; }
-    .structure-tag.resol     { background:#FEE2E2; color:#991B1B; }
-    .structure-desc { font-size:0.82rem; color:var(--text-dark); line-height:1.4; }
-    .structure-desc span { font-size:0.75rem; color:var(--text-muted); display:block; margin-top:2px; }
-
-    /* Submit section */
-    .submit-box { background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(245,158,11,0.03)); border:1.5px solid rgba(245,158,11,0.3); border-radius:14px; padding:16px 18px; margin-top:16px; display:flex; gap:12px; align-items:flex-start; }
-    .submit-box-icon { font-size:1.3rem; flex-shrink:0; }
-    .submit-box-title { font-size:0.85rem; font-weight:700; color:#92400E; margin-bottom:4px; }
-    .submit-box-text { font-size:0.82rem; color:#92400E; line-height:1.5; opacity:0.85; }
-
-    .hidden { display:none !important; }
-    footer { background:var(--text-dark); color:rgba(255,255,255,0.5); text-align:center; padding:20px; font-size:0.85rem; }
-    footer strong { color:var(--purple-light); }
-
-    .logout-btn { position: absolute; top: 20px; right: 20px; z-index: 2; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.85); font-size: 0.78rem; font-weight: 600; padding: 6px 14px; border-radius: 999px; cursor: pointer; font-family: inherit; display: none; align-items: center; gap: 5px; }
-    .logout-btn:hover { background: rgba(255,255,255,0.22); }
-    .teacher-active .logout-btn { display: flex; }
-
-    /* ── SIDEBAR (shared) ───────────────────────────────────── */
-    .hamburger { position:absolute; top:20px; right:20px; z-index:10; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); border-radius:10px; width:40px; height:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; cursor:pointer; padding:0; }
-    .hamburger span { display:block; width:18px; height:2px; background:#fff; border-radius:999px; transition:all 0.3s; }
-    .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
-    .hamburger.open span:nth-child(2) { opacity:0; }
-    .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
-    .sidebar-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.6); backdrop-filter:blur(6px); z-index:300; opacity:0; pointer-events:none; transition:opacity 0.3s; }
-    .sidebar-overlay.open { opacity:1; pointer-events:all; }
-    .sidebar { position:fixed; top:0; right:0; height:100%; width:min(320px,85vw); background:#0F172A; z-index:301; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.34,1.1,0.64,1); display:flex; flex-direction:column; overflow-y:auto; }
-    .sidebar.open { transform:translateX(0); }
-    .sidebar-head { padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; gap:12px; }
-    .sidebar-logo { width:36px; height:36px; border-radius:10px; object-fit:cover; }
-    .sidebar-head-text { flex:1; }
-    .sidebar-head-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:800; color:#fff; }
-    .sidebar-head-sub { font-size:0.7rem; color:rgba(255,255,255,0.45); margin-top:1px; }
-    .sidebar-close { width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,0.08); border:none; color:rgba(255,255,255,0.5); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
-    .sidebar-section { padding:14px 16px 4px; }
-    .sidebar-section-label { font-size:0.65rem; font-weight:700; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.12em; font-family:'IBM Plex Mono',monospace; padding:0 4px; margin-bottom:6px; }
-    .sidebar-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; text-decoration:none; transition:background 0.15s; margin-bottom:2px; }
-    .sidebar-item:hover, .sidebar-item:active { background:rgba(255,255,255,0.08); }
-    .sidebar-item.active { background:rgba(255,255,255,0.12); border-left:3px solid #60A5FA; padding-left:9px; }
-    .sidebar-item-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0; }
-    .sidebar-item-name { font-size:0.88rem; font-weight:600; color:#fff; flex:1; }
-    .sidebar-item-badge { font-size:0.6rem; font-weight:800; padding:2px 7px; border-radius:999px; font-family:'IBM Plex Mono',monospace; background:#F59E0B; color:#fff; }
-    .sidebar-divider { height:1px; background:rgba(255,255,255,0.07); margin:8px 16px; }
-    .sidebar-teacher { margin:12px 16px 20px; background:rgba(37,99,235,0.2); border:1px solid rgba(37,99,235,0.35); border-radius:14px; padding:12px 14px; }
-    .sidebar-teacher-label { font-size:0.68rem; font-weight:700; color:#60A5FA; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
-    .sidebar-teacher-logged { font-size:0.82rem; color:#60A5FA; font-weight:600; display:flex; align-items:center; gap:8px; }
-    .sidebar-teacher-logged span { cursor:pointer; color:rgba(255,255,255,0.4); font-size:0.75rem; margin-left:auto; }
-    .sidebar-home-btn { display:flex; align-items:center; gap:10px; margin:12px 16px 4px; padding:11px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:12px; text-decoration:none; }
-    .sidebar-home-btn:hover { background:rgba(255,255,255,0.1); }
-    .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
-    .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
-
-  </style>
-  <script src="../sidebar.js"></script>
-</head>
-<body data-page="strikes">
-
-<!-- REASON MODAL -->
-<div class="overlay hidden" id="reasonModal">
-  <div class="modal">
-    <div class="modal-title">⚠️ Add Strike</div>
-    <div class="modal-sub" id="reasonModalSub">Adding strike for student</div>
-    <div class="quick-reasons">
-      <button class="quick-btn" onclick="setReason('Not bringing the paper')">📄 Not bringing the paper</button>
-      <button class="quick-btn" onclick="setReason('Too much time taking notes')">📝 Too much time taking notes</button>
-      <button class="quick-btn" onclick="setReason('Late to class')">⏰ Late to class</button>
-      <button class="quick-btn" onclick="setReason('Disruptive behavior')">🔊 Disruptive behavior</button>
-      <button class="quick-btn" onclick="setReason('Not paying attention')">😴 Not paying attention</button>
-      <button class="quick-btn" onclick="setReason('Cheating')">🚫 Cheating</button>
-    </div>
-    <div class="modal-field">
-      <label>Reason</label>
-      <textarea id="reasonInput" placeholder="Type reason or pick one above..."></textarea>
-    </div>
-    <div class="modal-btns">
-      <button class="btn-cancel-m" onclick="closeReasonModal()">Cancel</button>
-      <button class="btn-confirm" onclick="confirmStrike()">Add Strike</button>
-    </div>
-  </div>
-</div>
-
-<!-- HEADER -->
-<header>
-  <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
-
-
-  <a class="back-btn" href="index.html">← Teacher Dashboard</a>
-  <div id="headerRight">
-    <button class="teacher-btn" onclick="openLogin()">🔑 Teacher</button>
-  </div>
-  <h1>Teacher <span>Strikes</span></h1>
-  <p class="header-sub">Manage Grade 10 warning records and strike clearance.</p>
-</header>
-
-<svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
-  <path fill="#1E3A8A" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
-  <path fill="#F8FAFC" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
-</svg>
-
-<div class="tab-bar">
-  <button class="tab-btn active hidden" id="tabTeacher" onclick="switchTab('teacher')">📝 Teacher Panel</button>
-</div>
-
-<main>
-
-  <div id="studentTab">
-    <div class="card">
-      <div class="card-title">Teacher access required</div>
-      <p style="color:var(--text-muted);line-height:1.6;margin-bottom:16px;">Login with the teacher account to manage student strikes. Students should use the Grade 10 My Strikes page.</p>
-      <button class="btn-primary" onclick="openLogin()">Teacher Login</button>
-    </div>
-  </div>
-
-  <!-- TEACHER TAB -->
-  <div id="teacherTab" class="hidden">
-    <div class="teacher-class-bar">
-      <div class="field" style="margin:0"><label>Select Class</label>
-        <select id="tClassSelect" onchange="loadTeacherStrikes()">
-          <option value="">— Select a class —</option>
-          <option value="XE1">X E-1</option><option value="XE4">X E-4</option>
-          <option value="XE5">X E-5</option><option value="XE6">X E-6</option>
-          <option value="XE7">X E-7</option><option value="XE8">X E-8</option>
-          <option value="XE9">X E-9</option><option value="XE10">X E-10</option>
-          <option value="XE11">X E-11</option>
-        </select>
-      </div>
-    </div>
-    <div id="teacherList"></div>
-  </div>
-
-</main>
-
-<footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
-<div class="toast" id="toast"></div>
-
-<!-- LOGIN MODAL (reuse from tasks) -->
-<div class="overlay hidden" id="loginModal">
-  <div class="modal">
-    <div class="modal-title">Teacher Login</div>
-    <div class="modal-sub">Login to manage strikes.</div>
-    <div class="modal-field" style="margin-bottom:12px"><label>Username</label><input type="text" id="loginUser" style="width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-family:inherit;font-size:1rem;outline:none;" placeholder="Username"/></div>
-    <div class="modal-field"><label>Password</label><input type="password" id="loginPass" style="width:100%;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;font-family:inherit;font-size:1rem;outline:none;" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
-    <div style="font-size:0.82rem;color:var(--red);margin:10px 0;display:none" id="loginError">Incorrect username or password.</div>
-    <div class="modal-btns" style="margin-top:16px">
-      <button class="btn-cancel-m" onclick="document.getElementById('loginModal').classList.add('hidden')">Cancel</button>
-      <button class="btn-confirm" style="background:linear-gradient(135deg,var(--purple),#1D4ED8)" onclick="doLogin()">Login</button>
-    </div>
-  </div>
-</div>
-
-<script>
-  const API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
-  let savedUser = '', savedPass = '', isTeacher = false;
-  let studentsCache = {}, strikesCache = {};
-  let pendingStrike = null; // { studentNo, cls }
-
-  // Restore session
-  savedUser = localStorage.getItem('eq_tu') || '';
-  savedPass = localStorage.getItem('eq_tp') || '';
-  if (savedUser && savedPass) verifyLogin(savedUser, savedPass, true);
-
-  // ── API ──────────────────────────────────────────────────────
-  async function apiGet(params) {
-    const url = API + '?' + new URLSearchParams(params);
-    try { const res = await fetch(url); if (res.ok) return await res.json(); } catch(e) {}
-    return new Promise((resolve, reject) => {
-      const cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-      const p  = { ...params, callback: cb, _t: Date.now() };
-      const script = document.createElement('script');
-      script.async = true;
-      const timer = setTimeout(() => { cleanup(); reject(new Error('Timeout')); }, 15000);
-      function cleanup() { delete window[cb]; try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e){} clearTimeout(timer); }
-      window[cb]     = d => { cleanup(); resolve(d); };
-      script.onerror = () => { cleanup(); reject(new Error('Network error')); };
-      script.src = API + '?' + new URLSearchParams(p);
-      (document.body || document.head).appendChild(script);
-    });
-  }
-
-  // ── CACHE LAYER ─────────────────────────────────────────────
-  var CACHE_TTL = 30 * 60 * 1000;
-  function cacheKey(params) {
-    var sorted = Object.keys(params).sort();
-    return 'eq_cache_' + sorted.map(function(k) { return k + '=' + params[k]; }).join('_').replace(/[^a-zA-Z0-9_=]/g, '_');
-  }
-  function cacheGet(params) {
-    try {
-      var raw = localStorage.getItem(cacheKey(params));
-      if (!raw) return null;
-      var entry = JSON.parse(raw);
-      if (Date.now() - entry.ts > CACHE_TTL) { localStorage.removeItem(cacheKey(params)); return null; }
-      return entry.data;
-    } catch(e) { return null; }
-  }
-  function cacheSet(params, data) {
-    try { localStorage.setItem(cacheKey(params), JSON.stringify({ ts: Date.now(), data: data })); } catch(e) {}
-  }
-  async function cachedApiGet(params) {
-    var cached = cacheGet(params);
-    if (cached) {
-      apiGet(params).then(function(fresh) { cacheSet(params, fresh); }).catch(function() {});
-      return cached;
+    .student-strike-row {
+      display: grid;
+      grid-template-columns: 54px minmax(180px, 1fr) auto auto;
+      gap: 14px;
+      align-items: center;
+      padding: 18px;
+      border: 1.5px solid #dbeafe;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.94);
+      box-shadow: 0 12px 26px rgba(37,99,235,0.06);
     }
-    var data = await apiGet(params);
-    cacheSet(params, data);
-    return data;
-  }
-
-
-  // ── TABS ─────────────────────────────────────────────────────
-  function switchTab(tab) {
-    document.getElementById('studentTab').classList.toggle('hidden', tab === 'teacher');
-    document.getElementById('teacherTab').classList.toggle('hidden', tab !== 'teacher');
-    document.getElementById('tabTeacher').classList.toggle('active', tab === 'teacher');
-  }
-
-  // ── LOGIN ────────────────────────────────────────────────────
-  async function hashPass(plain) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(plain));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-  }
-  function openLogin() { document.getElementById('loginModal').classList.remove('hidden'); }
-  async function doLogin() {
-    const u = document.getElementById('loginUser').value.trim();
-    const p = document.getElementById('loginPass').value.trim();
-    await verifyLogin(u, p, false);
-  }
-  async function verifyLogin(u, p, silent) {
-    try {
-      const data = await apiGet({ action: 'checkLogin', username: u, password: p });
-      if (data.ok) {
-        // If silent (auto-login from localStorage), p is already a hash — don't re-hash
-        const hashed = silent ? p : await hashPass(p);
-        isTeacher = true; savedUser = u; savedPass = hashed;
-        localStorage.setItem('eq_tu', u); localStorage.setItem('eq_tp', hashed);
-        document.getElementById('loginModal').classList.add('hidden');
-        document.getElementById('headerRight').innerHTML = `<div class="teacher-badge">🎓 Teacher <span style="cursor:pointer;margin-left:4px" onclick="logout()">✕</span></div>`;
-        document.getElementById('tabTeacher').classList.remove('hidden');
-        switchTab('teacher');
-        if (!silent) { showToast('✅ Logged in', 'ok'); }
-      } else {
-        if (!silent) document.getElementById('loginError').style.display = 'block';
+    .student-strike-row.blocked {
+      border-color: #fecaca;
+      background: linear-gradient(135deg, #fff, #fff5f5);
+    }
+    .student-strike-row.warning {
+      border-color: #fde68a;
+      background: linear-gradient(135deg, #fff, #fffbeb);
+    }
+    .avatar {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: #2563eb;
+      color: #fff;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 800;
+    }
+    .student-name {
+      font-weight: 800;
+      line-height: 1.25;
+    }
+    .student-meta {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 600;
+    }
+    .strike-meter {
+      display: grid;
+      gap: 8px;
+      min-width: 160px;
+    }
+    .strike-dots {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+    .strike-dot {
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      border: 1.5px solid #dbeafe;
+      background: #eff6ff;
+      color: transparent;
+      font-size: 0.72rem;
+      font-weight: 900;
+    }
+    .strike-dot.hit {
+      border-color: #f87171;
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .strike-label {
+      text-align: right;
+      color: var(--muted);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.74rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .strike-label.safe { color: #047857; }
+    .strike-label.warning { color: #b45309; }
+    .strike-label.blocked { color: #b91c1c; }
+    .strike-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+    .strike-actions .btn {
+      min-height: 40px;
+      border-radius: 999px;
+      padding: 0 14px;
+      font-size: 0.84rem;
+    }
+    .btn.danger {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+    .reason-note {
+      grid-column: 2 / -1;
+      display: grid;
+      gap: 5px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f8fbff;
+      border: 1px solid #dbeafe;
+      color: var(--muted);
+      font-size: 0.84rem;
+      line-height: 1.45;
+    }
+    .reason-note strong {
+      color: var(--ink);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .strike-guide {
+      display: grid;
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .guide-item {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border: 1.5px solid #dbeafe;
+      border-radius: 18px;
+      background: #fff;
+    }
+    .guide-no {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 900;
+    }
+    .guide-title {
+      font-weight: 800;
+    }
+    .guide-copy {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(15,23,42,0.62);
+      backdrop-filter: blur(8px);
+    }
+    .modal-overlay[hidden] {
+      display: none;
+    }
+    .strike-modal {
+      width: min(460px, 100%);
+      border: 1.5px solid #dbeafe;
+      border-radius: 24px;
+      background: #fff;
+      padding: 24px;
+      box-shadow: 0 24px 80px rgba(15,23,42,0.2);
+    }
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+    .modal-copy {
+      margin-top: 6px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .quick-reasons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 18px 0 14px;
+    }
+    .quick-reason {
+      min-height: 34px;
+      border: 1.5px solid #dbeafe;
+      border-radius: 999px;
+      background: #f8fbff;
+      color: var(--muted);
+      padding: 0 12px;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .quick-reason:hover {
+      border-color: #fca5a5;
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+    .modal-actions .btn {
+      min-height: 42px;
+      border-radius: 999px;
+      padding: 0 18px;
+    }
+    @media (max-width: 860px) {
+      .student-strike-row {
+        grid-template-columns: 48px 1fr;
       }
-    } catch(e) { if (!silent) showToast('Connection error', 'err'); }
-  }
-  function logout() {
-    isTeacher = false; savedUser = ''; savedPass = '';
-    localStorage.removeItem('eq_tu'); localStorage.removeItem('eq_tp');
-    document.getElementById('headerRight').innerHTML = `<button class="teacher-btn" onclick="openLogin()">🔑 Teacher</button>`;
-    document.getElementById('tabTeacher').classList.add('hidden');
-    switchTab('student');
-  }
+      .strike-meter,
+      .strike-actions,
+      .reason-note {
+        grid-column: 1 / -1;
+      }
+      .strike-dots,
+      .strike-label,
+      .strike-actions {
+        justify-content: flex-start;
+        text-align: left;
+      }
+    }
+  </style>
+  <script src="../shared/js/api.js"></script>
+  <script src="../shared/js/auth.js"></script>
+</head>
+<body class="teacher-tool-page">
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <img src="../logo.jpg" alt="English Quest Logo"/>
+        <div>
+          <div class="brand-title">English Quest</div>
+          <div class="brand-sub">Teacher Control Room</div>
+        </div>
+      </div>
+      <nav class="nav-actions" aria-label="Teacher navigation">
+        <a href="index.html">Dashboard</a>
+        <a href="../grade10/strikes.html">Student View</a>
+        <button type="button" onclick="teacherLogout()">Logout</button>
+      </nav>
+    </div>
+    <section class="hero">
+      <div class="kicker">Strike Manager</div>
+      <h1>Manage warnings without mixing student controls.</h1>
+      <p class="hero-copy">Load a Grade 10 class, review strike counts, add a clear reason, or remove the latest strike after a student completes the clearance task.</p>
+    </section>
+  </header>
 
-  // ── STUDENT — LOAD NAMES ──────────────────────────────────────
-  async function onSClassChange() {
-    const cls = document.getElementById('sClassSelect').value;
-    const nameSelect = document.getElementById('sNameSelect');
-    const viewBtn    = document.getElementById('sViewBtn');
-    nameSelect.innerHTML = '<option>Loading...</option>'; nameSelect.disabled = true; viewBtn.disabled = true;
-    document.getElementById('studentResult').innerHTML = '';
-    if (!cls) { nameSelect.innerHTML = '<option>— Select class first —</option>'; return; }
-    try {
-      let data = studentsCache[cls];
-      if (!data) { data = await cachedApiGet({ action: 'getStudents', className: cls }); studentsCache[cls] = data; }
-      if (data.error) { showToast(data.error, 'err'); return; }
-      nameSelect.innerHTML = '<option value="">— Select your name —</option>';
-      data.students.forEach(s => {
-        const opt = document.createElement('option');
-        opt.value = s.no;
-        opt.textContent = s.name + (s.nickname ? ' (' + s.nickname + ')' : '');
-        nameSelect.appendChild(opt);
+  <main>
+    <section class="access-card" id="accessCard" hidden>
+      <h2 class="access-title">Teacher login required.</h2>
+      <p class="access-copy">Open the teacher dashboard and log in first. This page uses the saved teacher session to manage strikes.</p>
+      <a class="btn" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none;">Open Teacher Login</a>
+    </section>
+
+    <section id="appPanel" hidden>
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2 class="panel-title">Grade 10 Strike Sheet</h2>
+            <p class="panel-copy">One strike blocks summative tests. Three strikes blocks class participation. Keep each action traceable with a reason.</p>
+          </div>
+          <div class="status-pill" id="loginPill">Teacher</div>
+        </div>
+
+        <div class="controls">
+          <div>
+            <label for="classSelect">Class</label>
+            <select id="classSelect">
+              <option value="XE1">X E-1</option>
+              <option value="XE4">X E-4</option>
+              <option value="XE5">X E-5</option>
+              <option value="XE6">X E-6</option>
+              <option value="XE7">X E-7</option>
+              <option value="XE8">X E-8</option>
+              <option value="XE9">X E-9</option>
+              <option value="XE10">X E-10</option>
+              <option value="XE11">X E-11</option>
+            </select>
+          </div>
+          <div>
+            <label for="searchInput">Search student</label>
+            <input id="searchInput" type="search" placeholder="Type name, nickname, or number"/>
+          </div>
+          <button class="btn" type="button" id="loadBtn" onclick="loadStrikes()">Load Strikes</button>
+        </div>
+
+        <div class="summary-grid" id="summaryGrid">
+          <div class="summary-card"><strong>0</strong><span>Students</span></div>
+          <div class="summary-card"><strong>0</strong><span>Clean Records</span></div>
+          <div class="summary-card"><strong>0</strong><span>Summative Blocked</span></div>
+          <div class="summary-card"><strong>0</strong><span>Class Blocked</span></div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="tabs" id="filterTabs">
+          <button class="tab active" type="button" onclick="setFilter('all')">All</button>
+          <button class="tab" type="button" onclick="setFilter('active')">Has Strikes</button>
+          <button class="tab" type="button" onclick="setFilter('blocked')">Blocked</button>
+        </div>
+      </div>
+
+      <div id="strikeList" class="strike-board"></div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2 class="panel-title">Clearance Rule</h2>
+            <p class="panel-copy">This is the current operational rule shown to students in their strike page and dashboard.</p>
+          </div>
+        </div>
+        <div class="strike-guide">
+          <div class="guide-item">
+            <div class="guide-no">1</div>
+            <div>
+              <div class="guide-title">At least one strike</div>
+              <div class="guide-copy">Student cannot join the summative test until the strike is cleared.</div>
+            </div>
+          </div>
+          <div class="guide-item">
+            <div class="guide-no">3</div>
+            <div>
+              <div class="guide-title">Three strikes</div>
+              <div class="guide-copy">Student cannot join class until they meet the teacher and complete the required clearance work.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2026 English Quest · Teacher Strike Manager</footer>
+  <div class="toast" id="toast"></div>
+
+  <div class="modal-overlay" id="reasonModal" hidden>
+    <div class="strike-modal" role="dialog" aria-modal="true" aria-labelledby="reasonTitle">
+      <h2 class="modal-title" id="reasonTitle">Add Strike</h2>
+      <p class="modal-copy" id="reasonModalSub">Choose a reason or write a specific note.</p>
+      <div class="quick-reasons">
+        <button class="quick-reason" type="button" onclick="setReason('Not bringing the paper')">Not bringing the paper</button>
+        <button class="quick-reason" type="button" onclick="setReason('Too much time taking notes')">Too much time taking notes</button>
+        <button class="quick-reason" type="button" onclick="setReason('Late to class')">Late to class</button>
+        <button class="quick-reason" type="button" onclick="setReason('Disruptive behavior')">Disruptive behavior</button>
+        <button class="quick-reason" type="button" onclick="setReason('Not paying attention')">Not paying attention</button>
+        <button class="quick-reason" type="button" onclick="setReason('Cheating')">Cheating</button>
+      </div>
+      <label for="reasonInput">Reason</label>
+      <textarea id="reasonInput" placeholder="Write the strike reason..." rows="4"></textarea>
+      <div class="modal-actions">
+        <button class="btn ghost" type="button" onclick="closeReasonModal()">Cancel</button>
+        <button class="btn danger" type="button" onclick="confirmStrike()">Add Strike</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var strikeData = [];
+    var filterMode = 'all';
+    var pendingStrike = null;
+
+    function teacherLogout() {
+      EQAuth.logoutTeacher('index.html');
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function initials(student) {
+      var source = student.nickname || student.name || '';
+      return source.split(/\s+/).filter(Boolean).slice(0, 2).map(function(part) {
+        return part.charAt(0).toUpperCase();
+      }).join('') || 'EQ';
+    }
+
+    function strikeStatus(total) {
+      if (total >= 3) return { rowClass: 'blocked', labelClass: 'blocked', text: 'Class blocked' };
+      if (total >= 1) return { rowClass: 'warning', labelClass: 'warning', text: 'Summative blocked' };
+      return { rowClass: '', labelClass: 'safe', text: 'Clean record' };
+    }
+
+    function setFilter(nextFilter) {
+      filterMode = nextFilter;
+      document.querySelectorAll('#filterTabs .tab').forEach(function(tab) {
+        tab.classList.toggle('active', tab.textContent.toLowerCase().replace(/\s+/g, '') === nextFilter || (nextFilter === 'active' && tab.textContent.indexOf('Has') > -1));
       });
-      nameSelect.disabled = false;
-      nameSelect.onchange = () => { viewBtn.disabled = !nameSelect.value; };
-    } catch(e) { showToast('Failed to load students', 'err'); nameSelect.innerHTML = '<option>— Select class first —</option>'; }
-  }
+      if (nextFilter === 'all') document.querySelectorAll('#filterTabs .tab')[0].classList.add('active');
+      renderStrikes();
+    }
 
-  // ── STUDENT — VIEW STRIKES ────────────────────────────────────
-  async function viewStrikes() {
-    const cls  = document.getElementById('sClassSelect').value;
-    const no   = document.getElementById('sNameSelect').value;
-    const clsLabel = document.getElementById('sClassSelect').options[document.getElementById('sClassSelect').selectedIndex].text;
-    if (!cls || !no) return;
-    document.getElementById('studentResult').innerHTML = '<div class="loading"><div class="spinner"></div><br/>Loading...</div>';
-    document.getElementById('sViewBtn').disabled = true;
-    document.getElementById('sViewBtn').textContent = '⏳ Loading...';
-    try {
-      const data = await cachedApiGet({ action: 'getStudentStrikes', className: cls, studentNo: no });
-      if (data.error) { showToast(data.error, 'err'); document.getElementById('studentResult').innerHTML = ''; return; }
-      renderStudentStrikes(data, clsLabel);
-    } catch(e) { showToast('Failed to load', 'err'); document.getElementById('studentResult').innerHTML = ''; }
-    finally { document.getElementById('sViewBtn').disabled = false; document.getElementById('sViewBtn').textContent = 'Check My Strike'; }
-  }
+    function loadStrikes() {
+      if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
+      var cls = document.getElementById('classSelect').value;
+      var btn = document.getElementById('loadBtn');
+      btn.disabled = true;
+      btn.textContent = 'Loading...';
+      document.getElementById('strikeList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading strikes...</h2><p class="empty-copy">Fetching ' + (EQApi.classLabels[cls] || cls) + ' from the spreadsheet.</p></div>';
+      EQApi.get({ action: 'getAllStrikes', className: cls }).then(function(data) {
+        if (data.error) throw new Error(data.error);
+        strikeData = data.students || [];
+        renderStrikes();
+        showToast('Strikes loaded', 'ok');
+      }).catch(function(err) {
+        document.getElementById('strikeList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Could not load strikes.</h2><p class="empty-copy">' + escapeHtml(err.message) + '</p></div>';
+        showToast(err.message, 'err');
+      }).finally(function() {
+        btn.disabled = false;
+        btn.textContent = 'Load Strikes';
+        updateSummary();
+      });
+    }
 
-  function renderStudentStrikes(data, clsLabel) {
-    const total   = data.total || 0;
-    const initial = (data.nickname || data.name)[0].toUpperCase();
+    function renderStrikes() {
+      var query = document.getElementById('searchInput').value.trim().toLowerCase();
+      var cls = document.getElementById('classSelect').value;
+      var students = strikeData.filter(function(student) {
+        var total = Number(student.total || 0);
+        var searchable = [student.no, student.name, student.nickname].join(' ').toLowerCase();
+        var matchesSearch = !query || searchable.indexOf(query) > -1;
+        var matchesFilter = filterMode === 'all'
+          || (filterMode === 'active' && total > 0)
+          || (filterMode === 'blocked' && total >= 1);
+        return matchesSearch && matchesFilter;
+      });
 
-    // Status config
-    const statusMap = [
-      { max:0, cls:'safe',    icon:'✅', text:'No strikes! Keep it up!', sub:'You have a clean record.' },
-      { max:1, cls:'safe',    icon:'👍', text:'1 Strike — You\'re okay', sub:'Stay focused and keep going!' },
-      { max:2, cls:'warning', icon:'⚠️', text:'2 Strikes — Be careful!', sub:'One more strike and you cannot join the summative.' },
-      { max:3, cls:'danger',  icon:'🚨', text:'3 Strikes — Warning!',    sub:'You cannot join the summative exam.' },
-      { max:4, cls:'out',     icon:'❌', text:'4 Strikes — Danger Zone', sub:'Please see your teacher immediately.' },
-    ];
-    const status = statusMap.find(s => total <= s.max) || statusMap[statusMap.length-1];
+      if (!strikeData.length) {
+        document.getElementById('strikeList').innerHTML = '<div class="empty-card"><h2 class="empty-title">No strike data loaded yet.</h2><p class="empty-copy">Choose a class and load the strike sheet.</p></div>';
+        updateSummary();
+        return;
+      }
 
-    // Strike dots
-    const dotsHtml = [1,2,3,4].map(i =>
-      `<div class="strike-dot ${i <= total ? 'hit' : 'miss'}">${i <= total ? '⚠️' : ''}</div>`
-    ).join('');
+      if (!students.length) {
+        document.getElementById('strikeList').innerHTML = '<div class="empty-card"><h2 class="empty-title">No students match this view.</h2><p class="empty-copy">Try another search or filter.</p></div>';
+        updateSummary();
+        return;
+      }
 
-    const detailHtml = total > 0 ? `
-      <div class="strike-detail">
-        ${data.date ? `<div class="strike-detail-row"><span class="strike-detail-label">Date</span><span class="strike-detail-val">${data.date}</span></div>` : ''}
-        ${data.reason ? `<div class="strike-detail-row"><span class="strike-detail-label">Reason</span><span class="strike-detail-val">${data.reason}</span></div>` : ''}
-      </div>` : '';
+      document.getElementById('strikeList').innerHTML = students.map(function(student) {
+        var total = Number(student.total || 0);
+        var status = strikeStatus(total);
+        var dots = [1, 2, 3, 4].map(function(index) {
+          return '<span class="strike-dot ' + (index <= total ? 'hit' : '') + '">' + (index <= total ? '!' : '') + '</span>';
+        }).join('');
+        var reason = student.reason
+          ? '<div class="reason-note"><strong>Latest note</strong><span>' + escapeHtml(student.reason) + (student.date ? ' · ' + escapeHtml(student.date) : '') + '</span></div>'
+          : '';
+        return '<article class="student-strike-row ' + status.rowClass + '" id="student-' + escapeHtml(student.no) + '">' +
+          '<div class="avatar">' + escapeHtml(initials(student)) + '</div>' +
+          '<div><div class="student-name">' + escapeHtml(student.nickname || student.name) + '</div><div class="student-meta">No. ' + escapeHtml(student.no) + ' · ' + escapeHtml(EQApi.classLabels[cls] || cls) + (student.nickname ? ' · ' + escapeHtml(student.name) : '') + '</div></div>' +
+          '<div class="strike-meter"><div class="strike-dots">' + dots + '</div><div class="strike-label ' + status.labelClass + '">' + total + '/4 · ' + status.text + '</div></div>' +
+          '<div class="strike-actions">' +
+            '<button class="btn ghost" type="button" onclick="removeStrike(\'' + escapeHtml(student.no) + '\')" ' + (total <= 0 ? 'disabled' : '') + '>Remove</button>' +
+            '<button class="btn danger" type="button" onclick="openReasonModal(\'' + escapeHtml(student.no) + '\')" ' + (total >= 4 ? 'disabled' : '') + '>Add Strike</button>' +
+          '</div>' + reason +
+        '</article>';
+      }).join('');
+      updateSummary();
+    }
 
-    const showClearance = total > 0;
-    document.getElementById('studentResult').innerHTML = `
-      <div class="strike-card">
-        <div class="profile-strip">
-          <div class="avatar">${initial}</div>
-          <div>
-            <div class="profile-name">${data.nickname || data.name}</div>
-            <div class="profile-meta">${data.name} · ${clsLabel}</div>
-          </div>
-        </div>
-        <div class="strike-body">
-          <div class="strike-dots-label">Strike Record (max 4)</div>
-          <div class="strike-dots">${dotsHtml}</div>
-          <div class="strike-status ${status.cls}">
-            <div class="strike-status-icon">${status.icon}</div>
-            <div>
-              <div class="strike-status-text">${status.text}</div>
-              <div class="strike-status-sub">${status.sub}</div>
-            </div>
-          </div>
-          ${detailHtml}
-        </div>
-      </div>
-      ${showClearance ? `
-      <div class="clearance-guide" id="clearanceGuide">
-        <div class="clearance-header">
-          <div class="clearance-header-icon">📝</div>
-          <div>
-            <div class="clearance-header-title">How to Clear Your Strike</div>
-            <div class="clearance-header-sub">Complete this writing task to remove your strike</div>
-          </div>
-        </div>
-        <div class="clearance-body">
-          <div class="clearance-intro">
-            To clear your strike, you must submit a <strong>writing task</strong> to your teacher.
-            The writing must meet all the requirements below. Once your teacher reviews and approves it,
-            your strike will be removed.
-          </div>
+    function updateSummary() {
+      var students = strikeData.length;
+      var clean = strikeData.filter(function(student) { return Number(student.total || 0) === 0; }).length;
+      var summativeBlocked = strikeData.filter(function(student) { return Number(student.total || 0) >= 1; }).length;
+      var classBlocked = strikeData.filter(function(student) { return Number(student.total || 0) >= 3; }).length;
+      document.getElementById('summaryGrid').innerHTML =
+        '<div class="summary-card"><strong>' + students + '</strong><span>Students</span></div>' +
+        '<div class="summary-card"><strong>' + clean + '</strong><span>Clean Records</span></div>' +
+        '<div class="summary-card"><strong>' + summativeBlocked + '</strong><span>Summative Blocked</span></div>' +
+        '<div class="summary-card"><strong>' + classBlocked + '</strong><span>Class Blocked</span></div>';
+    }
 
-          <div class="chapter-badge">
-            <div class="chapter-badge-label">Active Chapter</div>
-            <div class="chapter-badge-val">Chapter 4 · Analytical Exposition Text</div>
-          </div>
+    function openReasonModal(studentNo) {
+      var student = strikeData.find(function(item) { return String(item.no) === String(studentNo); }) || {};
+      var name = student.nickname || student.name || 'this student';
+      pendingStrike = { studentNo: studentNo };
+      document.getElementById('reasonModalSub').textContent = 'Adding a strike for ' + name + '.';
+      document.getElementById('reasonInput').value = '';
+      document.getElementById('reasonModal').hidden = false;
+      setTimeout(function() { document.getElementById('reasonInput').focus(); }, 80);
+    }
 
-          <div class="req-title">✅ Requirements</div>
-          <div class="req-item">
-            <div class="req-num">1</div>
-            <div class="req-text">Write a <strong>Analytical Exposition Text</strong>
-              <span>An Analytical Exposition is a text that presents an argument or point of view and aims to persuade the reader that something is important or true.</span>
-            </div>
-          </div>
-          <div class="req-item">
-            <div class="req-num">2</div>
-            <div class="req-text">Minimum <strong>3 paragraphs</strong>
-              <span>Each paragraph must cover a different part of the text structure.</span>
-            </div>
-          </div>
-          <div class="req-item">
-            <div class="req-num">3</div>
-            <div class="req-text">Minimum <strong>5 sentences per paragraph</strong>
-              <span>Short, one-line sentences don't count. Make them meaningful!</span>
-            </div>
-          </div>
-          <div class="req-item">
-            <div class="req-num">4</div>
-            <div class="req-text">Include <strong>all text structure parts</strong>
-              <span>See the structure guide below — every part must appear in your writing.</span>
-            </div>
-          </div>
+    function closeReasonModal() {
+      document.getElementById('reasonModal').hidden = true;
+      pendingStrike = null;
+    }
 
-          <div class="structure-wrap">
-            <div class="structure-title">📐 Text Structure Guide</div>
-            <div class="structure-item">
-        <span class="structure-tag thesis">Thesis</span>
-        <div class="structure-desc">State your main argument or point of view.<span>e.g. "Social media has more negative impacts on teenagers."</span></div>
-      </div>
-<div class="structure-item">
-        <span class="structure-tag arg">Argument 1</span>
-        <div class="structure-desc">Give your first reason to support the thesis.<span>Include facts, examples, or logical reasoning.</span></div>
-      </div>
-<div class="structure-item">
-        <span class="structure-tag arg">Argument 2</span>
-        <div class="structure-desc">Give your second reason to support the thesis.<span>The more specific, the stronger your argument.</span></div>
-      </div>
-<div class="structure-item">
-        <span class="structure-tag arg">Argument 3</span>
-        <div class="structure-desc">Optional: Give a third reason.<span>More arguments = stronger text. Aim for at least 2.</span></div>
-      </div>
-<div class="structure-item">
-        <span class="structure-tag reit">Reiteration</span>
-        <div class="structure-desc">Restate your thesis and summarize your arguments.<span>Do NOT introduce new ideas here.</span></div>
-      </div>
-          </div>
+    function setReason(reason) {
+      document.getElementById('reasonInput').value = reason;
+      document.getElementById('reasonInput').focus();
+    }
 
-          <div class="submit-box">
-            <div class="submit-box-icon">📬</div>
-            <div>
-              <div class="submit-box-title">How to Submit</div>
-              <div class="submit-box-text">
-                Write your text on paper or digitally, then submit it directly to your teacher
-                (in class or via WhatsApp). Your teacher will review it and clear your strike if it meets all requirements.
-              </div>
-            </div>
-          </div>
+    function confirmStrike() {
+      if (!pendingStrike) return;
+      var reason = document.getElementById('reasonInput').value.trim();
+      if (!reason) {
+        showToast('Please enter a reason', 'err');
+        return;
+      }
+      var teacher = EQAuth.getTeacher();
+      var cls = document.getElementById('classSelect').value;
+      var studentNo = pendingStrike.studentNo;
+      closeReasonModal();
+      EQApi.get({
+        action: 'addStrike',
+        username: teacher.username,
+        password: teacher.password,
+        className: cls,
+        studentNo: String(studentNo),
+        reason: reason
+      }).then(function(data) {
+        if (!data.success) throw new Error(data.error || 'Could not add strike');
+        showToast('Strike added', 'ok');
+        loadStrikes();
+      }).catch(function(err) {
+        showToast(err.message, 'err');
+      });
+    }
 
-        </div>
-      </div>` : ''}`;
-  }
+    function removeStrike(studentNo) {
+      if (!confirm('Remove the latest strike for this student?')) return;
+      var teacher = EQAuth.getTeacher();
+      var cls = document.getElementById('classSelect').value;
+      EQApi.get({
+        action: 'removeStrike',
+        username: teacher.username,
+        password: teacher.password,
+        className: cls,
+        studentNo: String(studentNo)
+      }).then(function(data) {
+        if (!data.success) throw new Error(data.error || 'Could not remove strike');
+        showToast('Strike removed', 'ok');
+        loadStrikes();
+      }).catch(function(err) {
+        showToast(err.message, 'err');
+      });
+    }
 
-  // ── TEACHER — LOAD STRIKES ────────────────────────────────────
-  async function loadTeacherStrikes() {
-    const cls = document.getElementById('tClassSelect').value;
-    if (!cls) { document.getElementById('teacherList').innerHTML = ''; return; }
-    document.getElementById('teacherList').innerHTML = '<div class="loading"><div class="spinner"></div><br/>Loading...</div>';
-    try {
-      const data = await apiGet({ action: 'getAllStrikes', className: cls });
-      if (data.error) { showToast(data.error, 'err'); document.getElementById('teacherList').innerHTML = ''; return; }
-      strikesCache[cls] = data.students;
-      renderTeacherStrikes(data.students, cls);
-    } catch(e) { showToast('Failed to load', 'err'); document.getElementById('teacherList').innerHTML = ''; }
-  }
+    function showToast(msg, type) {
+      var toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.className = 'toast ' + (type || '');
+      setTimeout(function() { toast.classList.add('show'); }, 10);
+      setTimeout(function() { toast.classList.remove('show'); }, 3000);
+    }
 
-  function renderTeacherStrikes(students, cls) {
-    const rows = students.map(s => {
-      const dots = [1,2,3,4].map(i =>
-        `<div class="str-dot ${i <= s.total ? 'hit' : 'miss'}">${i <= s.total ? '⚠️' : ''}</div>`
-      ).join('');
-      const atMax = s.total >= 4;
-      return `<div class="student-strike-row" id="srow-${s.no}">
-        <span class="str-no">${s.no}</span>
-        <span class="str-name">${s.nickname || s.name}</span>
-        <div class="str-dots">${dots}</div>
-        <div class="str-actions">
-          <button class="btn-rm-strike" onclick="doRemoveStrike(${s.no},'${cls}')" ${s.total <= 0 ? 'disabled' : ''} title="Remove last strike">−</button>
-          <button class="btn-add-strike" onclick="openReasonModal(${s.no},'${cls}','${s.nickname||s.name}')" ${atMax ? 'disabled' : ''}>+ Strike</button>
-        </div>
-      </div>`;
-    }).join('');
-    document.getElementById('teacherList').innerHTML = rows;
-  }
-
-  // ── REASON MODAL ──────────────────────────────────────────────
-  function openReasonModal(studentNo, cls, name) {
-    pendingStrike = { studentNo, cls };
-    document.getElementById('reasonModalSub').textContent = 'Adding strike for ' + name;
-    document.getElementById('reasonInput').value = '';
-    document.getElementById('reasonModal').classList.remove('hidden');
-    setTimeout(() => document.getElementById('reasonInput').focus(), 100);
-  }
-  function closeReasonModal() { document.getElementById('reasonModal').classList.add('hidden'); pendingStrike = null; }
-  function setReason(r) { document.getElementById('reasonInput').value = r; }
-
-  async function confirmStrike() {
-    if (!pendingStrike) return;
-    const reason = document.getElementById('reasonInput').value.trim();
-    if (!reason) { showToast('Please enter a reason', 'err'); return; }
-    const { studentNo, cls } = pendingStrike; // grab BEFORE closeReasonModal clears it
-    closeReasonModal();
-    try {
-      const res = await apiGet({ action: 'addStrike', username: savedUser, password: savedPass, className: cls, studentNo: String(studentNo), reason });
-      if (res.success) {
-        showToast('⚠️ Strike added!', 'ok');
-        loadTeacherStrikes(); // Refresh list
-      } else { showToast('Error: ' + res.error, 'err'); }
-    } catch(e) { showToast('Failed to save strike', 'err'); }
-  }
-
-  async function doRemoveStrike(studentNo, cls) {
-    if (!confirm('Remove the last strike for this student?')) return;
-    try {
-      const res = await apiGet({ action: 'removeStrike', username: savedUser, password: savedPass, className: cls, studentNo: String(studentNo) });
-      if (res.success) { showToast('Strike removed', 'ok'); loadTeacherStrikes(); }
-      else { showToast('Error: ' + res.error, 'err'); }
-    } catch(e) { showToast('Failed to remove strike', 'err'); }
-  }
-
-  // ── TOAST ─────────────────────────────────────────────────────
-  function showToast(msg, type) {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.className = 'toast ' + (type||'');
-    setTimeout(() => t.classList.add('show'), 10);
-    setTimeout(() => t.classList.remove('show'), 3000);
-  }
-
-  // Auto-select saved student — waits for page to be fully ready
-  document.addEventListener('DOMContentLoaded', function() {
-    var cls = localStorage.getItem('eq_student_class');
-    var no  = localStorage.getItem('eq_student_no');
-    if (!cls || !no) return;
-    var clsSel = document.getElementById('sClassSelect');
-    if (!clsSel) return;
-    clsSel.value = cls;
-    onSClassChange().then(function() {
-      var nameSel = document.getElementById('sNameSelect');
-      if (!nameSel) return;
-      nameSel.value = no;
-      var viewBtn = document.getElementById('sViewBtn');
-      if (viewBtn) { viewBtn.disabled = false; viewBtn.click(); }
-    }).catch(function(){});
-  });
-
-</script>
-
+    document.addEventListener('DOMContentLoaded', function() {
+      if (EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) {
+        loadStrikes();
+      }
+      document.getElementById('classSelect').addEventListener('change', loadStrikes);
+      document.getElementById('searchInput').addEventListener('input', renderStrikes);
+      document.getElementById('reasonModal').addEventListener('click', function(event) {
+        if (event.target.id === 'reasonModal') closeReasonModal();
+      });
+    });
+  </script>
 </body>
 </html>
