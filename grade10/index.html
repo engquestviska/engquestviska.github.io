@@ -135,6 +135,7 @@
       }
     }
   </style>
+  <script src="../shared/js/api.js"></script>
 </head>
 <body class="track-page grade10-page">
   <div class="shell">
@@ -295,43 +296,9 @@
 
   <footer>© 2026 English Quest · Grade 10</footer>
   <script>
-    var STUDENT_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
     var studentsForClass = [];
 
     localStorage.setItem('eq_grade', '10');
-
-    function apiGet(params) {
-      var url = STUDENT_API + '?';
-      var parts = [];
-      for (var k in params) parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
-      url += parts.join('&');
-
-      return new Promise(function(resolve, reject) {
-        var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-        var script = document.createElement('script');
-        var timer = setTimeout(function() {
-          cleanup();
-          reject(new Error('Request timed out'));
-        }, 15000);
-
-        function cleanup() {
-          clearTimeout(timer);
-          delete window[cb];
-          try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
-        }
-
-        window[cb] = function(data) {
-          cleanup();
-          resolve(data);
-        };
-        script.onerror = function() {
-          cleanup();
-          reject(new Error('Network error'));
-        };
-        script.src = url + '&callback=' + cb;
-        document.head.appendChild(script);
-      });
-    }
 
     function classLabel(value) {
       return value ? value.replace(/^XE/, 'XE-') : '';
@@ -391,7 +358,7 @@
       resetStudentSelect('Loading names...');
 
       try {
-        var data = await apiGet({ action: 'getStudents', className: cls });
+        var data = await EQApi.get({ action: 'getStudents', className: cls });
         studentsForClass = data.students || [];
         populateStudents(studentsForClass);
         document.getElementById('profileMessage').textContent = studentsForClass.length
@@ -468,7 +435,7 @@
     async function loadAnnouncement() {
       var card = document.getElementById('homeAnnouncement');
       try {
-        var data = await apiGet({ action: 'getAnnouncement' });
+        var data = await EQApi.get({ action: 'getAnnouncement' });
         var announcement = data.announcement || null;
         if (!announcement || (!announcement.title && !announcement.body)) {
           card.style.display = 'none';
