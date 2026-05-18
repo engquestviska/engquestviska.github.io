@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teacher Materials · English Quest</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css"/>
+  <style>
+    .material-manager-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .material-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field-help {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .material-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .material-row {
+      display: grid;
+      grid-template-columns: 58px minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      border: 1.5px solid #dbeafe;
+      border-radius: 20px;
+      background: #fff;
+      padding: 16px;
+      box-shadow: 0 12px 26px rgba(37, 99, 235, 0.06);
+    }
+
+    .material-type {
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: var(--blue-soft);
+      color: #1d4ed8;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .material-title {
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .material-meta {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    .material-row-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .material-row-actions .btn {
+      min-height: 40px;
+      border-radius: 999px;
+      padding: 0 14px;
+      font-size: 0.84rem;
+    }
+
+    .btn.danger {
+      background: #dc2626;
+      color: #fff;
+    }
+
+    .starter-note {
+      margin-top: 14px;
+      border: 1.5px dashed #bfdbfe;
+      border-radius: 18px;
+      background: #f8fbff;
+      padding: 15px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+
+    .starter-note strong {
+      color: var(--ink);
+    }
+
+    @media (max-width: 900px) {
+      .material-manager-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .material-row {
+        grid-template-columns: 1fr;
+      }
+
+      .material-row-actions {
+        justify-content: flex-start;
+      }
+    }
+  </style>
+  <script src="../shared/js/api.js"></script>
+  <script src="../shared/js/auth.js"></script>
+</head>
+<body class="teacher-tool-page">
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <img src="../logo.jpg" alt="English Quest Logo"/>
+        <div>
+          <div class="brand-title">English Quest</div>
+          <div class="brand-sub">Teacher Control Room</div>
+        </div>
+      </div>
+      <nav class="nav-actions" aria-label="Teacher navigation">
+        <a href="index.html">Dashboard</a>
+        <a href="../grade10/lessons.html">Student View</a>
+        <button type="button" onclick="teacherLogout()">Logout</button>
+      </nav>
+    </div>
+    <section class="hero">
+      <div class="kicker">Materials Manager</div>
+      <h1>Publish lesson files from the teacher side.</h1>
+      <p class="hero-copy">Add Google Drive materials by chapter, review what students can open, and remove dynamic materials without exposing controls on the student page.</p>
+    </section>
+  </header>
+
+  <main>
+    <section class="access-card" id="accessCard" hidden>
+      <h2 class="access-title">Teacher login required.</h2>
+      <p class="access-copy">Open the teacher dashboard and log in first. This page uses the saved teacher session to publish materials.</p>
+      <a class="btn" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none;">Open Teacher Login</a>
+    </section>
+
+    <section id="appPanel" hidden>
+      <div class="material-manager-grid">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title">Add Material</h2>
+              <p class="panel-copy">Paste a Google Drive file link or file ID. Students will see it on the Grade 10 Lesson Materials page.</p>
+            </div>
+          </div>
+
+          <div class="material-form">
+            <div>
+              <label for="chapterSelect">Chapter</label>
+              <select id="chapterSelect">
+                <option value="4">Chapter 4 · Analytical Exposition</option>
+                <option value="5">Chapter 5 · Narrative Text</option>
+              </select>
+            </div>
+            <div>
+              <label for="titleInput">Material Title</label>
+              <input id="titleInput" type="text" placeholder="e.g. Fact vs Opinion"/>
+            </div>
+            <div>
+              <label for="driveInput">Google Drive URL or File ID</label>
+              <input id="driveInput" type="text" placeholder="Paste Drive link or file ID"/>
+              <div class="field-help">Use a shareable Drive file link. The page converts it to preview and download links.</div>
+            </div>
+            <div>
+              <label for="typeSelect">File Type</label>
+              <select id="typeSelect">
+                <option value="PDF">PDF</option>
+                <option value="PPT">PPT</option>
+                <option value="DOC">DOC</option>
+                <option value="LINK">LINK</option>
+              </select>
+            </div>
+            <button class="btn" type="button" id="addBtn" onclick="addMaterial()">Add Material</button>
+          </div>
+
+          <div class="starter-note">
+            <strong>Note:</strong> the original Chapter 4 starter files are still code-managed in the student page. This manager controls materials saved through Apps Script.
+          </div>
+        </div>
+
+        <div>
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2 class="panel-title">Published Materials</h2>
+                <p class="panel-copy">Switch chapters to inspect or remove materials stored in the backend.</p>
+              </div>
+              <div class="status-pill" id="loginPill">Teacher</div>
+            </div>
+            <div class="controls">
+              <div>
+                <label for="listChapterSelect">Chapter</label>
+                <select id="listChapterSelect">
+                  <option value="4">Chapter 4</option>
+                  <option value="5">Chapter 5</option>
+                </select>
+              </div>
+              <button class="btn" type="button" id="loadBtn" onclick="loadMaterials()">Load Materials</button>
+            </div>
+          </div>
+
+          <div id="materialList" class="material-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2026 English Quest · Teacher Materials Manager</footer>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    var currentMaterials = [];
+
+    function teacherLogout() {
+      EQAuth.logoutTeacher('index.html');
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function extractDriveId(value) {
+      var input = String(value || '').trim();
+      if (!input) return '';
+      var patterns = [
+        /\/d\/([a-zA-Z0-9_-]+)/,
+        /[?&]id=([a-zA-Z0-9_-]+)/,
+        /^([a-zA-Z0-9_-]{20,})$/
+      ];
+      for (var i = 0; i < patterns.length; i++) {
+        var match = input.match(patterns[i]);
+        if (match) return match[1];
+      }
+      return '';
+    }
+
+    function previewUrl(fileId) {
+      return 'https://drive.google.com/file/d/' + encodeURIComponent(fileId) + '/preview';
+    }
+
+    function loadMaterials() {
+      if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
+      var chapter = document.getElementById('listChapterSelect').value;
+      var btn = document.getElementById('loadBtn');
+      btn.disabled = true;
+      btn.textContent = 'Loading...';
+      document.getElementById('materialList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading materials...</h2><p class="empty-copy">Fetching Chapter ' + chapter + ' materials from Apps Script.</p></div>';
+
+      EQApi.get({ action: 'getMaterials', chapter: chapter }).then(function(data) {
+        currentMaterials = data.materials || [];
+        renderMaterials();
+      }).catch(function(err) {
+        document.getElementById('materialList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Could not load materials.</h2><p class="empty-copy">' + escapeHtml(err.message) + '</p></div>';
+        showToast(err.message, 'err');
+      }).finally(function() {
+        btn.disabled = false;
+        btn.textContent = 'Load Materials';
+      });
+    }
+
+    function renderMaterials() {
+      var chapter = document.getElementById('listChapterSelect').value;
+      if (!currentMaterials.length) {
+        document.getElementById('materialList').innerHTML = '<div class="empty-card"><h2 class="empty-title">No dynamic materials yet.</h2><p class="empty-copy">Add the first Chapter ' + chapter + ' file from the form.</p></div>';
+        return;
+      }
+
+      document.getElementById('materialList').innerHTML = currentMaterials.map(function(material) {
+        var fileType = material.fileType || 'PDF';
+        var fileId = material.fileId || '';
+        var title = material.title || 'Untitled Material';
+        return '<article class="material-row">' +
+          '<div class="material-type">' + escapeHtml(fileType) + '</div>' +
+          '<div>' +
+            '<div class="material-title">' + escapeHtml(title) + '</div>' +
+            '<div class="material-meta">Chapter ' + chapter + ' · ' + escapeHtml(fileId) + '</div>' +
+          '</div>' +
+          '<div class="material-row-actions">' +
+            '<a class="btn ghost" href="' + previewUrl(fileId) + '" target="_blank">Preview</a>' +
+            '<button class="btn danger" type="button" onclick="deleteMaterial(&quot;' + escapeHtml(fileId) + '&quot;)">Remove</button>' +
+          '</div>' +
+        '</article>';
+      }).join('');
+    }
+
+    function addMaterial() {
+      var teacher = EQAuth.getTeacher();
+      var chapter = document.getElementById('chapterSelect').value;
+      var title = document.getElementById('titleInput').value.trim();
+      var fileId = extractDriveId(document.getElementById('driveInput').value);
+      var fileType = document.getElementById('typeSelect').value;
+      var btn = document.getElementById('addBtn');
+
+      if (!teacher.username || !teacher.password) {
+        EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' });
+        return;
+      }
+      if (!title) {
+        showToast('Enter a material title', 'err');
+        return;
+      }
+      if (!fileId) {
+        showToast('Paste a valid Google Drive file link or ID', 'err');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Adding...';
+      EQApi.get({
+        action: 'addMaterial',
+        username: teacher.username,
+        password: teacher.password,
+        chapter: chapter,
+        title: title,
+        fileId: fileId,
+        fileType: fileType
+      }).then(function(data) {
+        if (!data.success) throw new Error(data.error || 'Could not add material');
+        document.getElementById('titleInput').value = '';
+        document.getElementById('driveInput').value = '';
+        document.getElementById('listChapterSelect').value = chapter;
+        currentMaterials = data.materials || [];
+        renderMaterials();
+        showToast('Material added', 'ok');
+      }).catch(function(err) {
+        showToast(err.message, 'err');
+      }).finally(function() {
+        btn.disabled = false;
+        btn.textContent = 'Add Material';
+      });
+    }
+
+    function deleteMaterial(fileId) {
+      if (!confirm('Remove this material from the student page?')) return;
+      var teacher = EQAuth.getTeacher();
+      var chapter = document.getElementById('listChapterSelect').value;
+
+      EQApi.get({
+        action: 'deleteMaterial',
+        username: teacher.username,
+        password: teacher.password,
+        chapter: chapter,
+        fileId: fileId
+      }).then(function(data) {
+        if (!data.success) throw new Error(data.error || 'Could not remove material');
+        currentMaterials = data.materials || [];
+        renderMaterials();
+        showToast('Material removed', 'ok');
+      }).catch(function(err) {
+        showToast(err.message, 'err');
+      });
+    }
+
+    function showToast(message, type) {
+      var toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast ' + (type || '');
+      setTimeout(function() { toast.classList.add('show'); }, 10);
+      setTimeout(function() { toast.classList.remove('show'); }, 2600);
+    }
+
+    document.getElementById('listChapterSelect').addEventListener('change', loadMaterials);
+    document.getElementById('chapterSelect').addEventListener('change', function() {
+      document.getElementById('listChapterSelect').value = this.value;
+      loadMaterials();
+    });
+
+    (function init() {
+      if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
+      loadMaterials();
+    })();
+  </script>
+</body>
+</html>

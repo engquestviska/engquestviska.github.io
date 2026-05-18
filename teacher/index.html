@@ -48,7 +48,7 @@
         <div class="logged-card" id="loggedCard">
           <div class="login-title">Logged in</div>
           <div class="logged-name" id="loggedName">Teacher</div>
-          <div class="logged-copy">Your session is active for scores, tasks, and strikes.</div>
+          <div class="logged-copy">Your session is active for materials, scores, tasks, and strikes.</div>
           <div class="login-row">
             <button class="ghost-btn" type="button" onclick="teacherLogout()">Logout</button>
             <a class="primary-btn" href="scores.html">Open Scores</a>
@@ -107,14 +107,14 @@
       </div>
 
       <div class="teacher-control-grid compact">
-        <article class="control-card pending">
+        <a class="control-card live" href="materials.html">
           <div class="control-meta">
             <span class="control-code">Materials</span>
-            <span class="control-state">Next</span>
+            <span class="control-state live">Live</span>
           </div>
           <h3>Materials Manager</h3>
-          <p>Move add, edit, and remove lesson material controls out of the student page.</p>
-        </article>
+          <p>Add or remove dynamic lesson materials while students only view and download files.</p>
+        </a>
 
         <article class="control-card pending">
           <div class="control-meta">

@@ -41,6 +41,7 @@ English Quest is being reorganized into three tracks.
 ## Teacher
 
 - `teacher/index.html` - Teacher dashboard and future management hub for both grades.
+- `teacher/materials.html` - Teacher materials manager for Grade 10 dynamic lesson files.
 - `teacher/scores.html` - Teacher score manager for Grade 10.
 - `teacher/tasks.html` - Teacher task status manager for Grade 10.
 - `teacher/strikes.html` - Teacher strike management for Grade 10.
