@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Teacher Dashboard · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css"/>
+  <script src="../shared/js/api.js"></script>
+  <script src="../shared/js/auth.js"></script>
 </head>
 <body class="teacher-page">
   <header>
@@ -20,36 +22,36 @@
       </div>
       <div class="nav-actions">
         <a href="../index.html">Landing</a>
-        <a href="../grade10/" onclick="localStorage.setItem('eq_grade','10')">Grade 10</a>
-        <a href="../grade11/" onclick="localStorage.setItem('eq_grade','11')">Grade 11</a>
+        <a href="../grade10/" onclick="localStorage.setItem('eq_grade','10')">Grade 10 View</a>
+        <a href="../grade11/" onclick="localStorage.setItem('eq_grade','11')">Grade 11 Preview</a>
       </div>
     </div>
 
     <section class="hero">
       <div>
         <div class="kicker">Teacher Dashboard</div>
-        <h1>One control room for both grades.</h1>
-        <p class="hero-copy">Grade 10 and Grade 11 can become separate student experiences, while teacher tools stay centralized here. This page is the future editing hub for content, data, announcements, and grade-specific workflows.</p>
+        <h1>Run English Quest from one control room.</h1>
+        <p class="hero-copy">Teacher tools live here. Student tracks stay focused on viewing, submitting, and checking personal progress.</p>
       </div>
 
       <div class="login-panel">
         <div id="loginForm">
           <div class="login-title">Teacher Login</div>
-          <div class="login-copy">Use the same teacher account as the existing Grade 10 tools.</div>
+          <div class="login-copy">Log in once, then open any teacher manager without signing in again.</div>
           <input type="text" id="teacherUser" placeholder="Username"/>
           <input type="password" id="teacherPass" placeholder="Password" onkeydown="if(event.key==='Enter')teacherLogin()"/>
           <div class="error" id="loginError">Incorrect username or password.</div>
           <div class="login-row">
-            <button class="primary-btn" onclick="teacherLogin()">Login</button>
+            <button class="primary-btn" type="button" onclick="teacherLogin()">Login</button>
           </div>
         </div>
         <div class="logged-card" id="loggedCard">
           <div class="login-title">Logged in</div>
           <div class="logged-name" id="loggedName">Teacher</div>
-          <div class="logged-copy">Your login is saved for teacher tools across the site.</div>
+          <div class="logged-copy">Your session is active for scores, tasks, and strikes.</div>
           <div class="login-row">
-            <button class="ghost-btn" onclick="teacherLogout()">Logout</button>
-            <a class="primary-btn" href="../grade10/" style="text-align:center;text-decoration:none;">Open Grade 10</a>
+            <button class="ghost-btn" type="button" onclick="teacherLogout()">Logout</button>
+            <a class="primary-btn" href="scores.html">Open Scores</a>
           </div>
         </div>
       </div>
@@ -60,63 +62,122 @@
     <section>
       <div class="section-head">
         <div>
-          <div class="section-kicker">Manage Tracks</div>
-          <h2>Grade-specific workspaces</h2>
+          <div class="section-kicker">Grade 10</div>
+          <h2>Live management tools</h2>
+        </div>
+        <a class="btn ghost" href="../grade10/">Open student view</a>
+      </div>
+
+      <div class="teacher-control-grid">
+        <a class="control-card live" href="scores.html">
+          <div class="control-meta">
+            <span class="control-code">Scores</span>
+            <span class="control-state live">Live</span>
+          </div>
+          <h3>Score Manager</h3>
+          <p>Edit Chapter 4, Chapter 5, and final score tables from the teacher side.</p>
+        </a>
+
+        <a class="control-card live" href="tasks.html">
+          <div class="control-meta">
+            <span class="control-code">Tasks</span>
+            <span class="control-state live">Live</span>
+          </div>
+          <h3>Task Status Manager</h3>
+          <p>Update each student task status while Grade 10 pages stay read-only.</p>
+        </a>
+
+        <a class="control-card live" href="strikes.html">
+          <div class="control-meta">
+            <span class="control-code">Strikes</span>
+            <span class="control-state live">Live</span>
+          </div>
+          <h3>Strike Manager</h3>
+          <p>Add or remove warning strikes and keep summative/class restrictions traceable.</p>
+        </a>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Build Next</div>
+          <h2>Teacher tools still missing</h2>
         </div>
       </div>
-      <div class="track-grid">
-        <article class="track ten">
-          <div class="track-label">Live Toolset</div>
-          <div class="track-title">Grade 10</div>
-          <p class="track-copy">Manage the current working English Quest pages and the existing Google Apps Script data tools.</p>
-          <div class="action-grid">
-            <a class="action" href="../grade10/">🏠 Dashboard</a>
-            <a class="action" href="../grade10/students.html">🎓 Students</a>
-            <a class="action" href="../grade10/attendance.html">✅ Attendance</a>
-            <a class="action" href="scores.html">🏆 Scores</a>
-            <a class="action" href="tasks.html">📌 Tasks</a>
-            <a class="action" href="strikes.html">⚠️ Strikes</a>
-            <a class="action" href="../grade10/submission.html">📝 Submissions</a>
-            <a class="action" href="../grade10/lessons.html">📚 Lessons</a>
-            <a class="action" href="../summative.html">🎯 Summative</a>
+
+      <div class="teacher-control-grid compact">
+        <article class="control-card pending">
+          <div class="control-meta">
+            <span class="control-code">Materials</span>
+            <span class="control-state">Next</span>
           </div>
+          <h3>Materials Manager</h3>
+          <p>Move add, edit, and remove lesson material controls out of the student page.</p>
         </article>
 
-        <article class="track eleven">
-          <div class="track-label">Build Zone</div>
-          <div class="track-title">Grade 11</div>
-          <p class="track-copy">Prepare the new Grade 11 structure before the real classes, rosters, and materials arrive.</p>
-          <div class="action-grid">
-            <a class="action" href="../grade11/">🏠 Dashboard</a>
-            <a class="action" href="../grade11/students.html">🎓 Students</a>
-            <a class="action" href="../grade11/lessons.html">📚 Lessons</a>
-            <a class="action" href="../grade11/assignments.html">📝 Assignments</a>
-            <a class="action" href="../grade11/scores.html">🏆 Scores</a>
-            <a class="action" href="../grade11/attendance.html">✅ Attendance</a>
+        <article class="control-card pending">
+          <div class="control-meta">
+            <span class="control-code">Assignments</span>
+            <span class="control-state">Queued</span>
           </div>
+          <h3>Assignment Manager</h3>
+          <p>Publish task files from teacher tools while students only view or download them.</p>
+        </article>
+
+        <article class="control-card pending">
+          <div class="control-meta">
+            <span class="control-code">Submissions</span>
+            <span class="control-state">Queued</span>
+          </div>
+          <h3>Submission Review</h3>
+          <p>Review received work, latest previews, and missing submissions in one place.</p>
+        </article>
+
+        <article class="control-card pending">
+          <div class="control-meta">
+            <span class="control-code">Attendance</span>
+            <span class="control-state">Queued</span>
+          </div>
+          <h3>Attendance Manager</h3>
+          <p>Keep attendance editing separate from the student statistics view.</p>
+        </article>
+
+        <article class="control-card pending">
+          <div class="control-meta">
+            <span class="control-code">Activeness</span>
+            <span class="control-state">Queued</span>
+          </div>
+          <h3>Activeness Manager</h3>
+          <p>Update participation records without exposing teacher controls to students.</p>
+        </article>
+
+        <article class="control-card pending">
+          <div class="control-meta">
+            <span class="control-code">Announcements</span>
+            <span class="control-state">Later</span>
+          </div>
+          <h3>Announcements</h3>
+          <p>Post grade-specific updates when the core classroom managers are stable.</p>
         </article>
       </div>
     </section>
 
     <section class="planning">
-      <div class="section-kicker">What This Becomes</div>
-      <h2>Central editing, separate student worlds</h2>
-      <div class="planning-grid">
-        <div class="plan-card">
-          <div class="plan-icon">📢</div>
-          <div class="plan-title">Announcements</div>
-          <div class="plan-copy">Post or schedule messages for Grade 10, Grade 11, or both.</div>
+      <div class="section-head slim">
+        <div>
+          <div class="section-kicker">Grade 11</div>
+          <h2>Prepared, not wired yet</h2>
         </div>
-        <div class="plan-card">
-          <div class="plan-icon">🗂️</div>
-          <div class="plan-title">Content Control</div>
-          <div class="plan-copy">Edit which lessons, assignments, and resources each grade can see.</div>
-        </div>
-        <div class="plan-card">
-          <div class="plan-icon">📊</div>
-          <div class="plan-title">Data Separation</div>
-          <div class="plan-copy">Keep scores, attendance, submissions, and task status separate by grade.</div>
-        </div>
+        <a class="btn ghost" href="../grade11/">Open preview</a>
+      </div>
+      <div class="grade-note">
+        Grade 11 pages are structural placeholders for now. Do not connect management tools until the real Grade 11 spreadsheet and data rules exist.
+      </div>
+      <div class="teacher-control-grid compact disabled-grid">
+        <article class="control-card locked"><span class="control-code">Scores</span><h3>Grade 11 Scores</h3><p>Waiting for real Grade 11 score data.</p></article>
+        <article class="control-card locked"><span class="control-code">Tasks</span><h3>Grade 11 Tasks</h3><p>Waiting for task structure and class roster.</p></article>
+        <article class="control-card locked"><span class="control-code">Attendance</span><h3>Grade 11 Attendance</h3><p>Waiting for attendance sheet separation.</p></article>
       </div>
     </section>
   </main>
@@ -124,13 +185,6 @@
   <footer>© 2026 English Quest · Teacher Dashboard</footer>
 
   <script>
-    var API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
-
-    async function hashPass(plain) {
-      var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(plain));
-      return Array.from(new Uint8Array(buf)).map(function(b) { return b.toString(16).padStart(2, '0'); }).join('');
-    }
-
     function showLoggedIn(user) {
       document.getElementById('loginForm').style.display = 'none';
       document.getElementById('loggedCard').style.display = 'block';
@@ -142,51 +196,63 @@
       document.getElementById('loggedCard').style.display = 'none';
     }
 
-    async function teacherLogin() {
-      var u = document.getElementById('teacherUser').value.trim();
-      var p = document.getElementById('teacherPass').value.trim();
-      var err = document.getElementById('loginError');
-      if (!u || !p) return;
-      err.style.display = 'none';
+    function setLoginError(message) {
+      var error = document.getElementById('loginError');
+      error.textContent = message;
+      error.style.display = 'block';
+    }
 
-      try {
-        var res = await fetch(API + '?action=checkLogin&username=' + encodeURIComponent(u) + '&password=' + encodeURIComponent(p));
-        var data = await res.json();
+    function hashPass(plain) {
+      return crypto.subtle.digest('SHA-256', new TextEncoder().encode(plain)).then(function(buffer) {
+        return Array.from(new Uint8Array(buffer)).map(function(byte) {
+          return byte.toString(16).padStart(2, '0');
+        }).join('');
+      });
+    }
+
+    function teacherLogin() {
+      var username = document.getElementById('teacherUser').value.trim();
+      var password = document.getElementById('teacherPass').value.trim();
+      document.getElementById('loginError').style.display = 'none';
+      if (!username || !password) {
+        setLoginError('Enter both username and password.');
+        return;
+      }
+
+      EQApi.get({ action: 'checkLogin', username: username, password: password }).then(function(data) {
         if (!data.ok) {
-          err.textContent = 'Incorrect username or password.';
-          err.style.display = 'block';
+          setLoginError('Incorrect username or password.');
           return;
         }
-
-        var hashed = await hashPass(p);
-        localStorage.setItem('eq_tu', u);
-        localStorage.setItem('eq_tp', hashed);
-        showLoggedIn(u);
-      } catch (e) {
-        err.textContent = 'Connection error. Try again.';
-        err.style.display = 'block';
-      }
+        return hashPass(password).then(function(hashed) {
+          localStorage.setItem('eq_tu', username);
+          localStorage.setItem('eq_tp', hashed);
+          showLoggedIn(username);
+        });
+      }).catch(function() {
+        setLoginError('Connection error. Try again.');
+      });
     }
 
     function teacherLogout() {
-      localStorage.removeItem('eq_tu');
-      localStorage.removeItem('eq_tp');
+      EQAuth.logoutTeacher();
       showLoggedOut();
     }
 
-    (function initTeacherDashboard() {
-      var u = localStorage.getItem('eq_tu') || '';
-      var p = localStorage.getItem('eq_tp') || '';
-      if (!u || !p) {
+    function initTeacherDashboard() {
+      var teacher = EQAuth.getTeacher();
+      if (!teacher.username || !teacher.password) {
         showLoggedOut();
         return;
       }
 
-      fetch(API + '?action=checkLogin&username=' + encodeURIComponent(u) + '&password=' + encodeURIComponent(p))
-        .then(function(r) { return r.json(); })
-        .then(function(d) { d && d.ok ? showLoggedIn(u) : showLoggedOut(); })
-        .catch(function() { showLoggedOut(); });
-    })();
+      EQApi.get({ action: 'checkLogin', username: teacher.username, password: teacher.password }).then(function(data) {
+        if (data && data.ok) showLoggedIn(teacher.username);
+        else showLoggedOut();
+      }).catch(showLoggedOut);
+    }
+
+    document.addEventListener('DOMContentLoaded', initTeacherDashboard);
   </script>
 </body>
 </html>

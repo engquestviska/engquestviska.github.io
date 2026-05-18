@@ -62,6 +62,7 @@ This roadmap keeps the next-year rebuild focused. The goal is one English Quest 
    - Manage Grade 10 and Grade 11 from one place.
    - Add sections for content, scores, attendance, tasks, submissions, activeness, and announcements.
    - Make it clear which grade is being edited.
+   - Teacher dashboard now separates live Grade 10 managers, queued tools, and disabled Grade 11 placeholders.
 
 4. Plan data separation.
    - Decide how Google Sheets and Apps Script will separate Grade 10 and Grade 11.
