@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teacher Submissions · English Quest</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css"/>
+  <style>
+    .submission-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .submission-row {
+      display: grid;
+      grid-template-columns: 54px minmax(180px, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      border: 1.5px solid #dbeafe;
+      border-radius: 20px;
+      background: #fff;
+      padding: 16px;
+      box-shadow: 0 12px 26px rgba(37, 99, 235, 0.06);
+    }
+
+    .submission-row.missing {
+      border-color: #fecaca;
+      background: linear-gradient(135deg, #fff, #fff5f5);
+    }
+
+    .submission-avatar {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: #2563eb;
+      color: #fff;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 900;
+    }
+
+    .submission-name {
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .submission-meta {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 600;
+    }
+
+    .submission-state {
+      justify-self: end;
+      border-radius: 999px;
+      padding: 9px 12px;
+      background: #d1fae5;
+      color: #047857;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.74rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    .submission-state.missing {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .task-chip-row {
+      grid-column: 2 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .task-chip {
+      border-radius: 999px;
+      padding: 7px 10px;
+      background: #fee2e2;
+      color: #b91c1c;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 900;
+    }
+
+    .task-chip.done {
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    .sync-result {
+      margin-top: 14px;
+      border: 1.5px solid #dbeafe;
+      border-radius: 18px;
+      background: #f8fbff;
+      padding: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    @media (max-width: 760px) {
+      .submission-row {
+        grid-template-columns: 48px 1fr;
+      }
+
+      .submission-state,
+      .task-chip-row {
+        grid-column: 1 / -1;
+        justify-self: start;
+      }
+    }
+  </style>
+  <script src="../shared/js/api.js"></script>
+  <script src="../shared/js/auth.js"></script>
+</head>
+<body class="teacher-tool-page">
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <img src="../logo.jpg" alt="English Quest Logo"/>
+        <div>
+          <div class="brand-title">English Quest</div>
+          <div class="brand-sub">Teacher Control Room</div>
+        </div>
+      </div>
+      <nav class="nav-actions" aria-label="Teacher navigation">
+        <a href="index.html">Dashboard</a>
+        <a href="../grade10/submission.html">Student View</a>
+        <button type="button" onclick="teacherLogout()">Logout</button>
+      </nav>
+    </div>
+    <section class="hero">
+      <div class="kicker">Submission Review</div>
+      <h1>Check submitted work before it becomes task status.</h1>
+      <p class="hero-copy">Review Chapter 4 and Chapter 5 submission coverage by class, then sync Chapter 5 files into the task sheet when the class is ready.</p>
+    </section>
+  </header>
+
+  <main>
+    <section class="access-card" id="accessCard" hidden>
+      <h2 class="access-title">Teacher login required.</h2>
+      <p class="access-copy">Open the teacher dashboard and log in first. This page uses the saved teacher session for Chapter 5 sync actions.</p>
+      <a class="btn" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none;">Open Teacher Login</a>
+    </section>
+
+    <section id="appPanel" hidden>
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2 class="panel-title">Grade 10 Submissions</h2>
+            <p class="panel-copy">Choose a chapter and class. Chapter 4 uses the submission overview. Chapter 5 can also sync found files into Task_Status.</p>
+          </div>
+          <div class="status-pill" id="loginPill">Teacher</div>
+        </div>
+
+        <div class="controls">
+          <div>
+            <label for="chapterSelect">Chapter</label>
+            <select id="chapterSelect">
+              <option value="4">Chapter 4</option>
+              <option value="5">Chapter 5</option>
+            </select>
+          </div>
+          <div>
+            <label for="classSelect">Class</label>
+            <select id="classSelect">
+              <option value="XE1">X E-1</option>
+              <option value="XE4">X E-4</option>
+              <option value="XE5">X E-5</option>
+              <option value="XE6">X E-6</option>
+              <option value="XE7">X E-7</option>
+              <option value="XE8">X E-8</option>
+              <option value="XE9">X E-9</option>
+              <option value="XE10">X E-10</option>
+              <option value="XE11">X E-11</option>
+            </select>
+          </div>
+          <button class="btn" type="button" id="loadBtn" onclick="loadSubmissions()">Load</button>
+        </div>
+
+        <div class="summary-grid" id="summaryGrid">
+          <div class="summary-card"><strong>0</strong><span>Students</span></div>
+          <div class="summary-card"><strong>0</strong><span>Submitted</span></div>
+          <div class="summary-card"><strong>0</strong><span>Missing</span></div>
+          <div class="summary-card"><strong>0%</strong><span>Complete</span></div>
+        </div>
+
+        <div id="syncPanel" hidden>
+          <div class="toolbar">
+            <button class="btn" type="button" id="syncBtn" onclick="syncCh5Class()">Sync Chapter 5 to Task Status</button>
+          </div>
+          <div class="sync-result" id="syncResult">Sync only after reviewing the class list below.</div>
+        </div>
+      </div>
+
+      <div id="submissionList" class="submission-list"></div>
+    </section>
+  </main>
+
+  <footer>© 2026 English Quest · Teacher Submission Review</footer>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    var submissionRows = [];
+
+    function teacherLogout() {
+      EQAuth.logoutTeacher('index.html');
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function normName(value) {
+      return String(value || '').toLowerCase()
+        .replace(/[-]/g, ' ')
+        .replace(/[^a-z0-9\s]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function normClass(value) {
+      return String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function initials(name) {
+      return String(name || 'EQ').split(/\s+/).filter(Boolean).slice(0, 2).map(function(part) {
+        return part.charAt(0).toUpperCase();
+      }).join('') || 'EQ';
+    }
+
+    function loadSubmissions() {
+      if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
+      var chapter = document.getElementById('chapterSelect').value;
+      var list = document.getElementById('submissionList');
+      var btn = document.getElementById('loadBtn');
+      btn.disabled = true;
+      btn.textContent = 'Loading...';
+      document.getElementById('syncPanel').hidden = chapter !== '5';
+      list.innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading submissions...</h2><p class="empty-copy">Fetching Chapter ' + chapter + ' submission data.</p></div>';
+
+      if (chapter === '5') loadChapter5();
+      else loadChapter4();
+    }
+
+    function loadChapter4() {
+      var cls = document.getElementById('classSelect').value;
+      EQApi.get({ action: 'getSubmissions' }).then(function(data) {
+        if (data.error) throw new Error(data.error);
+        submissionRows = (data.students && data.students[cls] ? data.students[cls] : []).map(function(student) {
+          var tasks = [];
+          var total = Number(data.totalTasks || 0);
+          for (var i = 0; i < total; i++) tasks.push(!!(student.tasksDone && student.tasksDone[i]));
+          return {
+            name: student.name,
+            meta: 'Chapter 4',
+            submitted: !!student.submitted,
+            tasks: tasks
+          };
+        });
+        renderSubmissions();
+        showToast('Chapter 4 loaded', 'ok');
+      }).catch(showLoadError).finally(resetLoadButton);
+    }
+
+    function loadChapter5() {
+      var cls = document.getElementById('classSelect').value;
+      Promise.all([
+        EQApi.get({ action: 'getStudents', className: cls }),
+        EQApi.get({ action: 'getCh5Submissions' })
+      ]).then(function(results) {
+        var studentsData = results[0] || {};
+        var overview = results[1] || {};
+        if (studentsData.error) throw new Error(studentsData.error);
+        if (overview.error) showToast(overview.error, 'err');
+        var byKey = overview.byKey || {};
+        submissionRows = (studentsData.students || []).map(function(student) {
+          var key = normClass(cls) + '|' + normName(student.name);
+          var entry = byKey[key] || {};
+          var tasks = entry.tasks || [false, false, false, false, false];
+          var submitted = tasks.some(Boolean);
+          return {
+            name: student.name,
+            nickname: student.nickname,
+            no: student.no,
+            meta: 'No. ' + student.no + ' · Chapter 5',
+            submitted: submitted,
+            tasks: tasks
+          };
+        });
+        renderSubmissions();
+        showToast('Chapter 5 loaded', 'ok');
+      }).catch(showLoadError).finally(resetLoadButton);
+    }
+
+    function renderSubmissions() {
+      var list = document.getElementById('submissionList');
+      if (!submissionRows.length) {
+        list.innerHTML = '<div class="empty-card"><h2 class="empty-title">No students found.</h2><p class="empty-copy">Try another class or check the spreadsheet connection.</p></div>';
+        updateSummary();
+        return;
+      }
+      list.innerHTML = submissionRows.map(function(row) {
+        var taskHtml = row.tasks && row.tasks.length
+          ? '<div class="task-chip-row">' + row.tasks.map(function(done, index) {
+              return '<span class="task-chip ' + (done ? 'done' : '') + '">' + (done ? 'Received' : 'Missing') + ' T' + (index + 1) + '</span>';
+            }).join('') + '</div>'
+          : '';
+        return '<article class="submission-row ' + (row.submitted ? '' : 'missing') + '">' +
+          '<div class="submission-avatar">' + escapeHtml(initials(row.nickname || row.name)) + '</div>' +
+          '<div><div class="submission-name">' + escapeHtml(row.nickname || row.name) + '</div><div class="submission-meta">' + escapeHtml(row.meta || '') + (row.nickname ? ' · ' + escapeHtml(row.name) : '') + '</div></div>' +
+          '<div class="submission-state ' + (row.submitted ? '' : 'missing') + '">' + (row.submitted ? 'Submitted' : 'Missing') + '</div>' +
+          taskHtml +
+        '</article>';
+      }).join('');
+      updateSummary();
+    }
+
+    function updateSummary() {
+      var total = submissionRows.length;
+      var submitted = submissionRows.filter(function(row) { return row.submitted; }).length;
+      var missing = total - submitted;
+      var pct = total ? Math.round(submitted / total * 100) : 0;
+      document.getElementById('summaryGrid').innerHTML =
+        '<div class="summary-card"><strong>' + total + '</strong><span>Students</span></div>' +
+        '<div class="summary-card"><strong>' + submitted + '</strong><span>Submitted</span></div>' +
+        '<div class="summary-card"><strong>' + missing + '</strong><span>Missing</span></div>' +
+        '<div class="summary-card"><strong>' + pct + '%</strong><span>Complete</span></div>';
+    }
+
+    function syncCh5Class() {
+      var teacher = EQAuth.getTeacher();
+      var cls = document.getElementById('classSelect').value;
+      var btn = document.getElementById('syncBtn');
+      var result = document.getElementById('syncResult');
+      btn.disabled = true;
+      btn.textContent = 'Syncing...';
+      result.textContent = 'Syncing Chapter 5 submissions into Task_Status...';
+      EQApi.get({
+        action: 'syncCh5Class',
+        username: teacher.username,
+        password: teacher.password,
+        className: cls
+      }).then(function(data) {
+        if (!data.success) throw new Error(data.error || 'Sync failed');
+        result.textContent = 'Synced rows: ' + data.synced + '. Not found in responses: ' + data.notFound + '.';
+        showToast('Chapter 5 synced', 'ok');
+      }).catch(function(err) {
+        result.textContent = err.message;
+        showToast(err.message, 'err');
+      }).finally(function() {
+        btn.disabled = false;
+        btn.textContent = 'Sync Chapter 5 to Task Status';
+      });
+    }
+
+    function showLoadError(err) {
+      document.getElementById('submissionList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Could not load submissions.</h2><p class="empty-copy">' + escapeHtml(err.message) + '</p></div>';
+      showToast(err.message, 'err');
+    }
+
+    function resetLoadButton() {
+      var btn = document.getElementById('loadBtn');
+      btn.disabled = false;
+      btn.textContent = 'Load';
+    }
+
+    function showToast(message, type) {
+      var toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast ' + (type || '');
+      setTimeout(function() { toast.classList.add('show'); }, 10);
+      setTimeout(function() { toast.classList.remove('show'); }, 2600);
+    }
+
+    document.getElementById('chapterSelect').addEventListener('change', loadSubmissions);
+    document.getElementById('classSelect').addEventListener('change', loadSubmissions);
+
+    (function init() {
+      if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
+      loadSubmissions();
+    })();
+  </script>
+</body>
+</html>

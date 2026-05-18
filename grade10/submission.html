@@ -7,6 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css?v=20260505-clean-logo"/>
+  <script src="../shared/js/api.js"></script>
   <script src="../shared/js/sidebar.js"></script>
 </head>
 <body class="grade10-subpage" data-page="submission">
@@ -158,35 +159,11 @@
   <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built by <strong>LaksMedia</strong></footer>
 
   <script>
-    var API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
-
-    async function apiGet(params) {
-      try {
-        var res = await fetch(API + '?' + new URLSearchParams(params));
-        if (res.ok) return await res.json();
-      } catch(e) {}
-      return new Promise(function(resolve, reject) {
-        var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-        var p = Object.assign({}, params, { callback: cb, _t: Date.now() });
-        var script = document.createElement('script');
-        var timer = setTimeout(function() { cleanup(); reject(new Error('Timeout')); }, 15000);
-        function cleanup() {
-          delete window[cb];
-          try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
-          clearTimeout(timer);
-        }
-        window[cb] = function(data) { cleanup(); resolve(data); };
-        script.onerror = function() { cleanup(); reject(new Error('Network error')); };
-        script.src = API + '?' + new URLSearchParams(p);
-        document.body.appendChild(script);
-      });
-    }
-
     var subData = null;
 
     async function initCh4Status() {
       try {
-        var data = await apiGet({ action: 'getSubmissions' });
+        var data = await EQApi.get({ action: 'getSubmissions' });
         subData = data;
         var classes = Object.keys(data.students || {}).filter(Boolean).sort();
         var sel = document.getElementById('stClassSel');
@@ -256,7 +233,7 @@
       nameSel.disabled = true;
       try {
         if (!ch5Students[cls]) {
-          var data = await apiGet({ action: 'getStudents', className: cls });
+          var data = await EQApi.get({ action: 'getStudents', className: cls });
           ch5Students[cls] = data.students || [];
         }
         nameSel.innerHTML = '<option value="">Select your name</option>';
@@ -286,7 +263,7 @@
       result.innerHTML = '<div class="status-loading"><span class="spinner-sm"></span>Checking your submission...</div>';
       result.classList.add('show');
       try {
-        var data = await apiGet({ action: 'getCh5StudentFiles', className: cls, studentNo: no });
+        var data = await EQApi.get({ action: 'getCh5StudentFiles', className: cls, studentNo: no });
         var students = ch5Students[cls] || [];
         var s = students.find(function(st) { return String(st.no) === String(no); });
         var displayName = (data && data.studentName) || (s ? (s.nickname || s.name) : 'Student');

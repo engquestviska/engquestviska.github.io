@@ -65,6 +65,7 @@ This roadmap keeps the next-year rebuild focused. The goal is one English Quest 
    - Teacher dashboard now separates live Grade 10 managers, queued tools, and disabled Grade 11 placeholders.
    - Materials manager is now teacher-side for dynamic Grade 10 lesson files.
    - Assignment manager is now teacher-side for dynamic Grade 10 task files.
+   - Submission review is now teacher-side with Chapter 5 task-status sync.
 
 4. Plan data separation.
    - Decide how Google Sheets and Apps Script will separate Grade 10 and Grade 11.
