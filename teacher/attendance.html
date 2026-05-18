@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teacher Attendance · English Quest</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css"/>
+  <style>
+    .attendance-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .attendance-row {
+      display: grid;
+      grid-template-columns: 54px minmax(180px, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      border: 1.5px solid #dbeafe;
+      border-radius: 20px;
+      background: #fff;
+      padding: 16px;
+      box-shadow: 0 12px 26px rgba(37, 99, 235, 0.06);
+    }
+
+    .attendance-row.issue {
+      border-color: #fecaca;
+      background: linear-gradient(135deg, #fff, #fff5f5);
+    }
+
+    .attendance-avatar {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: #2563eb;
+      color: #fff;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 900;
+    }
+
+    .attendance-name {
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .attendance-meta {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 600;
+    }
+
+    .attendance-state {
+      justify-self: end;
+      border-radius: 999px;
+      padding: 9px 12px;
+      background: #d1fae5;
+      color: #047857;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.74rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    .attendance-state.Absent {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .attendance-state.Sick {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .attendance-state.Permission,
+    .attendance-state.Dispen {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .meeting-strip {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .meeting-chip {
+      min-height: 38px;
+      border: 1.5px solid #dbeafe;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--muted);
+      padding: 0 13px;
+      font: inherit;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.76rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .meeting-chip.active {
+      border-color: #2563eb;
+      background: #2563eb;
+      color: #fff;
+    }
+
+    .teacher-note {
+      margin-top: 18px;
+      border: 1.5px dashed #bfdbfe;
+      border-radius: 18px;
+      background: #f8fbff;
+      padding: 15px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    @media (max-width: 760px) {
+      .attendance-row {
+        grid-template-columns: 48px 1fr;
+      }
+
+      .attendance-state {
+        grid-column: 1 / -1;
+        justify-self: start;
+      }
+    }
+  </style>
+  <script src="../shared/js/auth.js"></script>
+  <script src="../shared/js/attendance.js"></script>
+</head>
+<body class="teacher-tool-page">
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <img src="../logo.jpg" alt="English Quest Logo"/>
+        <div>
+          <div class="brand-title">English Quest</div>
+          <div class="brand-sub">Teacher Control Room</div>
+        </div>
+      </div>
+      <nav class="nav-actions" aria-label="Teacher navigation">
+        <a href="index.html">Dashboard</a>
+        <a href="../grade10/attendance.html">Student View</a>
+        <button type="button" onclick="teacherLogout()">Logout</button>
+      </nav>
+    </div>
+    <section class="hero">
+      <div class="kicker">Attendance Review</div>
+      <h1>Inspect attendance records without touching student pages.</h1>
+      <p class="hero-copy">Load a Grade 10 class, review meeting totals, and inspect each meeting from the teacher room.</p>
+    </section>
+  </header>
+
+  <main>
+    <section class="access-card" id="accessCard" hidden>
+      <h2 class="access-title">Teacher login required.</h2>
+      <p class="access-copy">Open the teacher dashboard and log in first. Attendance review uses the saved teacher session.</p>
+      <a class="btn" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none;">Open Teacher Login</a>
+    </section>
+
+    <section id="appPanel" hidden>
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2 class="panel-title">Grade 10 Attendance</h2>
+            <p class="panel-copy">This page reads the deployed attendance source. Editing will be added after the attendance Apps Script source or write contract is available in the repo.</p>
+          </div>
+          <div class="status-pill" id="loginPill">Teacher</div>
+        </div>
+
+        <div class="controls">
+          <div>
+            <label for="classSelect">Class</label>
+            <select id="classSelect">
+              <option value="XE1">X E-1</option>
+              <option value="XE4">X E-4</option>
+              <option value="XE5">X E-5</option>
+              <option value="XE6">X E-6</option>
+              <option value="XE7">X E-7</option>
+              <option value="XE8">X E-8</option>
+              <option value="XE9">X E-9</option>
+              <option value="XE10">X E-10</option>
+              <option value="XE11">X E-11</option>
+            </select>
+          </div>
+          <div>
+            <label for="searchInput">Search student</label>
+            <input id="searchInput" type="search" placeholder="Type name, nickname, or number"/>
+          </div>
+          <button class="btn" type="button" id="loadBtn" onclick="loadAttendance()">Load Attendance</button>
+        </div>
+
+        <div class="summary-grid" id="summaryGrid">
+          <div class="summary-card"><strong>0</strong><span>Students</span></div>
+          <div class="summary-card"><strong>0</strong><span>Dated Meetings</span></div>
+          <div class="summary-card"><strong>0%</strong><span>Average Present</span></div>
+          <div class="summary-card"><strong>0</strong><span>Issues</span></div>
+        </div>
+
+        <div class="meeting-strip" id="meetingStrip"></div>
+        <div class="teacher-note">Current mode: review only. This avoids unsafe writes until the attendance backend write API is confirmed.</div>
+      </div>
+
+      <div id="attendanceList" class="attendance-list"></div>
+    </section>
+  </main>
+
+  <footer>© 2026 English Quest · Teacher Attendance Review</footer>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    var attendanceData = { students: [], meetings: [] };
+    var selectedMeeting = 'summary';
+
+    function teacherLogout() {
+      EQAuth.logoutTeacher('index.html');
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function initials(student) {
+      var source = student.nickname || student.name || 'EQ';
+      return source.split(/\s+/).filter(Boolean).slice(0, 2).map(function(part) {
+        return part.charAt(0).toUpperCase();
+      }).join('') || 'EQ';
+    }
+
+    function datedMeetings() {
+      return attendanceData.meetings.filter(function(meeting) {
+        return meeting.date && meeting.number !== undefined && meeting.number !== null && meeting.number !== '';
+      });
+    }
+
+    function statusFor(student, meeting) {
+      return (student.attendance && student.attendance['m' + meeting.number]) || 'Present';
+    }
+
+    function loadAttendance() {
+      if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
+      var cls = document.getElementById('classSelect').value;
+      var btn = document.getElementById('loadBtn');
+      btn.disabled = true;
+      btn.textContent = 'Loading...';
+      document.getElementById('attendanceList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading attendance...</h2><p class="empty-copy">Fetching ' + escapeHtml(cls) + ' from the attendance source.</p></div>';
+
+      EQAttendance.get({ action: 'getClassData', className: cls }).then(function(data) {
+        if (data.error) throw new Error(data.error);
+        attendanceData = {
+          students: data.students || [],
+          meetings: data.meetings || []
+        };
+        selectedMeeting = 'summary';
+        renderMeetings();
+        renderAttendance();
+        showToast('Attendance loaded', 'ok');
+      }).catch(function(err) {
+        document.getElementById('attendanceList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Could not load attendance.</h2><p class="empty-copy">' + escapeHtml(err.message) + '</p></div>';
+        showToast(err.message, 'err');
+      }).finally(function() {
+        btn.disabled = false;
+        btn.textContent = 'Load Attendance';
+        updateSummary();
+      });
+    }
+
+    function renderMeetings() {
+      var meetings = datedMeetings();
+      var html = '<button class="meeting-chip ' + (selectedMeeting === 'summary' ? 'active' : '') + '" type="button" onclick="setMeeting(&quot;summary&quot;)">Summary</button>';
+      html += meetings.map(function(meeting) {
+        return '<button class="meeting-chip ' + (String(selectedMeeting) === String(meeting.number) ? 'active' : '') + '" type="button" onclick="setMeeting(&quot;' + escapeHtml(meeting.number) + '&quot;)">M' + escapeHtml(meeting.number) + '</button>';
+      }).join('');
+      document.getElementById('meetingStrip').innerHTML = html;
+    }
+
+    function setMeeting(meetingNumber) {
+      selectedMeeting = meetingNumber;
+      renderMeetings();
+      renderAttendance();
+    }
+
+    function visibleStudents() {
+      var query = document.getElementById('searchInput').value.trim().toLowerCase();
+      return attendanceData.students.filter(function(student) {
+        var searchable = [student.no, student.name, student.nickname].join(' ').toLowerCase();
+        return !query || searchable.indexOf(query) > -1;
+      });
+    }
+
+    function renderAttendance() {
+      var list = document.getElementById('attendanceList');
+      var meetings = datedMeetings();
+      var students = visibleStudents();
+      if (!attendanceData.students.length) {
+        list.innerHTML = '<div class="empty-card"><h2 class="empty-title">No attendance data loaded yet.</h2><p class="empty-copy">Choose a class and load its attendance records.</p></div>';
+        updateSummary();
+        return;
+      }
+      if (!students.length) {
+        list.innerHTML = '<div class="empty-card"><h2 class="empty-title">No matching students.</h2><p class="empty-copy">Try another search.</p></div>';
+        updateSummary();
+        return;
+      }
+
+      list.innerHTML = students.map(function(student) {
+        var state;
+        var meta;
+        if (selectedMeeting === 'summary') {
+          var statuses = meetings.map(function(meeting) { return statusFor(student, meeting); });
+          var present = statuses.filter(function(status) { return status === 'Present'; }).length;
+          var issue = statuses.filter(function(status) { return status !== 'Present'; }).length;
+          var rate = statuses.length ? Math.round(present / statuses.length * 100) : 0;
+          state = rate + '%';
+          meta = present + ' present · ' + issue + ' non-present · ' + statuses.length + ' dated meetings';
+        } else {
+          var meeting = meetings.find(function(item) { return String(item.number) === String(selectedMeeting); });
+          state = meeting ? statusFor(student, meeting) : 'Present';
+          meta = meeting ? 'Meeting ' + meeting.number + ' · ' + meeting.date : 'Meeting not found';
+        }
+        var issueClass = selectedMeeting === 'summary' ? (state !== '100%' ? 'issue' : '') : (state !== 'Present' ? 'issue' : '');
+        var stateClass = selectedMeeting === 'summary' ? '' : state;
+        return '<article class="attendance-row ' + issueClass + '">' +
+          '<div class="attendance-avatar">' + escapeHtml(initials(student)) + '</div>' +
+          '<div><div class="attendance-name">' + escapeHtml(student.nickname || student.name) + '</div><div class="attendance-meta">No. ' + escapeHtml(student.no) + ' · ' + escapeHtml(meta) + (student.nickname ? ' · ' + escapeHtml(student.name) : '') + '</div></div>' +
+          '<div class="attendance-state ' + escapeHtml(stateClass) + '">' + escapeHtml(state) + '</div>' +
+        '</article>';
+      }).join('');
+      updateSummary();
+    }
+
+    function updateSummary() {
+      var meetings = datedMeetings();
+      var students = attendanceData.students;
+      var totalSlots = students.length * meetings.length;
+      var presentSlots = 0;
+      var issues = 0;
+      students.forEach(function(student) {
+        meetings.forEach(function(meeting) {
+          var status = statusFor(student, meeting);
+          if (status === 'Present') presentSlots++;
+          else issues++;
+        });
+      });
+      var average = totalSlots ? Math.round(presentSlots / totalSlots * 100) : 0;
+      document.getElementById('summaryGrid').innerHTML =
+        '<div class="summary-card"><strong>' + students.length + '</strong><span>Students</span></div>' +
+        '<div class="summary-card"><strong>' + meetings.length + '</strong><span>Dated Meetings</span></div>' +
+        '<div class="summary-card"><strong>' + average + '%</strong><span>Average Present</span></div>' +
+        '<div class="summary-card"><strong>' + issues + '</strong><span>Issues</span></div>';
+    }
+
+    function showToast(message, type) {
+      var toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast ' + (type || '');
+      setTimeout(function() { toast.classList.add('show'); }, 10);
+      setTimeout(function() { toast.classList.remove('show'); }, 2600);
+    }
+
+    document.getElementById('classSelect').addEventListener('change', loadAttendance);
+    document.getElementById('searchInput').addEventListener('input', renderAttendance);
+
+    (function init() {
+      if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
+      loadAttendance();
+    })();
+  </script>
+</body>
+</html>

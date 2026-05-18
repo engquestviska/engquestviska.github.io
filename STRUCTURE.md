@@ -44,6 +44,7 @@ English Quest is being reorganized into three tracks.
 - `teacher/materials.html` - Teacher materials manager for Grade 10 dynamic lesson files.
 - `teacher/assignments.html` - Teacher assignment manager for Grade 10 dynamic task files.
 - `teacher/submissions.html` - Teacher submission review and Chapter 5 sync manager.
+- `teacher/attendance.html` - Teacher attendance review for Grade 10 attendance records.
 - `teacher/scores.html` - Teacher score manager for Grade 10.
 - `teacher/tasks.html` - Teacher task status manager for Grade 10.
 - `teacher/strikes.html` - Teacher strike management for Grade 10.
@@ -52,6 +53,7 @@ English Quest is being reorganized into three tracks.
 
 - `shared/js/api.js` - shared Apps Script API helper and class labels.
 - `shared/js/auth.js` - shared teacher session helpers.
+- `shared/js/attendance.js` - shared Grade 10 attendance API helper.
 - `shared/js/sidebar.js` - shared sidebar for Grade 10 secondary pages.
 - `shared/css/` - reserved for shared styles as pages are cleaned up.
 

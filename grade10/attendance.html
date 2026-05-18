@@ -356,6 +356,7 @@
       }
     }
   </style>
+  <script src="../shared/js/attendance.js"></script>
   <script src="../shared/js/sidebar.js"></script>
 </head>
 <body class="grade10-subpage attendance-page" data-page="attendance">
@@ -470,7 +471,6 @@
   <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built by <strong>LaksMedia</strong></footer>
 
   <script>
-    const API = 'https://script.google.com/macros/s/AKfycbxHaOK1WSG5hVVrzOUwGI3QxY3eSbjaAseRVxVaMXU-b8k9Stn4exUUbvB56dYbKLfr/exec';
     const classSelect = document.getElementById('classSelect');
     const studentSelect = document.getElementById('studentSelect');
     const pickerHint = document.getElementById('pickerHint');
@@ -481,35 +481,6 @@
     let currentClass = '';
     let currentStudents = [];
     let currentMeetings = [];
-
-    function apiGet(params) {
-      const url = API + '?' + new URLSearchParams(params);
-      return new Promise((resolve, reject) => {
-        const cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-        const script = document.createElement('script');
-        const timer = setTimeout(() => {
-          cleanup();
-          reject(new Error('Request timed out'));
-        }, 15000);
-
-        function cleanup() {
-          clearTimeout(timer);
-          delete window[cb];
-          try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
-        }
-
-        window[cb] = data => {
-          cleanup();
-          resolve(data);
-        };
-        script.onerror = () => {
-          cleanup();
-          reject(new Error('Network error'));
-        };
-        script.src = url + '&callback=' + cb;
-        (document.body || document.head).appendChild(script);
-      });
-    }
 
     function setLoading(on) {
       loadingState.classList.toggle('hidden', !on);
@@ -628,7 +599,7 @@
       setLoading(true);
 
       try {
-        const data = await apiGet({ action: 'getClassData', className });
+        const data = await EQAttendance.get({ action: 'getClassData', className });
         if (data.error) throw new Error(data.error);
         currentStudents = data.students || [];
         currentMeetings = data.meetings || [];

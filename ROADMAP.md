@@ -66,6 +66,7 @@ This roadmap keeps the next-year rebuild focused. The goal is one English Quest 
    - Materials manager is now teacher-side for dynamic Grade 10 lesson files.
    - Assignment manager is now teacher-side for dynamic Grade 10 task files.
    - Submission review is now teacher-side with Chapter 5 task-status sync.
+   - Attendance review is now teacher-side; editing waits for the attendance Apps Script write contract.
 
 4. Plan data separation.
    - Decide how Google Sheets and Apps Script will separate Grade 10 and Grade 11.
