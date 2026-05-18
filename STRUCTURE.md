@@ -45,6 +45,7 @@ English Quest is being reorganized into three tracks.
 - `teacher/assignments.html` - Teacher assignment manager for Grade 10 dynamic task files.
 - `teacher/submissions.html` - Teacher submission review and Chapter 5 sync manager.
 - `teacher/attendance.html` - Teacher attendance review for Grade 10 attendance records.
+- `teacher/activeness.html` - Teacher activeness manager for Grade 10 participation points.
 - `teacher/scores.html` - Teacher score manager for Grade 10.
 - `teacher/tasks.html` - Teacher task status manager for Grade 10.
 - `teacher/strikes.html` - Teacher strike management for Grade 10.
