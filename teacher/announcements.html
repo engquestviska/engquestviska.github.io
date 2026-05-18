@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teacher Announcements · English Quest</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css"/>
+  <style>
+    .announcement-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.76fr) minmax(0, 1.24fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .announcement-form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .announcement-form textarea {
+      min-height: 180px;
+      border: 1.5px solid #bfdbfe;
+      border-radius: 18px;
+      background: #f8fbff;
+      color: var(--ink);
+      font: 600 0.96rem 'IBM Plex Sans', sans-serif;
+      line-height: 1.55;
+      outline: none;
+      padding: 14px;
+      resize: vertical;
+    }
+
+    .announcement-form textarea:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+
+    .type-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .type-option {
+      cursor: pointer;
+      min-height: 78px;
+      border: 1.5px solid #dbeafe;
+      border-radius: 18px;
+      background: #fff;
+      color: var(--ink);
+      display: grid;
+      gap: 6px;
+      align-content: center;
+      padding: 14px;
+      transition: 0.18s ease;
+    }
+
+    .type-option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .type-option strong {
+      font-size: 0.9rem;
+    }
+
+    .type-option span {
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .type-option:has(input:checked) {
+      border-color: #2563eb;
+      background: #eff6ff;
+      box-shadow: 0 12px 24px rgba(37, 99, 235, 0.12);
+    }
+
+    .announcement-preview {
+      border: 1.5px solid #dbeafe;
+      border-radius: 26px;
+      background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+      overflow: hidden;
+      box-shadow: 0 20px 44px rgba(37, 99, 235, 0.08);
+    }
+
+    .announcement-preview-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      border-bottom: 1px solid #dbeafe;
+      padding: 18px 20px;
+    }
+
+    .announcement-state {
+      border-radius: 999px;
+      background: var(--blue-soft);
+      color: #1d4ed8;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      padding: 9px 12px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .announcement-body {
+      display: grid;
+      gap: 18px;
+      padding: 22px;
+    }
+
+    .announcement-card {
+      border: 1.5px solid #dbeafe;
+      border-left: 8px solid #2563eb;
+      border-radius: 22px;
+      background: #fff;
+      padding: 20px;
+    }
+
+    .announcement-card.warning {
+      border-left-color: #f59e0b;
+      background: #fffbeb;
+    }
+
+    .announcement-card.success {
+      border-left-color: #059669;
+      background: #f0fdf4;
+    }
+
+    .announcement-card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 3.4rem);
+      line-height: 0.95;
+      margin: 0;
+    }
+
+    .announcement-card-copy {
+      color: #334155;
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.7;
+      margin: 16px 0 0;
+      white-space: pre-wrap;
+    }
+
+    .announcement-meta {
+      color: var(--muted);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .announcement-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn.danger {
+      background: #dc2626;
+      color: #fff;
+    }
+
+    @media (max-width: 900px) {
+      .announcement-grid,
+      .type-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+  <script src="../shared/js/api.js"></script>
+  <script src="../shared/js/auth.js"></script>
+</head>
+<body class="teacher-tool-page">
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <img src="../logo.jpg" alt="English Quest Logo"/>
+        <div>
+          <div class="brand-title">English Quest</div>
+          <div class="brand-sub">Teacher Control Room</div>
+        </div>
+      </div>
+      <nav class="nav-actions" aria-label="Teacher navigation">
+        <a href="index.html">Dashboard</a>
+        <a href="../grade10/">Student View</a>
+        <button type="button" onclick="teacherLogout()">Logout</button>
+      </nav>
+    </div>
+    <section class="hero">
+      <div class="kicker">Announcements</div>
+      <h1>Post one clear update for Grade 10.</h1>
+      <p class="hero-copy">Publish the current class announcement from the teacher side. Students only see the latest published update on their Grade 10 home page.</p>
+    </section>
+  </header>
+
+  <main>
+    <section class="access-card" id="accessCard" hidden>
+      <h2 class="access-title">Teacher login required.</h2>
+      <p class="access-copy">Open the teacher dashboard and log in first. This page uses the saved teacher session to publish announcements.</p>
+      <a class="btn" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none;">Open Teacher Login</a>
+    </section>
+
+    <section id="appPanel" hidden>
+      <div class="announcement-grid">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title">Compose Update</h2>
+              <p class="panel-copy">Keep it direct. This replaces the current announcement immediately after publishing.</p>
+            </div>
+            <div class="status-pill" id="loginPill">Teacher</div>
+          </div>
+
+          <div class="announcement-form">
+            <div>
+              <label for="announcementTitle">Title</label>
+              <input id="announcementTitle" type="text" maxlength="90" placeholder="e.g. Chapter 5 deadline"/>
+            </div>
+            <div>
+              <label for="announcementBody">Announcement</label>
+              <textarea id="announcementBody" maxlength="800" placeholder="Write the update students should see..."></textarea>
+            </div>
+            <div>
+              <label>Type</label>
+              <div class="type-grid">
+                <label class="type-option">
+                  <input type="radio" name="announcementType" value="info" checked/>
+                  <strong>Info</strong>
+                  <span>General update</span>
+                </label>
+                <label class="type-option">
+                  <input type="radio" name="announcementType" value="warning"/>
+                  <strong>Warning</strong>
+                  <span>Deadline or issue</span>
+                </label>
+                <label class="type-option">
+                  <input type="radio" name="announcementType" value="success"/>
+                  <strong>Success</strong>
+                  <span>Good news</span>
+                </label>
+              </div>
+            </div>
+            <div class="announcement-actions">
+              <button class="btn" type="button" id="publishBtn" onclick="publishAnnouncement()">Publish Announcement</button>
+              <button class="btn ghost" type="button" onclick="loadAnnouncement()">Reload</button>
+              <button class="btn danger" type="button" id="clearBtn" onclick="clearAnnouncement()">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="announcement-preview">
+          <div class="announcement-preview-head">
+            <div>
+              <h2 class="panel-title">Current Student View</h2>
+              <p class="panel-copy">This is what Grade 10 students will see on the home page.</p>
+            </div>
+            <div class="announcement-state" id="announcementState">Loading</div>
+          </div>
+          <div class="announcement-body" id="announcementPreview">
+            <div class="empty-card">
+              <h2 class="empty-title">Loading announcement...</h2>
+              <p class="empty-copy">Fetching the latest update from Apps Script.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2026 English Quest · Teacher Announcements</footer>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    function teacherLogout() {
+      EQAuth.logoutTeacher('index.html');
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function selectedType() {
+      var checked = document.querySelector('input[name="announcementType"]:checked');
+      return checked ? checked.value : 'info';
+    }
+
+    function safeType(value) {
+      return ['info', 'warning', 'success'].indexOf(value) >= 0 ? value : 'info';
+    }
+
+    function setType(value) {
+      var type = safeType(value || 'info');
+      var option = document.querySelector('input[name="announcementType"][value="' + type + '"]');
+      if (option) option.checked = true;
+    }
+
+    function formatDate(value) {
+      if (!value) return '';
+      var date = new Date(value);
+      if (isNaN(date.getTime())) return '';
+      return date.toLocaleString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function renderAnnouncement(announcement) {
+      var state = document.getElementById('announcementState');
+      var preview = document.getElementById('announcementPreview');
+      if (!announcement || (!announcement.title && !announcement.body)) {
+        state.textContent = 'No Update';
+        preview.innerHTML = '<div class="empty-card"><h2 class="empty-title">No announcement is published.</h2><p class="empty-copy">Students will not see an announcement block until you publish one.</p></div>';
+        document.getElementById('clearBtn').disabled = true;
+        return;
+      }
+
+      var type = safeType(announcement.type || 'info');
+      var title = announcement.title || 'Class Announcement';
+      var body = announcement.body || '';
+      var meta = [];
+      if (announcement.postedBy) meta.push('By ' + announcement.postedBy);
+      if (announcement.postedAt) meta.push(formatDate(announcement.postedAt));
+
+      state.textContent = type;
+      document.getElementById('clearBtn').disabled = false;
+      preview.innerHTML = '<article class="announcement-card ' + escapeHtml(type) + '">' +
+        '<div class="announcement-meta">' + escapeHtml(meta.join(' · ') || 'Current announcement') + '</div>' +
+        '<h3 class="announcement-card-title">' + escapeHtml(title) + '</h3>' +
+        '<p class="announcement-card-copy">' + escapeHtml(body) + '</p>' +
+      '</article>';
+    }
+
+    function fillForm(announcement) {
+      if (!announcement) return;
+      document.getElementById('announcementTitle').value = announcement.title || '';
+      document.getElementById('announcementBody').value = announcement.body || '';
+      setType(announcement.type || 'info');
+    }
+
+    function loadAnnouncement() {
+      if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
+      document.getElementById('announcementState').textContent = 'Loading';
+      EQApi.get({ action: 'getAnnouncement' }).then(function(data) {
+        var announcement = data.announcement || null;
+        renderAnnouncement(announcement);
+        fillForm(announcement);
+      }).catch(function(err) {
+        document.getElementById('announcementPreview').innerHTML = '<div class="empty-card"><h2 class="empty-title">Could not load announcement.</h2><p class="empty-copy">' + escapeHtml(err.message) + '</p></div>';
+        showToast(err.message, 'err');
+      });
+    }
+
+    function publishAnnouncement() {
+      var teacher = EQAuth.getTeacher();
+      var title = document.getElementById('announcementTitle').value.trim();
+      var body = document.getElementById('announcementBody').value.trim();
+      var btn = document.getElementById('publishBtn');
+
+      if (!teacher.username || !teacher.password) {
+        EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' });
+        return;
+      }
+      if (!title || !body) {
+        showToast('Add both title and announcement text', 'err');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Publishing...';
+      EQApi.get({
+        action: 'setAnnouncement',
+        username: teacher.username,
+        password: teacher.password,
+        title: title,
+        body: body,
+        type: selectedType()
+      }).then(function(data) {
+        if (!data.success) throw new Error(data.error || 'Could not publish announcement');
+        renderAnnouncement(data.announcement);
+        showToast('Announcement published', 'ok');
+      }).catch(function(err) {
+        showToast(err.message, 'err');
+      }).finally(function() {
+        btn.disabled = false;
+        btn.textContent = 'Publish Announcement';
+      });
+    }
+
+    function clearAnnouncement() {
+      if (!confirm('Clear the current announcement from the Grade 10 home page?')) return;
+      var teacher = EQAuth.getTeacher();
+      var btn = document.getElementById('clearBtn');
+      btn.disabled = true;
+      EQApi.get({
+        action: 'clearAnnouncement',
+        username: teacher.username,
+        password: teacher.password
+      }).then(function(data) {
+        if (!data.success) throw new Error(data.error || 'Could not clear announcement');
+        renderAnnouncement(null);
+        document.getElementById('announcementTitle').value = '';
+        document.getElementById('announcementBody').value = '';
+        setType('info');
+        showToast('Announcement cleared', 'ok');
+      }).catch(function(err) {
+        showToast(err.message, 'err');
+      }).finally(function() {
+        btn.disabled = false;
+      });
+    }
+
+    function showToast(message, type) {
+      var toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast ' + (type || '');
+      setTimeout(function() { toast.classList.add('show'); }, 10);
+      setTimeout(function() { toast.classList.remove('show'); }, 2600);
+    }
+
+    (function init() {
+      if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
+      loadAnnouncement();
+    })();
+  </script>
+</body>
+</html>

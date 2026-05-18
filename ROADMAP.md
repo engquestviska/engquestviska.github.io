@@ -68,6 +68,7 @@ This roadmap keeps the next-year rebuild focused. The goal is one English Quest 
    - Submission review is now teacher-side with Chapter 5 task-status sync.
    - Attendance review is now teacher-side; editing waits for the attendance Apps Script write contract.
    - Activeness manager is now teacher-side for Grade 10 participation point updates.
+   - Announcements are now teacher-side for publishing the current Grade 10 update.
 
 4. Plan data separation.
    - Decide how Google Sheets and Apps Script will separate Grade 10 and Grade 11.
