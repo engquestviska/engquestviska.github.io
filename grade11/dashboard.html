@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Grade 11 Statistics · English Quest</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css"/>
+  <style>
+    .placeholder-shell {
+      width: min(1120px, 100%);
+      margin: 0 auto;
+      padding: 22px;
+    }
+
+    .placeholder-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: end;
+      border-radius: 34px;
+      background: linear-gradient(135deg, #7c3aed 0%, #4338ca 54%, #312e81 100%);
+      color: #fff;
+      padding: clamp(30px, 6vw, 58px);
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .placeholder-hero h1 {
+      max-width: 760px;
+    }
+
+    .placeholder-hero .hero-copy {
+      max-width: 700px;
+    }
+
+    .status-tile {
+      min-width: 220px;
+      border: 1px solid rgba(255, 255, 255, 0.26);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.12);
+      padding: 18px;
+    }
+
+    .tile-label,
+    .card-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .tile-label {
+      color: #ddd6fe;
+    }
+
+    .tile-value {
+      margin-top: 8px;
+      font: 800 1.3rem 'IBM Plex Sans', sans-serif;
+    }
+
+    .placeholder-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .placeholder-card {
+      border: 1.5px solid #ddd6fe;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 22px 60px rgba(79, 70, 229, 0.08);
+      padding: 22px;
+      min-height: 220px;
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .placeholder-card.wide {
+      grid-column: span 2;
+    }
+
+    .card-label {
+      color: #6d28d9;
+    }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.7rem, 3vw, 2.45rem);
+      line-height: 1;
+    }
+
+    .card-copy {
+      color: #64748b;
+      font-weight: 600;
+      line-height: 1.65;
+    }
+
+    .ghost-metric {
+      border-radius: 20px;
+      background: #f5f3ff;
+      border: 1px solid #ddd6fe;
+      padding: 16px;
+      color: #312e81;
+      font-weight: 800;
+    }
+
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-self: end;
+    }
+
+    @media (max-width: 820px) {
+      .placeholder-hero,
+      .placeholder-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .placeholder-card.wide {
+        grid-column: auto;
+      }
+    }
+  </style>
+</head>
+<body class="track-page grade11-page">
+  <div class="placeholder-shell">
+    <header class="topbar">
+      <div class="brand">
+        <img src="../logo.jpg" alt="English Quest Logo"/>
+        <div>
+          <div class="brand-title">English Quest</div>
+          <div class="brand-sub">Grade 11 Student Track</div>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="index.html">Grade 11 Home</a>
+        <a href="strikes.html">My Strikes</a>
+        <a href="../index.html">Choose Grade</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="placeholder-hero">
+        <div>
+          <div class="kicker">My Statistics</div>
+          <h1>Grade 11 statistics are prepared, not connected.</h1>
+          <p class="hero-copy">This page reserves the same student-dashboard space as Grade 10, but it will stay data-free until the Grade 11 roster, sheets, and score rules are real.</p>
+        </div>
+        <aside class="status-tile">
+          <div class="tile-label">Data Status</div>
+          <div class="tile-value">Waiting for Grade 11 source</div>
+        </aside>
+      </section>
+
+      <section class="placeholder-grid">
+        <article class="placeholder-card wide">
+          <div class="card-label">Student Dashboard</div>
+          <h2 class="card-title">No personal profile yet.</h2>
+          <p class="card-copy">Grade 11 students will eventually see scores, attendance, tasks, submissions, activeness, and strikes here. For now, this page exists only to keep the structure ready.</p>
+          <div class="action-row">
+            <a class="btn" href="index.html">Back to Grade 11</a>
+            <a class="btn ghost" href="scores.html">Scores placeholder</a>
+          </div>
+        </article>
+
+        <article class="placeholder-card">
+          <div class="card-label">Planned Blocks</div>
+          <div class="ghost-metric">Scores</div>
+          <div class="ghost-metric">Attendance</div>
+          <div class="ghost-metric">Tasks</div>
+        </article>
+
+        <article class="placeholder-card">
+          <div class="card-label">Safety Rule</div>
+          <h2 class="card-title">Do not reuse Grade 10 data.</h2>
+          <p class="card-copy">Connecting this dashboard should wait until Grade 11 has its own spreadsheet and API contract.</p>
+        </article>
+
+        <article class="placeholder-card">
+          <div class="card-label">Next Data Step</div>
+          <h2 class="card-title">Define the source first.</h2>
+          <p class="card-copy">Roster, class labels, score tabs, attendance format, and strike rules need to be agreed before this becomes live.</p>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <footer>© 2026 English Quest · Grade 11 Statistics</footer>
+  <script>
+    localStorage.setItem('eq_grade', '11');
+    localStorage.removeItem('eq_student_class');
+    localStorage.removeItem('eq_student_no');
+    localStorage.removeItem('eq_student_name');
+  </script>
+</body>
+</html>

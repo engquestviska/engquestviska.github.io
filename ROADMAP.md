@@ -57,6 +57,7 @@ This roadmap keeps the next-year rebuild focused. The goal is one English Quest 
    - Use the same structure as Grade 10 first.
    - Keep data/content as placeholders until real Grade 11 data exists.
    - Avoid mixing Grade 10 data into Grade 11.
+   - Student statistics and strikes placeholders now exist so Grade 11 mirrors the newer Grade 10 student surfaces.
 
 3. Improve Teacher Dashboard.
    - Manage Grade 10 and Grade 11 from one place.

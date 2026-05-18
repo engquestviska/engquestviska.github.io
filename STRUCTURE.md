@@ -27,6 +27,7 @@ English Quest is being reorganized into three tracks.
 ## Grade 11
 
 - `grade11/index.html` - Grade 11 student dashboard.
+- `grade11/dashboard.html` - Grade 11 student statistics placeholder.
 - `grade11/lessons.html` - Lesson Materials placeholder.
 - `grade11/assignments.html` - Assignments placeholder.
 - `grade11/submission.html` - Submission placeholder.
@@ -36,6 +37,7 @@ English Quest is being reorganized into three tracks.
 - `grade11/scores.html` - Student Scores placeholder.
 - `grade11/tasks.html` - Task Status placeholder.
 - `grade11/activeness.html` - Activeness placeholder.
+- `grade11/strikes.html` - Student-facing strike tracker placeholder.
 - Grade 11 pages are scaffolded without spreadsheet connections until real Grade 11 data exists.
 
 ## Teacher
