@@ -7,6 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css?v=20260505-clean-logo"/>
+  <script src="../shared/js/api.js"></script>
   <script src="../shared/js/sidebar.js"></script>
 </head>
 <body class="grade10-subpage" data-page="assignments">
@@ -92,36 +93,6 @@
   <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built by <strong>LaksMedia</strong></footer>
 
   <script>
-    var SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
-    function apiGet(params) {
-      var url = SCORES_API + '?';
-      var parts = [];
-      for (var k in params) parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
-      url += parts.join('&');
-      return new Promise(function(resolve, reject) {
-        var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-        var script = document.createElement('script');
-        var timer = setTimeout(function() {
-          delete window[cb];
-          try { document.head.removeChild(script); } catch(e) {}
-          reject(new Error('Timeout'));
-        }, 12000);
-        window[cb] = function(data) {
-          clearTimeout(timer);
-          delete window[cb];
-          try { document.head.removeChild(script); } catch(e) {}
-          resolve(data);
-        };
-        script.onerror = function() {
-          clearTimeout(timer);
-          delete window[cb];
-          reject(new Error('Network error'));
-        };
-        script.src = url + '&callback=' + cb;
-        document.head.appendChild(script);
-      });
-    }
-
     function openPDF(title, previewUrl, downloadUrl) {
       document.getElementById('pdfModalTitle').textContent = title;
       document.getElementById('pdfModalIframe').src = previewUrl;
@@ -190,7 +161,7 @@
     }
 
     function loadSaved() {
-      apiGet({ action: 'getMaterials', chapter: 'assign4' }).then(function(res) {
+      EQApi.get({ action: 'getMaterials', chapter: 'assign4' }).then(function(res) {
         if (res.materials) {
           res.materials.forEach(function(m) {
             appendCard(4, m.title, m.fileId, m.fileType || '');
@@ -198,7 +169,7 @@
         }
       }).catch(function() {});
 
-      apiGet({ action: 'getMaterials', chapter: 'assign5' }).then(function(res) {
+      EQApi.get({ action: 'getMaterials', chapter: 'assign5' }).then(function(res) {
         if (res.materials && res.materials.length) {
           res.materials.forEach(function(m) {
             appendCard(5, m.title, m.fileId, m.fileType || '');

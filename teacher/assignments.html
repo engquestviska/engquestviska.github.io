@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teacher Assignments · English Quest</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css"/>
+  <style>
+    .assignment-manager-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .assignment-form,
+    .assignment-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field-help {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    .assignment-row {
+      display: grid;
+      grid-template-columns: 58px minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      border: 1.5px solid #dbeafe;
+      border-radius: 20px;
+      background: #fff;
+      padding: 16px;
+      box-shadow: 0 12px 26px rgba(37, 99, 235, 0.06);
+    }
+
+    .assignment-type {
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: var(--blue-soft);
+      color: #1d4ed8;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .assignment-title {
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .assignment-meta {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    .assignment-row-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .assignment-row-actions .btn {
+      min-height: 40px;
+      border-radius: 999px;
+      padding: 0 14px;
+      font-size: 0.84rem;
+    }
+
+    .btn.danger {
+      background: #dc2626;
+      color: #fff;
+    }
+
+    .starter-note {
+      margin-top: 14px;
+      border: 1.5px dashed #bfdbfe;
+      border-radius: 18px;
+      background: #f8fbff;
+      padding: 15px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+
+    .starter-note strong {
+      color: var(--ink);
+    }
+
+    @media (max-width: 900px) {
+      .assignment-manager-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .assignment-row {
+        grid-template-columns: 1fr;
+      }
+
+      .assignment-row-actions {
+        justify-content: flex-start;
+      }
+    }
+  </style>
+  <script src="../shared/js/api.js"></script>
+  <script src="../shared/js/auth.js"></script>
+</head>
+<body class="teacher-tool-page">
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <img src="../logo.jpg" alt="English Quest Logo"/>
+        <div>
+          <div class="brand-title">English Quest</div>
+          <div class="brand-sub">Teacher Control Room</div>
+        </div>
+      </div>
+      <nav class="nav-actions" aria-label="Teacher navigation">
+        <a href="index.html">Dashboard</a>
+        <a href="../grade10/assignments.html">Student View</a>
+        <button type="button" onclick="teacherLogout()">Logout</button>
+      </nav>
+    </div>
+    <section class="hero">
+      <div class="kicker">Assignment Manager</div>
+      <h1>Publish task files without touching student pages.</h1>
+      <p class="hero-copy">Add Google Drive assignment files by chapter, review published tasks, and remove dynamic tasks from the Grade 10 student view.</p>
+    </section>
+  </header>
+
+  <main>
+    <section class="access-card" id="accessCard" hidden>
+      <h2 class="access-title">Teacher login required.</h2>
+      <p class="access-copy">Open the teacher dashboard and log in first. This page uses the saved teacher session to publish assignment files.</p>
+      <a class="btn" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none;">Open Teacher Login</a>
+    </section>
+
+    <section id="appPanel" hidden>
+      <div class="assignment-manager-grid">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title">Add Assignment</h2>
+              <p class="panel-copy">Paste a Google Drive file link or file ID. Students will see the task file on the Grade 10 Assignments page.</p>
+            </div>
+          </div>
+
+          <div class="assignment-form">
+            <div>
+              <label for="chapterSelect">Chapter</label>
+              <select id="chapterSelect">
+                <option value="assign4">Chapter 4 · Analytical Exposition</option>
+                <option value="assign5">Chapter 5 · Narrative Text</option>
+              </select>
+            </div>
+            <div>
+              <label for="titleInput">Assignment Title</label>
+              <input id="titleInput" type="text" placeholder="e.g. Present Perfect Exercise"/>
+            </div>
+            <div>
+              <label for="tagInput">Task Label</label>
+              <input id="tagInput" type="text" placeholder="e.g. GRAMMAR · PRESENT PERFECT"/>
+              <div class="field-help">This appears as the small description below the task title.</div>
+            </div>
+            <div>
+              <label for="driveInput">Google Drive URL or File ID</label>
+              <input id="driveInput" type="text" placeholder="Paste Drive link or file ID"/>
+            </div>
+            <button class="btn" type="button" id="addBtn" onclick="addAssignment()">Add Assignment</button>
+          </div>
+
+          <div class="starter-note">
+            <strong>Note:</strong> the original Chapter 4 starter task is still code-managed in the student page. This manager controls assignments saved through Apps Script.
+          </div>
+        </div>
+
+        <div>
+          <div class="panel">
+            <div class="panel-head">
+              <div>
+                <h2 class="panel-title">Published Assignments</h2>
+                <p class="panel-copy">Switch chapters to inspect or remove dynamic assignment files.</p>
+              </div>
+              <div class="status-pill" id="loginPill">Teacher</div>
+            </div>
+            <div class="controls">
+              <div>
+                <label for="listChapterSelect">Chapter</label>
+                <select id="listChapterSelect">
+                  <option value="assign4">Chapter 4</option>
+                  <option value="assign5">Chapter 5</option>
+                </select>
+              </div>
+              <button class="btn" type="button" id="loadBtn" onclick="loadAssignments()">Load Assignments</button>
+            </div>
+          </div>
+
+          <div id="assignmentList" class="assignment-list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2026 English Quest · Teacher Assignment Manager</footer>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    var currentAssignments = [];
+
+    function teacherLogout() {
+      EQAuth.logoutTeacher('index.html');
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function chapterLabel(key) {
+      return key === 'assign5' ? 'Chapter 5' : 'Chapter 4';
+    }
+
+    function extractDriveId(value) {
+      var input = String(value || '').trim();
+      if (!input) return '';
+      var patterns = [
+        /\/d\/([a-zA-Z0-9_-]+)/,
+        /[?&]id=([a-zA-Z0-9_-]+)/,
+        /^([a-zA-Z0-9_-]{20,})$/
+      ];
+      for (var i = 0; i < patterns.length; i++) {
+        var match = input.match(patterns[i]);
+        if (match) return match[1];
+      }
+      return '';
+    }
+
+    function previewUrl(fileId) {
+      return 'https://drive.google.com/file/d/' + encodeURIComponent(fileId) + '/preview';
+    }
+
+    function loadAssignments() {
+      if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
+      var chapter = document.getElementById('listChapterSelect').value;
+      var btn = document.getElementById('loadBtn');
+      btn.disabled = true;
+      btn.textContent = 'Loading...';
+      document.getElementById('assignmentList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading assignments...</h2><p class="empty-copy">Fetching ' + chapterLabel(chapter) + ' task files from Apps Script.</p></div>';
+
+      EQApi.get({ action: 'getMaterials', chapter: chapter }).then(function(data) {
+        currentAssignments = data.materials || [];
+        renderAssignments();
+      }).catch(function(err) {
+        document.getElementById('assignmentList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Could not load assignments.</h2><p class="empty-copy">' + escapeHtml(err.message) + '</p></div>';
+        showToast(err.message, 'err');
+      }).finally(function() {
+        btn.disabled = false;
+        btn.textContent = 'Load Assignments';
+      });
+    }
+
+    function renderAssignments() {
+      var chapter = document.getElementById('listChapterSelect').value;
+      if (!currentAssignments.length) {
+        document.getElementById('assignmentList').innerHTML = '<div class="empty-card"><h2 class="empty-title">No dynamic assignments yet.</h2><p class="empty-copy">Add the first ' + chapterLabel(chapter) + ' task file from the form.</p></div>';
+        return;
+      }
+
+      document.getElementById('assignmentList').innerHTML = currentAssignments.map(function(assignment, index) {
+        var title = assignment.title || 'Untitled Assignment';
+        var fileId = assignment.fileId || '';
+        var tag = assignment.fileType || '';
+        return '<article class="assignment-row">' +
+          '<div class="assignment-type">T' + (index + 1) + '</div>' +
+          '<div>' +
+            '<div class="assignment-title">' + escapeHtml(title) + '</div>' +
+            '<div class="assignment-meta">' + escapeHtml(tag || chapterLabel(chapter)) + ' · ' + escapeHtml(fileId) + '</div>' +
+          '</div>' +
+          '<div class="assignment-row-actions">' +
+            '<a class="btn ghost" href="' + previewUrl(fileId) + '" target="_blank">Preview</a>' +
+            '<button class="btn danger" type="button" onclick="deleteAssignment(&quot;' + escapeHtml(fileId) + '&quot;)">Remove</button>' +
+          '</div>' +
+        '</article>';
+      }).join('');
+    }
+
+    function addAssignment() {
+      var teacher = EQAuth.getTeacher();
+      var chapter = document.getElementById('chapterSelect').value;
+      var title = document.getElementById('titleInput').value.trim();
+      var tag = document.getElementById('tagInput').value.trim();
+      var fileId = extractDriveId(document.getElementById('driveInput').value);
+      var btn = document.getElementById('addBtn');
+
+      if (!teacher.username || !teacher.password) {
+        EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' });
+        return;
+      }
+      if (!title) {
+        showToast('Enter an assignment title', 'err');
+        return;
+      }
+      if (!fileId) {
+        showToast('Paste a valid Google Drive file link or ID', 'err');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Adding...';
+      EQApi.get({
+        action: 'addMaterial',
+        username: teacher.username,
+        password: teacher.password,
+        chapter: chapter,
+        title: title,
+        fileId: fileId,
+        fileType: tag || chapterLabel(chapter)
+      }).then(function(data) {
+        if (!data.success) throw new Error(data.error || 'Could not add assignment');
+        document.getElementById('titleInput').value = '';
+        document.getElementById('tagInput').value = '';
+        document.getElementById('driveInput').value = '';
+        document.getElementById('listChapterSelect').value = chapter;
+        currentAssignments = data.materials || [];
+        renderAssignments();
+        showToast('Assignment added', 'ok');
+      }).catch(function(err) {
+        showToast(err.message, 'err');
+      }).finally(function() {
+        btn.disabled = false;
+        btn.textContent = 'Add Assignment';
+      });
+    }
+
+    function deleteAssignment(fileId) {
+      if (!confirm('Remove this assignment from the student page?')) return;
+      var teacher = EQAuth.getTeacher();
+      var chapter = document.getElementById('listChapterSelect').value;
+
+      EQApi.get({
+        action: 'deleteMaterial',
+        username: teacher.username,
+        password: teacher.password,
+        chapter: chapter,
+        fileId: fileId
+      }).then(function(data) {
+        if (!data.success) throw new Error(data.error || 'Could not remove assignment');
+        currentAssignments = data.materials || [];
+        renderAssignments();
+        showToast('Assignment removed', 'ok');
+      }).catch(function(err) {
+        showToast(err.message, 'err');
+      });
+    }
+
+    function showToast(message, type) {
+      var toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast ' + (type || '');
+      setTimeout(function() { toast.classList.add('show'); }, 10);
+      setTimeout(function() { toast.classList.remove('show'); }, 2600);
+    }
+
+    document.getElementById('listChapterSelect').addEventListener('change', loadAssignments);
+    document.getElementById('chapterSelect').addEventListener('change', function() {
+      document.getElementById('listChapterSelect').value = this.value;
+      loadAssignments();
+    });
+
+    (function init() {
+      if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
+      loadAssignments();
+    })();
+  </script>
+</body>
+</html>
