@@ -226,7 +226,7 @@ window.ASAT_ASSIGNMENTS = [
     "className": "XE1",
     "no": 29,
     "name": "NATANIA PRATIWI",
-    "package": "Unassigned",
+    "package": "Package A - Challenge",
     "status": "Complete"
   },
   {
@@ -436,7 +436,7 @@ window.ASAT_ASSIGNMENTS = [
     "className": "XE4",
     "no": 25,
     "name": "MUHAMMAD NAUFAL RAYA RAMADHANI",
-    "package": "Unassigned",
+    "package": "Package A - Challenge",
     "status": "Complete"
   },
   {
@@ -975,7 +975,7 @@ window.ASAT_ASSIGNMENTS = [
     "className": "XE6",
     "no": 30,
     "name": "RAKHMA NURI KHAIRUNNISA",
-    "package": "Unassigned",
+    "package": "Package A - Challenge",
     "status": "Complete"
   },
   {
@@ -1206,7 +1206,7 @@ window.ASAT_ASSIGNMENTS = [
     "className": "XE7",
     "no": 27,
     "name": "Randi",
-    "package": "Unassigned",
+    "package": "Package A - Challenge",
     "status": "Complete"
   },
   {
