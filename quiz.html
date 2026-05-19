@@ -153,6 +153,7 @@
     .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
 
   </style>
+  <script src="shared/js/auth.js"></script>
   <script src="sidebar.js"></script>
 </head>
 <body data-page="quiz">
@@ -200,7 +201,7 @@
 <script>
 // Show teacher-only elements
 (function() {
-  if (localStorage.getItem('eq_tu')) {
+  if (EQAuth.hasTeacher()) {
     var el = document.getElementById('guessWhoCard');
     if (el) el.style.display = 'block';
   }

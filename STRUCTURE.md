@@ -67,7 +67,7 @@ Some older pages still live at the root while the revamp is in progress. They sh
 - `chapter5_guess_who.html` - legacy classroom game.
 - `gallery.html` - legacy gallery with student upload and teacher approval controls.
 - `jeopardyquiz.html` - legacy classroom quiz game.
-- `quiz.html` - legacy quiz landing/game entry.
+- `quiz.html` - legacy Grade 10 quiz/activity hub, linked from the Grade 10 home while the games are still at the root.
 - `strikes.html` redirects to `teacher/strikes.html` for old links.
 - `submission_status.html` - legacy read-only submission status overview.
 - `summative.html` - legacy summative topic lookup with teacher reveal controls.
