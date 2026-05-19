@@ -7,6 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css?v=20260505-clean-logo"/>
+  <script src="../shared/js/api.js"></script>
   <script src="../shared/js/sidebar.js"></script>
 </head>
 <body class="grade10-subpage" data-page="session">
@@ -103,48 +104,6 @@
   <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built by <strong>LaksMedia</strong></footer>
 
   <script>
-    var SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
-    function apiGet(params) {
-      var url = SCORES_API + '?';
-      var parts = [];
-      for (var k in params) parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
-      url += parts.join('&');
-
-      function attempt(retries) {
-        return new Promise(function(resolve, reject) {
-          var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-          var script = document.createElement('script');
-          var timer = setTimeout(function() {
-            cleanup();
-            if (retries > 0) attempt(retries - 1).then(resolve).catch(reject);
-            else reject(new Error('Request timed out. Please try again.'));
-          }, 15000);
-
-          function cleanup() {
-            clearTimeout(timer);
-            delete window[cb];
-            try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
-          }
-
-          window[cb] = function(data) {
-            cleanup();
-            resolve(data);
-          };
-
-          script.onerror = function() {
-            cleanup();
-            if (retries > 0) attempt(retries - 1).then(resolve).catch(reject);
-            else reject(new Error('Network error. Please try again.'));
-          };
-
-          script.src = url + '&callback=' + cb;
-          (document.body || document.head).appendChild(script);
-        });
-      }
-
-      return attempt(1);
-    }
-
     function openPdf(title, fileId) {
       document.getElementById('pdfModalTitle').textContent = title;
       document.getElementById('pdfModalIframe').src = 'https://drive.google.com/file/d/' + fileId + '/preview';
@@ -182,7 +141,7 @@
     });
 
     function loadAll() {
-      apiGet({ action: 'getMaterials', chapter: 'reading' }).then(function(res) {
+      EQApi.get({ action: 'getMaterials', chapter: 'reading' }).then(function(res) {
         if (res.materials && res.materials.length > 0) {
           res.materials.forEach(function(m) {
             appendReadingCard(m.title, m.fileId);
@@ -190,7 +149,7 @@
         }
       }).catch(function() {});
 
-      apiGet({ action: 'getMaterials', chapter: 'video' }).then(function(res) {
+      EQApi.get({ action: 'getMaterials', chapter: 'video' }).then(function(res) {
         if (res.materials && res.materials.length > 0) {
           res.materials.forEach(function(m) {
             appendVideoCard(m.title, m.fileId);
