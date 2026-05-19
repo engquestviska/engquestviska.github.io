@@ -7,6 +7,8 @@
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css?v=20260505-dashboard"/>
+  <script src="../shared/js/api.js"></script>
+  <script src="../shared/js/attendance.js"></script>
   <style>
     .student-dashboard-page {
       --primary: #2563eb;
@@ -424,8 +426,6 @@
   <footer>© 2026 English Quest · My Statistics</footer>
 
   <script>
-    var API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
-    var ATTENDANCE_API = 'https://script.google.com/macros/s/AKfycbxHaOK1WSG5hVVrzOUwGI3QxY3eSbjaAseRVxVaMXU-b8k9Stn4exUUbvB56dYbKLfr/exec';
     var studentProfile = {};
     var summary = {
       scores: 'Loading',
@@ -438,32 +438,12 @@
 
     localStorage.setItem('eq_grade', '10');
 
-    function apiGet(base, params) {
-      var url = base + '?' + new URLSearchParams(params);
-      return new Promise(function(resolve, reject) {
-        var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-        var p = Object.assign({}, params, { callback: cb, _t: Date.now() });
-        var script = document.createElement('script');
-        var timer = setTimeout(function() {
-          cleanup();
-          reject(new Error('Request timed out'));
-        }, 15000);
-        function cleanup() {
-          clearTimeout(timer);
-          delete window[cb];
-          try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
-        }
-        window[cb] = function(data) {
-          cleanup();
-          resolve(data);
-        };
-        script.onerror = function() {
-          cleanup();
-          reject(new Error('Network error'));
-        };
-        script.src = base + '?' + new URLSearchParams(p);
-        (document.body || document.head).appendChild(script);
-      });
+    function mainApiGet(params) {
+      return EQApi.get(params);
+    }
+
+    function attendanceApiGet(params) {
+      return EQAttendance.get(params);
     }
 
     function setText(id, value) {
@@ -526,9 +506,9 @@
     async function loadScores() {
       try {
         var responses = await Promise.all([
-          apiGet(API, { action: 'getChapterScores', className: studentProfile.cls, chapter: 4 }),
-          apiGet(API, { action: 'getChapterScores', className: studentProfile.cls, chapter: 5 }),
-          apiGet(API, { action: 'getFinalScores', className: studentProfile.cls }).catch(function() { return {}; })
+          mainApiGet({ action: 'getChapterScores', className: studentProfile.cls, chapter: 4 }),
+          mainApiGet({ action: 'getChapterScores', className: studentProfile.cls, chapter: 5 }),
+          mainApiGet({ action: 'getFinalScores', className: studentProfile.cls }).catch(function() { return {}; })
         ]);
         var ch4 = findStudent(responses[0].students);
         var ch5 = findStudent(responses[1].students);
@@ -553,7 +533,7 @@
 
     async function loadAttendance() {
       try {
-        var data = await apiGet(ATTENDANCE_API, { action: 'getClassData', className: studentProfile.cls });
+        var data = await attendanceApiGet({ action: 'getClassData', className: studentProfile.cls });
         var student = findStudent(data.students);
         var meetings = (data.meetings || []).filter(function(meeting) {
           return meeting.date && meeting.number !== undefined && meeting.number !== null && meeting.number !== '';
@@ -583,7 +563,7 @@
 
     async function loadTasks() {
       try {
-        var data = await apiGet(API, { action: 'getTaskStatus', className: studentProfile.cls, studentNo: studentProfile.no });
+        var data = await mainApiGet({ action: 'getTaskStatus', className: studentProfile.cls, studentNo: studentProfile.no });
         var tasks = data.tasks || {};
         var keys = Object.keys(tasks);
         var done = keys.filter(function(key) { return !!tasks[key]; }).length;
@@ -605,7 +585,7 @@
 
     async function loadSubmission() {
       try {
-        var data = await apiGet(API, { action: 'getSubmissions' });
+        var data = await mainApiGet({ action: 'getSubmissions' });
         var classRows = data.students && data.students[studentProfile.cls] ? data.students[studentProfile.cls] : [];
         var match = classRows.find(function(row) {
           return String(row.name || '').toLowerCase() === String(studentProfile.name || '').toLowerCase();
@@ -624,7 +604,7 @@
 
     async function loadActiveness() {
       try {
-        var data = await apiGet(API, { action: 'getAllActiveness', className: studentProfile.cls });
+        var data = await mainApiGet({ action: 'getAllActiveness', className: studentProfile.cls });
         var student = findStudent(data.students);
         var total = student ? Number(student.Total || 0) : null;
         var indicator = student ? (student.Indicator || 'No indicator yet') : 'No activeness data found for your profile.';
@@ -661,7 +641,7 @@
 
     async function loadStrikes() {
       try {
-        var data = await apiGet(API, { action: 'getStudentStrikes', className: studentProfile.cls, studentNo: studentProfile.no });
+        var data = await mainApiGet({ action: 'getStudentStrikes', className: studentProfile.cls, studentNo: studentProfile.no });
         if (data.error) throw new Error(data.error);
         var total = Number(data.total || 0);
         var status = strikeStatus(total);

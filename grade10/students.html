@@ -378,6 +378,20 @@
       justify-content: space-between !important;
       margin-bottom: 16px !important;
     }
+    body.student-directory-page .student-controls {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1fr) minmax(150px, 0.35fr) auto !important;
+      align-items: center !important;
+      gap: 12px !important;
+    }
+    body.student-directory-page .student-controls .search-wrap,
+    body.student-directory-page .student-controls .filter-select,
+    body.student-directory-page .student-controls .count-badge {
+      min-width: 0 !important;
+    }
+    body.student-directory-page .student-controls .filter-select {
+      width: 100% !important;
+    }
     body.student-directory-page .student-list {
       display: grid !important;
       gap: 10px !important;
@@ -456,7 +470,17 @@
       text-transform: uppercase !important;
       white-space: nowrap !important;
     }
+    @media (max-width: 640px) {
+      body.student-directory-page .student-controls {
+        grid-template-columns: 1fr !important;
+      }
+      body.student-directory-page .student-controls .count-badge {
+        justify-self: stretch !important;
+        text-align: center !important;
+      }
+    }
   </style>
+  <script src="../shared/js/api.js"></script>
   <script src="../shared/js/sidebar.js"></script>
 </head>
 <body class="grade10-subpage student-directory-page" data-page="students">
@@ -663,7 +687,7 @@ function loadAllStudents() {
   // Always fetch fresh in background (or foreground if no cache)
   Promise.all(classes.map(cls => {
     var params = { action: 'getStudents', className: apiClsMap[cls] };
-    return apiGet(params)
+    return EQApi.get(params)
       .then(res => { cacheSet(params, res); return { cls, students: res.students || [] }; })
       .catch(() => ({ cls, students: [] }));
   })).then(results => {
@@ -742,10 +766,9 @@ function cacheSet(params, data) {
   try { localStorage.setItem(cacheKey(params), JSON.stringify({ ts: Date.now(), data: data })); } catch(e) {}
 }
 
-const SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
 const activenessCache = {};
 
-// Now safe to load students (apiGet is defined above)
+// Now safe to load students (EQApi is loaded above)
 loadAllStudents();
 
 const ACTS = [
@@ -760,23 +783,6 @@ const ACTS = [
 // Class key mapping: XE-1 → XE1 for API
 function toApiClass(cls) { return cls.replace('-', ''); }
 
-async function apiGet(params) {
-  const url = SCORES_API + '?' + new URLSearchParams(params);
-  try { const res = await fetch(url); if (res.ok) return await res.json(); } catch(e) {}
-  return new Promise((resolve, reject) => {
-    const cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-    const p  = { ...params, callback: cb, _t: Date.now() };
-    const script = document.createElement('script');
-    script.async = true;
-    const timer = setTimeout(() => { cleanup(); reject(new Error('Timeout')); }, 15000);
-    function cleanup() { delete window[cb]; try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e){} clearTimeout(timer); }
-    window[cb]     = d => { cleanup(); resolve(d); };
-    script.onerror = () => { cleanup(); reject(new Error('Network error')); };
-    script.src = SCORES_API + '?' + new URLSearchParams(p);
-    (document.body || document.head).appendChild(script);
-  });
-}
-
 async function openActModal(name, cls) {
   const apiCls = toApiClass(cls);
   document.getElementById('actName').textContent    = name;
@@ -790,7 +796,7 @@ async function openActModal(name, cls) {
     // Use cache per class
     let classData = activenessCache[apiCls];
     if (!classData) {
-      classData = await apiGet({ action: 'getAllActiveness', className: apiCls });
+      classData = await EQApi.get({ action: 'getAllActiveness', className: apiCls });
       if (!classData.error) activenessCache[apiCls] = classData;
     }
     if (classData.error) { document.getElementById('actBody').innerHTML = '<div class="act-loading">Could not load stats.</div>'; return; }

@@ -7,6 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css?v=20260505-tasks-revamp"/>
+  <script src="../shared/js/api.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -542,30 +543,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  const API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
-
   let studentsCache = {};
-
-  // ── API ──────────────────────────────────────────────────────
-  async function apiGet(params) {
-    const url = API + '?' + new URLSearchParams(params);
-    try {
-      const res = await fetch(url);
-      if (res.ok) return await res.json();
-    } catch(e) {}
-    return new Promise((resolve, reject) => {
-      const cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-      const p  = { ...params, callback: cb, _t: Date.now() };
-      const script = document.createElement('script');
-      script.async = true;
-      const timer = setTimeout(() => { cleanup(); reject(new Error('Timeout')); }, 15000);
-      function cleanup() { delete window[cb]; try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e){} clearTimeout(timer); }
-      window[cb]     = d => { cleanup(); resolve(d); };
-      script.onerror = () => { cleanup(); reject(new Error('Network error')); };
-      script.src = API + '?' + new URLSearchParams(p);
-      (document.body || document.head).appendChild(script);
-    });
-  }
 
   // ── CACHE LAYER ─────────────────────────────────────────────
   var CACHE_TTL = 30 * 60 * 1000;
@@ -588,10 +566,10 @@
   async function cachedApiGet(params) {
     var cached = cacheGet(params);
     if (cached) {
-      apiGet(params).then(function(fresh) { cacheSet(params, fresh); }).catch(function() {});
+      EQApi.get(params).then(function(fresh) { cacheSet(params, fresh); }).catch(function() {});
       return cached;
     }
-    var data = await apiGet(params);
+    var data = await EQApi.get(params);
     cacheSet(params, data);
     return data;
   }

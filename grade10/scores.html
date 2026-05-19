@@ -7,6 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css?v=20260505-scores-revamp"/>
+  <script src="../shared/js/api.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -432,7 +433,6 @@
 <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
 
 <script>
-const SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
 const CLASSES = ['XE1','XE4','XE5','XE6','XE7','XE8','XE9','XE10','XE11'];
 const CLASS_LABELS = { XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
 
@@ -467,42 +467,10 @@ function cachedApiGet(params) {
   var cached = cacheGet(params);
   if (cached) {
     // Return cache immediately, refresh in background
-    apiGet(params).then(function(fresh) { cacheSet(params, fresh); }).catch(function() {});
+    EQApi.get(params).then(function(fresh) { cacheSet(params, fresh); }).catch(function() {});
     return Promise.resolve(cached);
   }
-  return apiGet(params).then(function(data) { cacheSet(params, data); return data; });
-}
-
-function apiGet(params) {
-  var base = SCORES_API + '?';
-  var parts = [];
-  for (var k in params) parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
-  var url = base + parts.join('&');
-
-  function attempt(retries) {
-    return new Promise(function(resolve, reject) {
-      var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-      var script = document.createElement('script');
-      var timer = setTimeout(function() {
-        cleanup();
-        if (retries > 0) { attempt(retries - 1).then(resolve).catch(reject); }
-        else { reject(new Error('Connection timed out. Please check your internet and try again 🙏')); }
-      }, 15000);
-      function cleanup() {
-        clearTimeout(timer); delete window[cb];
-        try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
-      }
-      window[cb] = function(data) { cleanup(); resolve(data); };
-      script.onerror = function() {
-        cleanup();
-        if (retries > 0) { attempt(retries - 1).then(resolve).catch(reject); }
-        else { reject(new Error('Could not connect. Please check your internet and try again.')); }
-      };
-      script.src = url + '&callback=' + cb;
-      (document.body || document.head).appendChild(script);
-    });
-  }
-  return attempt(1);
+  return EQApi.get(params).then(function(data) { cacheSet(params, data); return data; });
 }
 
 function init() {
@@ -614,7 +582,7 @@ function autoLoadStudentScores(cls, no, name) {
 function loadStudentList() {
   var sel = document.getElementById('sStudent');
   sel.innerHTML = '<option value="">Loading...</option>';
-  apiGet({ action: 'getStudents', className: currentClass }).then(function(res) {
+  EQApi.get({ action: 'getStudents', className: currentClass }).then(function(res) {
     if (res.error || !res.students) { sel.innerHTML = '<option value="">Error loading</option>'; return; }
     allStudents = res.students;
     sel.innerHTML = '<option value="">-- Select your name --</option>';
