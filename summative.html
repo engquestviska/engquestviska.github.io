@@ -199,6 +199,7 @@
     .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
     .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
   </style>
+  <script src="shared/js/api.js"></script>
   <script src="sidebar.js"></script>
 </head>
 <body data-page="summative">
@@ -314,7 +315,6 @@
 var SHEET_ID   = '1hzFDt3RyW1JuK3JJE7nuXAtVjiKG6btXD6RxEcHDYbk';
 var SHEET_TAB  = 'SummativeTopic';
 var INNATE_TAB = 'InnateTopic';
-var API        = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
 // Using gid= is more reliable than sheet name (avoids encoding issues)
 var SHEET_GID  = '710068729';   // Summative Topic tab
 var GSHEET_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID +
@@ -341,22 +341,6 @@ function showToast(msg) {
 function doLogout() {
   localStorage.removeItem('eq_tu'); localStorage.removeItem('eq_tp');
   window.location.href = 'index.html';
-}
-
-function apiGet(params) {
-  var url = API + '?';
-  var parts = [];
-  for (var k in params) parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
-  url += parts.join('&');
-  return new Promise(function(resolve, reject) {
-    var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-    var s = document.createElement('script');
-    var timer = setTimeout(function(){ delete window[cb]; try{document.head.removeChild(s);}catch(e){} reject(new Error('Timeout')); }, 12000);
-    window[cb] = function(d){ clearTimeout(timer); delete window[cb]; try{document.head.removeChild(s);}catch(e){} resolve(d); };
-    s.onerror = function(){ clearTimeout(timer); delete window[cb]; reject(new Error('Network error')); };
-    s.src = url + '&callback=' + cb;
-    document.head.appendChild(s);
-  });
 }
 
 // ── LOAD SHEET DATA via GViz ─────────────────────────────────
@@ -559,7 +543,7 @@ function saveStance(cls, attNum, stance) {
   if (ba) { ba.disabled = true; ba.innerHTML = '<span class="spinner-sm"></span>'; }
   if (bd) { bd.disabled = true; }
 
-  apiGet({ action: 'setStance', cls: cls, attNum: attNum, stance: stance, sheetId: SHEET_ID, sheetTab: SHEET_TAB })
+  EQApi.get({ action: 'setStance', cls: cls, attNum: attNum, stance: stance, sheetId: SHEET_ID, sheetTab: SHEET_TAB })
     .then(function(res){
       if (res.success) {
         if (ba) { ba.disabled = false; ba.innerHTML = '&#9989; Agree'; ba.classList.toggle('selected', stance==='Agree'); }
@@ -677,7 +661,7 @@ function toggleReveal(cls, attNum, revealed) {
                   ?.closest('.reveal-toggle')?.querySelector('.toggle-label');
   if (labelEl) labelEl.textContent = revealed ? 'On' : 'Off';
 
-  apiGet({ action: 'setReveal', username: savedUser, password: savedPass, cls: cls, attNum: attNum, revealed: revealed ? 'TRUE' : 'FALSE', sheetId: SHEET_ID, sheetTab: SHEET_TAB })
+  EQApi.get({ action: 'setReveal', username: savedUser, password: savedPass, cls: cls, attNum: attNum, revealed: revealed ? 'TRUE' : 'FALSE', sheetId: SHEET_ID, sheetTab: SHEET_TAB })
     .then(function(res){
       if (res.success) {
         showToast(revealed ? 'Topic revealed!' : 'Topic hidden.');
@@ -709,7 +693,7 @@ function bulkReveal(reveal) {
       return;
     }
     var attNum = idx + 1;
-    apiGet({ action: 'setReveal', username: savedUser, password: savedPass, cls: currentCls, attNum: attNum, revealed: reveal ? 'TRUE' : 'FALSE' })
+    EQApi.get({ action: 'setReveal', username: savedUser, password: savedPass, cls: currentCls, attNum: attNum, revealed: reveal ? 'TRUE' : 'FALSE' })
       .then(function(res){
         if (res.success) {
           done++;
@@ -762,7 +746,7 @@ function revealAll(reveal) {
       return;
     }
     var attNum = idx + 1;
-    apiGet({ action: 'setReveal', username: savedUser, password: savedPass,
+    EQApi.get({ action: 'setReveal', username: savedUser, password: savedPass,
              cls: currentCls, attNum: attNum, revealed: reveal ? 'TRUE' : 'FALSE' })
       .then(function(res){
         if (res.success) {
@@ -793,7 +777,7 @@ async function syncRevealByTasks() {
     // Load task status for the current class
     // currentCls is 'XE1' format, ScoresAPI expects the same
     var taskData = await new Promise(function(resolve, reject) {
-      apiGet({ action: 'getAllTasks', className: currentCls })
+      EQApi.get({ action: 'getAllTasks', className: currentCls })
         .then(resolve).catch(reject);
     });
 
@@ -843,7 +827,7 @@ async function syncRevealByTasks() {
       var attNum = item.attNum;
       if (btn) btn.textContent = '⏳ Revealing ' + (idx + 1) + '/' + toReveal.length + '...';
 
-      apiGet({ action: 'setReveal', username: savedUser, password: savedPass,
+      EQApi.get({ action: 'setReveal', username: savedUser, password: savedPass,
                cls: currentCls, attNum: attNum, revealed: 'TRUE' })
         .then(function(res) {
           if (res.success) {

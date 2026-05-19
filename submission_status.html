@@ -101,6 +101,7 @@
     .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
     .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
   </style>
+  <script src="shared/js/api.js"></script>
   <script src="sidebar.js"></script>
 </head>
 <body data-page="submission_status">
@@ -140,7 +141,6 @@
 <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
 
 <script>
-const SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
 const CLASS_LABELS = { XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
 
 var allData  = null; // Ch4: { classes, students: { ClassName: [{name, submitted}] } }
@@ -156,35 +156,11 @@ function getCh5Entry(cls, name) {
   return ch5Data.byKey[ch5Key(cls, name)] || null;
 }
 
-function apiGet(params) {
-  var url = SCORES_API + '?';
-  var parts = [];
-  for (var k in params) parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
-  url += parts.join('&');
-  return new Promise(function(resolve, reject) {
-    var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-    var s  = document.createElement('script');
-    var timer = setTimeout(function() {
-      delete window[cb];
-      try { if (s.parentNode) s.parentNode.removeChild(s); } catch(e) {}
-      reject(new Error('Request timed out.'));
-    }, 20000);
-    window[cb] = function(data) {
-      clearTimeout(timer); delete window[cb];
-      try { if (s.parentNode) s.parentNode.removeChild(s); } catch(e) {}
-      resolve(data);
-    };
-    s.onerror = function() { clearTimeout(timer); delete window[cb]; reject(new Error('Network error.')); };
-    s.src = url + '&callback=' + cb;
-    document.head.appendChild(s);
-  });
-}
-
 function load() {
   document.getElementById('tableArea').innerHTML = '<div class="state-card"><div class="spinner"></div><div class="state-title">Loading submissions...</div></div>';
   Promise.all([
-    apiGet({ action: 'getSubmissions' }),
-    apiGet({ action: 'getCh5Submissions' })
+    EQApi.get({ action: 'getSubmissions' }),
+    EQApi.get({ action: 'getCh5Submissions' })
   ]).then(function(results) {
     var ch4Res = results[0], ch5Res = results[1];
     if (ch4Res.error) {

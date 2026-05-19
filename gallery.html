@@ -161,6 +161,7 @@
     .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
     .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
   </style>
+  <script src="shared/js/api.js"></script>
   <script src="sidebar.js"></script>
 </head>
 <body data-page="gallery">
@@ -304,7 +305,6 @@
 
 <script>
 var API = 'https://script.google.com/macros/s/AKfycbxaH7GlkeJ_KsaegFEqNefOpQpTnxTVpC_cgfQJlLLA0c1fWu0qZTSNtNSAPGItpF6B-Q/exec';
-var SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
 
 var savedUser = localStorage.getItem('eq_tu') || '';
 var savedPass = localStorage.getItem('eq_tp') || '';
@@ -517,7 +517,7 @@ function onClassChange() {
   sel.innerHTML = '<option value="">Loading...</option>';
   sel.disabled = true;
   if (!cls) { sel.innerHTML = '<option value="">— Select class first —</option>'; return; }
-  apiGet(SCORES_API, { action: 'getStudents', className: cls }).then(function(res) {
+  EQApi.get({ action: 'getStudents', className: cls }).then(function(res) {
     if (res.students) {
       sel.innerHTML = '<option value="">— Select your name —</option>' +
         res.students.map(function(s) {
