@@ -7,6 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css?v=20260505-strikes"/>
+  <script src="../shared/js/api.js"></script>
   <style>
     .student-strikes-page {
       --primary: #2563eb;
@@ -358,39 +359,9 @@
   <footer>© 2026 English Quest · My Strikes</footer>
 
   <script>
-    var API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
     var profile = {};
 
     localStorage.setItem('eq_grade', '10');
-
-    function apiGet(params) {
-      return new Promise(function(resolve, reject) {
-        var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-        var p = Object.assign({}, params, { callback: cb, _t: Date.now() });
-        var script = document.createElement('script');
-        var timer = setTimeout(function() {
-          cleanup();
-          reject(new Error('Request timed out'));
-        }, 15000);
-
-        function cleanup() {
-          clearTimeout(timer);
-          delete window[cb];
-          try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
-        }
-
-        window[cb] = function(data) {
-          cleanup();
-          resolve(data);
-        };
-        script.onerror = function() {
-          cleanup();
-          reject(new Error('Network error'));
-        };
-        script.src = API + '?' + new URLSearchParams(p);
-        (document.body || document.head).appendChild(script);
-      });
-    }
 
     function initials(name) {
       return (name || 'EQ').split(/\s+/).filter(Boolean).slice(0, 2).map(function(part) {
@@ -464,7 +435,7 @@
 
     async function loadStrikes() {
       try {
-        var data = await apiGet({ action: 'getStudentStrikes', className: profile.cls, studentNo: profile.no });
+        var data = await EQApi.get({ action: 'getStudentStrikes', className: profile.cls, studentNo: profile.no });
         if (data.error) throw new Error(data.error);
         renderStrikes(data);
       } catch(e) {
