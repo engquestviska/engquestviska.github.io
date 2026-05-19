@@ -41,7 +41,11 @@
   /* Keep shared sidebars consistent on secondary student pages. */
   var style = document.createElement('style');
   style.textContent =
-    '.sidebar { display:flex !important; flex-direction:column !important; overflow-y:auto !important; }';
+    '.sidebar { display:flex !important; flex-direction:column !important; overflow-y:auto !important; }' +
+    '#hamburgerBtn { width:92px !important; min-width:92px !important; height:42px !important; align-items:flex-start !important; padding:0 14px !important; border-radius:999px !important; position:absolute !important; }' +
+    '#hamburgerBtn::after { content:"Menu"; position:absolute; right:14px; top:50%; transform:translateY(-50%); color:#fff; font:700 0.82rem "IBM Plex Sans", sans-serif; }' +
+    '#hamburgerBtn.open::after { content:"Close"; }' +
+    '#hamburgerBtn span { margin-left:0 !important; }';
   document.head.appendChild(style);
 
   document.addEventListener('DOMContentLoaded', function () {

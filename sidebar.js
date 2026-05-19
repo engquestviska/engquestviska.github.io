@@ -1,6 +1,14 @@
 /* Legacy root-page sidebar.
    Active Grade 10 pages use shared/js/sidebar.js after the folder restructure. */
 (function () {
+  var style = document.createElement('style');
+  style.textContent =
+    '#hamburgerBtn { width:92px !important; min-width:92px !important; height:42px !important; align-items:flex-start !important; padding:0 14px !important; border-radius:999px !important; position:absolute !important; }' +
+    '#hamburgerBtn::after { content:"Menu"; position:absolute; right:14px; top:50%; transform:translateY(-50%); color:#fff; font:700 0.82rem "IBM Plex Sans", sans-serif; }' +
+    '#hamburgerBtn.open::after { content:"Close"; }' +
+    '#hamburgerBtn span { margin-left:0 !important; }';
+  document.head.appendChild(style);
+
   var HTML = [
     '<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>',
     '<nav class="sidebar" id="sidebar" aria-label="Legacy page navigation">',
