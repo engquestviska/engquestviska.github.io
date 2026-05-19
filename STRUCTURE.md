@@ -64,4 +64,10 @@ English Quest is being reorganized into three tracks.
 ## Legacy Root Pages
 
 Some older pages still live at the root while the revamp is in progress. They should either be moved into the correct track or removed later.
+- `chapter5_guess_who.html` - legacy classroom game.
+- `gallery.html` - legacy gallery with student upload and teacher approval controls.
+- `jeopardyquiz.html` - legacy classroom quiz game.
+- `quiz.html` - legacy quiz landing/game entry.
 - `strikes.html` redirects to `teacher/strikes.html` for old links.
+- `submission_status.html` - legacy read-only submission status overview.
+- `summative.html` - legacy summative topic lookup with teacher reveal controls.

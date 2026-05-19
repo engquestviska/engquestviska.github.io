@@ -200,6 +200,7 @@
     .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
   </style>
   <script src="shared/js/api.js"></script>
+  <script src="shared/js/auth.js"></script>
   <script src="sidebar.js"></script>
 </head>
 <body data-page="summative">
@@ -322,9 +323,10 @@ var GSHEET_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID +
 var INNATE_URL = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID +
                  '/gviz/tq?tqx=out:json&sheet=' + encodeURIComponent(INNATE_TAB);
 
-var savedUser  = localStorage.getItem('eq_tu') || '';
-var savedPass  = localStorage.getItem('eq_tp') || '';
-var isTeacher  = !!savedUser;
+var teacherSession = EQAuth.getTeacher();
+var savedUser  = teacherSession.username;
+var savedPass  = teacherSession.password;
+var isTeacher  = EQAuth.hasTeacher();
 var allData    = [];   // Summative Topic sheet (shuffled topics)
 var innateData = [];   // InnateTopic sheet (original owners)
 var currentCls = 'XE1';
@@ -339,8 +341,7 @@ function showToast(msg) {
 }
 
 function doLogout() {
-  localStorage.removeItem('eq_tu'); localStorage.removeItem('eq_tp');
-  window.location.href = 'index.html';
+  EQAuth.logoutTeacher('index.html');
 }
 
 // ── LOAD SHEET DATA via GViz ─────────────────────────────────
