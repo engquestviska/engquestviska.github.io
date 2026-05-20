@@ -3,25 +3,33 @@ window.ASAT_PACKAGES = {
     "label": "Package A",
     "title": "Challenge Route",
     "fileName": "ASAT_Exercise_Package_A_Challenge_Route.pdf",
-    "fileId": "1GEN_dN8F-4rsB6EpqI_AUFEKD5PlTwbS"
+    "fileId": "1GEN_dN8F-4rsB6EpqI_AUFEKD5PlTwbS",
+    "answerKeyFileName": "ASAT_Exercise_Answer_Key_Package_A.pdf",
+    "answerKeyFileId": "11l6SQO5VuSh2p8BUPa9Gaue3jd3CIhT7"
   },
   "Package B - Standard": {
     "label": "Package B",
     "title": "Standard Route",
     "fileName": "ASAT_Exercise_Package_B_Standard_Route.pdf",
-    "fileId": "196EaFJpYL002jaYWncVPGU7niTyJ2UR0"
+    "fileId": "196EaFJpYL002jaYWncVPGU7niTyJ2UR0",
+    "answerKeyFileName": "ASAT_Exercise_Answer_Key_Package_B.pdf",
+    "answerKeyFileId": "16c3UgqkiqFzGzcmIU94iMCk4sKMnBDe4"
   },
   "Package C - Guided": {
     "label": "Package C",
     "title": "Guided Route",
     "fileName": "ASAT_Exercise_Package_C_Guided_Route.pdf",
-    "fileId": "1VBNCKmEFvrry-p32jcUsdtr16PfuQPi6"
+    "fileId": "1VBNCKmEFvrry-p32jcUsdtr16PfuQPi6",
+    "answerKeyFileName": "ASAT_Exercise_Answer_Key_Package_C.pdf",
+    "answerKeyFileId": "1pDnaw3aLnUT1TYKz6_ihoi5y_4-Xjjyu"
   },
   "Package D - Intensive": {
     "label": "Package D",
     "title": "Intensive Support Route",
     "fileName": "ASAT_Exercise_Package_D_Support_Route.pdf",
-    "fileId": "19JtO4LlCBDLjfnQhdXmgGkOHlzi3FgU5"
+    "fileId": "19JtO4LlCBDLjfnQhdXmgGkOHlzi3FgU5",
+    "answerKeyFileName": "ASAT_Exercise_Answer_Key_Package_D.pdf",
+    "answerKeyFileId": "1P8u8-cPHgdRvRFU9GzUkXX306LQQaYHe"
   }
 };
 

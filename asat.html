@@ -208,17 +208,51 @@
     }
     .download-btn { background:linear-gradient(135deg,var(--green),#059669); color:#fff; }
     .preview-btn { background:#fff; color:#1D4ED8; border-color:#BFDBFE; }
-    .answer-note {
+    .answer-key-card {
       margin-top:16px;
       padding:14px 16px;
-      border:1.5px solid #FDE68A;
+      border:1.5px solid #A7F3D0;
       border-radius:14px;
-      background:#FFFBEB;
-      color:#7C2D12;
+      background:#ECFDF5;
+      color:#064E3B;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .answer-key-text {
       font-size:0.88rem;
       font-weight:700;
       line-height:1.5;
     }
+    .answer-key-file {
+      display:block;
+      margin-top:3px;
+      color:#047857;
+      font-size:0.78rem;
+      overflow-wrap:anywhere;
+    }
+    .answer-key-actions {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .key-download-btn, .key-preview-btn {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      border-radius:12px;
+      padding:10px 14px;
+      min-width:126px;
+      font-weight:800;
+      font-size:0.82rem;
+      font-family:'IBM Plex Mono', monospace;
+      border:1.5px solid transparent;
+    }
+    .key-download-btn { background:linear-gradient(135deg,#059669,#047857); color:#fff; }
+    .key-preview-btn { background:#fff; color:#047857; border-color:#A7F3D0; }
     .empty-state {
       padding:30px 24px;
       text-align:center;
@@ -261,7 +295,8 @@
       .panel-inner, .package-body { padding:18px; }
       .package-card { grid-template-columns:1fr; }
       .pkg-actions { justify-content:stretch; }
-      .download-btn, .preview-btn { width:100%; }
+      .download-btn, .preview-btn, .key-download-btn, .key-preview-btn { width:100%; }
+      .answer-key-actions { width:100%; }
       .brand { justify-content:flex-start; padding-right:54px; }
     }
   </style>
@@ -432,6 +467,19 @@
 
       const previewUrl = 'https://drive.google.com/file/d/' + encodeURIComponent(pkg.fileId) + '/view';
       const downloadUrl = 'https://drive.google.com/uc?export=download&id=' + encodeURIComponent(pkg.fileId);
+      const answerPreviewUrl = pkg.answerKeyFileId ? 'https://drive.google.com/file/d/' + encodeURIComponent(pkg.answerKeyFileId) + '/view' : '';
+      const answerDownloadUrl = pkg.answerKeyFileId ? 'https://drive.google.com/uc?export=download&id=' + encodeURIComponent(pkg.answerKeyFileId) : '';
+      const answerKeyHtml = pkg.answerKeyFileId ? `
+          <div class="answer-key-card">
+            <div class="answer-key-text">
+              Answer key is available for your package.
+              <span class="answer-key-file">${escapeHtml(pkg.answerKeyFileName || 'Answer key PDF')}</span>
+            </div>
+            <div class="answer-key-actions">
+              <a class="key-download-btn" href="${answerDownloadUrl}" target="_blank" rel="noopener">Download Key</a>
+              <a class="key-preview-btn" href="${answerPreviewUrl}" target="_blank" rel="noopener">Open Key</a>
+            </div>
+          </div>` : '';
       result.innerHTML = profile + `
         <div class="package-body">
           <div class="package-card">
@@ -445,7 +493,7 @@
               <a class="preview-btn" href="${previewUrl}" target="_blank" rel="noopener">Open</a>
             </div>
           </div>
-          <div class="answer-note">After finishing the exercise, contact Mr. Laksma on WhatsApp to request the answer key.</div>
+          ${answerKeyHtml}
         </div>`;
       result.style.display = 'block';
       result.scrollIntoView({ behavior:'smooth', block:'nearest' });
