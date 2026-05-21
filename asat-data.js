@@ -472,7 +472,7 @@ window.ASAT_ASSIGNMENTS = [
     "className": "XE4",
     "no": 29,
     "name": "RAISSA ANINDYA KUNARYA",
-    "package": "Unassigned",
+    "package": "Package B - Standard",
     "status": "Incomplete"
   },
   {
