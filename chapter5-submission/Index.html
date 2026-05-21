@@ -287,6 +287,34 @@
     });
   }
 
+  function describeScriptError(err) {
+    if (!err) return 'Connection to the upload server failed';
+    if (typeof err === 'string') return err;
+    if (err.message) return err.message;
+    if (err.name) return err.name;
+    try {
+      var text = JSON.stringify(err);
+      return text && text !== '{}' ? text : String(err);
+    } catch(e) {
+      return String(err);
+    }
+  }
+
+  function sleep(ms) {
+    return new Promise(function(resolve) { setTimeout(resolve, ms); });
+  }
+
+  function uploadTaskFile(base64, fname, className, studentName, label) {
+    return new Promise(function(resolve, reject) {
+      google.script.run
+        .withSuccessHandler(resolve)
+        .withFailureHandler(function(err) {
+          reject(new Error(describeScriptError(err)));
+        })
+        .uploadFile(base64, fname, 'application/pdf', className, studentName, label);
+    });
+  }
+
   // ── Validate ─────────────────────────────────────────────────────
   function validate() {
     var ok = true;
@@ -342,25 +370,25 @@
 
       try {
         var base64 = await fileToBase64(file);
-        var result = await new Promise(function(resolve, reject) {
-          var label = t.label;
-          var fname = file.name;
-          google.script.run
-            .withSuccessHandler(resolve)
-            .withFailureHandler(reject)
-            .uploadFile(base64, fname, 'application/pdf', className, studentName, label);
-        });
+        var result;
+        try {
+          result = await uploadTaskFile(base64, file.name, className, studentName, t.label);
+        } catch(firstError) {
+          document.getElementById('loadingStatus').textContent = 'Retrying ' + t.label + '...';
+          await sleep(1200);
+          result = await uploadTaskFile(base64, file.name, className, studentName, t.label);
+        }
 
         if (result && result.success) {
           taskFileIds.push([result.fileId]);
           uploadedCount++;
         } else {
           taskFileIds.push(['']);
-          failed.push(t.label + ': ' + (result ? result.error : 'unknown error'));
+          failed.push(t.label + ': ' + (result ? (result.error || 'Server did not return a file link') : 'No response from server'));
         }
       } catch(e) {
         taskFileIds.push(['']);
-        failed.push(t.label + ': ' + e.message);
+        failed.push(t.label + ': ' + describeScriptError(e));
       }
     }
 
@@ -371,7 +399,7 @@
 
     if (failed.length > 0) {
       document.getElementById('loadingOverlay').classList.remove('active');
-      alert('Some files failed to upload:\n\n' + failed.join('\n') + '\n\nPlease try again.');
+      alert('Some files failed to upload:\n\n' + failed.join('\n') + '\n\nPlease open the submission link in Chrome, check your connection, and try again.');
       document.getElementById('submitBtn').disabled = false;
       return;
     }
