@@ -224,6 +224,9 @@
         var o = document.createElement('option'); o.value = s; o.text = s; nd.appendChild(o);
       });
       nd.disabled = false;
+    }).withFailureHandler(function(err) {
+      nd.innerHTML = '<option value="">Failed to load names</option>';
+      console.error('Failed to load students:', describeScriptError(err));
     }).getStudents(cls);
   }
 
@@ -412,13 +415,13 @@
           document.getElementById('successContainer').style.display = 'block';
           window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
-          alert('Error saving response: ' + res.error);
+          alert('Error saving response: ' + (res && res.error ? res.error : 'Server did not save your response. Please try again.'));
           document.getElementById('submitBtn').disabled = false;
         }
       })
       .withFailureHandler(function(err) {
         document.getElementById('loadingOverlay').classList.remove('active');
-        alert('Error: ' + err.message);
+        alert('Error saving response: ' + describeScriptError(err) + '\n\nPlease open the submission link in Safari or Chrome and try again.');
         document.getElementById('submitBtn').disabled = false;
       })
       .submitForm(className, studentName, taskFileIds);
