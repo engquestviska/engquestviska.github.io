@@ -1,6 +1,6 @@
 /* sidebar.js — shared sidebar for all secondary pages */
 (function () {
-  var SECURITY_MAINTENANCE = true;
+  var SECURITY_MAINTENANCE = false;
 
   function showSecurityMaintenance() {
     if (!SECURITY_MAINTENANCE || document.getElementById('securityMaintenanceScreen')) return;
