@@ -19,6 +19,29 @@ const SCORE_SHEETS = {
 const TASK_SHEET_NAME = 'Task_Status';
 const TEACHER_USER    = 'teacher';
 const TEACHER_HASH    = '39de0394764747426b997b945770fd60661cbd072051131da2cb99d6d8dd8430';
+const WRITES_ENABLED  = false;
+const SECURITY_AUDIT_KEY = 'securityAuditLog';
+const WRITE_ACTIONS = {
+  saveChapterScore: true,
+  saveFinalScore: true,
+  saveTaskStatus: true,
+  syncCh5Student: true,
+  syncCh5Class: true,
+  saveQuizScore: true,
+  setSummative: true,
+  clearSummative: true,
+  incrementActiveness: true,
+  setupQuizColumn: true,
+  addStrike: true,
+  removeStrike: true,
+  addMaterial: true,
+  deleteMaterial: true,
+  setStance: true,
+  setReveal: true,
+  setBannerSlides: true,
+  setAnnouncement: true,
+  clearAnnouncement: true
+};
 
 function sha256Hex_(value) {
   var bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(value || ''), Utilities.Charset.UTF_8);
@@ -33,10 +56,65 @@ function authOk(username, password) {
   return username === TEACHER_USER && sha256Hex_(password) === TEACHER_HASH;
 }
 
+function isWriteAction_(action) {
+  return !!WRITE_ACTIONS[action];
+}
+
+function sanitizeParams_(params) {
+  var clean = {};
+  params = params || {};
+  Object.keys(params).forEach(function(key) {
+    if (key === 'password' || key === 'callback') return;
+    var value = params[key];
+    if (value === undefined || value === null) return;
+    value = String(value);
+    clean[key] = value.length > 240 ? value.slice(0, 240) + '...' : value;
+  });
+  return clean;
+}
+
+function logSecurityEvent_(action, username, status, details) {
+  try {
+    var props = PropertiesService.getScriptProperties();
+    var raw = props.getProperty(SECURITY_AUDIT_KEY);
+    var log = [];
+    try { if (raw) log = JSON.parse(raw); } catch(e) { log = []; }
+    log.push({
+      at: new Date().toISOString(),
+      action: action || '',
+      username: username || '',
+      status: status || '',
+      details: details || {}
+    });
+    if (log.length > 200) log = log.slice(log.length - 200);
+    props.setProperty(SECURITY_AUDIT_KEY, JSON.stringify(log));
+  } catch(e) {}
+}
+
+function getSecurityAudit(username, password) {
+  if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
+  var raw = PropertiesService.getScriptProperties().getProperty(SECURITY_AUDIT_KEY);
+  var log = [];
+  try { if (raw) log = JSON.parse(raw); } catch(e) { log = []; }
+  return { success: true, log: log };
+}
+
+function output_(result, callback) {
+  var json = JSON.stringify(result);
+  if (callback) return ContentService.createTextOutput(callback + '(' + json + ')').setMimeType(ContentService.MimeType.JAVASCRIPT);
+  return ContentService.createTextOutput(json).setMimeType(ContentService.MimeType.JSON);
+}
+
 function doGet(e) {
+  e = e || { parameter: {} };
   const action = e.parameter.action || '', callback = e.parameter.callback || '';
   let result;
   try {
+    if (isWriteAction_(action) && !WRITES_ENABLED) {
+      result = { success: false, error: 'Security maintenance: write actions are temporarily disabled.' };
+      logSecurityEvent_(action, e.parameter.username || '', 'blocked_maintenance', sanitizeParams_(e.parameter));
+      return output_(result, callback);
+    }
     if      (action === 'getStudents')    result = getStudents(e.parameter.className);
     else if (action === 'getScore')       result = getScore(e.parameter.className, e.parameter.studentNo);
     else if (action === 'getChapterScores')  result = getChapterScores(e.parameter.className, e.parameter.chapter);
@@ -53,6 +131,7 @@ function doGet(e) {
     else if (action === 'getCh4StudentFiles') result = getCh4StudentFiles(e.parameter.className, e.parameter.studentNo);
     else if (action === 'getCh5StudentFiles') result = getCh5StudentFiles(e.parameter.className, e.parameter.studentNo);
     else if (action === 'checkLogin')       result = { ok: authOk(e.parameter.username, e.parameter.password) };
+    else if (action === 'getSecurityAudit') result = getSecurityAudit(e.parameter.username, e.parameter.password);
     else if (action === 'getSummative')     result = getSummative();
     else if (action === 'getQuizAttempt')   result = getQuizAttempt(e.parameter.className, e.parameter.studentNo, e.parameter.chapter);
     else if (action === 'getGeminiKey')      result = getGeminiKey(e.parameter.username, e.parameter.password);
@@ -82,9 +161,11 @@ function doGet(e) {
     else if (action === 'clearAnnouncement') result = clearAnnouncement(e.parameter.username, e.parameter.password);
     else result = { error: 'Unknown action' };
   } catch(err) { result = { error: err.message }; }
-  const json = JSON.stringify(result);
-  if (callback) return ContentService.createTextOutput(callback + '(' + json + ')').setMimeType(ContentService.MimeType.JAVASCRIPT);
-  return ContentService.createTextOutput(json).setMimeType(ContentService.MimeType.JSON);
+  if (isWriteAction_(action)) {
+    var status = result && result.success ? 'write_success' : (result && result.error === 'Unauthorized' ? 'unauthorized_write' : 'write_failed');
+    logSecurityEvent_(action, e.parameter.username || '', status, sanitizeParams_(e.parameter));
+  }
+  return output_(result, callback);
 }
 
 function doPost(e) {
@@ -92,8 +173,16 @@ function doPost(e) {
   try { body = JSON.parse(e.postData.contents); } catch(err) {}
   let result;
   try {
-    if (body.action === 'saveTaskStatus') result = saveTaskStatus(body.username, body.password, body.className, body.studentNo, body.tasks || {});
+    if (isWriteAction_(body.action) && !WRITES_ENABLED) {
+      result = { success: false, error: 'Security maintenance: write actions are temporarily disabled.' };
+      logSecurityEvent_(body.action, body.username || '', 'blocked_maintenance', sanitizeParams_(body));
+    }
+    else if (body.action === 'saveTaskStatus') result = saveTaskStatus(body.username, body.password, body.className, body.studentNo, body.tasks || {});
   } catch(err) { result = { error: err.message }; }
+  if (isWriteAction_(body.action) && WRITES_ENABLED) {
+    var status = result && result.success ? 'write_success' : (result && result.error === 'Unauthorized' ? 'unauthorized_write' : 'write_failed');
+    logSecurityEvent_(body.action, body.username || '', status, sanitizeParams_(body));
+  }
   return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
 }
 
