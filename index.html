@@ -1115,7 +1115,7 @@
     <span class="tag">📖 English Class</span>
     <span class="tag">🏫 SMAVISKA</span>
   </div>
-  <div id="headerLoginArea" style="margin-top:14px;position:relative;z-index:2;">
+  <div id="headerLoginArea" style="margin-top:14px;position:relative;z-index:2;display:none;">
     <button id="headerLoginBtn" onclick="openHeaderLogin()" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.35);color:#fff;font-family:'IBM Plex Sans',sans-serif;font-size:0.82rem;font-weight:700;padding:8px 20px;border-radius:999px;cursor:pointer;">🔑 Teacher Login</button>
     <div id="headerTeacherBadge" style="display:none;background:var(--accent);color:#fff;font-size:0.82rem;font-weight:700;padding:8px 18px;border-radius:999px;display:none;align-items:center;gap:8px;">
       🎓 Logged in as Teacher <span style="cursor:pointer;opacity:0.8" onclick="headerLogout()">✕</span>
@@ -1918,17 +1918,35 @@ function showSummToast(msg, type) {
 
 <script>
 // ── HOMEPAGE TEACHER LOGIN ─────────────────────────────────────
+function teacherAccessRequested() {
+  var params = new URLSearchParams(window.location.search);
+  return params.get('teacher') === '1' || window.location.hash === '#teacher';
+}
+
+function showTeacherLoginEntry() {
+  var area = document.getElementById('headerLoginArea');
+  var btn = document.getElementById('headerLoginBtn');
+  if (area) area.style.display = 'block';
+  if (btn) btn.style.display = 'inline-flex';
+}
+
 (function() {
   const u = localStorage.getItem('eq_tu') || '';
   const p = localStorage.getItem('eq_tp') || '';
   if (u && p) {
     // Already logged in — verify and show badge
     fetch('https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec?action=checkLogin&username=' + encodeURIComponent(u) + '&password=' + encodeURIComponent(p))
-      .then(r => r.json()).then(d => { if (d.ok) showTeacherBadge(); }).catch(()=>{});
+      .then(r => r.json()).then(d => {
+        if (d.ok) showTeacherBadge();
+        else { localStorage.removeItem('eq_tu'); localStorage.removeItem('eq_tp'); if (teacherAccessRequested()) showTeacherLoginEntry(); }
+      }).catch(()=>{ if (teacherAccessRequested()) showTeacherLoginEntry(); });
+  } else if (teacherAccessRequested()) {
+    showTeacherLoginEntry();
   }
 })();
 
 function openHeaderLogin() {
+  if (!teacherAccessRequested() && !localStorage.getItem('eq_tu')) return;
   document.getElementById('headerLoginModal').style.display = 'flex';
   setTimeout(() => document.getElementById('hlUser').focus(), 100);
 }
@@ -1950,9 +1968,8 @@ async function doHeaderLogin() {
     const res = await fetch('https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec?action=checkLogin&username=' + encodeURIComponent(u) + '&password=' + encodeURIComponent(p));
     const data = await res.json();
     if (data.ok) {
-      const hashed = await hashPass(p);
       localStorage.setItem('eq_tu', u);
-      localStorage.setItem('eq_tp', hashed);
+      localStorage.setItem('eq_tp', p);
       window.location.reload();
     } else {
       document.getElementById('hlError').style.display = 'block';
@@ -1961,6 +1978,7 @@ async function doHeaderLogin() {
 }
 
 function showTeacherBadge() {
+  document.getElementById('headerLoginArea').style.display = 'block';
   document.getElementById('headerLoginBtn').style.display = 'none';
   const badge = document.getElementById('headerTeacherBadge');
   badge.style.display = 'inline-flex';
@@ -2304,7 +2322,7 @@ document.addEventListener('keydown', e => {
   </div>
 
   <!-- Teacher login area in sidebar -->
-  <div class="sidebar-teacher">
+  <div class="sidebar-teacher" id="sidebarTeacherBox" style="display:none;">
     <div class="sidebar-teacher-label">🔑 Teacher Access</div>
     <div id="sbTeacherLoggedOut">
       <button class="sidebar-teacher-btn" onclick="closeSidebar();openHeaderLogin();">Login as Teacher</button>
@@ -2413,7 +2431,9 @@ function closeSidebar() {
 }
 function updateSidebarTeacher() {
   const loggedIn = !!localStorage.getItem('eq_tu');
-  document.getElementById('sbTeacherLoggedOut').style.display = loggedIn ? 'none' : 'block';
+  const canShowLogin = loggedIn || teacherAccessRequested();
+  document.getElementById('sidebarTeacherBox').style.display = canShowLogin ? 'block' : 'none';
+  document.getElementById('sbTeacherLoggedOut').style.display = !loggedIn && teacherAccessRequested() ? 'block' : 'none';
   document.getElementById('sbTeacherLoggedIn').style.display  = loggedIn ? 'block' : 'none';
   var gwItem = document.getElementById('sbGuessWho');
   if (gwItem) gwItem.style.display = loggedIn ? 'flex' : 'none';

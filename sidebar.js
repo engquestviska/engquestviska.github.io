@@ -47,7 +47,7 @@
     '    <a href="gallery.html" class="sidebar-item" data-page="gallery"><div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">&#128247;</div><div class="sidebar-item-name">Photo Gallery</div></a>',
     '    <a href="chapter5_guess_who.html" class="sidebar-item" data-page="guess_who" id="sbGuessWho" style="display:none"><div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">&#129300;</div><div class="sidebar-item-name">Guess Who? <span style="font-size:0.65rem;background:#7C3AED;color:#fff;padding:1px 6px;border-radius:999px;margin-left:4px;font-family:IBM Plex Mono,monospace;">Ch.5</span></div></a>',
     '  </div>',
-    '  <div class="sidebar-teacher">',
+    '  <div class="sidebar-teacher" id="sidebarTeacherBox" style="display:none;">',
     '    <div class="sidebar-teacher-label">&#128273; Teacher Access</div>',
     '    <div id="sbTeacherLoggedOut">',
     '      <button style="width:100%;padding:10px;background:linear-gradient(135deg,#7C3AED,#5B21B6);color:#fff;font-family:inherit;font-weight:700;font-size:0.85rem;border:none;border-radius:10px;cursor:pointer;" onclick="closeSidebar();window.location.href=\'index.html\';">Login as Teacher</button>',
@@ -115,9 +115,13 @@
 
   window.updateSidebarTeacher = function () {
     var loggedIn = !!localStorage.getItem('eq_tu');
+    var params = new URLSearchParams(window.location.search);
+    var teacherAccess = params.get('teacher') === '1' || window.location.hash === '#teacher';
+    var box = document.getElementById('sidebarTeacherBox');
     var out = document.getElementById('sbTeacherLoggedOut');
     var inn = document.getElementById('sbTeacherLoggedIn');
-    if (out) out.style.display = loggedIn ? 'none' : 'block';
+    if (box) box.style.display = (loggedIn || teacherAccess) ? 'block' : 'none';
+    if (out) out.style.display = (!loggedIn && teacherAccess) ? 'block' : 'none';
     if (inn) inn.style.display = loggedIn ? 'block' : 'none';
     var gw  = document.getElementById('sbGuessWho');
     if (gw)  gw.style.display  = loggedIn ? 'flex'  : 'none';

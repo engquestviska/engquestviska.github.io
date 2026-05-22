@@ -18,13 +18,19 @@ const SCORE_SHEETS = {
 
 const TASK_SHEET_NAME = 'Task_Status';
 const TEACHER_USER    = 'teacher';
-const TEACHER_PASS    = 'engquestviska'; // plain, for legacy fallback
-const TEACHER_HASH    = '6b65c9d83a25b098f930dbe0b6ccb543923e1f95f28bb2b0b49738e6b8dac581'; // SHA-256
+const TEACHER_HASH    = '39de0394764747426b997b945770fd60661cbd072051131da2cb99d6d8dd8430';
 
-// Accept either the hash (new) or plain password (legacy fallback)
+function sha256Hex_(value) {
+  var bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, String(value || ''), Utilities.Charset.UTF_8);
+  return bytes.map(function(byte) {
+    var v = byte;
+    if (v < 0) v += 256;
+    return ('0' + v.toString(16)).slice(-2);
+  }).join('');
+}
+
 function authOk(username, password) {
-  return username === TEACHER_USER &&
-    (password === TEACHER_HASH || password === TEACHER_PASS);
+  return username === TEACHER_USER && sha256Hex_(password) === TEACHER_HASH;
 }
 
 function doGet(e) {
