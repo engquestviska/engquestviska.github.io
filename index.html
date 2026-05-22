@@ -1230,8 +1230,9 @@
   var name = localStorage.getItem('eq_student_name');
   if (!cls || !no || !name) return;
 
-  var clsLabels = { XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
+  var clsLabels = { XE1:'X E-1', XE2:'X E-2', XE3:'X E-3', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
   var asatHref = 'asat.html?cls=' + encodeURIComponent(cls) + '&no=' + encodeURIComponent(no);
+  var asatResultHref = 'asat-result.html?cls=' + encodeURIComponent(cls) + '&no=' + encodeURIComponent(no);
 
   var wrap = document.createElement('div');
   wrap.style.cssText = 'display:grid;gap:12px;margin-bottom:20px;';
@@ -1259,7 +1260,19 @@
     '</div>' +
     '<div style="font-size:1.25rem;color:rgba(255,255,255,0.62);">›</div>';
   asatCard.onclick = function() { window.location.href = asatHref; };
+  var asatResultCard = document.createElement('div');
+  asatResultCard.style.cssText = 'background:linear-gradient(135deg,#0F766E,#115E59);border-radius:18px;padding:15px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:0 8px 22px rgba(15,118,110,0.20);';
+  asatResultCard.innerHTML =
+    '<div style="width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-size:1.25rem;color:#fff;flex-shrink:0;">🎯</div>' +
+    '<div style="flex:1;">' +
+      '<div style="font-size:0.7rem;color:rgba(255,255,255,0.72);font-family:monospace;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">ASAT Result</div>' +
+      '<div style="font-weight:800;font-size:0.96rem;color:#fff;">See my multiple choice score</div>' +
+      '<div style="font-size:0.76rem;color:rgba(255,255,255,0.72);">' + (clsLabels[cls] || cls) + ' · Score, correct, and wrong numbers</div>' +
+    '</div>' +
+    '<div style="font-size:1.25rem;color:rgba(255,255,255,0.62);">›</div>';
+  asatResultCard.onclick = function() { window.location.href = asatResultHref; };
   wrap.appendChild(scoreCard);
+  wrap.appendChild(asatResultCard);
   wrap.appendChild(asatCard);
 
   var main = document.querySelector('main');
@@ -1403,6 +1416,11 @@
         <div class="card-icon ic-blue">📦</div>
         <div class="card-name">ASAT Package</div>
         <div class="card-desc">Download your assigned practice package</div>
+      </a>
+      <a href="asat-result.html" class="card">
+        <div class="card-icon ic-green">🎯</div>
+        <div class="card-name">ASAT Result</div>
+        <div class="card-desc">Check multiple choice score and review</div>
       </a>
       <a href="strikes.html" class="card">
         <div class="card-icon ic-red">⚠️</div>
@@ -2340,6 +2358,10 @@ document.addEventListener('keydown', e => {
     <a href="asat.html" class="sidebar-item">
       <div class="sidebar-item-icon" style="background:rgba(59,130,246,0.2)">📦</div>
       <div class="sidebar-item-name">ASAT Package</div>
+    </a>
+    <a href="asat-result.html" class="sidebar-item">
+      <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">🎯</div>
+      <div class="sidebar-item-name">ASAT Result</div>
     </a>
     <a href="activeness.html" class="sidebar-item">
       <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">⚡</div>
