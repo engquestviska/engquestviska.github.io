@@ -21,6 +21,8 @@ const TEACHER_USER    = 'teacher';
 const TEACHER_HASH    = '39de0394764747426b997b945770fd60661cbd072051131da2cb99d6d8dd8430';
 const WRITES_ENABLED  = false;
 const SECURITY_AUDIT_KEY = 'securityAuditLog';
+const TEACHER_SESSIONS_KEY = 'teacherSessions';
+const TEACHER_SESSION_TTL_MS = 6 * 60 * 60 * 1000;
 const WRITE_ACTIONS = {
   saveChapterScore: true,
   saveFinalScore: true,
@@ -52,8 +54,68 @@ function sha256Hex_(value) {
   }).join('');
 }
 
-function authOk(username, password) {
+function getTeacherSessions_() {
+  var raw = PropertiesService.getScriptProperties().getProperty(TEACHER_SESSIONS_KEY);
+  var sessions = [];
+  try { if (raw) sessions = JSON.parse(raw); } catch(e) { sessions = []; }
+  var now = Date.now();
+  return sessions.filter(function(s) {
+    return s && s.hash && Number(s.expiresAt || 0) > now;
+  });
+}
+
+function saveTeacherSessions_(sessions) {
+  PropertiesService.getScriptProperties().setProperty(TEACHER_SESSIONS_KEY, JSON.stringify(sessions.slice(-10)));
+}
+
+function teacherPasswordOk_(username, password) {
   return username === TEACHER_USER && sha256Hex_(password) === TEACHER_HASH;
+}
+
+function teacherSessionOk_(username, token) {
+  if (username !== TEACHER_USER || !token) return false;
+  var hash = sha256Hex_(token);
+  var sessions = getTeacherSessions_();
+  return sessions.some(function(s) { return s.hash === hash; });
+}
+
+function issueTeacherToken_(username) {
+  var token = Utilities.getUuid() + ':' + Utilities.getUuid();
+  var sessions = getTeacherSessions_();
+  sessions.push({
+    hash: sha256Hex_(token),
+    username: username,
+    createdAt: new Date().toISOString(),
+    expiresAt: Date.now() + TEACHER_SESSION_TTL_MS
+  });
+  saveTeacherSessions_(sessions);
+  return token;
+}
+
+function authOk(username, secret) {
+  return teacherPasswordOk_(username, secret) || teacherSessionOk_(username, secret);
+}
+
+function checkTeacherLogin(username, secret) {
+  if (teacherPasswordOk_(username, secret)) {
+    var token = issueTeacherToken_(username);
+    logSecurityEvent_('checkLogin', username, 'login_success', { issuedToken: true });
+    return { ok: true, token: token, expiresIn: TEACHER_SESSION_TTL_MS };
+  }
+  if (teacherSessionOk_(username, secret)) {
+    return { ok: true, expiresIn: TEACHER_SESSION_TTL_MS };
+  }
+  logSecurityEvent_('checkLogin', username || '', 'login_failed', { usernameProvided: !!username });
+  return { ok: false };
+}
+
+function teacherLogout(username, secret) {
+  if (username !== TEACHER_USER || !secret) return { success: true };
+  var hash = sha256Hex_(secret);
+  var sessions = getTeacherSessions_().filter(function(s) { return s.hash !== hash; });
+  saveTeacherSessions_(sessions);
+  logSecurityEvent_('teacherLogout', username, 'logout', {});
+  return { success: true };
 }
 
 function isWriteAction_(action) {
@@ -130,7 +192,8 @@ function doGet(e) {
     else if (action === 'getCh5Submissions')   result = getCh5Submissions();
     else if (action === 'getCh4StudentFiles') result = getCh4StudentFiles(e.parameter.className, e.parameter.studentNo);
     else if (action === 'getCh5StudentFiles') result = getCh5StudentFiles(e.parameter.className, e.parameter.studentNo);
-    else if (action === 'checkLogin')       result = { ok: authOk(e.parameter.username, e.parameter.password) };
+    else if (action === 'checkLogin')       result = checkTeacherLogin(e.parameter.username, e.parameter.password);
+    else if (action === 'teacherLogout')    result = teacherLogout(e.parameter.username, e.parameter.password);
     else if (action === 'getSecurityAudit') result = getSecurityAudit(e.parameter.username, e.parameter.password);
     else if (action === 'getSummative')     result = getSummative();
     else if (action === 'getQuizAttempt')   result = getQuizAttempt(e.parameter.className, e.parameter.studentNo, e.parameter.chapter);

@@ -284,8 +284,9 @@
     try {
       const data = await apiGet({ action: 'checkLogin', username: u, password: p });
       if (data.ok) {
-        savedUser = u; savedPass = p;
-        localStorage.setItem('eq_tu', u); localStorage.setItem('eq_tp', p);
+        const token = data.token || p;
+        savedUser = u; savedPass = token;
+        localStorage.setItem('eq_tu', u); localStorage.setItem('eq_tp', token);
         document.getElementById('loginWall').classList.add('hidden');
         document.getElementById('mainPanel').classList.remove('hidden');
         document.getElementById('headerRight').innerHTML = `<div class="teacher-badge">🎓 Teacher <span class="logout-x" onclick="logout()">✕</span></div>`;
@@ -297,6 +298,7 @@
   }
 
   function logout() {
+    if (savedUser && savedPass) apiGet({ action: 'teacherLogout', username: savedUser, password: savedPass }).catch(function(){});
     savedUser = ''; savedPass = '';
     localStorage.removeItem('eq_tu'); localStorage.removeItem('eq_tp');
     document.getElementById('loginWall').classList.remove('hidden');

@@ -382,10 +382,6 @@
   }
 
   // ── LOGIN ────────────────────────────────────────────────────
-  async function hashPass(plain) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(plain));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-  }
   function openLogin()  { document.getElementById('loginModal').classList.remove('hidden'); setTimeout(() => document.getElementById('loginUser').focus(), 100); }
   function closeLogin() { document.getElementById('loginModal').classList.add('hidden'); document.getElementById('loginError').style.display = 'none'; }
 
@@ -399,10 +395,9 @@
     try {
       const data = await apiGet({ action: 'checkLogin', username: u, password: p });
       if (data.ok) {
-        // If silent (auto-login from localStorage), p is already a hash — don't re-hash
-        const hashed = silent ? p : await hashPass(p);
-        isTeacher = true; savedUser = u; savedPass = hashed;
-        localStorage.setItem('eq_tu', u); localStorage.setItem('eq_tp', hashed);
+        const token = data.token || p;
+        isTeacher = true; savedUser = u; savedPass = token;
+        localStorage.setItem('eq_tu', u); localStorage.setItem('eq_tp', token);
         closeLogin();
         document.getElementById('headerRight').innerHTML = `<div class="teacher-badge">🎓 Teacher <span class="logout-x" onclick="logout()">✕</span></div>`;
         document.getElementById('tabTeacher').classList.remove('hidden');
@@ -414,6 +409,7 @@
   }
 
   function logout() {
+    if (savedUser && savedPass) apiGet({ action: 'teacherLogout', username: savedUser, password: savedPass }).catch(function(){});
     isTeacher = false; savedUser = ''; savedPass = '';
     localStorage.removeItem('eq_tu'); localStorage.removeItem('eq_tp');
     document.getElementById('headerRight').innerHTML = `<button class="teacher-btn" onclick="openLogin()">🔑 Teacher</button>`;

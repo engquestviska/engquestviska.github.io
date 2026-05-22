@@ -450,9 +450,10 @@
     try {
       const data = await apiGet({ action: 'checkLogin', username: u, password: p });
       if (data.ok) {
-        isTeacher = true; savedUser = u; savedPass = p;
+        const token = data.token || p;
+        isTeacher = true; savedUser = u; savedPass = token;
         sessionStorage.setItem('eq_u', u);
-        sessionStorage.setItem('eq_p', p);
+        sessionStorage.setItem('eq_p', token);
         closeLogin();
         setTeacherUI(true);
         if (!silent) showToast('✅ Logged in as Teacher', 'ok');
@@ -464,6 +465,7 @@
   }
 
   function logout() {
+    if (savedUser && savedPass) apiGet({ action: 'teacherLogout', username: savedUser, password: savedPass }).catch(function(){});
     isTeacher = false; savedUser = ''; savedPass = '';
     sessionStorage.removeItem('eq_u'); sessionStorage.removeItem('eq_p');
     setTeacherUI(false);

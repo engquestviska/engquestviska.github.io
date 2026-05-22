@@ -1873,6 +1873,7 @@ if (summUser && summPass) {
   summApiGet({ action:'checkLogin', username:summUser, password:summPass })
     .then(d => {
       if (d.ok) {
+        if (d.token) localStorage.setItem('eq_tp', d.token);
         summTeacher = true;
         document.getElementById('summEditBtn').classList.add('visible');
         // Also show floating set button in case banner is hidden
@@ -2031,7 +2032,7 @@ function showTeacherLoginEntry() {
     // Already logged in — verify and show badge
     fetch('https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec?action=checkLogin&username=' + encodeURIComponent(u) + '&password=' + encodeURIComponent(p))
       .then(r => r.json()).then(d => {
-        if (d.ok) showTeacherBadge();
+        if (d.ok) { if (d.token) localStorage.setItem('eq_tp', d.token); showTeacherBadge(); }
         else { localStorage.removeItem('eq_tu'); localStorage.removeItem('eq_tp'); if (teacherAccessRequested()) showTeacherLoginEntry(); }
       }).catch(()=>{ if (teacherAccessRequested()) showTeacherLoginEntry(); });
   } else if (teacherAccessRequested()) {
@@ -2049,11 +2050,6 @@ function closeHeaderLogin() {
   document.getElementById('hlError').style.display = 'none';
 }
 
-async function hashPass(plain) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(plain));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-}
-
 async function doHeaderLogin() {
   const u = document.getElementById('hlUser').value.trim();
   const p = document.getElementById('hlPass').value.trim();
@@ -2063,7 +2059,7 @@ async function doHeaderLogin() {
     const data = await res.json();
     if (data.ok) {
       localStorage.setItem('eq_tu', u);
-      localStorage.setItem('eq_tp', p);
+      localStorage.setItem('eq_tp', data.token || p);
       window.location.reload();
     } else {
       document.getElementById('hlError').style.display = 'block';
@@ -2079,6 +2075,11 @@ function showTeacherBadge() {
 }
 
 function headerLogout() {
+  const u = localStorage.getItem('eq_tu') || '';
+  const p = localStorage.getItem('eq_tp') || '';
+  if (u && p) {
+    fetch('https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec?action=teacherLogout&username=' + encodeURIComponent(u) + '&password=' + encodeURIComponent(p)).catch(()=>{});
+  }
   localStorage.removeItem('eq_tu');
   localStorage.removeItem('eq_tp');
   window.location.reload();
