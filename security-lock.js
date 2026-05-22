@@ -2,8 +2,23 @@
   var SECURITY_MAINTENANCE = true;
   if (!SECURITY_MAINTENANCE) return;
 
+  var LOCKED_PAGES = {
+    'submission.html': true,
+    'attendance.html': true,
+    'activeness.html': true,
+    'strikes.html': true,
+    'gallery.html': true,
+    'summative.html': true,
+    'quiz.html': true,
+    'jeopardyquiz.html': true,
+    'chapter5_guess_who.html': true
+  };
+
+  var page = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
+  if (!LOCKED_PAGES[page]) return;
+
   var MESSAGE_TITLE = 'English Quest is temporarily locked.';
-  var MESSAGE_BODY = 'We are checking and securing the system. During this maintenance, student pages, submissions, scores, task status, ASAT packages, and teacher tools are unavailable.';
+  var MESSAGE_BODY = 'This page is temporarily closed while we secure the system. Read-only pages such as scores, task status, materials, ASAT package, and ASAT result remain available.';
   var MESSAGE_NOTE = 'Please wait for the official update in your class group before using the website again.';
 
   document.documentElement.className += ' security-maintenance-html';
