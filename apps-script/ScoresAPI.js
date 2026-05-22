@@ -122,6 +122,10 @@ function isWriteAction_(action) {
   return !!WRITE_ACTIONS[action];
 }
 
+function isMaintenanceAllowedWrite_(action) {
+  return action === 'syncCh5Student' || action === 'syncCh5Class';
+}
+
 function sanitizeParams_(params) {
   var clean = {};
   params = params || {};
@@ -172,7 +176,7 @@ function doGet(e) {
   const action = e.parameter.action || '', callback = e.parameter.callback || '';
   let result;
   try {
-    if (isWriteAction_(action) && !WRITES_ENABLED) {
+    if (isWriteAction_(action) && !WRITES_ENABLED && !isMaintenanceAllowedWrite_(action)) {
       result = { success: false, error: 'Security maintenance: write actions are temporarily disabled.' };
       logSecurityEvent_(action, e.parameter.username || '', 'blocked_maintenance', sanitizeParams_(e.parameter));
       return output_(result, callback);
@@ -236,13 +240,13 @@ function doPost(e) {
   try { body = JSON.parse(e.postData.contents); } catch(err) {}
   let result;
   try {
-    if (isWriteAction_(body.action) && !WRITES_ENABLED) {
+    if (isWriteAction_(body.action) && !WRITES_ENABLED && !isMaintenanceAllowedWrite_(body.action)) {
       result = { success: false, error: 'Security maintenance: write actions are temporarily disabled.' };
       logSecurityEvent_(body.action, body.username || '', 'blocked_maintenance', sanitizeParams_(body));
     }
     else if (body.action === 'saveTaskStatus') result = saveTaskStatus(body.username, body.password, body.className, body.studentNo, body.tasks || {});
   } catch(err) { result = { error: err.message }; }
-  if (isWriteAction_(body.action) && WRITES_ENABLED) {
+  if (isWriteAction_(body.action) && (WRITES_ENABLED || isMaintenanceAllowedWrite_(body.action))) {
     var status = result && result.success ? 'write_success' : (result && result.error === 'Unauthorized' ? 'unauthorized_write' : 'write_failed');
     logSecurityEvent_(body.action, body.username || '', status, sanitizeParams_(body));
   }
