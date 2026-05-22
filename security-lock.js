@@ -3,7 +3,6 @@
   if (!SECURITY_MAINTENANCE) return;
 
   var LOCKED_PAGES = {
-    'submission.html': true,
     'attendance.html': true,
     'activeness.html': true,
     'strikes.html': true,
