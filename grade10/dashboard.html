@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="../shared/css/system.css?v=20260505-dashboard"/>
   <script src="../shared/js/api.js"></script>
   <script src="../shared/js/attendance.js"></script>
+  <script src="../shared/js/sidebar.js"></script>
   <style>
     .student-dashboard-page {
       --primary: #2563eb;
@@ -288,7 +289,7 @@
     }
   </style>
 </head>
-<body class="student-dashboard-page">
+<body class="student-dashboard-page" data-page="dashboard">
   <div class="dashboard-shell">
     <header class="topbar">
       <div class="brand">
@@ -301,6 +302,7 @@
       <nav class="nav" aria-label="Main navigation">
         <a href="index.html">Grade 10 Home</a>
         <a href="../index.html">Choose Grade</a>
+        <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
       </nav>
     </header>
 
