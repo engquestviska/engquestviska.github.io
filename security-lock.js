@@ -1,5 +1,5 @@
 (function () {
-  var SECURITY_MAINTENANCE = true;
+  var SECURITY_MAINTENANCE = false;
   if (!SECURITY_MAINTENANCE) return;
 
   var LOCKED_PAGES = {
