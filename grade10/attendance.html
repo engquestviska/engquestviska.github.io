@@ -589,6 +589,32 @@
       studentSelect.disabled = students.length === 0;
     }
 
+    function savedProfile() {
+      return {
+        className: localStorage.getItem('eq_student_class') || '',
+        studentNo: localStorage.getItem('eq_student_no') || '',
+        studentName: localStorage.getItem('eq_student_name') || ''
+      };
+    }
+
+    function rememberStudent(student) {
+      if (!student || !currentClass) return;
+      localStorage.setItem('eq_grade', '10');
+      localStorage.setItem('eq_student_class', currentClass);
+      localStorage.setItem('eq_student_no', student.no || '');
+      localStorage.setItem('eq_student_name', student.name || '');
+    }
+
+    function openSavedStudent() {
+      const profile = savedProfile();
+      if (!profile.studentNo || profile.className !== currentClass) return false;
+      const index = currentStudents.findIndex(student => String(student.no) === String(profile.studentNo));
+      if (index < 0) return false;
+      studentSelect.value = String(index);
+      renderStudent(currentStudents[index]);
+      return true;
+    }
+
     async function loadClass(className) {
       currentClass = className;
       currentStudents = [];
@@ -607,6 +633,10 @@
         pickerHint.textContent = currentStudents.length
           ? currentStudents.length + ' students found. Choose your name to view your record.'
           : 'No students found for this class yet.';
+        if (openSavedStudent()) {
+          pickerHint.textContent = 'Showing your saved attendance profile.';
+          return;
+        }
         showEmpty('Choose your name.', 'Your attendance dashboard will appear after you select a student.');
       } catch (error) {
         studentSelect.innerHTML = '<option value="">Could not load students</option>';
@@ -634,7 +664,15 @@
         showEmpty('Choose your name.', 'Your attendance dashboard will appear after you select a student.');
         return;
       }
+      rememberStudent(student);
       renderStudent(student);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const profile = savedProfile();
+      if (!profile.className) return;
+      classSelect.value = profile.className;
+      loadClass(profile.className);
     });
   </script>
 </body>
