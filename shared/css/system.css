@@ -1854,13 +1854,18 @@ a.module:hover {
 .sidebar-head-sub { color: rgba(255, 255, 255, 0.45); font-size: 0.7rem; margin-top: 2px; }
 
 .sidebar-close {
-  width: 30px;
-  height: 30px;
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
   border: none;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.62);
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
 }
 
 .sidebar-home-btn {
