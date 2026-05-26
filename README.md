@@ -8,16 +8,24 @@ This branch is a safe draft space for preparing the website for the next school 
 
 ## What This Site Contains
 
-English Quest is a static GitHub Pages website for class activities, scores, attendance, task tracking, submissions, lessons, and gallery pages.
+English Quest is a static GitHub Pages website being rebuilt into three clear tracks:
+
+- `teacher/` - teacher-only dashboard and Grade 10 management tools.
+- `grade10/` - Grade 10 student-facing pages for class work and personal data.
+- `grade11/` - Grade 11 student-facing placeholders until real Grade 11 data exists.
 
 Important files and folders:
 
-- `index.html` - main landing/dashboard page.
-- `shared/js/sidebar.js` - shared sidebar/navigation script used by Grade 10 pages on this branch.
-- `scores.html`, `attendance.html`, `students.html`, `tasks.html`, `strikes.html` - teacher/student tracking pages.
-- `submission.html`, `submission_status.html` - submission workflow pages.
-- `lessons.html`, `assignments.html`, `session.html`, `quiz.html`, `jeopardyquiz.html`, `chapter5_guess_who.html` - learning/activity pages.
-- `gallery.html` - class photo gallery.
+- `index.html` - landing page for choosing Grade 10, Grade 11, or Teacher.
+- `grade10/index.html` - Grade 10 student home and profile setup.
+- `grade10/dashboard.html` - Grade 10 personal statistics dashboard.
+- `grade10/strikes.html` - Grade 10 student-facing strike tracker.
+- `teacher/index.html` - teacher control room.
+- `teacher/materials.html`, `teacher/assignments.html`, `teacher/submissions.html`, `teacher/attendance.html`, `teacher/activeness.html`, `teacher/announcements.html`, `teacher/scores.html`, `teacher/tasks.html`, `teacher/strikes.html` - Grade 10 teacher managers.
+- `grade11/` - matching Grade 11 placeholder structure without spreadsheet connections yet.
+- `shared/css/system.css` - shared design system styles.
+- `shared/js/api.js`, `shared/js/auth.js`, `shared/js/sidebar.js`, `shared/js/teacher-sidebar.js` - shared API, auth, and navigation helpers.
+- `quiz.html`, `jeopardyquiz.html`, `chapter5_guess_who.html`, `submission_status.html`, `summative.html`, `gallery.html` - legacy root pages still used during the transition.
 - `apps-script/` - Google Apps Script backend source for the main data API.
 - `chapter5-submission/` - Google Apps Script source for the Chapter 5 submission flow.
 - `images/` - local image assets used by activities.
@@ -35,10 +43,10 @@ This preview is useful for checking layout and basic behavior, but the final liv
 ## Editing Workflow
 
 1. Work on the `next-year` branch.
-2. Preview pages locally by opening `index.html` in a browser.
+2. Preview pages locally with a static server or by opening `index.html` in a browser.
 3. Commit related changes with clear messages.
 4. Push `next-year` to GitHub.
-5. Test the draft preview link above.
+5. Test the draft preview link above. If RawGitHack branch cache lags, test the exact commit URL.
 6. Merge into `main` only when the next-year version is ready to become live.
 
 Useful commands:
@@ -60,9 +68,9 @@ Some pages depend on Google Apps Script, Google Sheets, Google Drive, and YouTub
 ## Next-Year Goals
 
 - Prepare structure for a new school year.
-- Support Grade 10 and possibly Grade 11 separately.
+- Support Grade 10 and Grade 11 as separate student tracks.
 - Keep student lists/data separate by school year and class.
-- Clean up the large `index.html` file over time.
+- Keep teacher editing tools inside `teacher/`.
 - Improve mobile layout, performance, and teacher workflow.
 
 ## Before Going Live
