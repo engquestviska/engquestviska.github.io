@@ -1540,7 +1540,7 @@
 </main>
 
 <!-- ── FOOTER ── -->
-<footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
+<footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong id="teacherFooterTrigger" onclick="handleTeacherFooterTrigger()">LaksMedia</strong></footer>
 
 
 <script>
@@ -1999,9 +1999,13 @@ function showSummToast(msg, type) {
 
 <script>
 // ── HOMEPAGE TEACHER LOGIN ─────────────────────────────────────
+var teacherFooterUnlocked = false;
+var teacherFooterClicks = 0;
+var teacherFooterTimer = null;
+
 function teacherAccessRequested() {
   var params = new URLSearchParams(window.location.search);
-  return params.get('teacher') === '1' || window.location.hash === '#teacher';
+  return teacherFooterUnlocked || params.get('teacher') === '1' || window.location.hash === '#teacher';
 }
 
 function showTeacherLoginEntry() {
@@ -2030,6 +2034,18 @@ function openHeaderLogin() {
   if (!teacherAccessRequested() && !localStorage.getItem('eq_tu')) return;
   document.getElementById('headerLoginModal').style.display = 'flex';
   setTimeout(() => document.getElementById('hlUser').focus(), 100);
+}
+
+function handleTeacherFooterTrigger() {
+  teacherFooterClicks++;
+  clearTimeout(teacherFooterTimer);
+  teacherFooterTimer = setTimeout(function() { teacherFooterClicks = 0; }, 2500);
+  if (teacherFooterClicks < 5) return;
+
+  teacherFooterClicks = 0;
+  teacherFooterUnlocked = true;
+  showTeacherLoginEntry();
+  openHeaderLogin();
 }
 function closeHeaderLogin() {
   document.getElementById('headerLoginModal').style.display = 'none';
