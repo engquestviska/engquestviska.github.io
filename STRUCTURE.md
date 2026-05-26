@@ -69,6 +69,6 @@ Some older pages still live at the root while the revamp is in progress. They sh
 - `gallery.html` - legacy gallery with student upload and teacher approval controls.
 - `jeopardyquiz.html` - legacy classroom quiz game.
 - `quiz.html` - legacy Grade 10 quiz/activity hub, linked from the Grade 10 home while the games are still at the root.
-- `strikes.html` redirects to `teacher/strikes.html` for old links.
+- `strikes.html` redirects to `grade10/strikes.html` for old student links.
 - `submission_status.html` - legacy read-only submission status overview.
 - `summative.html` - legacy summative topic lookup with teacher reveal controls.
