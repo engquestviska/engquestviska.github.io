@@ -8,31 +8,31 @@ This roadmap keeps the next-year rebuild focused. The goal is one English Quest 
 
 ## Urgent
 
-1. Define the new file/folder structure.
+1. Define the new file/folder structure. Done.
    - Decide where Grade 10 pages live.
    - Decide where Grade 11 pages live.
    - Decide where teacher-only pages live.
    - Decide where shared CSS, JS, and assets live.
 
-2. Build a shared design system.
+2. Build a shared design system. In place, continue cleanup as pages are touched.
    - Shared layout shell.
    - Shared buttons, cards, tabs, forms, and status styles.
    - Shared mobile rules.
    - Track colors for Grade 10, Grade 11, and Teacher.
 
-3. Make navigation consistent.
+3. Make navigation consistent. Launch baseline is in place.
    - Landing page routes to Grade 10, Grade 11, and Teacher.
    - Grade 10 pages stay inside Grade 10.
    - Grade 11 pages stay inside Grade 11.
    - Teacher pages stay inside Teacher tools.
    - Every page should have a clear way back to its track dashboard.
 
-4. Separate teacher tools from student pages.
+4. Separate teacher tools from student pages. Grade 10 launch baseline is in place.
    - Student pages should be for viewing and submitting.
    - Teacher dashboard should handle editing, posting, scoring, activeness, and management.
-   - Existing Grade 10 pages may still contain teacher controls, so those need to move over time.
+   - Keep auditing legacy root pages before moving them into the new tracks.
 
-5. Revamp Grade 10 core pages first.
+5. Revamp Grade 10 core pages first. Done for launch baseline.
    - Lesson Materials.
    - Assignments.
    - Submission.
@@ -45,7 +45,13 @@ This roadmap keeps the next-year rebuild focused. The goal is one English Quest 
 
 ## Important Next
 
-1. Technical consolidation before more feature pages.
+1. Final launch QA on `next-year`.
+   - Keep `main` untouched until the planned switchover.
+   - Re-run local route checks after each meaningful batch.
+   - Verify the pushed preview by commit URL when RawGitHack branch cache lags.
+   - Confirm student-facing pages do not expose teacher editing routes.
+
+2. Technical consolidation before more feature pages.
    - Move repeated API helpers into `shared/js/api.js`.
    - Move teacher login/session helpers into `shared/js/auth.js`.
    - Refactor newest teacher tools first: `teacher/tasks.html` and `teacher/scores.html`.
@@ -53,13 +59,13 @@ This roadmap keeps the next-year rebuild focused. The goal is one English Quest 
    - Initial API/auth and teacher tool shell extraction is in place; continue this pattern for new manager pages.
    - Do this before building more manager pages, otherwise the site will become harder to maintain.
 
-2. Create Grade 11 page equivalents.
+3. Create Grade 11 page equivalents. Done for placeholder baseline.
    - Use the same structure as Grade 10 first.
    - Keep data/content as placeholders until real Grade 11 data exists.
    - Avoid mixing Grade 10 data into Grade 11.
    - Student statistics and strikes placeholders now exist so Grade 11 mirrors the newer Grade 10 student surfaces.
 
-3. Improve Teacher Dashboard.
+4. Improve Teacher Dashboard.
    - Manage Grade 10 and Grade 11 from one place.
    - Add sections for content, scores, attendance, tasks, submissions, activeness, and announcements.
    - Make it clear which grade is being edited.
@@ -71,12 +77,12 @@ This roadmap keeps the next-year rebuild focused. The goal is one English Quest 
    - Activeness manager is now teacher-side for Grade 10 participation point updates.
    - Announcements are now teacher-side for publishing the current Grade 10 update.
 
-4. Plan data separation.
+5. Plan data separation.
    - Decide how Google Sheets and Apps Script will separate Grade 10 and Grade 11.
    - Keep the current Apps Script as Grade 10 for now.
    - Add Grade 11 only when real data exists.
 
-5. Improve mobile UX.
+6. Improve mobile UX.
    - Larger tap targets.
    - Simpler navigation.
    - Cleaner cards.
