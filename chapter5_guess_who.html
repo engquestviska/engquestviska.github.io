@@ -150,20 +150,41 @@
     .toast.good { background:#065F46; color:#fff; }
     .toast.bad { background:#991B1B; color:#fff; }
     .toast:not(.good):not(.bad) { background:#0F172A; color:#fff; }
+    .teacher-access-card { min-height:100vh; display:grid; place-items:center; padding:24px; background:linear-gradient(135deg,#eff6ff,#f8fafc); }
+    .teacher-access-card[hidden] { display:none; }
+    .teacher-access-inner { width:min(560px,100%); background:#fff; border:1.5px solid var(--border); border-radius:24px; padding:30px; box-shadow:0 24px 60px rgba(37,99,235,0.12); text-align:left; }
+    .teacher-access-inner h1 { font-family:'Playfair Display',serif; font-size:clamp(2rem,6vw,3.4rem); line-height:0.95; margin:14px 0; color:var(--text-dark); }
+    .teacher-access-inner p { color:var(--text-muted); font-weight:600; line-height:1.65; margin-bottom:22px; }
+    .teacher-access-actions { display:grid; gap:10px; }
+    .teacher-access-actions .btn-primary { display:flex; align-items:center; justify-content:center; text-decoration:none; }
+    .teacher-access-actions .btn-primary.secondary { background:#DBEAFE; color:#1D4ED8; }
 
     @media(max-width:600px) {
       .game-actions { flex-direction:column; }
       .silhouette-wrap { height:200px; }
     }
   </style>
+  <script src="shared/js/auth.js"></script>
   <script src="sidebar.js"></script>
 </head>
 <body data-page="chapter5_guess_who">
 
+<section class="teacher-access-card" id="teacherAccessCard" hidden>
+  <div class="teacher-access-inner">
+    <div class="round-badge">Teacher Only</div>
+    <h1>Guess Who is a teacher-led activity.</h1>
+    <p>Open the teacher dashboard and log in first. Students should use the Activity Hub unless the teacher is running this game in class.</p>
+    <div class="teacher-access-actions">
+      <a class="btn-primary" href="teacher/">Open Teacher Dashboard</a>
+      <a class="btn-primary secondary" href="quiz.html">Back to Activity Hub</a>
+    </div>
+  </div>
+</section>
+
 <!-- SETUP SCREEN -->
 <div id="setup-screen" class="screen active">
   <div class="page-header">
-    <a class="back-btn" href="index.html">&#8592; Back</a>
+    <a class="back-btn" href="quiz.html">&#8592; Back</a>
     <h1>Guess <span>Who?</span></h1>
     <p class="page-header-sub">Chapter 5 · Narrative Text · English Quest · Mr. Laksma</p>
   </div>
@@ -316,6 +337,15 @@
 <div class="toast" id="toast"></div>
 
 <script>
+(function guardTeacherGame() {
+  if (window.EQAuth && EQAuth.hasTeacher()) return;
+  document.querySelectorAll('.screen, #topbar').forEach(function(el) {
+    el.hidden = true;
+  });
+  var access = document.getElementById('teacherAccessCard');
+  if (access) access.hidden = false;
+})();
+
 // ─────────────────────────────────────────────
 // DATA
 // ─────────────────────────────────────────────

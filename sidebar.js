@@ -19,7 +19,7 @@
     '.sidebar-head-text { flex:1; }' +
     '.sidebar-head-title { font-family:"Playfair Display",serif; font-size:1rem; font-weight:800; color:#fff; }' +
     '.sidebar-head-sub { margin-top:1px; color:rgba(255,255,255,0.45); font-size:0.7rem; }' +
-    '.sidebar-close { width:30px; height:30px; border:0; border-radius:50%; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.65); cursor:pointer; font-size:1rem; }' +
+    '.sidebar-close { width:38px; min-width:38px; height:38px; border:0; border-radius:50%; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.08); color:rgba(255,255,255,0.65); cursor:pointer; font-size:1rem; }' +
     '.sidebar-section { padding:14px 16px 4px; }' +
     '.sidebar-section-label { padding:0 4px; margin-bottom:6px; color:rgba(255,255,255,0.3); font:700 0.65rem "IBM Plex Mono", monospace; text-transform:uppercase; letter-spacing:0.12em; }' +
     '.sidebar-item { display:flex; align-items:center; gap:12px; padding:11px 12px; margin-bottom:2px; border-radius:12px; text-decoration:none; transition:background 0.15s; }' +
@@ -66,7 +66,7 @@
     '    <div class="sidebar-section-label">&#127919; Activities</div>',
     '    <a href="quiz.html" class="sidebar-item" data-page="quiz"><div class="sidebar-item-icon" style="background:rgba(37,99,235,0.2)">QZ</div><div class="sidebar-item-name">Activity Hub</div></a>',
     '    <a href="jeopardyquiz.html" class="sidebar-item" data-page="jeopardyquiz"><div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">J</div><div class="sidebar-item-name">Jeopardy Quiz</div></a>',
-    '    <a href="chapter5_guess_who.html" class="sidebar-item" data-page="chapter5_guess_who"><div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">GW</div><div class="sidebar-item-name">Guess Who</div><span class="sidebar-item-badge">Teacher</span></a>',
+    '    <a href="chapter5_guess_who.html" class="sidebar-item" data-page="chapter5_guess_who" data-teacher-only="true"><div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">GW</div><div class="sidebar-item-name">Guess Who</div><span class="sidebar-item-badge">Teacher</span></a>',
     '  </div>',
     '  <div class="sidebar-divider"></div>',
     '  <div class="sidebar-section">',
@@ -93,8 +93,12 @@
 
   function updateSidebarTeacher() {
     var box = document.getElementById('sidebarTeacherState');
+    document.querySelectorAll('[data-teacher-only="true"]').forEach(function (el) {
+      el.hidden = !hasTeacher();
+    });
     if (!box) return;
     if (hasTeacher()) {
+      box.hidden = false;
       box.innerHTML =
         '<div class="sidebar-teacher-label">Teacher Session</div>' +
         '<div class="sidebar-teacher-logged">' +
@@ -105,9 +109,8 @@
         '</div>';
       return;
     }
-    box.innerHTML =
-      '<div class="sidebar-teacher-label">Teacher</div>' +
-      '<a href="teacher/" style="color:#fff;text-decoration:none;font-size:0.86rem;font-weight:700;">Open teacher dashboard</a>';
+    box.hidden = true;
+    box.innerHTML = '';
   }
 
   function ensureMenuButton() {
