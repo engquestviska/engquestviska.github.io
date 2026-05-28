@@ -5,8 +5,19 @@
 const FOLDER_ID = '1mrV8NBGb8SyxX6oyxU_GNSJM_Q9GF3bP';
 const SHEET_NAME = 'Students';
 const RESPONSES_SHEET = 'Responses';
+const SUBMISSIONS_OPEN = false;
 
 function doGet(e) {
+  if (!SUBMISSIONS_OPEN) {
+    return HtmlService.createHtmlOutput(
+      '<!doctype html><html><head><meta name="viewport" content="width=device-width, initial-scale=1">' +
+      '<title>Submission Closed</title>' +
+      '<style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f0ebf8;font-family:Arial,sans-serif;color:#202124;padding:24px;box-sizing:border-box}.card{max-width:560px;background:#fff;border-top:10px solid #673ab7;border-radius:10px;padding:30px 26px;box-shadow:0 2px 10px rgba(0,0,0,.12);text-align:center}h1{font-size:24px;margin:0 0 10px;font-weight:700}p{font-size:15px;line-height:1.6;color:#5f6368;margin:0}</style>' +
+      '</head><body><main class="card"><h1>Chapter 5 submission is closed</h1><p>Task submission is no longer accepting new uploads. Please contact your teacher if you need help.</p></main></body></html>'
+    ).setTitle('Submission Closed')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+      .addMetaTag("viewport", "width=device-width, initial-scale=1.0");
+  }
   return HtmlService.createHtmlOutputFromFile('Index')
     .setTitle('Chapter 5 Task Submission')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
@@ -46,6 +57,7 @@ function trySetSharingSafe(file) {
 }
 
 function uploadFile(base64Data, fileName, mimeType, className, studentName, taskLabel) {
+  if (!SUBMISSIONS_OPEN) return { success: false, error: 'Chapter 5 submission is closed.' };
   try {
     var mainFolder = DriveApp.getFolderById(FOLDER_ID);
 
@@ -89,6 +101,7 @@ function checkSubmission(className, studentName) {
 
 // taskFileIds: array of 5 items (Task 1-5), each is an array of fileIds
 function submitForm(className, studentName, taskFileIds) {
+  if (!SUBMISSIONS_OPEN) return { success: false, error: 'Chapter 5 submission is closed.' };
   try {
     var ss = getSpreadsheet();
     var sheet = ss.getSheetByName(RESPONSES_SHEET);
