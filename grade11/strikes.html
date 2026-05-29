@@ -7,120 +7,9 @@
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css"/>
-  <style>
-    .strike-placeholder-shell {
-      width: min(980px, 100%);
-      margin: 0 auto;
-      padding: 22px;
-    }
-
-    .strike-placeholder-hero {
-      border-radius: 34px;
-      background: linear-gradient(135deg, #7c3aed 0%, #4338ca 54%, #312e81 100%);
-      color: #fff;
-      padding: clamp(30px, 6vw, 58px);
-      box-shadow: var(--shadow);
-      margin-bottom: 24px;
-    }
-
-    .strike-placeholder-hero h1,
-    .strike-placeholder-hero .hero-copy {
-      max-width: 720px;
-    }
-
-    .strike-placeholder-panel {
-      border: 1.5px solid #ddd6fe;
-      border-radius: 28px;
-      background: rgba(255, 255, 255, 0.94);
-      box-shadow: 0 22px 60px rgba(79, 70, 229, 0.08);
-      padding: clamp(22px, 4vw, 32px);
-    }
-
-    .strike-rule-grid {
-      display: grid;
-      grid-template-columns: 0.75fr 1.25fr;
-      gap: 18px;
-      align-items: stretch;
-    }
-
-    .strike-count-preview {
-      border-radius: 24px;
-      background: #312e81;
-      color: #fff;
-      padding: 24px;
-      display: grid;
-      align-content: space-between;
-      min-height: 260px;
-    }
-
-    .count-label,
-    .section-label {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.72rem;
-      font-weight: 900;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    .count-label {
-      color: #ddd6fe;
-    }
-
-    .count-value {
-      font: 800 clamp(4.4rem, 12vw, 7rem) 'IBM Plex Sans', sans-serif;
-      line-height: 0.9;
-      margin: 18px 0;
-    }
-
-    .count-copy,
-    .rule-copy {
-      color: #64748b;
-      font-weight: 600;
-      line-height: 1.65;
-    }
-
-    .strike-count-preview .count-copy {
-      color: rgba(255, 255, 255, 0.72);
-    }
-
-    .rule-card {
-      border-radius: 24px;
-      border: 1.5px solid #ddd6fe;
-      background: #faf5ff;
-      padding: 22px;
-    }
-
-    .rule-list {
-      display: grid;
-      gap: 12px;
-      margin-top: 16px;
-    }
-
-    .rule-item {
-      border: 1px solid #ddd6fe;
-      border-radius: 18px;
-      background: #fff;
-      padding: 14px;
-      font-weight: 800;
-      color: #312e81;
-    }
-
-    .action-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 22px;
-    }
-
-    @media (max-width: 760px) {
-      .strike-rule-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
 </head>
 <body class="track-page grade11-page">
-  <div class="strike-placeholder-shell">
+  <div class="placeholder-shell narrow">
     <header class="topbar">
       <div class="brand">
         <img src="../logo.jpg" alt="English Quest Logo"/>
@@ -137,32 +26,32 @@
     </header>
 
     <main>
-      <section class="strike-placeholder-hero">
+      <section class="placeholder-hero simple">
         <div class="kicker">My Strikes</div>
         <h1>Grade 11 strike tracking will live here.</h1>
         <p class="hero-copy">The rule structure is ready, but no Grade 11 warning records are connected until the real Grade 11 roster and teacher workflow exist.</p>
       </section>
 
-      <section class="strike-placeholder-panel">
-        <div class="strike-rule-grid">
-          <article class="strike-count-preview">
+      <section class="placeholder-panel">
+        <div class="placeholder-rule-grid">
+          <article class="placeholder-count-preview">
             <div>
-              <div class="count-label">Current Status</div>
-              <div class="count-value">--</div>
+              <div class="placeholder-count-label">Current Status</div>
+              <div class="placeholder-count-value">--</div>
             </div>
-            <p class="count-copy">No Grade 11 strike source is connected yet.</p>
+            <p class="placeholder-copy">No Grade 11 strike source is connected yet.</p>
           </article>
 
-          <article class="rule-card">
-            <div class="section-label">Policy Preview</div>
+          <article class="placeholder-rule-card">
+            <div class="placeholder-card-label">Policy Preview</div>
             <h2>Same warning logic, separate data.</h2>
-            <p class="rule-copy">When Grade 11 becomes live, this page should read only Grade 11 warning records. Students will only view their own status.</p>
-            <div class="rule-list">
-              <div class="rule-item">1 strike: cannot join summative test.</div>
-              <div class="rule-item">3 strikes: cannot join class.</div>
-              <div class="rule-item">Teacher dashboard owns all strike changes.</div>
+            <p class="placeholder-copy">When Grade 11 becomes live, this page should read only Grade 11 warning records. Students will only view their own status.</p>
+            <div class="placeholder-rule-list">
+              <div class="placeholder-rule-item">1 strike: cannot join summative test.</div>
+              <div class="placeholder-rule-item">3 strikes: cannot join class.</div>
+              <div class="placeholder-rule-item">Teacher dashboard owns all strike changes.</div>
             </div>
-            <div class="action-row">
+            <div class="placeholder-actions">
               <a class="btn" href="dashboard.html">Statistics placeholder</a>
               <a class="btn ghost" href="index.html">Back to Grade 11</a>
             </div>

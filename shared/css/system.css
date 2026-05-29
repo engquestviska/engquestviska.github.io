@@ -484,6 +484,184 @@ a.module:hover {
 .module.pink .module-icon { background: #fce7f3; }
 .module.pending { opacity: 0.78; }
 
+/* Grade 11 placeholders */
+.placeholder-shell {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: 22px;
+}
+
+.placeholder-shell.narrow {
+  width: min(980px, 100%);
+}
+
+.placeholder-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 24px;
+  align-items: end;
+  border-radius: 34px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: #fff;
+  padding: clamp(30px, 6vw, 58px);
+  box-shadow: var(--shadow);
+  margin-bottom: 24px;
+}
+
+.placeholder-hero.simple {
+  display: block;
+}
+
+.placeholder-hero h1,
+.placeholder-hero .hero-copy {
+  max-width: 760px;
+}
+
+.placeholder-status-tile,
+.placeholder-count-preview {
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 18px;
+}
+
+.placeholder-status-tile {
+  min-width: 220px;
+}
+
+.placeholder-label,
+.placeholder-card-label,
+.placeholder-count-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.placeholder-label,
+.placeholder-count-label {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.placeholder-status-value {
+  margin-top: 8px;
+  font: 800 1.3rem 'IBM Plex Sans', sans-serif;
+}
+
+.placeholder-grid,
+.placeholder-rule-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.placeholder-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.placeholder-rule-grid {
+  grid-template-columns: 0.75fr 1.25fr;
+}
+
+.placeholder-card,
+.placeholder-panel {
+  border: 1.5px solid var(--line);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 22px 60px rgba(15, 118, 110, 0.08);
+}
+
+.placeholder-card {
+  border-radius: 24px;
+  padding: 22px;
+  min-height: 220px;
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+
+.placeholder-panel {
+  border-radius: 28px;
+  padding: clamp(22px, 4vw, 32px);
+}
+
+.placeholder-card.wide {
+  grid-column: span 2;
+}
+
+.placeholder-card-label {
+  color: var(--primary);
+}
+
+.placeholder-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.7rem, 3vw, 2.45rem);
+  line-height: 1;
+}
+
+.placeholder-copy {
+  color: var(--muted);
+  font-weight: 600;
+  line-height: 1.65;
+}
+
+.placeholder-metric,
+.placeholder-rule-item {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--primary-dark);
+  font-weight: 800;
+}
+
+.placeholder-metric {
+  border-radius: 20px;
+  background: var(--primary-soft);
+  padding: 16px;
+}
+
+.placeholder-count-preview {
+  display: grid;
+  align-content: space-between;
+  min-height: 260px;
+  background: var(--primary-dark);
+  color: #fff;
+  padding: 24px;
+}
+
+.placeholder-count-value {
+  font: 800 clamp(4.4rem, 12vw, 7rem) 'IBM Plex Sans', sans-serif;
+  line-height: 0.9;
+  margin: 18px 0;
+}
+
+.placeholder-count-preview .placeholder-copy {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.placeholder-rule-card {
+  border-radius: 24px;
+  border: 1.5px solid var(--line);
+  background: #f0fdfa;
+  padding: 22px;
+}
+
+.placeholder-rule-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.placeholder-rule-item {
+  border-radius: 18px;
+  padding: 14px;
+}
+
+.placeholder-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+
 /* Grade 10 secondary pages */
 .grade10-subpage {
   background:
@@ -2601,6 +2779,9 @@ a.control-card.live:hover {
 @media (max-width: 900px) {
   .hero,
   .module-grid,
+  .placeholder-grid,
+  .placeholder-hero,
+  .placeholder-rule-grid,
   .teacher-control-grid,
   .teacher-control-grid.compact,
   .track-grid,
@@ -2627,6 +2808,10 @@ a.control-card.live:hover {
 
   .action-grid {
     grid-template-columns: 1fr;
+  }
+
+  .placeholder-card.wide {
+    grid-column: auto;
   }
 }
 
