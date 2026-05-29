@@ -15,7 +15,7 @@
     <div class="viewer-top">
       <div class="viewer-title" id="pdfModalTitle">Reading Material</div>
       <div class="viewer-actions">
-        <a class="btn primary" id="pdfModalDl" href="#" target="_blank">Download</a>
+        <a class="btn primary" id="pdfModalDl" href="#" target="_blank" rel="noopener">Download</a>
         <button class="round-close" onclick="closePdfModal()" aria-label="Close reading viewer">x</button>
       </div>
     </div>
@@ -28,7 +28,7 @@
     <div class="viewer-top">
       <div class="viewer-title" id="videoModalTitle">Video Lesson</div>
       <div class="viewer-actions">
-        <a class="btn danger" id="videoModalYt" href="#" target="_blank">YouTube</a>
+        <a class="btn danger" id="videoModalYt" href="#" target="_blank" rel="noopener">YouTube</a>
         <button class="round-close" onclick="closeVideoModal()" aria-label="Close video player">x</button>
       </div>
     </div>
@@ -191,6 +191,7 @@
       btnDownload.className = 'btn primary icon-btn';
       btnDownload.href = downloadUrl;
       btnDownload.target = '_blank';
+      btnDownload.rel = 'noopener';
       btnDownload.textContent = '↓';
       actions.appendChild(btnView);
       actions.appendChild(btnDownload);
@@ -243,6 +244,7 @@
       btnYt.className = 'btn danger icon-btn';
       btnYt.href = ytUrl;
       btnYt.target = '_blank';
+      btnYt.rel = 'noopener';
       btnYt.textContent = '↗';
       actions.appendChild(btnWatch);
       actions.appendChild(btnYt);

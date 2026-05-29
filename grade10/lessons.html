@@ -15,7 +15,7 @@
     <div class="viewer-top">
       <div class="viewer-title" id="modalTitle">Document</div>
       <div class="viewer-actions">
-        <a class="btn primary" id="modalDownload" href="#" target="_blank">Download</a>
+        <a class="btn primary" id="modalDownload" href="#" target="_blank" rel="noopener">Download</a>
         <button class="round-close" onclick="closeModal()" aria-label="Close viewer">x</button>
       </div>
     </div>
@@ -67,7 +67,7 @@
             <div class="material-meta">PDF · Chapter 4</div>
             <div class="material-actions">
               <button class="btn" onclick="openPDF('Fact vs Opinion','https://drive.google.com/file/d/12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx/preview','https://drive.google.com/uc?export=download&id=12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx')">View</button>
-              <a class="btn primary icon-btn" href="https://drive.google.com/uc?export=download&id=12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx" target="_blank">↓</a>
+              <a class="btn primary icon-btn" href="https://drive.google.com/uc?export=download&id=12CCKNiZ2uU9eOmKJ_vxkRGE5rAmAQWRx" target="_blank" rel="noopener">↓</a>
             </div>
           </div>
         </article>
@@ -83,7 +83,7 @@
             <div class="material-meta">PDF · Chapter 4</div>
             <div class="material-actions">
               <button class="btn" onclick="openPDF('Argument','https://drive.google.com/file/d/1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ/preview','https://drive.google.com/uc?export=download&id=1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ')">View</button>
-              <a class="btn primary icon-btn" href="https://drive.google.com/uc?export=download&id=1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ" target="_blank">↓</a>
+              <a class="btn primary icon-btn" href="https://drive.google.com/uc?export=download&id=1iNKhUJeCStmsQahqrL7lwDBg4Wl72ePQ" target="_blank" rel="noopener">↓</a>
             </div>
           </div>
         </article>
@@ -180,6 +180,7 @@
       btnDownload.className = 'btn primary icon-btn';
       btnDownload.href = downloadUrl;
       btnDownload.target = '_blank';
+      btnDownload.rel = 'noopener';
       btnDownload.textContent = '↓';
       actions.appendChild(btnView);
       actions.appendChild(btnDownload);
