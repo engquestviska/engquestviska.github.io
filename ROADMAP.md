@@ -47,6 +47,7 @@ This roadmap keeps the next-year rebuild focused. The goal is one English Quest 
 
 1. Final launch QA on `next-year`.
    - Keep `main` untouched until the planned switchover.
+   - Use `LAUNCH_CHECKLIST.md` as the live readiness checklist.
    - Re-run local route checks after each meaningful batch.
    - Verify the pushed preview by commit URL when RawGitHack branch cache lags.
    - Confirm student-facing pages do not expose teacher editing routes.

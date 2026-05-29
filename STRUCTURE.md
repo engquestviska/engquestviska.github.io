@@ -5,6 +5,7 @@ English Quest is being reorganized into three tracks.
 ## Root
 
 - `index.html` - landing page for Grade 10, Grade 11, and Teacher.
+- `LAUNCH_CHECKLIST.md` - launch readiness checklist before merging `next-year` into `main`.
 - `ROADMAP.md` - revamp priorities.
 - `STRUCTURE.md` - current folder structure.
 - `shared/` - shared CSS and JavaScript for the new structure.
