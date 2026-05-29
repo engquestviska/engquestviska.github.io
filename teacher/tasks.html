@@ -220,6 +220,15 @@
     var filterMode = 'all';
     var dirtyRows = {};
 
+    function escapeHtml(value) {
+      return String(value === undefined || value === null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     function getVisibleTaskKeys() {
       if (currentChapter === 'all') return taskData.taskKeys.slice();
       return taskData.taskKeys.filter(function(key) {
@@ -253,7 +262,7 @@
       btn.disabled = true;
       btn.textContent = 'Loading...';
       dirtyRows = {};
-      document.getElementById('taskList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading task status...</h2><p class="empty-copy">Fetching ' + (EQApi.classLabels[cls] || cls) + ' from the task sheet.</p></div>';
+      document.getElementById('taskList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading task status...</h2><p class="empty-copy">Fetching ' + escapeHtml(EQApi.classLabels[cls] || cls) + ' from the task sheet.</p></div>';
 
       EQApi.get({ action: 'getAllTasks', className: cls }).then(function(data) {
         if (data.error) throw new Error(data.error);
@@ -264,7 +273,7 @@
         renderTasks();
         showToast('Tasks loaded', 'ok');
       }).catch(function(err) {
-        document.getElementById('taskList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Could not load tasks.</h2><p class="empty-copy">' + err.message + '</p></div>';
+        document.getElementById('taskList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Could not load tasks.</h2><p class="empty-copy">' + escapeHtml(err.message) + '</p></div>';
         showToast(err.message, 'err');
       }).finally(function() {
         btn.disabled = false;
@@ -303,22 +312,22 @@
         var pct = total ? Math.round(done / total * 100) : 0;
         var initial = (student.nickname || student.name || '?').charAt(0).toUpperCase();
         var cardClass = dirtyRows[student.no] ? 'student-card dirty' : 'student-card';
-        return '<article class="' + cardClass + '" data-no="' + student.no + '">' +
+        return '<article class="' + cardClass + '" data-no="' + escapeHtml(student.no) + '">' +
           '<div class="student-row">' +
-            '<div class="avatar">' + initial + '</div>' +
+            '<div class="avatar">' + escapeHtml(initial) + '</div>' +
             '<div>' +
-              '<div class="student-name">' + student.name + '</div>' +
-              '<div class="student-meta">No. ' + student.no + (student.nickname ? ' · ' + student.nickname : '') + '</div>' +
+              '<div class="student-name">' + escapeHtml(student.name) + '</div>' +
+              '<div class="student-meta">No. ' + escapeHtml(student.no) + (student.nickname ? ' · ' + escapeHtml(student.nickname) : '') + '</div>' +
             '</div>' +
             '<div class="student-stats">' +
               '<span class="progress-pill">' + done + '/' + total + ' · ' + pct + '%</span>' +
-              '<button class="btn save-btn' + (dirtyRows[student.no] ? ' dirty' : '') + '" type="button" onclick="saveStudentTasks(&quot;' + student.no + '&quot;)">' + (dirtyRows[student.no] ? 'Save Changes' : 'Saved') + '</button>' +
+              '<button class="btn save-btn' + (dirtyRows[student.no] ? ' dirty' : '') + '" type="button" onclick="saveStudentTasks(&quot;' + escapeHtml(student.no) + '&quot;)">' + (dirtyRows[student.no] ? 'Save Changes' : 'Saved') + '</button>' +
             '</div>' +
           '</div>' +
           '<div class="task-grid">' + keys.map(function(key) {
             var isDone = !!student.tasks[key];
-            return '<button class="task-toggle ' + (isDone ? 'done' : 'missing') + '" type="button" onclick="toggleTask(&quot;' + student.no + '&quot;,&quot;' + key + '&quot;)">' +
-              (isDone ? 'Done · ' : 'Missing · ') + taskLabel(key) +
+            return '<button class="task-toggle ' + (isDone ? 'done' : 'missing') + '" type="button" onclick="toggleTask(&quot;' + escapeHtml(student.no) + '&quot;,&quot;' + escapeHtml(key) + '&quot;)">' +
+              (isDone ? 'Done · ' : 'Missing · ') + escapeHtml(taskLabel(key)) +
             '</button>';
           }).join('') + '</div>' +
         '</article>';

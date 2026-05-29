@@ -174,6 +174,15 @@
     var mode = '4';
     var scoreData = { students: [], inputCols: [], calcCols: [] };
 
+    function escapeHtml(value) {
+      return String(value === undefined || value === null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     function setMode(nextMode) {
       mode = nextMode;
       document.querySelectorAll('.tab').forEach(function(tab) {
@@ -189,7 +198,7 @@
       var btn = document.getElementById('loadBtn');
       btn.disabled = true;
       btn.textContent = 'Loading...';
-      document.getElementById('scoreArea').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading scores...</h2><p class="empty-copy">Fetching ' + (EQApi.classLabels[cls] || cls) + ' from the spreadsheet.</p></div>';
+      document.getElementById('scoreArea').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading scores...</h2><p class="empty-copy">Fetching ' + escapeHtml(EQApi.classLabels[cls] || cls) + ' from the spreadsheet.</p></div>';
       var params = mode === 'final'
         ? { action: 'getFinalScores', className: cls }
         : { action: 'getChapterScores', className: cls, chapter: mode };
@@ -203,7 +212,7 @@
         renderScores();
         showToast('Scores loaded', 'ok');
       }).catch(function(err) {
-        document.getElementById('scoreArea').innerHTML = '<div class="empty-card"><h2 class="empty-title">Could not load scores.</h2><p class="empty-copy">' + err.message + '</p></div>';
+        document.getElementById('scoreArea').innerHTML = '<div class="empty-card"><h2 class="empty-title">Could not load scores.</h2><p class="empty-copy">' + escapeHtml(err.message) + '</p></div>';
         showToast(err.message, 'err');
       }).finally(function() {
         btn.disabled = false;
@@ -231,19 +240,19 @@
 
       var calcCols = mode === 'final' ? scoreData.calcCols : ['Average', 'Final Score', 'Indicator'];
       var head = '<tr><th>Student</th>' +
-        scoreData.inputCols.map(function(col) { return '<th>' + col + '</th>'; }).join('') +
-        calcCols.map(function(col) { return '<th class="calc">' + col + '</th>'; }).join('') +
+        scoreData.inputCols.map(function(col) { return '<th>' + escapeHtml(col) + '</th>'; }).join('') +
+        calcCols.map(function(col) { return '<th class="calc">' + escapeHtml(col) + '</th>'; }).join('') +
         '</tr>';
       var rows = students.map(function(student) {
         return '<tr>' +
-          '<td class="student-cell">' + student.name + '<span class="student-meta">No. ' + student.no + (student.nickname ? ' · ' + student.nickname : '') + '</span></td>' +
+          '<td class="student-cell">' + escapeHtml(student.name) + '<span class="student-meta">No. ' + escapeHtml(student.no) + (student.nickname ? ' · ' + escapeHtml(student.nickname) : '') + '</span></td>' +
           scoreData.inputCols.map(function(col) {
             var val = student.scores && student.scores[col] !== undefined ? student.scores[col] : '';
-            return '<td><input class="score-input" type="number" inputmode="decimal" min="0" max="100" step="0.01" value="' + val + '" data-no="' + student.no + '" data-col="' + col + '" onchange="saveScore(this)"/></td>';
+            return '<td><input class="score-input" type="number" inputmode="decimal" min="0" max="100" step="0.01" value="' + escapeHtml(val) + '" data-no="' + escapeHtml(student.no) + '" data-col="' + escapeHtml(col) + '" onchange="saveScore(this)"/></td>';
           }).join('') +
           calcCols.map(function(col) {
             var val = calcValue(student, col);
-            return '<td><span class="calc-pill">' + (val === '' || val === undefined || val === null ? '-' : val) + '</span></td>';
+            return '<td><span class="calc-pill">' + (val === '' || val === undefined || val === null ? '-' : escapeHtml(val)) + '</span></td>';
           }).join('') +
         '</tr>';
       }).join('');
