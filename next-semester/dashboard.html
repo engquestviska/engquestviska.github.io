@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Next Semester Dashboard · English Quest</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css"/>
+  <script src="../shared/js/next-semester-api.js"></script>
+  <style>
+    .next-dashboard {
+      --primary: #2563eb;
+      --primary-dark: #1e3a8a;
+      --primary-soft: #dbeafe;
+      --line: #bfdbfe;
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.14), transparent 32rem),
+        linear-gradient(180deg, #f8fafc 0%, #eef6ff 100%);
+      color: #0f172a;
+    }
+
+    .dash-shell {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 22px;
+    }
+
+    .dash-hero,
+    .dash-card,
+    .dash-guard {
+      border: 1.5px solid var(--line);
+      border-radius: 30px;
+      box-shadow: 0 22px 60px rgba(37, 99, 235, 0.1);
+    }
+
+    .dash-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 0.35fr);
+      gap: 22px;
+      align-items: end;
+      margin: 28px 0 22px;
+      padding: clamp(28px, 5vw, 54px);
+      color: #fff;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 52%, #1e3a8a 100%);
+    }
+
+    .dash-kicker,
+    .dash-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .dash-kicker {
+      color: #bfdbfe;
+      margin-bottom: 16px;
+    }
+
+    .dash-copy {
+      max-width: 720px;
+      margin-top: 18px;
+      color: rgba(255, 255, 255, 0.78);
+      line-height: 1.75;
+    }
+
+    .student-tile {
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.12);
+      padding: 18px;
+    }
+
+    .student-name {
+      margin-top: 8px;
+      font: 800 1.35rem 'IBM Plex Sans', sans-serif;
+      overflow-wrap: anywhere;
+    }
+
+    .student-meta {
+      margin-top: 6px;
+      color: rgba(255, 255, 255, 0.76);
+      line-height: 1.5;
+    }
+
+    .dash-grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .dash-card {
+      grid-column: span 4;
+      min-height: 210px;
+      display: grid;
+      gap: 16px;
+      align-content: start;
+      background: rgba(255, 255, 255, 0.96);
+      padding: 22px;
+    }
+
+    .dash-card.wide {
+      grid-column: span 8;
+    }
+
+    .dash-card.full {
+      grid-column: 1 / -1;
+    }
+
+    .dash-label {
+      color: #2563eb;
+    }
+
+    .dash-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.7rem, 3vw, 2.35rem);
+      line-height: 1;
+      margin-top: 8px;
+    }
+
+    .dash-value {
+      font: 800 clamp(2.4rem, 5vw, 4rem) 'IBM Plex Sans', sans-serif;
+      line-height: 0.9;
+    }
+
+    .dash-muted {
+      color: #64748b;
+      line-height: 1.6;
+    }
+
+    .progress-track {
+      height: 12px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #dbeafe;
+    }
+
+    .progress-fill {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #2563eb, #10b981);
+      transition: width 0.3s ease;
+    }
+
+    .mini-grid,
+    .list-grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .mini-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .mini {
+      border: 1px solid #dbeafe;
+      border-radius: 18px;
+      background: #f8fbff;
+      padding: 14px;
+    }
+
+    .mini strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 1.25rem;
+    }
+
+    .list-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+      border: 1px solid #dbeafe;
+      border-radius: 18px;
+      background: #f8fbff;
+      padding: 14px;
+    }
+
+    .pill {
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      padding: 8px 12px;
+      font: 800 0.78rem 'IBM Plex Sans', sans-serif;
+      white-space: nowrap;
+    }
+
+    .strike-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .strike-dot {
+      width: 46px;
+      height: 46px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #bfdbfe;
+      border-radius: 50%;
+      background: #f8fbff;
+      color: #94a3b8;
+      font-weight: 800;
+    }
+
+    .strike-dot.active {
+      border-color: #fca5a5;
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    .notice {
+      border-radius: 18px;
+      border: 1.5px solid #bbf7d0;
+      background: #f0fdf4;
+      color: #166534;
+      font-weight: 800;
+      line-height: 1.45;
+      padding: 14px 16px;
+    }
+
+    .notice.warning {
+      border-color: #fcd34d;
+      background: #fffbeb;
+      color: #92400e;
+    }
+
+    .notice.danger {
+      border-color: #fca5a5;
+      background: #fef2f2;
+      color: #991b1b;
+    }
+
+    .dash-guard {
+      max-width: 760px;
+      margin: 42px auto;
+      background: #fff;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .dash-guard p {
+      color: #64748b;
+      line-height: 1.6;
+      margin: 12px 0 18px;
+    }
+
+    @media (max-width: 900px) {
+      .dash-hero,
+      .dash-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .dash-card,
+      .dash-card.wide,
+      .dash-card.full {
+        grid-column: auto;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .dash-shell {
+        padding: 18px;
+      }
+
+      .dash-hero,
+      .dash-card,
+      .dash-guard {
+        border-radius: 24px;
+        padding: 22px;
+      }
+
+      .mini-grid,
+      .list-item {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body class="next-dashboard">
+  <div class="dash-shell">
+    <header class="topbar">
+      <div class="brand">
+        <img src="../logo.jpg" alt="English Quest Logo"/>
+        <div>
+          <div class="brand-title">English Quest</div>
+          <div class="brand-sub">Next Semester Dashboard</div>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Preview navigation">
+        <a href="index.html">Profile Login</a>
+        <a href="../index.html">Current Site</a>
+      </nav>
+    </header>
+
+    <main id="app">
+      <section class="dash-guard" id="guard">
+        <div class="dash-label">Student Dashboard</div>
+        <h1>Choose your profile first.</h1>
+        <p>This page needs a saved next-semester class and student name before it can load personal statistics.</p>
+        <a class="btn primary" href="index.html">Go to Profile Login</a>
+      </section>
+
+      <div id="dashboard" hidden>
+        <section class="dash-hero">
+          <div>
+            <div class="dash-kicker">My Statistics</div>
+            <h1>Your next-semester profile dashboard.</h1>
+            <p class="dash-copy">Scores, task progress, attendance, submissions, XP rank, profile answers, and strike eligibility from the new master spreadsheet.</p>
+          </div>
+          <aside class="student-tile">
+            <div class="dash-kicker">Logged in as</div>
+            <div class="student-name" id="studentName">Student</div>
+            <div class="student-meta" id="studentMeta">Class</div>
+          </aside>
+        </section>
+
+        <section class="dash-grid" aria-label="Next semester dashboard">
+          <article class="dash-card">
+            <div>
+              <div class="dash-label">XP Rank</div>
+              <div class="dash-title" id="rankName">Loading</div>
+            </div>
+            <div class="dash-value" id="xpValue">--</div>
+            <div class="progress-track"><div class="progress-fill" id="xpBar"></div></div>
+            <p class="dash-muted" id="xpText">Loading XP summary...</p>
+          </article>
+
+          <article class="dash-card">
+            <div>
+              <div class="dash-label">Attendance</div>
+              <div class="dash-title">Presence</div>
+            </div>
+            <div class="dash-value" id="attendanceValue">--</div>
+            <div class="progress-track"><div class="progress-fill" id="attendanceBar"></div></div>
+            <p class="dash-muted" id="attendanceText">Loading attendance...</p>
+          </article>
+
+          <article class="dash-card">
+            <div>
+              <div class="dash-label">Strikes</div>
+              <div class="dash-title">Eligibility</div>
+            </div>
+            <div class="dash-value" id="strikeValue">--</div>
+            <div class="strike-row" id="strikeDots"></div>
+            <div class="notice" id="strikeNotice">Loading strike status...</div>
+          </article>
+
+          <article class="dash-card wide">
+            <div>
+              <div class="dash-label">Tasks</div>
+              <div class="dash-title">Published task progress</div>
+            </div>
+            <div class="mini-grid">
+              <div class="mini"><span class="dash-label">Done</span><strong id="taskDone">--</strong></div>
+              <div class="mini"><span class="dash-label">Missing</span><strong id="taskMissing">--</strong></div>
+              <div class="mini"><span class="dash-label">Total</span><strong id="taskTotal">--</strong></div>
+            </div>
+            <div class="list-grid" id="taskList"></div>
+          </article>
+
+          <article class="dash-card">
+            <div>
+              <div class="dash-label">Submissions</div>
+              <div class="dash-title">File records</div>
+            </div>
+            <div class="dash-value" id="submissionValue">--</div>
+            <p class="dash-muted" id="submissionText">Loading submissions...</p>
+          </article>
+
+          <article class="dash-card full">
+            <div>
+              <div class="dash-label">Student Profile</div>
+              <div class="dash-title">Form answers</div>
+            </div>
+            <div class="list-grid" id="profileList"></div>
+          </article>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <footer>© 2026 English Quest · Next Semester Dashboard</footer>
+
+  <script>
+    function getSavedProfile() {
+      return {
+        classId: localStorage.getItem('eq_next_class_id') || '',
+        studentNo: localStorage.getItem('eq_next_student_no') || '',
+        fullName: localStorage.getItem('eq_next_student_name') || ''
+      };
+    }
+
+    function setText(id, text) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = text;
+    }
+
+    function number(value) {
+      var num = Number(value);
+      return Number.isFinite(num) ? num : 0;
+    }
+
+    function percent(value, total) {
+      return total ? Math.max(0, Math.min(100, Math.round((value / total) * 100))) : 0;
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[ch];
+      });
+    }
+
+    function renderError(message) {
+      document.getElementById('guard').hidden = false;
+      document.getElementById('dashboard').hidden = true;
+      document.getElementById('guard').innerHTML =
+        '<div class="dash-label">API Status</div>' +
+        '<h1>Dashboard cannot load yet.</h1>' +
+        '<p>' + escapeHtml(message) + '</p>' +
+        '<a class="btn primary" href="index.html">Back to Profile Login</a>';
+    }
+
+    function renderStrike(total, canJoinSummative, canJoinClass) {
+      var dots = [1, 2, 3].map(function(num) {
+        return '<span class="strike-dot' + (num <= total ? ' active' : '') + '">' + num + '</span>';
+      }).join('');
+      var notice = document.getElementById('strikeNotice');
+      var text = 'No strikes. Clear for class and summative test.';
+      var cls = 'notice';
+      if (!canJoinClass) {
+        text = 'Three strikes. Student cannot join class until cleared.';
+        cls += ' danger';
+      } else if (!canJoinSummative) {
+        text = 'At least one strike. Student cannot join summative test.';
+        cls += ' warning';
+      }
+      setText('strikeValue', String(total));
+      document.getElementById('strikeDots').innerHTML = dots;
+      notice.className = cls;
+      notice.textContent = text;
+    }
+
+    function renderTasks(tasks) {
+      tasks = tasks || [];
+      var done = tasks.filter(function(item) { return item.status !== 'Missing'; }).length;
+      var missing = Math.max(tasks.length - done, 0);
+      setText('taskDone', String(done));
+      setText('taskMissing', String(missing));
+      setText('taskTotal', String(tasks.length));
+      document.getElementById('taskList').innerHTML = tasks.length ? tasks.slice(0, 6).map(function(item) {
+        var task = item.task || {};
+        return '<div class="list-item">' +
+          '<div><strong>' + escapeHtml(task.title || task.task_id || 'Task') + '</strong><div class="dash-muted">Chapter ' + escapeHtml(task.chapter || '-') + '</div></div>' +
+          '<span class="pill">' + escapeHtml(item.status || 'Missing') + '</span>' +
+        '</div>';
+      }).join('') : '<p class="dash-muted">No published tasks yet.</p>';
+    }
+
+    function renderProfile(profile) {
+      var fields = [
+        ['Preferred name', profile && profile.preferred_name],
+        ['Learning goal', profile && profile.learning_goal],
+        ['Strength', profile && profile.english_strength],
+        ['Weakness', profile && profile.english_weakness],
+        ['Favorite activity', profile && profile.favorite_activity],
+        ['Quote', profile && profile.quote]
+      ].filter(function(item) { return item[1]; });
+
+      document.getElementById('profileList').innerHTML = fields.length ? fields.map(function(item) {
+        return '<div class="list-item"><div><strong>' + escapeHtml(item[0]) + '</strong><div class="dash-muted">' + escapeHtml(item[1]) + '</div></div></div>';
+      }).join('') : '<p class="dash-muted">No profile form answer has been approved yet.</p>';
+    }
+
+    function renderDashboard(data) {
+      var student = data.student || {};
+      var xp = data.xp || {};
+      var attendance = data.attendance || {};
+      var strikes = data.strikes || {};
+      var submissions = data.submissions || [];
+      var xpProgress = percent(number(xp.progress_xp), number(xp.level_span_xp));
+      var attendancePct = number(attendance.percentage);
+
+      setText('studentName', student.full_name || getSavedProfile().fullName || 'Student');
+      setText('studentMeta', (student.class_id || data.class_id || '') + ' · No. ' + (student.student_no || data.student_no || ''));
+
+      setText('rankName', xp.rank_name || 'Level ' + number(xp.level));
+      setText('xpValue', number(xp.total_xp) + ' XP');
+      document.getElementById('xpBar').style.width = xpProgress + '%';
+      setText('xpText', number(xp.xp_to_next) + ' XP to next level.');
+
+      setText('attendanceValue', attendancePct ? attendancePct + '%' : '--');
+      document.getElementById('attendanceBar').style.width = attendancePct + '%';
+      setText('attendanceText', number(attendance.present_like) + ' present-like records out of ' + number(attendance.total_records) + '.');
+
+      renderStrike(number(strikes.active_strikes), strikes.can_join_summative !== false, strikes.can_join_class !== false);
+      renderTasks(data.tasks || []);
+      setText('submissionValue', String(submissions.length));
+      setText('submissionText', submissions.length ? 'Submission records found for this student.' : 'No submission records yet.');
+      renderProfile(data.profile || null);
+    }
+
+    async function init() {
+      var profile = getSavedProfile();
+      if (!profile.classId || !profile.studentNo) return;
+
+      document.getElementById('guard').hidden = true;
+      document.getElementById('dashboard').hidden = false;
+      setText('studentName', profile.fullName || 'Student');
+      setText('studentMeta', profile.classId + ' · No. ' + profile.studentNo);
+
+      try {
+        var data = await EQNextAPI.get({
+          action: 'getStudentDashboard',
+          classId: profile.classId,
+          studentNo: profile.studentNo
+        });
+        renderDashboard(data);
+      } catch (err) {
+        renderError(err.message + '. If this is the public deployment, enable web-app access for anyone and redeploy.');
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>

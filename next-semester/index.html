@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Next Semester Preview · English Quest</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css"/>
+  <script src="../shared/js/next-semester-api.js"></script>
+  <style>
+    .next-page {
+      --primary: #2563eb;
+      --primary-dark: #1e3a8a;
+      --primary-soft: #dbeafe;
+      --line: #bfdbfe;
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.14), transparent 32rem),
+        linear-gradient(180deg, #f8fafc 0%, #eef6ff 100%);
+      color: #0f172a;
+    }
+
+    .next-shell {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 22px;
+    }
+
+    .next-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.55fr);
+      gap: 24px;
+      align-items: stretch;
+      margin-top: 28px;
+    }
+
+    .next-hero-main,
+    .next-login {
+      border: 1.5px solid var(--line);
+      border-radius: 30px;
+      box-shadow: 0 22px 60px rgba(37, 99, 235, 0.1);
+    }
+
+    .next-hero-main {
+      min-height: 420px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: clamp(28px, 5vw, 54px);
+      color: #fff;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 52%, #1e3a8a 100%);
+    }
+
+    .next-kicker,
+    .next-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .next-kicker {
+      color: #bfdbfe;
+      margin-bottom: 16px;
+    }
+
+    .next-hero h1 {
+      max-width: 760px;
+    }
+
+    .next-copy {
+      max-width: 680px;
+      margin-top: 22px;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 1rem;
+      line-height: 1.75;
+    }
+
+    .next-status-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+
+    .next-status {
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.12);
+      padding: 16px;
+    }
+
+    .next-status strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 1.2rem;
+    }
+
+    .next-login {
+      display: grid;
+      gap: 18px;
+      align-content: start;
+      background: rgba(255, 255, 255, 0.96);
+      padding: 26px;
+    }
+
+    .next-login h2 {
+      font-size: clamp(2rem, 4vw, 2.8rem);
+    }
+
+    .next-login p {
+      color: #64748b;
+      line-height: 1.65;
+    }
+
+    .next-field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .next-label {
+      color: #1d4ed8;
+    }
+
+    .next-field select {
+      width: 100%;
+      min-height: 52px;
+      border: 1.5px solid #bfdbfe;
+      border-radius: 16px;
+      background: #f8fbff;
+      color: #0f172a;
+      font: 700 0.96rem 'IBM Plex Sans', sans-serif;
+      outline: none;
+      padding: 0 14px;
+    }
+
+    .next-field select:focus {
+      border-color: #2563eb;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    }
+
+    .next-actions {
+      display: grid;
+      gap: 10px;
+    }
+
+    .next-actions .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .next-message {
+      min-height: 44px;
+      border-radius: 16px;
+      background: #eff6ff;
+      color: #475569;
+      line-height: 1.55;
+      padding: 12px 14px;
+    }
+
+    .next-message.error {
+      background: #fef2f2;
+      color: #991b1b;
+    }
+
+    .next-message.ok {
+      background: #f0fdf4;
+      color: #166534;
+    }
+
+    @media (max-width: 900px) {
+      .next-hero,
+      .next-status-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .next-shell {
+        padding: 18px;
+      }
+
+      .next-hero-main,
+      .next-login {
+        border-radius: 24px;
+        padding: 22px;
+      }
+    }
+  </style>
+</head>
+<body class="next-page">
+  <div class="next-shell">
+    <header class="topbar">
+      <div class="brand">
+        <img src="../logo.jpg" alt="English Quest Logo"/>
+        <div>
+          <div class="brand-title">English Quest</div>
+          <div class="brand-sub">Next Semester Preview</div>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Preview navigation">
+        <a href="../index.html">Current Site</a>
+        <a href="dashboard.html">Dashboard</a>
+      </nav>
+    </header>
+
+    <main class="next-hero">
+      <section class="next-hero-main">
+        <div>
+          <div class="next-kicker">Next Semester</div>
+          <h1>Student profile first, statistics after.</h1>
+          <p class="next-copy">This preview uses the new master spreadsheet and separate Apps Script project. It is isolated from the current-year pages until the next-semester model is proven.</p>
+        </div>
+        <div class="next-status-grid" aria-label="Preview status">
+          <div class="next-status">
+            <div class="next-kicker">Data</div>
+            <strong>Master Sheet</strong>
+          </div>
+          <div class="next-status">
+            <div class="next-kicker">Mode</div>
+            <strong>Read Only</strong>
+          </div>
+          <div class="next-status">
+            <div class="next-kicker">Flow</div>
+            <strong>Profile Login</strong>
+          </div>
+        </div>
+      </section>
+
+      <aside class="next-login">
+        <div>
+          <div class="next-label">Student Login</div>
+          <h2>Choose your class and name.</h2>
+          <p>The page refreshes immediately after confirm, matching the student-login behavior you requested.</p>
+        </div>
+
+        <div class="next-field">
+          <label class="next-label" for="classSelect">Class</label>
+          <select id="classSelect">
+            <option value="">Loading classes...</option>
+          </select>
+        </div>
+
+        <div class="next-field">
+          <label class="next-label" for="studentSelect">Name</label>
+          <select id="studentSelect" disabled>
+            <option value="">Choose class first</option>
+          </select>
+        </div>
+
+        <div class="next-message" id="message">Checking the next-semester API...</div>
+
+        <div class="next-actions">
+          <button class="btn primary" type="button" id="confirmBtn" disabled>Confirm Profile</button>
+          <a class="btn ghost" href="dashboard.html" id="dashboardLink">Open Dashboard</a>
+          <button class="btn ghost" type="button" id="changeBtn">Change Name</button>
+          <button class="btn danger" type="button" id="logoutBtn">Logout</button>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <footer>© 2026 English Quest · Next Semester Preview</footer>
+
+  <script>
+    var classes = [];
+    var students = [];
+
+    function setMessage(text, type) {
+      var el = document.getElementById('message');
+      el.className = 'next-message' + (type ? ' ' + type : '');
+      el.textContent = text;
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[ch];
+      });
+    }
+
+    function savedProfile() {
+      return {
+        classId: localStorage.getItem('eq_next_class_id') || '',
+        studentNo: localStorage.getItem('eq_next_student_no') || '',
+        fullName: localStorage.getItem('eq_next_student_name') || ''
+      };
+    }
+
+    function refreshSavedState() {
+      var saved = savedProfile();
+      document.getElementById('dashboardLink').style.display = saved.classId && saved.studentNo ? 'inline-flex' : 'none';
+      document.getElementById('changeBtn').disabled = !(saved.classId && saved.studentNo);
+      document.getElementById('logoutBtn').disabled = !(saved.classId && saved.studentNo);
+      if (saved.classId && saved.studentNo) {
+        setMessage('Logged in as ' + saved.fullName + ' from ' + saved.classId + '. Open dashboard when ready.', 'ok');
+      }
+    }
+
+    function populateClasses() {
+      var select = document.getElementById('classSelect');
+      var saved = savedProfile();
+      select.innerHTML = '<option value="">Choose class</option>' + classes.map(function(item) {
+        return '<option value="' + escapeHtml(item.class_id) + '">' + escapeHtml(item.display_name) + ' (' + escapeHtml(item.class_id) + ')</option>';
+      }).join('');
+      if (saved.classId) select.value = saved.classId;
+    }
+
+    function populateStudents() {
+      var select = document.getElementById('studentSelect');
+      var saved = savedProfile();
+      select.innerHTML = '<option value="">Choose your name</option>' + students.map(function(item) {
+        return '<option value="' + escapeHtml(item.student_no) + '" data-name="' + escapeHtml(item.full_name) + '">' +
+          escapeHtml(item.student_no) + ' · ' + escapeHtml(item.full_name) +
+        '</option>';
+      }).join('');
+      select.disabled = !students.length;
+      if (saved.studentNo) select.value = saved.studentNo;
+      document.getElementById('confirmBtn').disabled = !select.value;
+    }
+
+    async function loadClasses() {
+      try {
+        var data = await EQNextAPI.get({ action: 'getActiveClasses', includeInactive: 'true' });
+        classes = data.classes || [];
+        populateClasses();
+        refreshSavedState();
+        setMessage(classes.length ? 'Choose a class to load the student template.' : 'No classes found in the template.', classes.length ? '' : 'error');
+        if (document.getElementById('classSelect').value) loadStudents();
+      } catch (err) {
+        setMessage(err.message + '. The Apps Script deployment still needs public web-app access enabled.', 'error');
+        document.getElementById('classSelect').innerHTML = '<option value="">API unavailable</option>';
+      }
+    }
+
+    async function loadStudents() {
+      var classId = document.getElementById('classSelect').value;
+      students = [];
+      document.getElementById('studentSelect').innerHTML = '<option value="">Loading names...</option>';
+      document.getElementById('studentSelect').disabled = true;
+      document.getElementById('confirmBtn').disabled = true;
+      if (!classId) {
+        setMessage('Choose a class first.');
+        return;
+      }
+
+      try {
+        var data = await EQNextAPI.get({ action: 'getStudentsByClass', classId: classId, includeInactive: 'true' });
+        students = data.students || [];
+        populateStudents();
+        setMessage(students.length ? 'Choose your name, then confirm. The page will refresh immediately.' : 'No students found for this class.', students.length ? '' : 'error');
+      } catch (err) {
+        setMessage(err.message, 'error');
+        document.getElementById('studentSelect').innerHTML = '<option value="">Could not load students</option>';
+      }
+    }
+
+    function confirmProfile() {
+      var classId = document.getElementById('classSelect').value;
+      var select = document.getElementById('studentSelect');
+      var studentNo = select.value;
+      var option = select.options[select.selectedIndex];
+      var fullName = option ? option.dataset.name : '';
+      if (!classId || !studentNo || !fullName) {
+        setMessage('Please choose both class and name first.', 'error');
+        return;
+      }
+      localStorage.setItem('eq_next_class_id', classId);
+      localStorage.setItem('eq_next_student_no', studentNo);
+      localStorage.setItem('eq_next_student_name', fullName);
+      window.location.reload();
+    }
+
+    function logout() {
+      localStorage.removeItem('eq_next_class_id');
+      localStorage.removeItem('eq_next_student_no');
+      localStorage.removeItem('eq_next_student_name');
+      window.location.reload();
+    }
+
+    document.getElementById('classSelect').addEventListener('change', loadStudents);
+    document.getElementById('studentSelect').addEventListener('change', function() {
+      document.getElementById('confirmBtn').disabled = !this.value;
+    });
+    document.getElementById('confirmBtn').addEventListener('click', confirmProfile);
+    document.getElementById('changeBtn').addEventListener('click', logout);
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    refreshSavedState();
+    loadClasses();
+  </script>
+</body>
+</html>

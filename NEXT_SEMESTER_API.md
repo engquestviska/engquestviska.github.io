@@ -30,6 +30,16 @@ Current-year data stays on the existing Apps Script deployment. Next-semester wo
 
 The source spreadsheet must be shared with the Google account that owns/runs this Apps Script project. If it is not shared, public endpoint tests will return Google Drive access denied even though the web app deployment exists.
 
+The web app deployment must also be configured for public access. If even `?action=ping` returns a Google Drive "Anda memerlukan akses" page, the deployment itself is private and the code is not running yet.
+
+## Preview Frontend
+
+- `next-semester/index.html` - isolated student profile login for the new master Sheet.
+- `next-semester/dashboard.html` - isolated student dashboard for XP/rank, attendance, tasks, submissions, profile answers, and strikes.
+- `shared/js/next-semester-api.js` - small client for the separate deployment URL.
+
+These pages are not linked into the current Grade 10 or Teacher flow yet.
+
 ## Read Endpoints
 
 All endpoints use `GET` with an `action` parameter.
