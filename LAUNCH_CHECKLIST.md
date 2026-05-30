@@ -69,6 +69,6 @@ Use this checklist before merging `next-year` into `main`.
 - [x] Run JavaScript syntax checks.
 - [x] Run local HTTP smoke check for root, Grade 10, Grade 11, Teacher, and shared CSS.
 - [x] Push the final `next-year` commit after each completed batch.
-- [ ] Open the exact pushed commit preview if branch preview is stale.
+- [x] Open the exact pushed commit preview if branch preview is stale.
 - [ ] Merge to `main` only when the user decides the new version should become live.
 - [ ] After merge, check the real GitHub Pages live URL again.
