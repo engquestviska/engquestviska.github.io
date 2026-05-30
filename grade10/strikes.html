@@ -376,6 +376,24 @@
       if (el) el.textContent = value;
     }
 
+    function escapeHtml(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[ch];
+      });
+    }
+
+    function safeStrikeTotal(value) {
+      var total = Number(value);
+      if (!Number.isFinite(total)) return 0;
+      return Math.max(0, Math.floor(total));
+    }
+
     function statusFor(total) {
       if (total >= 3) {
         return {
@@ -401,16 +419,16 @@
     function renderDetails(data) {
       var rows = '';
       if (data.date) {
-        rows += '<div class="detail-row"><div class="detail-label">Date</div><div class="detail-value">' + data.date + '</div></div>';
+        rows += '<div class="detail-row"><div class="detail-label">Date</div><div class="detail-value">' + escapeHtml(data.date) + '</div></div>';
       }
       if (data.reason) {
-        rows += '<div class="detail-row"><div class="detail-label">Reason</div><div class="detail-value">' + data.reason + '</div></div>';
+        rows += '<div class="detail-row"><div class="detail-label">Reason</div><div class="detail-value">' + escapeHtml(data.reason) + '</div></div>';
       }
       document.getElementById('detailRows').innerHTML = rows || '<p class="strike-copy">No strike detail has been recorded.</p>';
     }
 
     function renderStrikes(data) {
-      var total = Number(data.total || 0);
+      var total = safeStrikeTotal(data.total);
       var status = statusFor(total);
       var dots = [1, 2, 3].map(function(num) {
         return '<div class="strike-dot' + (num <= total ? ' active' : '') + '">' + num + '</div>';
