@@ -161,6 +161,18 @@
   <script>
     var subData = null;
 
+    function escapeHtml(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[ch];
+      });
+    }
+
     async function initCh4Status() {
       try {
         var data = await EQApi.get({ action: 'getSubmissions' });
@@ -208,7 +220,7 @@
         return;
       }
       result.innerHTML =
-        '<div class="status-student-name">' + student.name + '</div>' +
+        '<div class="status-student-name">' + escapeHtml(student.name) + '</div>' +
         '<div class="status-badge-big ' + (student.submitted ? 'status-submitted' : 'status-missing') + '">' +
           (student.submitted ? 'Submitted' : 'Not Yet Submitted') +
         '</div>' +
@@ -271,7 +283,7 @@
         var fileKeys = Object.keys(files).filter(function(k) { return /^C5T/i.test(k); }).sort();
         if (!data || data.error || !data.submitted || !fileKeys.length) {
           result.innerHTML =
-            '<div class="status-student-name">' + displayName + '</div>' +
+            '<div class="status-student-name">' + escapeHtml(displayName) + '</div>' +
             '<div class="status-badge-big status-missing">Not Submitted Yet</div>' +
             '<div class="status-sub-note">We could not find a Chapter 5 submission for you. Make sure you used the submission form above and uploaded at least one PDF.</div>';
         } else {
@@ -281,7 +293,7 @@
             return '<span class="task-chip ' + (hasFile ? 'done' : '') + '">' + (hasFile ? 'Received' : 'Missing') + ' Task ' + num + '</span>';
           }).join('');
           result.innerHTML =
-            '<div class="status-student-name">' + displayName + '</div>' +
+            '<div class="status-student-name">' + escapeHtml(displayName) + '</div>' +
             '<div class="status-badge-big status-submitted">Submission Received</div>' +
             '<div class="status-sub-note">' + fileKeys.length + ' of 5 Chapter 5 task files were found. Task status can only be changed by the teacher dashboard.</div>' +
             '<div class="task-chip-row">' + chips + '</div>';

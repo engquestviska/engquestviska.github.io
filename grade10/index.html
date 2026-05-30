@@ -412,15 +412,6 @@
       window.location.reload();
     }
 
-    function escapeHtml(value) {
-      return String(value == null ? '' : value)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
     function announcementDate(value) {
       if (!value) return '';
       var date = new Date(value);
@@ -451,8 +442,8 @@
         var type = safeAnnouncementType(announcement.type || 'info');
         card.className = 'home-announcement ' + type;
         document.getElementById('announcementMeta').textContent = 'Class Announcement' + (announcement.postedAt ? ' · ' + announcementDate(announcement.postedAt) : '');
-        document.getElementById('announcementTitle').innerHTML = escapeHtml(announcement.title || 'Class Announcement');
-        document.getElementById('announcementCopy').innerHTML = escapeHtml(announcement.body || '');
+        document.getElementById('announcementTitle').textContent = announcement.title || 'Class Announcement';
+        document.getElementById('announcementCopy').textContent = announcement.body || '';
         card.style.display = 'block';
       } catch(e) {
         card.style.display = 'none';

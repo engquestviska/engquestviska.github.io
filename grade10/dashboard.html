@@ -453,6 +453,27 @@
       if (el) el.textContent = value;
     }
 
+    function escapeHtml(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[ch];
+      });
+    }
+
+    function safeNumber(value) {
+      var number = Number(value);
+      return Number.isFinite(number) ? number : 0;
+    }
+
+    function safeStrikeTotal(value) {
+      return Math.max(0, Math.floor(safeNumber(value)));
+    }
+
     function pct(done, total) {
       return total ? Math.round((done / total) * 100) : 0;
     }
@@ -486,8 +507,8 @@
       ];
       document.getElementById('quickList').innerHTML = items.map(function(item) {
         return '<a class="quick-item" href="' + item.href + '">' +
-          '<div><div class="quick-title">' + item.title + '</div><div class="quick-meta">' + item.meta + '</div></div>' +
-          '<div class="quick-status">' + item.status + '</div>' +
+          '<div><div class="quick-title">' + escapeHtml(item.title) + '</div><div class="quick-meta">' + escapeHtml(item.meta) + '</div></div>' +
+          '<div class="quick-status">' + escapeHtml(item.status) + '</div>' +
         '</a>';
       }).join('');
     }
@@ -645,7 +666,7 @@
       try {
         var data = await mainApiGet({ action: 'getStudentStrikes', className: studentProfile.cls, studentNo: studentProfile.no });
         if (data.error) throw new Error(data.error);
-        var total = Number(data.total || 0);
+        var total = safeStrikeTotal(data.total);
         var status = strikeStatus(total);
         var dots = [1, 2, 3].map(function(num) {
           return '<div class="strike-dot' + (num <= total ? ' active' : '') + '">' + num + '</div>';

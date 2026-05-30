@@ -104,7 +104,19 @@
   <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built by <strong>LaksMedia</strong></footer>
 
   <script>
+    function safeDriveId(value) {
+      var id = String(value || '').trim();
+      return /^[A-Za-z0-9_-]+$/.test(id) ? id : '';
+    }
+
+    function safeYouTubeId(value) {
+      var id = String(value || '').trim();
+      return /^[A-Za-z0-9_-]{6,}$/.test(id) ? id : '';
+    }
+
     function openPdf(title, fileId) {
+      fileId = safeDriveId(fileId);
+      if (!fileId) return;
       document.getElementById('pdfModalTitle').textContent = title;
       document.getElementById('pdfModalIframe').src = 'https://drive.google.com/file/d/' + fileId + '/preview';
       document.getElementById('pdfModalDl').href = 'https://drive.google.com/uc?export=download&id=' + fileId;
@@ -119,6 +131,8 @@
     }
 
     function openVideo(title, videoId) {
+      videoId = safeYouTubeId(videoId);
+      if (!videoId) return;
       document.getElementById('videoModalTitle').textContent = title;
       document.getElementById('videoModalIframe').src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0';
       document.getElementById('videoModalYt').href = 'https://www.youtube.com/watch?v=' + videoId;
@@ -159,6 +173,8 @@
     }
 
     function appendReadingCard(title, fileId) {
+      fileId = safeDriveId(fileId);
+      if (!fileId) return;
       if (document.querySelector('[data-reading-id="' + fileId + '"]')) return;
       var empty = document.getElementById('readingEmpty');
       if (empty) empty.remove();
@@ -171,7 +187,20 @@
 
       var preview = document.createElement('div');
       preview.className = 'material-preview';
-      preview.innerHTML = '<span class="material-icon">PDF</span><iframe src="' + previewUrl + '" title="' + title + '"></iframe><div class="material-overlay"><span>Read</span></div>';
+      var icon = document.createElement('span');
+      icon.className = 'material-icon';
+      icon.textContent = 'PDF';
+      var frame = document.createElement('iframe');
+      frame.src = previewUrl;
+      frame.title = title || 'Reading material';
+      var overlay = document.createElement('div');
+      overlay.className = 'material-overlay';
+      var overlayText = document.createElement('span');
+      overlayText.textContent = 'Read';
+      overlay.appendChild(overlayText);
+      preview.appendChild(icon);
+      preview.appendChild(frame);
+      preview.appendChild(overlay);
       preview.onclick = function() { openPdf(title, fileId); };
 
       var info = document.createElement('div');
@@ -212,6 +241,8 @@
     }
 
     function appendVideoCard(title, videoId) {
+      videoId = safeYouTubeId(videoId);
+      if (!videoId) return;
       if (document.querySelector('[data-video-id="' + videoId + '"]')) return;
       var empty = document.getElementById('videoEmpty');
       if (empty) empty.remove();
@@ -224,7 +255,17 @@
 
       var preview = document.createElement('div');
       preview.className = 'video-preview';
-      preview.innerHTML = '<img src="' + thumbUrl + '" alt="' + title + '" onerror="this.style.display=\'none\'"/><div class="video-play"><span>Play</span></div>';
+      var thumb = document.createElement('img');
+      thumb.src = thumbUrl;
+      thumb.alt = title || 'Video lesson';
+      thumb.onerror = function() { this.style.display = 'none'; };
+      var play = document.createElement('div');
+      play.className = 'video-play';
+      var playText = document.createElement('span');
+      playText.textContent = 'Play';
+      play.appendChild(playText);
+      preview.appendChild(thumb);
+      preview.appendChild(play);
       preview.onclick = function() { openVideo(title, videoId); };
 
       var info = document.createElement('div');

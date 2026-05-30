@@ -114,6 +114,11 @@
   <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built by <strong>LaksMedia</strong></footer>
 
   <script>
+    function safeDriveId(value) {
+      var id = String(value || '').trim();
+      return /^[A-Za-z0-9_-]+$/.test(id) ? id : '';
+    }
+
     function openPDF(title, previewUrl, downloadUrl) {
       document.getElementById('modalTitle').textContent = title;
       document.getElementById('modalIframe').src = previewUrl;
@@ -145,6 +150,8 @@
     }
 
     function appendCard(ch, name, fileId, fileType) {
+      fileId = safeDriveId(fileId);
+      if (!fileId) return;
       var previewUrl = 'https://drive.google.com/file/d/' + fileId + '/preview';
       var downloadUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
       var existing = document.querySelector('[data-fileid="' + fileId + '"]');
@@ -159,7 +166,20 @@
 
       var preview = document.createElement('div');
       preview.className = 'material-preview';
-      preview.innerHTML = '<span class="material-icon">PDF</span><iframe src="' + previewUrl + '" title="' + name + '"></iframe><div class="material-overlay"><span>View</span></div>';
+      var icon = document.createElement('span');
+      icon.className = 'material-icon';
+      icon.textContent = 'PDF';
+      var frame = document.createElement('iframe');
+      frame.src = previewUrl;
+      frame.title = name || 'Material preview';
+      var overlay = document.createElement('div');
+      overlay.className = 'material-overlay';
+      var overlayText = document.createElement('span');
+      overlayText.textContent = 'View';
+      overlay.appendChild(overlayText);
+      preview.appendChild(icon);
+      preview.appendChild(frame);
+      preview.appendChild(overlay);
       preview.onclick = function() { openPDF(name, previewUrl, downloadUrl); };
 
       var info = document.createElement('div');
