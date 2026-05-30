@@ -500,8 +500,26 @@
       return (name || 'EQ').split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase() || 'EQ';
     }
 
+    function escapeHtml(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[ch];
+      });
+    }
+
     function normalizeStatus(value) {
-      return value || 'Present';
+      const status = String(value || 'Present');
+      if (status === 'Present') return 'Present';
+      if (status === 'Absent') return 'Absent';
+      if (status === 'Sick') return 'Sick';
+      if (status === 'Permission') return 'Permission';
+      if (status === 'Dispen') return 'Dispen';
+      return 'Present';
     }
 
     function usableMeetings() {
@@ -566,9 +584,9 @@
       } else {
         list.innerHTML = records.slice().reverse().map(item => (
           '<div class="record-row">' +
-            '<div class="meeting-no">Meeting ' + item.number + '</div>' +
-            '<div class="meeting-date">' + formatDate(item.date) + '</div>' +
-            '<div class="status-chip status-' + item.status + '">' + statusLabel(item.status) + '</div>' +
+            '<div class="meeting-no">Meeting ' + escapeHtml(item.number) + '</div>' +
+            '<div class="meeting-date">' + escapeHtml(formatDate(item.date)) + '</div>' +
+            '<div class="status-chip status-' + item.status + '">' + escapeHtml(statusLabel(item.status)) + '</div>' +
           '</div>'
         )).join('');
       }
