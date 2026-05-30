@@ -248,6 +248,7 @@
 
     /* ── SECTION ── */
     .section { margin-bottom: 52px; }
+    .visually-removed { display: none !important; }
 
     .section-label {
       display: inline-flex;
@@ -1105,7 +1106,7 @@
 </div>
 
 <!-- ── SUMMATIVE STICKY BANNER ── -->
-<div class="summ-banner" id="summBanner">
+<div class="summ-banner visually-removed" id="summBanner">
   <div class="summ-banner-inner">
     <div class="summ-pulse"></div>
     <div class="summ-label">📝 Summative</div>
@@ -1156,14 +1157,14 @@
 </div>
 
 <div class="summ-toast" id="summToast"></div>
-<button class="summ-float-btn" id="summFloatBtn" onclick="openSummModal()">
+<button class="summ-float-btn visually-removed" id="summFloatBtn" onclick="openSummModal()">
   📝 Set Summative
 </button>
 
 <!-- ── HEADER ── -->
 
 <!-- ANNOUNCEMENT BANNER -->
-<div class="ann-banner" id="annBanner">
+<div class="ann-banner visually-removed" id="annBanner">
   <div class="ann-inner">
     <div class="ann-icon" id="annIcon">📢</div>
     <div class="ann-content">
@@ -1226,7 +1227,7 @@
 
 
 <!-- TEACHER ANNOUNCEMENT EDITOR (injected by JS when logged in) -->
-<div class="ann-editor" id="annEditor">
+<div class="ann-editor visually-removed" id="annEditor">
   <div class="ann-editor-title">
     <span>📢 Post Announcement</span>
     <span id="annEditorStatus" style="font-size:0.75rem;font-weight:400;color:var(--text-muted);"></span>
@@ -1259,7 +1260,7 @@
 
 
 <!-- BANNER EDITOR (teacher) -->
-<div class="ann-editor teacher-only" id="bannerEditor" style="display:none;">
+<div class="ann-editor teacher-only visually-removed" id="bannerEditor" style="display:none;">
   <div class="banner-editor">
     <div class="banner-editor-title">
       <span>&#127775; Banner Slides</span>
@@ -1311,9 +1312,6 @@
   if (!cls || !no || !name) return;
 
   var clsLabels = { XE1:'X E-1', XE2:'X E-2', XE3:'X E-3', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
-  var asatHref = 'asat.html?cls=' + encodeURIComponent(cls) + '&no=' + encodeURIComponent(no);
-  var asatResultHref = 'asat-result.html?cls=' + encodeURIComponent(cls) + '&no=' + encodeURIComponent(no);
-
   var wrap = document.createElement('div');
   wrap.style.cssText = 'display:grid;gap:12px;margin-bottom:20px;';
 
@@ -1329,31 +1327,7 @@
     '<div style="font-size:1.3rem;color:rgba(255,255,255,0.5);">›</div>';
   scoreCard.onclick = function() { window.location.href = 'scores.html'; };
 
-  var asatCard = document.createElement('div');
-  asatCard.style.cssText = 'background:linear-gradient(135deg,#0EA5E9,#1D4ED8);border-radius:18px;padding:15px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:0 8px 22px rgba(14,165,233,0.20);';
-  asatCard.innerHTML =
-    '<div style="width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-size:1.25rem;color:#fff;flex-shrink:0;">📦</div>' +
-    '<div style="flex:1;">' +
-      '<div style="font-size:0.7rem;color:rgba(255,255,255,0.72);font-family:monospace;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">ASAT Package</div>' +
-      '<div style="font-weight:800;font-size:0.96rem;color:#fff;">Open my practice PDF</div>' +
-      '<div style="font-size:0.76rem;color:rgba(255,255,255,0.72);">' + (clsLabels[cls] || cls) + ' · Your assigned route only</div>' +
-    '</div>' +
-    '<div style="font-size:1.25rem;color:rgba(255,255,255,0.62);">›</div>';
-  asatCard.onclick = function() { window.location.href = asatHref; };
-  var asatResultCard = document.createElement('div');
-  asatResultCard.style.cssText = 'background:linear-gradient(135deg,#0F766E,#115E59);border-radius:18px;padding:15px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:0 8px 22px rgba(15,118,110,0.20);';
-  asatResultCard.innerHTML =
-    '<div style="width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-size:1.25rem;color:#fff;flex-shrink:0;">🎯</div>' +
-    '<div style="flex:1;">' +
-      '<div style="font-size:0.7rem;color:rgba(255,255,255,0.72);font-family:monospace;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">ASAT Result</div>' +
-      '<div style="font-weight:800;font-size:0.96rem;color:#fff;">See my multiple choice score</div>' +
-      '<div style="font-size:0.76rem;color:rgba(255,255,255,0.72);">' + (clsLabels[cls] || cls) + ' · Score, correct, and wrong numbers</div>' +
-    '</div>' +
-    '<div style="font-size:1.25rem;color:rgba(255,255,255,0.62);">›</div>';
-  asatResultCard.onclick = function() { window.location.href = asatResultHref; };
   wrap.appendChild(scoreCard);
-  wrap.appendChild(asatResultCard);
-  wrap.appendChild(asatCard);
 
   var main = document.querySelector('main');
   if (main) main.insertBefore(wrap, main.firstChild);
@@ -1367,7 +1341,7 @@
 
 
   <!-- BANNER SLIDER -->
-  <div class="banner-wrap" id="bannerWrap" style="display:none;">
+  <div class="banner-wrap visually-removed" id="bannerWrap" style="display:none;">
     <div class="banner-track-outer">
       <div class="banner-track" id="bannerTrack"></div>
       <button class="banner-nav prev" id="bannerPrev" onclick="bannerNav(-1)">&#8249;</button>
@@ -1377,7 +1351,7 @@
   </div>
 
   <!-- HALL OF FAME -->
-  <div class="hof-section" id="hofSection">
+  <div class="hof-section visually-removed" id="hofSection">
     <div class="hof-title-row">
       <div>
         <div class="hof-title">🏆 Hall of Fame</div>
@@ -1391,7 +1365,7 @@
   </div>
 
   <!-- STRIKE LIST -->
-  <div class="strike-list-section">
+  <div class="strike-list-section visually-removed">
     <div class="hof-title-row">
       <div>
         <div class="hof-title">⚠️ Strike Board</div>
@@ -1425,37 +1399,11 @@
         <div class="card-name">Lesson Materials</div>
         <div class="card-desc">View & download lesson slides</div>
       </a>
-      <a href="assignments.html" class="card">
-        <div class="card-icon ic-blue">📋</div>
-        <div class="card-name">Assignments</div>
-        <div class="card-desc">Download task PDFs & instructions</div>
-      </a>
-      <a href="submission.html" class="card">
-        <div class="card-icon ic-yellow">📝</div>
-        <div class="card-name">Submission</div>
-        <div class="card-desc">Submit your task PDF files here</div>
-      </a>
-      <a href="session.html" class="card">
-        <div class="card-icon ic-amber">📖</div>
-        <div class="card-name">Reading</div>
-        <div class="card-desc">Class reading material</div>
-      </a>
-      <a href="session.html" class="card">
-        <div class="card-icon ic-red">🎬</div>
-        <div class="card-name">Video Lesson</div>
-        <div class="card-desc">Watch the lesson video</div>
-      </a>
-      <a href="summative.html" class="card">
-        <div class="card-icon ic-green">🎯</div>
-        <div class="card-name">Summative</div>
-        <div class="card-desc">Exam schedule, topics &amp; what to study</div>
-      </a>
-
     </div>
   </div>
 
   <!-- QUIZ -->
-  <div class="section" id="quiz">
+  <div class="section visually-removed" id="quiz">
     <div class="section-label">Practice &amp; Games</div>
     <div class="section-title">Quiz &amp; Review</div>
     <div class="card-grid">
@@ -1477,11 +1425,6 @@
         <div class="card-name">Student List</div>
         <div class="card-desc">Browse names & activeness stats</div>
       </a>
-      <a href="attendance.html" class="card">
-        <div class="card-icon ic-teal">✅</div>
-        <div class="card-name">Attendance</div>
-        <div class="card-desc">View & record class attendance</div>
-      </a>
       <a href="scores.html" class="card">
         <div class="card-icon ic-orange">🏆</div>
         <div class="card-name">Student Scores</div>
@@ -1491,16 +1434,6 @@
         <div class="card-icon ic-green">✅</div>
         <div class="card-name">Task Status</div>
         <div class="card-desc">See which tasks are done or missing</div>
-      </a>
-      <a href="asat.html" class="card">
-        <div class="card-icon ic-blue">📦</div>
-        <div class="card-name">ASAT Package</div>
-        <div class="card-desc">Download your assigned practice package</div>
-      </a>
-      <a href="asat-result.html" class="card">
-        <div class="card-icon ic-green">🎯</div>
-        <div class="card-name">ASAT Result</div>
-        <div class="card-desc">Check multiple choice score and review</div>
       </a>
       <a href="strikes.html" class="card">
         <div class="card-icon ic-red">⚠️</div>
@@ -1518,7 +1451,7 @@
   </div>
 
   <!-- GALLERY / BRANDING -->
-  <div class="section" id="gallery">
+  <div class="section visually-removed" id="gallery">
     <div class="section-label">Gallery & Branding</div>
     <div class="section-title">Our Identity</div>
     <div class="card-grid">
@@ -1663,7 +1596,7 @@ async function loadHallOfFame() {
   }
 }
 
-loadHallOfFame();
+// Visually removed from the simplified homepage.
 
 async function refreshHallOfFame() {
   const btn = document.getElementById('hofRefreshBtn');
@@ -1894,7 +1827,7 @@ async function loadSummative() {
     }
   } catch(e) { /* fail silently */ }
 }
-loadSummative();
+// Summative banner is visually removed from the simplified homepage.
 
 function renderBanner(d) {
   if (!d || !d.date || !d.title) return;
@@ -2165,7 +2098,7 @@ async function loadStrikeBoard() {
   }
 }
 
-loadStrikeBoard();
+// Visually removed from the simplified homepage.
 
 function openStrikeInfo() {
   document.getElementById('strikeInfoOverlay').classList.remove('hidden');
@@ -2431,23 +2364,10 @@ document.addEventListener('keydown', e => {
 
   <div class="sidebar-section">
     <div class="sidebar-section-label">📂 Documents</div>
-    <a href="jeopardyquiz.html" class="sidebar-item" data-page="jeopardyquiz">
-      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">🎮</div>
-      <div class="sidebar-item-name">Chapter 4 Quiz</div>
-    </a>
     <a href="lessons.html" class="sidebar-item">
       <div class="sidebar-item-icon" style="background:rgba(124,58,237,0.2)">📑</div>
       <div class="sidebar-item-name">Lesson Materials</div>
     </a>
-    <a href="assignments.html" class="sidebar-item">
-      <div class="sidebar-item-icon" style="background:rgba(59,130,246,0.2)">📋</div>
-      <div class="sidebar-item-name">Assignments</div>
-    </a>
-    <a href="submission.html" class="sidebar-item" data-page="submission">
-      <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">📨</div>
-      <div class="sidebar-item-name">Submission</div>
-    </a>
-    <a href="submission_status.html" class="sidebar-item" data-page="submission_status"><div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#9989;</div><div class="sidebar-item-name">Submission Status</div></a>
   </div>
 
   <div class="sidebar-divider"></div>
@@ -2458,10 +2378,6 @@ document.addEventListener('keydown', e => {
       <div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">👨‍🎓</div>
       <div class="sidebar-item-name">Student List</div>
     </a>
-    <a href="attendance.html" class="sidebar-item">
-      <div class="sidebar-item-icon" style="background:rgba(20,184,166,0.2)">✅</div>
-      <div class="sidebar-item-name">Attendance</div>
-    </a>
     <a href="scores.html" class="sidebar-item">
       <div class="sidebar-item-icon" style="background:rgba(249,115,22,0.2)">🏆</div>
       <div class="sidebar-item-name">Student Scores</div>
@@ -2469,14 +2385,6 @@ document.addEventListener('keydown', e => {
     <a href="tasks.html" class="sidebar-item">
       <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">✅</div>
       <div class="sidebar-item-name">Task Status</div>
-    </a>
-    <a href="asat.html" class="sidebar-item">
-      <div class="sidebar-item-icon" style="background:rgba(59,130,246,0.2)">📦</div>
-      <div class="sidebar-item-name">ASAT Package</div>
-    </a>
-    <a href="asat-result.html" class="sidebar-item">
-      <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">🎯</div>
-      <div class="sidebar-item-name">ASAT Result</div>
     </a>
     <a href="activeness.html" class="sidebar-item">
       <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">⚡</div>
@@ -2487,26 +2395,6 @@ document.addEventListener('keydown', e => {
       <div class="sidebar-item-icon" style="background:rgba(220,38,38,0.2)">⚠️</div>
       <div class="sidebar-item-name">Strikes</div>
     </a>
-  </div>
-
-  <div class="sidebar-divider"></div>
-
-  <div class="sidebar-section">
-    <div class="sidebar-section-label">📢 Info</div>
-    <a href="summative.html" class="sidebar-item">
-      <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">🎯</div>
-      <div class="sidebar-item-name">Summative</div>
-    </a>
-    <a href="chapter5_guess_who.html" class="sidebar-item" data-page="guess_who" id="sbGuessWho" style="display:none"><div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">&#129300;</div><div class="sidebar-item-name">Guess Who? <span style="font-size:0.65rem;background:#7C3AED;color:#fff;padding:1px 6px;border-radius:999px;margin-left:4px;font-family:IBM Plex Mono,monospace;">Ch.5</span></div></a>
-    <a href="https://www.instagram.com/engquest.viska/" target="_blank" class="sidebar-item">
-      <div class="sidebar-item-icon" style="background:rgba(124,58,237,0.2)">📸</div>
-      <div class="sidebar-item-name">Instagram</div>
-    </a>
-    <a href="gallery.html" class="sidebar-item" data-page="gallery">
-      <div class="sidebar-item-icon" style="background:rgba(59,130,246,0.2)">🖼️</div>
-      <div class="sidebar-item-name">Photo Gallery</div>
-    </a>
-
   </div>
 
 </nav>
@@ -2872,7 +2760,7 @@ if (localStorage.getItem('eq_tu')) {
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', loadAnnouncement);
 } else {
-  loadAnnouncement();
+  // Announcement banner is visually removed from the simplified homepage.
 }
 
 // ── BANNER SLIDER ─────────────────────────────────────────────
@@ -3024,7 +2912,7 @@ function deleteBannerSlide(idx) {
     }).catch(function() {});
 }
 
-loadBannerSlides();
+// Banner slider is visually removed from the simplified homepage.
 if (localStorage.getItem('eq_tu')) renderBannerEditor();
 
 </script>
