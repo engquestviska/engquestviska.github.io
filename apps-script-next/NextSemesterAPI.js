@@ -31,6 +31,7 @@ function doGet(e) {
     if (action === 'ping') result = { ok: true, system: 'next-semester' };
     else if (action === 'healthCheck') result = healthCheck();
     else if (action === 'getSettings') result = getSettings();
+    else if (action === 'getDataReadiness') result = getDataReadiness();
     else if (action === 'getActiveClasses') result = getActiveClasses(isTruthy(params.includeInactive));
     else if (action === 'getStudentsByClass') result = getStudentsByClass(params.classId || params.class_id, isTruthy(params.includeInactive));
     else if (action === 'getStudentProfile') result = getStudentProfile(params.classId || params.class_id, params.studentNo || params.student_no);
@@ -75,6 +76,150 @@ function getSettings() {
     settings[String(row.key)] = row.value;
   });
   return { settings: settings, rows: rows };
+}
+
+function getDataReadiness() {
+  const classes = readRecords(SHEETS.CLASSES)
+    .filter(function(row) { return row.class_id; })
+    .map(function(row) {
+      return {
+        class_id: normalizeClassId(row.class_id),
+        grade: normalizeNumber(row.grade),
+        display_name: String(row.display_name || row.class_id).trim(),
+        active: isTruthy(row.active),
+        student_capacity: normalizeNumber(row.student_capacity),
+        notes: String(row.notes || '').trim()
+      };
+    });
+  const students = readRecords(SHEETS.STUDENTS)
+    .filter(function(row) { return row.class_id || row.student_no || row.full_name; })
+    .map(normalizeStudent);
+  const classIds = {};
+  const activeClassIds = {};
+  const issues = [];
+  const byClass = {};
+  const seenStudentSlots = {};
+
+  classes.forEach(function(cls) {
+    classIds[cls.class_id] = true;
+    if (cls.active) activeClassIds[cls.class_id] = true;
+    byClass[cls.class_id] = {
+      class_id: cls.class_id,
+      display_name: cls.display_name,
+      grade: cls.grade,
+      active: cls.active,
+      student_capacity: cls.student_capacity,
+      total_students: 0,
+      active_students: 0,
+      placeholder_students: 0,
+      first_placeholder: ''
+    };
+  });
+
+  students.forEach(function(student) {
+    const classId = student.class_id;
+    const key = classId + '#' + student.student_no;
+    const classSummary = byClass[classId] || {
+      class_id: classId,
+      display_name: classId,
+      grade: 0,
+      active: false,
+      student_capacity: 0,
+      total_students: 0,
+      active_students: 0,
+      placeholder_students: 0,
+      first_placeholder: ''
+    };
+
+    if (!classIds[classId]) {
+      issues.push({
+        severity: 'error',
+        code: 'unknown_class',
+        message: 'Student row points to a class that is not listed in Classes.',
+        class_id: classId,
+        student_no: student.student_no
+      });
+    }
+
+    if (seenStudentSlots[key]) {
+      issues.push({
+        severity: 'error',
+        code: 'duplicate_student_slot',
+        message: 'Two student rows use the same class_id and student_no.',
+        class_id: classId,
+        student_no: student.student_no
+      });
+    }
+    seenStudentSlots[key] = true;
+
+    classSummary.total_students += 1;
+    if (student.active) classSummary.active_students += 1;
+    if (isPlaceholderStudent(student.full_name)) {
+      classSummary.placeholder_students += 1;
+      if (!classSummary.first_placeholder) classSummary.first_placeholder = student.full_name;
+    }
+    byClass[classId] = classSummary;
+  });
+
+  Object.keys(byClass).forEach(function(classId) {
+    const summary = byClass[classId];
+    if (summary.active && summary.placeholder_students > 0) {
+      issues.push({
+        severity: 'warning',
+        code: 'active_class_has_placeholders',
+        message: 'Active class still has placeholder student names.',
+        class_id: classId,
+        placeholder_students: summary.placeholder_students,
+        first_placeholder: summary.first_placeholder
+      });
+    }
+    if (summary.student_capacity && summary.total_students > summary.student_capacity) {
+      issues.push({
+        severity: 'warning',
+        code: 'over_capacity',
+        message: 'Class has more student rows than its configured capacity.',
+        class_id: classId,
+        student_capacity: summary.student_capacity,
+        total_students: summary.total_students
+      });
+    }
+    if (summary.active && summary.active_students === 0) {
+      issues.push({
+        severity: 'warning',
+        code: 'active_class_no_active_students',
+        message: 'Class is active but has no active students.',
+        class_id: classId
+      });
+    }
+  });
+
+  const classSummaries = Object.keys(byClass).sort().map(function(classId) {
+    return byClass[classId];
+  });
+  const activeClasses = classSummaries.filter(function(item) { return item.active; });
+  const placeholderTotal = classSummaries.reduce(function(sum, item) {
+    return sum + item.placeholder_students;
+  }, 0);
+  const errors = issues.filter(function(issue) { return issue.severity === 'error'; }).length;
+  const warnings = issues.filter(function(issue) { return issue.severity === 'warning'; }).length;
+
+  return {
+    ok: errors === 0,
+    ready_for_real_students: activeClasses.length > 0 && errors === 0,
+    ready_for_frontend_migration: activeClasses.length > 0 && errors === 0 && warnings === 0,
+    summary: {
+      total_classes: classes.length,
+      active_classes: activeClasses.length,
+      inactive_classes: classes.length - activeClasses.length,
+      total_students: students.length,
+      active_students: students.filter(function(student) { return student.active; }).length,
+      placeholder_students: placeholderTotal,
+      errors: errors,
+      warnings: warnings
+    },
+    classes: classSummaries,
+    issues: issues
+  };
 }
 
 function getActiveClasses(includeInactive) {
@@ -260,6 +405,10 @@ function normalizeStudent(row) {
     active: isTruthy(row.active),
     notes: String(row.notes || '').trim()
   };
+}
+
+function isPlaceholderStudent(name) {
+  return /^student\s+\d+$/i.test(String(name || '').trim());
 }
 
 function findStudent(classId, studentNo) {

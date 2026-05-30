@@ -21,11 +21,29 @@ Current-year data stays on the existing Apps Script deployment. Next-semester wo
   - `Ranks`
   - `Strikes`
 
+## Step 3 Data Rules
+
+The master Sheet can stay as a full template, but only active classes should be treated as real classes.
+
+- `Classes.active`
+  - `TRUE` means the class is used by the next-semester site.
+  - `FALSE` means the class stays in the template but should not appear in normal student flows later.
+  - Keep unused classes as `FALSE` until the teaching assignment is final.
+- `Students`
+  - Keep rows for `Student 1` through `Student 36` while class lists are unknown.
+  - Replace placeholder names with real names only when the roster is confirmed.
+  - Keep `student_no` stable because profiles, scores, attendance, submissions, XP, and strikes all join by `class_id + student_no`.
+  - Do not reuse the same `student_no` twice inside one class.
+- Frontend migration rule
+  - Preview can use inactive/template classes with `includeInactive=true`.
+  - Real Grade 10/Grade 11 pages should use active classes only.
+  - Do not migrate the preview into real grade pages until active classes are chosen and readiness warnings are understood.
+
 ## Apps Script Project
 
 - Folder: `apps-script-next/`
 - Script ID: `1WvWDIGD-FX67lSLjSbC6Gx1pufZ87WN6Kv1o74sKf_dU7aYBQ8p7v6Hq`
-- Initial deployment URL: `https://script.google.com/macros/s/AKfycbyNLYf1615P2rAZsW16sGxPO3jCGGK6TpOwpBmmwNNnCRI8hmwR0eN6d2DVAqj4EsELbg/exec`
+- Deployment URL: `https://script.google.com/macros/s/AKfycbyNLYf1615P2rAZsW16sGxPO3jCGGK6TpOwpBmmwNNnCRI8hmwR0eN6d2DVAqj4EsELbg/exec`
 - Purpose: next-semester read API only until the data model is proven.
 
 The source spreadsheet must be shared with the Google account that owns/runs this Apps Script project. If it is not shared, public endpoint tests will return Google Drive access denied even though the web app deployment exists.
@@ -46,6 +64,7 @@ These pages are not linked into the current Grade 10 or Teacher flow yet.
 
 - 2026-05-30: Public API smoke tests passed for `ping`, `healthCheck`, `getActiveClasses`, `getStudentsByClass`, and `getStudentDashboard`.
 - 2026-05-30: Preview login/dashboard passed desktop and mobile headless checks with `XE1` / `Student 1`; profile save, immediate refresh, and dashboard rendering work.
+- 2026-05-31: `getDataReadiness` deployed at version 2 and verified. Current template has 22 classes, 0 active classes, 792 placeholder students, and no structural errors.
 
 ## Read Endpoints
 
@@ -53,6 +72,7 @@ All endpoints use `GET` with an `action` parameter.
 
 - `ping`
 - `healthCheck`
+- `getDataReadiness`
 - `getSettings`
 - `getActiveClasses`
 - `getStudentsByClass&classId=XE1`
@@ -62,6 +82,8 @@ All endpoints use `GET` with an `action` parameter.
 - `getStudentDashboard&classId=XE1&studentNo=1`
 
 `getActiveClasses` and `getStudentsByClass` support `includeInactive=true` for template/testing work.
+
+`getDataReadiness` checks active classes, roster placeholders, duplicate student slots, unknown class references, capacity mismatches, and whether the Sheet is ready for frontend migration.
 
 ## Important Boundary
 
