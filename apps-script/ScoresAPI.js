@@ -41,7 +41,7 @@ function doGet(e) {
     else if (action === 'getTaskStatus')  result = getTaskStatus(e.parameter.className, e.parameter.studentNo);
     else if (action === 'getAllTasks')    result = getAllTasks(e.parameter.className);
     else if (action === 'saveTaskStatus') result = saveTaskStatus(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.studentNo, JSON.parse(e.parameter.tasks || '{}'));
-    else if (action === 'syncCh5Student') result = syncCh5Student(e.parameter.className, e.parameter.studentNo);
+    else if (action === 'syncCh5Student') result = syncCh5Student(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.studentNo);
     else if (action === 'syncCh5Class')   result = syncCh5Class(e.parameter.className, e.parameter.username, e.parameter.password);
     else if (action === 'getCh5Submissions')   result = getCh5Submissions();
     else if (action === 'getCh5StudentFiles') result = getCh5StudentFiles(e.parameter.className, e.parameter.studentNo);
@@ -177,8 +177,9 @@ function saveTaskStatus(username, password, className, studentNo, tasks) {
   return { success: true };
 }
 
-// ── SYNC CH5 SUBMISSION → TASK STATUS (no auth, student-triggered) ──
-function syncCh5Student(className, studentNo) {
+// ── SYNC CH5 SUBMISSION → TASK STATUS (teacher-triggered) ──
+function syncCh5Student(username, password, className, studentNo) {
+  if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
   const CH5_SS_ID = '1WqvB1SkFEh-lnZ3mLAFzArCuHWqnuxXDbGz_gLZ3zyQ';
   const sheetId = SCORE_SHEETS[className];
   if (!sheetId) return { success: false, error: 'Class not found' };

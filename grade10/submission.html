@@ -29,7 +29,7 @@
     <section class="subpage-hero">
       <div class="kicker">Task Submission</div>
       <h1>Submit your work as a clean PDF file.</h1>
-      <p class="hero-copy">Use the chapter forms for uploads, then check whether your submission has been received and synced to task status.</p>
+      <p class="hero-copy">Use the chapter forms for uploads, then check whether your submission has been received.</p>
     </section>
   </header>
 
@@ -295,7 +295,7 @@
           result.innerHTML =
             '<div class="status-student-name">' + escapeHtml(displayName) + '</div>' +
             '<div class="status-badge-big status-submitted">Submission Received</div>' +
-            '<div class="status-sub-note">' + fileKeys.length + ' of 5 Chapter 5 task files were found. Task status can only be changed by the teacher dashboard.</div>' +
+            '<div class="status-sub-note">' + fileKeys.length + ' of 5 Chapter 5 task files were found. Task status is updated from the teacher track.</div>' +
             '<div class="task-chip-row">' + chips + '</div>';
         }
       } catch(e) {
