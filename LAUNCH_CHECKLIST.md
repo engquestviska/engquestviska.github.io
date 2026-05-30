@@ -31,7 +31,7 @@ Use this checklist before merging `next-year` into `main`.
 
 ## Teacher Track Checks
 
-- [ ] Teacher dashboard login works in the deployed preview.
+- [x] Teacher dashboard login works against the deployed Scores API.
 - [x] Teacher dashboard links open each Grade 10 manager.
 - [x] Teacher manager pages stay inside `teacher/`.
 - [x] Teacher-only actions are not linked from student pages.
@@ -48,11 +48,11 @@ Use this checklist before merging `next-year` into `main`.
 
 ## Data And Backend Checks
 
-- [ ] Apps Script deployment URLs are current.
-- [ ] Google Apps Script permissions allow the public student reads needed by Grade 10.
+- [x] Apps Script deployment URLs are current.
+- [x] Google Apps Script permissions allow the public student reads needed by Grade 10.
 - [ ] Teacher write actions still work after any Apps Script deployment change.
 - [x] Chapter 5 single-student sync requires teacher credentials.
-- [ ] Grade 10 spreadsheet tabs match the class names used by the frontend.
+- [x] Grade 10 spreadsheet tabs match the class names used by the frontend.
 - [x] Grade 11 remains disconnected until its roster, sheets, and API contract exist.
 
 ## Device Checks
