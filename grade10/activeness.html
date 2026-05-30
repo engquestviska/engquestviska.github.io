@@ -528,6 +528,23 @@
   let currentClass = '';
   let studentsData = [];
 
+  function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+      return {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[ch];
+    });
+  }
+
+  function safeNumber(value) {
+    const number = Number(value);
+    return Number.isFinite(number) ? number : 0;
+  }
+
   // ── LOAD CLASS ────────────────────────────────────────────
   async function loadClass() {
     currentClass = document.getElementById('classSelect').value;
@@ -545,7 +562,7 @@
     try {
       const data = await EQApi.get({ action: 'getAllActiveness', className: currentClass });
       if (data.error) { showToast(data.error, 'err'); studentSelect.innerHTML = '<option value="">Failed to load</option>'; return; }
-      studentsData = data.students;
+      studentsData = Array.isArray(data.students) ? data.students : [];
       studentSelect.innerHTML = '<option value="">— Select your name —</option>';
       studentsData.forEach(s => {
         const opt = document.createElement('option');
@@ -562,7 +579,7 @@
   }
 
   function indicatorClass(indicator) {
-    const value = indicator || '';
+    const value = String(indicator || '');
     return value.includes('Pro Maxxing') ? 'ind-promax' :
       value.includes('Ultra Pro') ? 'ind-ultrapro' :
       value.includes('Plus Ultra') ? 'ind-ultra' :
@@ -573,7 +590,7 @@
   }
 
   function activityValue(student, key) {
-    return Number(student[key.replace(/\s/g, '')] || 0);
+    return safeNumber(student[key.replace(/\s/g, '')]);
   }
 
   function viewActiveness() {
@@ -587,21 +604,28 @@
     localStorage.setItem('eq_student_name', student.name || '');
 
     const classLabel = document.getElementById('classSelect').options[document.getElementById('classSelect').selectedIndex].text;
-    const total = Number(student.Total || 0);
-    const indicator = student.Indicator || 'Not Active (+0 bonus)';
+    const total = safeNumber(student.Total);
+    const indicator = String(student.Indicator || 'Not Active (+0 bonus)');
     const indClass = indicatorClass(indicator);
-    const initial = (student.nickname || student.name || '?').charAt(0).toUpperCase();
+    const displayName = student.nickname || student.name || 'Student';
+    const fullName = student.name || displayName;
+    const initial = displayName.charAt(0).toUpperCase() || '?';
+    const safeInitial = escapeHtml(initial);
+    const safeDisplayName = escapeHtml(displayName);
+    const safeFullName = escapeHtml(fullName);
+    const safeClassLabel = escapeHtml(classLabel);
+    const safeIndicator = escapeHtml(indicator);
 
     const activityCards = ACTS.map(a => {
       const raw = activityValue(student, a.key);
       const weighted = raw * (ACT_PTS[a.key] || 1);
       return `<article class="activity-card">
         <div class="activity-top">
-          <div class="activity-icon" style="background:${a.col}">${a.short}</div>
+          <div class="activity-icon" style="background:${a.col}">${escapeHtml(a.short)}</div>
           <div class="activity-value">${raw}</div>
         </div>
         <div>
-          <div class="activity-name">${a.key}</div>
+          <div class="activity-name">${escapeHtml(a.key)}</div>
           <div class="activity-weight">${weighted} weighted point${weighted === 1 ? '' : 's'}</div>
         </div>
       </article>`;
@@ -610,10 +634,10 @@
     document.getElementById('activenessResult').innerHTML = `
       <section class="activeness-dashboard">
         <div class="dash-head">
-          <div class="dash-avatar">${initial}</div>
+          <div class="dash-avatar">${safeInitial}</div>
           <div>
-            <div class="dash-name">${student.nickname || student.name}</div>
-            <div class="dash-meta">${student.name} · ${classLabel}</div>
+            <div class="dash-name">${safeDisplayName}</div>
+            <div class="dash-meta">${safeFullName} · ${safeClassLabel}</div>
           </div>
           <div class="dash-summary">
             <div class="summary-pill"><strong>${total}</strong><span>Total</span></div>
@@ -621,7 +645,7 @@
           </div>
         </div>
         <div class="indicator-strip">
-          <div class="indicator-badge ${indClass}">${indicator}</div>
+          <div class="indicator-badge ${indClass}">${safeIndicator}</div>
         </div>
         <div class="activity-grid">${activityCards}</div>
       </section>`;
