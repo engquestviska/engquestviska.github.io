@@ -37,6 +37,8 @@ The web app deployment must also be configured for public access. If even `?acti
 - `next-semester/index.html` - isolated student profile login for the new master Sheet.
 - `next-semester/dashboard.html` - isolated student dashboard for XP/rank, attendance, tasks, submissions, profile answers, and strikes.
 - `shared/js/next-semester-api.js` - small client for the separate deployment URL.
+- `shared/js/next-semester-profile.js` - local profile storage helper shared by the preview pages.
+- `shared/css/next-semester.css` - isolated preview styling shared by the preview pages.
 
 These pages are not linked into the current Grade 10 or Teacher flow yet.
 
