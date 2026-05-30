@@ -50,18 +50,18 @@ Use this checklist before merging `next-year` into `main`.
 
 - [x] Apps Script deployment URLs are current.
 - [x] Google Apps Script permissions allow the public student reads needed by Grade 10.
-- [ ] Teacher write actions still work after any Apps Script deployment change.
+- [x] Teacher write path still works after Apps Script deployment change.
 - [x] Chapter 5 single-student sync requires teacher credentials.
 - [x] Grade 10 spreadsheet tabs match the class names used by the frontend.
 - [x] Grade 11 remains disconnected until its roster, sheets, and API contract exist.
 
 ## Device Checks
 
-- [ ] Test on desktop width.
-- [ ] Test on phone width.
-- [ ] Confirm navigation, cards, buttons, and long student names do not overlap.
-- [ ] Confirm tables or lists are readable on mobile.
-- [ ] Confirm student-facing buttons have clear tap targets.
+- [x] Test on desktop width.
+- [x] Test on phone width.
+- [x] Confirm navigation, cards, buttons, and long student names do not overlap.
+- [x] Confirm tables or lists are readable on mobile.
+- [x] Confirm student-facing buttons have clear tap targets.
 
 ## Final Merge Checks
 

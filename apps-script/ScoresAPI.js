@@ -27,6 +27,31 @@ function authOk(username, password) {
     (password === TEACHER_HASH || password === TEACHER_PASS);
 }
 
+function teacherHealthCheck(username, password) {
+  if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
+  const details = {};
+  const stamp = new Date().toISOString();
+  try {
+    const props = PropertiesService.getScriptProperties();
+    props.setProperty('_launchHealthCheck', stamp);
+    details.scriptPropertyWrite = props.getProperty('_launchHealthCheck') === stamp;
+    props.deleteProperty('_launchHealthCheck');
+
+    const classNames = Object.keys(SCORE_SHEETS);
+    details.classSheets = classNames.length;
+    details.firstClassRows = SpreadsheetApp.openById(SCORE_SHEETS[classNames[0]]).getSheets()[0].getLastRow();
+    details.summativeRows = _getSummativeTopicSheet().getLastRow();
+
+    return {
+      success: true,
+      checkedAt: stamp,
+      details: details
+    };
+  } catch (e) {
+    return { success: false, error: e.message, details: details };
+  }
+}
+
 function doGet(e) {
   const action = e.parameter.action || '', callback = e.parameter.callback || '';
   let result;
@@ -69,6 +94,7 @@ function doGet(e) {
     else if (action === 'setReveal')        result = setReveal(e.parameter.username, e.parameter.password, e.parameter.cls, e.parameter.attNum, e.parameter.revealed);
     else if (action === 'getBannerSlides')  result = getBannerSlides();
     else if (action === 'setBannerSlides')  result = setBannerSlides(e.parameter.username, e.parameter.password, e.parameter.data);
+    else if (action === 'teacherHealthCheck') result = teacherHealthCheck(e.parameter.username, e.parameter.password);
     else if (action === 'ping')            result = { ok: true };
     else if (action === 'getAnnouncement')   result = getAnnouncement();
     else if (action === 'setAnnouncement')   result = setAnnouncement(e.parameter.username, e.parameter.password, e.parameter.title, e.parameter.body, e.parameter.type);

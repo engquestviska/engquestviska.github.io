@@ -1,6 +1,6 @@
 /* English Quest shared API helpers */
 (function(global) {
-  var API_URL = 'https://script.google.com/macros/s/AKfycbxhGd_M4pb7wx5RoOy49y9mUDStXuSQ6b5fFD-QYAqYSbL83hwitkXkq7ujtbSEyF_D_w/exec';
+  var API_URL = 'https://script.google.com/macros/s/AKfycbxK9MSUe75KC7xMhZhy-9a4omw9rVf1RugYR72OaGlzuNiKJvS5XRoZRp9hcTzjibHuxg/exec';
   var CLASS_LABELS = {
     XE1: 'X E-1',
     XE4: 'X E-4',
