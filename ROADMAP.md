@@ -51,6 +51,7 @@ This roadmap keeps the next-year rebuild focused. The goal is one English Quest 
    - Re-run local route checks after each meaningful batch.
    - Verify the pushed preview by commit URL when RawGitHack branch cache lags.
    - Confirm student-facing pages do not expose teacher editing routes.
+   - Current hardening pass: Grade 10 student data rendering is escaped, Chapter 5 sync is teacher-authenticated, and Grade 11 placeholder pages keep profile state separate.
 
 2. Technical consolidation before more feature pages.
    - Move repeated API helpers into `shared/js/api.js`.
