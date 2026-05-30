@@ -350,6 +350,20 @@ function apiPost(url, params) {
   }).then(function(r) { return r.json(); });
 }
 
+function escapeHtml(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+    return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
+  });
+}
+
+function escapeAttr(value) {
+  return escapeHtml(value).replace(/`/g, '&#96;');
+}
+
+function safeDriveFileId(value) {
+  return String(value || '').replace(/[^a-zA-Z0-9_-]/g, '');
+}
+
 function toBase64(file) {
   return new Promise(function(resolve, reject) {
     var reader = new FileReader();
@@ -386,15 +400,18 @@ function loadGallery() {
     res.photos.forEach(function(p) {
       var item = document.createElement('div');
       item.className = 'gallery-item';
-      var imgUrl = 'https://drive.google.com/thumbnail?id=' + p.fileId + '&sz=w400';
+      var fileId = safeDriveFileId(p.fileId);
+      var imgUrl = 'https://drive.google.com/thumbnail?id=' + fileId + '&sz=w400';
+      var caption = p.caption || 'Class moment';
+      var meta = (p.name || 'Student') + ' · ' + (p.cls || 'Class');
       item.innerHTML =
-        '<img class="gallery-img" src="' + imgUrl + '" alt="' + p.caption + '" loading="lazy"/>' +
+        '<img class="gallery-img" src="' + escapeAttr(imgUrl) + '" alt="' + escapeAttr(caption) + '" loading="lazy"/>' +
         '<div class="gallery-info">' +
-          '<div class="gallery-caption">' + (p.caption || 'Class moment') + '</div>' +
-          '<div class="gallery-meta">' + p.name + ' · ' + p.cls + '</div>' +
+          '<div class="gallery-caption">' + escapeHtml(caption) + '</div>' +
+          '<div class="gallery-meta">' + escapeHtml(meta) + '</div>' +
         '</div>';
       item.onclick = function() {
-        openLightbox('https://drive.google.com/thumbnail?id=' + p.fileId + '&sz=w800', p.caption || 'Class moment', p.name + ' · ' + p.cls);
+        openLightbox('https://drive.google.com/thumbnail?id=' + fileId + '&sz=w800', caption, meta);
       };
       grid.appendChild(item);
     });
@@ -422,15 +439,16 @@ function loadPending() {
       var card = document.createElement('div');
       card.className = 'pending-card';
       card.id = 'pending_' + p.rowIndex;
-      var imgUrl = 'https://drive.google.com/thumbnail?id=' + p.fileId + '&sz=w400';
+      var imgUrl = 'https://drive.google.com/thumbnail?id=' + safeDriveFileId(p.fileId) + '&sz=w400';
+      var rowIndex = parseInt(p.rowIndex, 10) || 0;
       card.innerHTML =
-        '<img class="pending-img" src="' + imgUrl + '" alt=""/>' +
+        '<img class="pending-img" src="' + escapeAttr(imgUrl) + '" alt=""/>' +
         '<div class="pending-info">' +
-          '<div class="pending-name">' + p.name + ' · ' + p.cls + '</div>' +
-          '<div class="pending-caption">' + (p.caption || '—') + '</div>' +
+          '<div class="pending-name">' + escapeHtml((p.name || 'Student') + ' · ' + (p.cls || 'Class')) + '</div>' +
+          '<div class="pending-caption">' + escapeHtml(p.caption || '—') + '</div>' +
           '<div class="pending-actions">' +
-            '<button class="btn-approve" onclick="approvePhoto(' + p.rowIndex + ')">&#10003; Approve</button>' +
-            '<button class="btn-reject" onclick="rejectPhoto(' + p.rowIndex + ')">&#10005; Reject</button>' +
+            '<button class="btn-approve" onclick="approvePhoto(' + rowIndex + ')">&#10003; Approve</button>' +
+            '<button class="btn-reject" onclick="rejectPhoto(' + rowIndex + ')">&#10005; Reject</button>' +
           '</div>' +
         '</div>';
       grid.appendChild(card);
@@ -520,10 +538,13 @@ function onClassChange() {
   if (!cls) { sel.innerHTML = '<option value="">— Select class first —</option>'; return; }
   EQApi.get({ action: 'getStudents', className: cls }).then(function(res) {
     if (res.students) {
-      sel.innerHTML = '<option value="">— Select your name —</option>' +
-        res.students.map(function(s) {
-          return '<option value="' + s.no + '">' + s.name + '</option>';
-        }).join('');
+      sel.innerHTML = '<option value="">— Select your name —</option>';
+      res.students.forEach(function(s) {
+        var opt = document.createElement('option');
+        opt.value = s.no;
+        opt.textContent = s.name;
+        sel.appendChild(opt);
+      });
       sel.disabled = false;
     }
   }).catch(function() {

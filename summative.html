@@ -340,6 +340,12 @@ function showToast(msg) {
   setTimeout(function(){ t.classList.remove('show'); }, 2500);
 }
 
+function escapeHtml(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+    return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch];
+  });
+}
+
 function doLogout() {
   EQAuth.logoutTeacher('index.html');
 }
@@ -498,14 +504,15 @@ function showTopicView(student, attNum) {
   var topicOwner = findTopicOwner(student.cls, student.topic);
 
   var stanceHtml = '';
+  var clsArg = String(student.cls || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
   if (student.stance === 'Agree' || student.stance === 'Disagree') {
     var isAgree = student.stance === 'Agree';
     stanceHtml =
       '<div class="stance-section">' +
         '<div class="stance-label">Your Confirmation</div>' +
         '<div class="stance-btns">' +
-          '<button class="btn-agree' + (isAgree ? ' selected' : '') + '" onclick="saveStance(\'' + student.cls + '\',' + (allData.filter(function(r){return r.cls===student.cls;}).indexOf(student)+1) + ',\'Agree\')">&#9989; Agree</button>' +
-          '<button class="btn-disagree' + (!isAgree ? ' selected' : '') + '" onclick="saveStance(\'' + student.cls + '\',' + (allData.filter(function(r){return r.cls===student.cls;}).indexOf(student)+1) + ',\'Disagree\')">&#10060; Disagree</button>' +
+          '<button class="btn-agree' + (isAgree ? ' selected' : '') + '" onclick="saveStance(\'' + clsArg + '\',' + (allData.filter(function(r){return r.cls===student.cls;}).indexOf(student)+1) + ',\'Agree\')">&#9989; Agree</button>' +
+          '<button class="btn-disagree' + (!isAgree ? ' selected' : '') + '" onclick="saveStance(\'' + clsArg + '\',' + (allData.filter(function(r){return r.cls===student.cls;}).indexOf(student)+1) + ',\'Disagree\')">&#10060; Disagree</button>' +
         '</div>' +
         '<div class="stance-saved show">&#10003; You chose: <strong>' + student.stance + '</strong> — saved successfully!</div>' +
       '</div>';
@@ -516,8 +523,8 @@ function showTopicView(student, attNum) {
         '<div class="stance-label">Confirm Your Stance</div>' +
         '<div class="stance-question">Do you <strong>agree</strong> or <strong>disagree</strong> with the statement in your topic?</div>' +
         '<div class="stance-btns">' +
-          '<button class="btn-agree" id="btnAgree" onclick="saveStance(\'' + student.cls + '\',' + clsIdx + ',\'Agree\')">&#9989; Agree</button>' +
-          '<button class="btn-disagree" id="btnDisagree" onclick="saveStance(\'' + student.cls + '\',' + clsIdx + ',\'Disagree\')">&#10060; Disagree</button>' +
+          '<button class="btn-agree" id="btnAgree" onclick="saveStance(\'' + clsArg + '\',' + clsIdx + ',\'Agree\')">&#9989; Agree</button>' +
+          '<button class="btn-disagree" id="btnDisagree" onclick="saveStance(\'' + clsArg + '\',' + clsIdx + ',\'Disagree\')">&#10060; Disagree</button>' +
         '</div>' +
         '<div class="stance-saved" id="stanceSaved"></div>' +
       '</div>';
@@ -525,11 +532,11 @@ function showTopicView(student, attNum) {
 
   body.innerHTML =
     '<div class="topic-revealed">' +
-      '<div class="topic-sentence">' + displayTopic + '</div>' +
+      '<div class="topic-sentence">' + escapeHtml(displayTopic) + '</div>' +
       (topicOwner === 'Mr. Laksma'
         ? '<div class="topic-from">&#127979; Topic assigned by <strong>Mr. Laksma</strong></div>'
         : topicOwner
-          ? '<div class="topic-from">&#128100; Topic originally written by <strong>' + topicOwner + '</strong></div>'
+          ? '<div class="topic-from">&#128100; Topic originally written by <strong>' + escapeHtml(topicOwner) + '</strong></div>'
           : '') +
       stanceHtml +
     '</div>';
@@ -639,7 +646,7 @@ function renderTeacherTable() {
       '<div class="reveal-toggle">' +
         '<label class="toggle-switch">' +
           '<input type="checkbox" id="' + toggleId + '"' + (isRevealed ? ' checked' : '') +
-          ' onchange="toggleReveal(\'' + s.cls + '\',' + attNum + ',this.checked)">' +
+          ' onchange="toggleReveal(\'' + currentCls + '\',' + attNum + ',this.checked)">' +
           '<span class="toggle-slider"></span>' +
         '</label>' +
         '<span class="toggle-label">' + (isRevealed ? 'On' : 'Off') + '</span>' +
@@ -648,8 +655,8 @@ function renderTeacherTable() {
     html +=
       '<tr>' +
         '<td class="td-num">' + String(attNum).padStart(2,'0') + '</td>' +
-        '<td class="td-name">' + s.name + '</td>' +
-        '<td class="td-topic">' + (s.topic || '<em style="color:var(--text-muted)">No topic</em>') + (function(){ var own = findTopicOwner(s.cls, s.topic); return own ? '<div style="font-size:0.7rem;color:var(--purple-light);margin-top:3px;font-family:IBM Plex Mono,monospace;">from: ' + own + '</div>' : ''; })() + '</td>' +
+        '<td class="td-name">' + escapeHtml(s.name) + '</td>' +
+        '<td class="td-topic">' + (s.topic ? escapeHtml(s.topic) : '<em style="color:var(--text-muted)">No topic</em>') + (function(){ var own = findTopicOwner(s.cls, s.topic); return own ? '<div style="font-size:0.7rem;color:var(--purple-light);margin-top:3px;font-family:IBM Plex Mono,monospace;">from: ' + escapeHtml(own) + '</div>' : ''; })() + '</td>' +
         '<td>' + stance + '</td>' +
         '<td>' + reveal + '</td>' +
       '</tr>';

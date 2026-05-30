@@ -40,10 +40,10 @@ Use this checklist before merging `next-year` into `main`.
 
 ## Legacy Route Checks
 
-- [ ] `quiz.html` remains student-safe.
-- [ ] `jeopardyquiz.html` routes back to the activity hub.
-- [ ] `chapter5_guess_who.html` stays teacher-gated.
-- [ ] `gallery.html`, `summative.html`, and `submission_status.html` do not expose unsafe teacher workflows to students.
+- [x] `quiz.html` remains student-safe.
+- [x] `jeopardyquiz.html` routes back to the activity hub.
+- [x] `chapter5_guess_who.html` stays teacher-gated.
+- [x] `gallery.html`, `summative.html`, and `submission_status.html` do not expose unsafe teacher workflows to students.
 - [x] Root `strikes.html` redirects to `grade10/strikes.html`.
 
 ## Data And Backend Checks
@@ -67,7 +67,7 @@ Use this checklist before merging `next-year` into `main`.
 
 - [x] Run local href/src audit.
 - [x] Run JavaScript syntax checks.
-- [ ] Run local HTTP smoke check for root, Grade 10, Grade 11, Teacher, and shared CSS.
+- [x] Run local HTTP smoke check for root, Grade 10, Grade 11, Teacher, and shared CSS.
 - [x] Push the final `next-year` commit after each completed batch.
 - [ ] Open the exact pushed commit preview if branch preview is stale.
 - [ ] Merge to `main` only when the user decides the new version should become live.
