@@ -574,6 +574,18 @@
     return data;
   }
 
+  function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+      return {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[ch];
+    });
+  }
+
 
   // ── STUDENT — LOAD NAMES ──────────────────────────────────────
   async function onSClassChange() {
@@ -635,9 +647,15 @@
   }
 
   function renderStudentTasks(data, clsLabel, hasSubmitted) {
-    const tasks   = data.tasks;
+    const tasks   = data.tasks || {};
     const keys    = Object.keys(tasks);
-    const initial = data.nickname ? data.nickname[0].toUpperCase() : data.name[0].toUpperCase();
+    const displayName = data.nickname || data.name || 'Student';
+    const fullName = data.name || displayName;
+    const initial = displayName ? displayName[0].toUpperCase() : '?';
+    const safeDisplayName = escapeHtml(displayName);
+    const safeFullName = escapeHtml(fullName);
+    const safeClassLabel = escapeHtml(clsLabel);
+    const safeInitial = escapeHtml(initial);
 
     const ch4Keys = keys.filter(k => /^C4T/i.test(k));
     const ch5Keys = keys.filter(k => /^C5T/i.test(k));
@@ -651,9 +669,10 @@
       const total = ckeys.length;
       const pct   = total > 0 ? Math.round((done / total) * 100) : 0;
       const bar   = pct >= 80 ? '' : pct >= 50 ? 'warn' : 'bad';
+      const safeLabel = escapeHtml(label);
       return `<div class="progress-section">
         <div class="progress-label">
-          <div class="progress-title">${label} Progress</div>
+          <div class="progress-title">${safeLabel} Progress</div>
           <div class="progress-count">${done} / ${total} Done</div>
         </div>
         <div class="progress-bar-wrap"><div class="progress-bar-fill ${bar}" style="width:${pct}%"></div></div>
@@ -663,13 +682,14 @@
     const makeChips = ckeys => ckeys.map(k => {
       const isDone = tasks[k];
       const m = k.match(/^C\d+T(\d+)$/i);
+      const taskName = m ? 'Task ' + m[1] : k;
       return `<div class="task-chip ${isDone ? 'done' : 'missing'}">
         <div class="task-chip-top">
           <div class="task-chip-icon">${isDone ? '&#10003;' : '!'}</div>
           <div class="task-chip-badge">${isDone ? 'Done' : 'Missing'}</div>
         </div>
         <div>
-          <div class="task-chip-name">${m ? 'Task ' + m[1] : k}</div>
+          <div class="task-chip-name">${escapeHtml(taskName)}</div>
           <div class="task-chip-label">${isDone ? 'Recorded as complete' : 'Needs attention'}</div>
         </div>
       </div>`;
@@ -689,10 +709,10 @@
     document.getElementById('studentResult').innerHTML = `
       <div class="status-card">
         <div class="profile-strip">
-          <div class="avatar">${initial}</div>
+          <div class="avatar">${safeInitial}</div>
           <div>
-            <div class="profile-name">${data.nickname || data.name}</div>
-            <div class="profile-meta">${data.name} · ${clsLabel}</div>
+            <div class="profile-name">${safeDisplayName}</div>
+            <div class="profile-meta">${safeFullName} · ${safeClassLabel}</div>
           </div>
           <div class="profile-summary">
             <div class="summary-pill"><strong>${overallPct}%</strong><span>Overall</span></div>
