@@ -622,24 +622,45 @@ let totalStudents = 0;
 
 // Will be called after apiGet is defined below
 
+function escapeHtml(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+    return {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    }[ch];
+  });
+}
+
+function safeNumber(value) {
+  var n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+}
+
 function renderStudentClass(cls, students) {
   const list = document.getElementById('list-' + cls);
   list.innerHTML = '';
   students.forEach((s, i) => {
     const name = s.name || '';
     const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase() || '?';
+    const safeName = escapeHtml(name);
+    const safeInitials = escapeHtml(initials);
+    const safeClass = escapeHtml(cls);
+    const safeNickname = escapeHtml(s.nickname || '');
     const item = document.createElement('div');
     item.className = 'student-item';
     item.dataset.name  = name.toLowerCase();
     item.dataset.class = cls;
     item.innerHTML = `
-      <span class="student-avatar">${initials}</span>
+      <span class="student-avatar">${safeInitials}</span>
       <span class="student-main">
-        <span class="student-name">${name}</span>
+        <span class="student-name">${safeName}</span>
         <span class="student-meta">
           <span>No. ${i + 1}</span>
-          <span>${cls}</span>
-          ${s.nickname ? '<span>' + s.nickname + '</span>' : ''}
+          <span>${safeClass}</span>
+          ${s.nickname ? '<span>' + safeNickname + '</span>' : ''}
         </span>
       </span>
       <span class="student-action">Stats</span>
@@ -802,29 +823,30 @@ async function openActModal(name, cls) {
     if (classData.error) { document.getElementById('actBody').innerHTML = '<div class="act-loading">Could not load stats.</div>'; return; }
 
     // Find student by name (case-insensitive, with fuzzy fallback)
-    let student = classData.students.find(s => s.name.toLowerCase() === name.toLowerCase());
+    let student = classData.students.find(s => String(s.name || '').toLowerCase() === name.toLowerCase());
     if (!student) {
       // Fuzzy fallback: match by first word + last word to handle minor spelling differences
       const nameParts = name.toLowerCase().split(' ');
       const first = nameParts[0], last = nameParts[nameParts.length - 1];
       student = classData.students.find(s => {
-        const sp = s.name.toLowerCase().split(' ');
+        const sp = String(s.name || '').toLowerCase().split(' ');
         return sp[0] === first && sp[sp.length - 1] === last;
       });
     }
     if (!student) { document.getElementById('actBody').innerHTML = '<div class="act-loading">Student stats not found.</div>'; return; }
 
     // Update avatar with nickname if available
-    if (student.nickname) document.getElementById('actAvatar').textContent = student.nickname[0].toUpperCase();
+    if (student.nickname) document.getElementById('actAvatar').textContent = String(student.nickname)[0].toUpperCase();
 
-    const total   = (student.Total || 0);
-    const indClass = student.Indicator.includes('Pro Maxxing') ? 'ind-promax' :
-      student.Indicator.includes('Ultra Pro') ? 'ind-ultrapro' :
-      student.Indicator.includes('Plus Ultra') ? 'ind-ultra' :
-      student.Indicator.includes('Hyperactive') ? 'ind-hyper' :
-      student.Indicator.includes('Super') ? 'ind-super' :
-      student.Indicator.includes('Active') && !student.Indicator.includes('Not') ? 'ind-active' :
-      student.Indicator.includes('Okay') ? 'ind-okay' : 'ind-not';
+    const total   = safeNumber(student.Total);
+    const indicator = String(student.Indicator || '');
+    const indClass = indicator.includes('Pro Maxxing') ? 'ind-promax' :
+      indicator.includes('Ultra Pro') ? 'ind-ultrapro' :
+      indicator.includes('Plus Ultra') ? 'ind-ultra' :
+      indicator.includes('Hyperactive') ? 'ind-hyper' :
+      indicator.includes('Super') ? 'ind-super' :
+      indicator.includes('Active') && !indicator.includes('Not') ? 'ind-active' :
+      indicator.includes('Okay') ? 'ind-okay' : 'ind-not';
     const barPct  = Math.min(100, Math.round((total / 200) * 100)); // 200 = Pro Maxxing threshold
 
     // Point rules per activity
@@ -838,13 +860,13 @@ async function openActModal(name, cls) {
     };
 
     const statsHtml = ACTS.map(a => {
-      const times = student[a.key] || 0;
+      const times = safeNumber(student[a.key]);
       const rule  = pointRules[a.key];
       const pts   = times * rule.pts;
       return `<div class="act-stat-card">
         <div class="act-stat-top">
           <div class="act-stat-dot" style="background:${a.color}"></div>
-          <div class="act-stat-label">${a.label}</div>
+          <div class="act-stat-label">${escapeHtml(a.label)}</div>
         </div>
         <div class="act-stat-nums">
           <div class="act-stat-times">${times}<span>times</span></div>
@@ -868,10 +890,10 @@ async function openActModal(name, cls) {
       <div class="act-info-box">
         <div class="act-info-title">📖 How points work</div>
         <div class="act-info-rows">
-          ${ACTS.map(a => `<div class="act-info-row"><span>${a.label}</span><span>×${pointRules[a.key].pts} ${pointRules[a.key].unit}</span></div>`).join('')}
+          ${ACTS.map(a => `<div class="act-info-row"><span>${escapeHtml(a.label)}</span><span>×${pointRules[a.key].pts} ${escapeHtml(pointRules[a.key].unit)}</span></div>`).join('')}
         </div>
       </div>
-      <div class="act-indicator ${indClass}" style="margin-top:14px">${student.Indicator || '—'}</div>`;
+      <div class="act-indicator ${indClass}" style="margin-top:14px">${escapeHtml(indicator || '—')}</div>`;
 
   } catch(e) {
     document.getElementById('actBody').innerHTML = '<div class="act-loading">Failed to load stats.</div>';
