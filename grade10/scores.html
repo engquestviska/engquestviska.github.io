@@ -473,6 +473,15 @@ function cachedApiGet(params) {
   return EQApi.get(params).then(function(data) { cacheSet(params, data); return data; });
 }
 
+function escapeHtml(value) {
+  return String(value === undefined || value === null ? '' : value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function init() {
   renderStudentMode();
 }
@@ -490,7 +499,7 @@ function renderStudentMode() {
     // Auto-load their scores directly
     var clsLabel = CLASS_LABELS[savedCls] || savedCls;
     main.innerHTML =
-      '<div class="mode-badge student">&#128203; ' + savedName.split(' ')[0] + ' &mdash; ' + clsLabel + ' <span onclick="forgetStudent()" style="margin-left:8px;cursor:pointer;opacity:0.7;font-size:0.85em;">&#10005; Not you?</span></div>' +
+      '<div class="mode-badge student">&#128203; ' + escapeHtml(savedName.split(' ')[0]) + ' &mdash; ' + escapeHtml(clsLabel) + ' <span onclick="forgetStudent()" style="margin-left:8px;cursor:pointer;opacity:0.7;font-size:0.85em;">&#10005; Not you?</span></div>' +
       '<div id="sResult"><div class="state-card"><div class="spinner"></div><div class="state-title">Loading your scores...</div></div></div>';
 
     currentClass = savedCls;
@@ -500,7 +509,7 @@ function renderStudentMode() {
 
   // No identity saved — show picker
   var classOptions = CLASSES.map(function(c) {
-    return '<option value="' + c + '"' + (c === currentClass ? ' selected' : '') + '>' + CLASS_LABELS[c] + '</option>';
+    return '<option value="' + escapeHtml(c) + '"' + (c === currentClass ? ' selected' : '') + '>' + escapeHtml(CLASS_LABELS[c]) + '</option>';
   }).join('');
 
   main.innerHTML =
@@ -559,11 +568,11 @@ function autoLoadStudentScores(cls, no, name) {
     var result = document.getElementById('sResult');
     result.innerHTML =
       '<div class="student-score-card">' +
-        '<div class="score-card-header">' +
-          '<div class="score-card-avatar">' + name.charAt(0).toUpperCase() + '</div>' +
+          '<div class="score-card-header">' +
+          '<div class="score-card-avatar">' + escapeHtml(name.charAt(0).toUpperCase()) + '</div>' +
           '<div class="score-card-name">' +
-            '<div class="name">' + name + '</div>' +
-            '<div class="meta">' + (CLASS_LABELS[cls] || cls) + '</div>' +
+            '<div class="name">' + escapeHtml(name) + '</div>' +
+            '<div class="meta">' + escapeHtml(CLASS_LABELS[cls] || cls) + '</div>' +
           '</div>' +
         '</div>' +
         '<div class="score-card-body">' +
@@ -576,7 +585,7 @@ function autoLoadStudentScores(cls, no, name) {
       '<div id="leaderboardArea"></div>';
     renderLeaderboard(cls);
   }).catch(function(e) {
-    document.getElementById('sResult').innerHTML = '<div class="state-card"><div class="state-icon">&#9203;</div><div class="state-title">Connection problem</div><div class="state-sub">' + e.message + '</div></div>';
+    document.getElementById('sResult').innerHTML = '<div class="state-card"><div class="state-icon">&#9203;</div><div class="state-title">Connection problem</div><div class="state-sub">' + escapeHtml(e.message) + '</div></div>';
   });
 }
 function loadStudentList() {
@@ -588,7 +597,7 @@ function loadStudentList() {
     sel.innerHTML = '<option value="">-- Select your name --</option>';
     res.students.forEach(function(s) {
       var label = s.nickname ? s.name + ' (' + s.nickname + ')' : s.name;
-      sel.innerHTML += '<option value="' + s.no + '">' + label + '</option>';
+      sel.innerHTML += '<option value="' + escapeHtml(s.no) + '">' + escapeHtml(label) + '</option>';
     });
   });
 }
@@ -631,7 +640,7 @@ function renderStudentScoreCard(student, ch4, ch5, fin, cols4, cols5, colsF, cal
   var initial = student ? student.name.charAt(0).toUpperCase() : '?';
 
   var html = '<div class="student-score-card">';
-  html += '<div class="score-card-header"><div class="score-card-avatar">' + initial + '</div><div class="score-card-name"><div class="name">' + (student ? student.name : '') + '</div><div class="meta">' + CLASS_LABELS[currentClass] + ' &middot; ' + (student && student.nickname ? student.nickname : '') + '</div></div></div>';
+  html += '<div class="score-card-header"><div class="score-card-avatar">' + escapeHtml(initial) + '</div><div class="score-card-name"><div class="name">' + escapeHtml(student ? student.name : '') + '</div><div class="meta">' + escapeHtml(CLASS_LABELS[currentClass]) + ' &middot; ' + escapeHtml(student && student.nickname ? student.nickname : '') + '</div></div></div>';
   html += '<div class="score-card-body">';
   html += '<div class="chapter-tabs"><button class="ch-tab active" id="stab4" onclick="switchStudentTab(4)">Chapter 4</button><button class="ch-tab" id="stab5" onclick="switchStudentTab(5)">Chapter 5</button><button class="ch-tab" id="stabF" onclick="switchStudentTab(&apos;F&apos;)">&#127942; Final Score</button></div>';
   html += '<div id="sScoreCh4">' + buildStudentChapterHTML(ch4, cols4, 4) + '</div>';
@@ -651,7 +660,7 @@ function buildStudentChapterHTML(chData, cols, ch) {
     cols.forEach(function(col) {
       var val = chData.scores[col];
       var isEmpty = val === '' || val === undefined || val === null;
-      html += '<div class="score-tile"><div class="score-tile-label">' + col + '</div><div class="score-tile-val' + (isEmpty ? ' empty' : '') + '">' + (isEmpty ? '-' : val) + '</div></div>';
+      html += '<div class="score-tile"><div class="score-tile-label">' + escapeHtml(col) + '</div><div class="score-tile-val' + (isEmpty ? ' empty' : '') + '">' + (isEmpty ? '-' : escapeHtml(val)) + '</div></div>';
     });
   }
   html += '</div>';
@@ -663,8 +672,8 @@ function buildStudentChapterHTML(chData, cols, ch) {
   var gradeClass = ind !== '-' ? 'grade-' + ind.charAt(0).toUpperCase() : '';
 
   html += '<div class="final-summary">';
-  html += '<div class="summary-item"><div class="summary-label">Final Score</div><div class="summary-val">' + final + '</div></div>';
-  html += '<div class="summary-item grade"><div class="summary-label">Grade</div><div class="summary-val"><span class="grade-badge ' + gradeClass + '">' + ind + '</span></div></div>';
+  html += '<div class="summary-item"><div class="summary-label">Final Score</div><div class="summary-val">' + escapeHtml(final) + '</div></div>';
+  html += '<div class="summary-item grade"><div class="summary-label">Grade</div><div class="summary-val"><span class="grade-badge ' + escapeHtml(gradeClass) + '">' + escapeHtml(ind) + '</span></div></div>';
   html += '</div>';
 
   return html;
@@ -680,7 +689,7 @@ function buildStudentFinalHTML(finData, inputCols, calcCols) {
     inputCols.forEach(function(col) {
       var val = finData.scores ? finData.scores[col] : '';
       var isEmpty = val === '' || val === undefined || val === null;
-      html += '<div class="score-tile"><div class="score-tile-label">' + col + '</div><div class="score-tile-val' + (isEmpty ? ' empty' : '') + '">' + (isEmpty ? '-' : val) + '</div></div>';
+      html += '<div class="score-tile"><div class="score-tile-label">' + escapeHtml(col) + '</div><div class="score-tile-val' + (isEmpty ? ' empty' : '') + '">' + (isEmpty ? '-' : escapeHtml(val)) + '</div></div>';
     });
   }
 
@@ -693,10 +702,10 @@ function buildStudentFinalHTML(finData, inputCols, calcCols) {
       if (isGrade) {
         var ind = isEmpty ? '-' : String(val);
         var gradeClass = ind !== '-' ? 'grade-' + ind.charAt(0).toUpperCase() : '';
-        html += '<div class="score-tile highlight"><div class="score-tile-label">' + col + '</div><div class="score-tile-val"><span class="grade-badge ' + gradeClass + '">' + ind + '</span></div></div>';
+        html += '<div class="score-tile highlight"><div class="score-tile-label">' + escapeHtml(col) + '</div><div class="score-tile-val"><span class="grade-badge ' + escapeHtml(gradeClass) + '">' + escapeHtml(ind) + '</span></div></div>';
       } else {
         var num = isEmpty ? '-' : (isNaN(Number(val)) ? val : Number(val).toFixed(1));
-        html += '<div class="score-tile highlight"><div class="score-tile-label">' + col + '</div><div class="score-tile-val">' + (isEmpty ? '-' : num) + '</div></div>';
+        html += '<div class="score-tile highlight"><div class="score-tile-label">' + escapeHtml(col) + '</div><div class="score-tile-val">' + (isEmpty ? '-' : escapeHtml(num)) + '</div></div>';
       }
     });
   }
@@ -728,7 +737,7 @@ function renderLeaderboard(cls) {
       '<div class="leaderboard-header">' +
         '<div>' +
           '<h3>&#127942; Class Leaderboard</h3>' +
-          '<div class="lb-sub">' + clsLabel + ' &mdash; Top 5 by Average Score</div>' +
+          '<div class="lb-sub">' + escapeHtml(clsLabel) + ' &mdash; Top 5 by Average Score</div>' +
         '</div>' +
       '</div>' +
       '<div class="leaderboard-body">' +
@@ -826,7 +835,7 @@ function loadLbRankings(cls) {
       html += '<div class="lb-row' + rankClass + '">';
       html += '<div class="lb-medal">' + medal + '</div>';
       html += '<div class="lb-rank-num">' + rankNum + '</div>';
-      html += '<div class="lb-name">' + s.name + (s.nickname ? '<span class="lb-nick">' + s.nickname + '</span>' : '') + '</div>';
+      html += '<div class="lb-name">' + escapeHtml(s.name) + (s.nickname ? '<span class="lb-nick">' + escapeHtml(s.nickname) + '</span>' : '') + '</div>';
       html += '<div class="lb-avg">' + s.avg.toFixed(1) + '</div>';
       html += '</div>';
     });
