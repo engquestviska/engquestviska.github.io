@@ -60,6 +60,11 @@
   </div>
 
   <footer>© 2026 English Quest · Grade 11 Attendance</footer>
-  <script>localStorage.setItem('eq_grade', '11');</script>
+  <script>
+    localStorage.setItem('eq_grade', '11');
+    localStorage.removeItem('eq_student_class');
+    localStorage.removeItem('eq_student_no');
+    localStorage.removeItem('eq_student_name');
+  </script>
 </body>
 </html>
