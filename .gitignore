@@ -13,6 +13,11 @@ desktop.ini
 *.bak
 *.swp
 
+# Local spreadsheet templates and exports
+*.xls
+*.xlsx
+*.ods
+
 # Local environment files
 .env
 .env.*

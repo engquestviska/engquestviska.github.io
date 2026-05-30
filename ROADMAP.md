@@ -45,7 +45,13 @@ This roadmap keeps the next-year rebuild focused. The goal is one English Quest 
 
 ## Important Next
 
-1. Final launch QA on `next-year`.
+1. Next-semester data model and API.
+   - Use the uploaded master Google Sheet as the next-semester source of truth.
+   - Keep next-semester Apps Script in `apps-script-next/`, separate from current-year `apps-script/ScoresAPI.js`.
+   - Start with read-only endpoints for active classes, students, profiles, XP, rankings, and student dashboards.
+   - Do not wire the current Grade 10/teacher pages to the next-semester API until the new deployment is proven and the user asks for frontend migration.
+
+2. Final launch QA on `next-year`.
    - Keep `main` untouched until the planned switchover.
    - Use `LAUNCH_CHECKLIST.md` as the live readiness checklist.
    - Re-run local route checks after each meaningful batch.
@@ -53,7 +59,7 @@ This roadmap keeps the next-year rebuild focused. The goal is one English Quest 
    - Confirm student-facing pages do not expose teacher editing routes.
    - Current hardening pass: Grade 10 student data rendering is escaped, Chapter 5 sync is teacher-authenticated, and Grade 11 placeholder pages keep profile state separate.
 
-2. Technical consolidation before more feature pages.
+3. Technical consolidation before more feature pages.
    - Move repeated API helpers into `shared/js/api.js`.
    - Move teacher login/session helpers into `shared/js/auth.js`.
    - Refactor newest teacher tools first: `teacher/tasks.html` and `teacher/scores.html`.
@@ -61,13 +67,13 @@ This roadmap keeps the next-year rebuild focused. The goal is one English Quest 
    - Initial API/auth and teacher tool shell extraction is in place; continue this pattern for new manager pages.
    - Do this before building more manager pages, otherwise the site will become harder to maintain.
 
-3. Create Grade 11 page equivalents. Done for placeholder baseline.
+4. Create Grade 11 page equivalents. Done for placeholder baseline.
    - Use the same structure as Grade 10 first.
    - Keep data/content as placeholders until real Grade 11 data exists.
    - Avoid mixing Grade 10 data into Grade 11.
    - Student statistics and strikes placeholders now exist so Grade 11 mirrors the newer Grade 10 student surfaces.
 
-4. Improve Teacher Dashboard.
+5. Improve Teacher Dashboard.
    - Manage Grade 10 and Grade 11 from one place.
    - Add sections for content, scores, attendance, tasks, submissions, activeness, and announcements.
    - Make it clear which grade is being edited.
@@ -79,12 +85,12 @@ This roadmap keeps the next-year rebuild focused. The goal is one English Quest 
    - Activeness manager is now teacher-side for Grade 10 participation point updates.
    - Announcements are now teacher-side for publishing the current Grade 10 update.
 
-5. Plan data separation.
+6. Plan data separation.
    - Decide how Google Sheets and Apps Script will separate Grade 10 and Grade 11.
    - Keep the current Apps Script as Grade 10 for now.
    - Add Grade 11 only when real data exists.
 
-6. Improve mobile UX.
+7. Improve mobile UX.
    - Larger tap targets.
    - Simpler navigation.
    - Cleaner cards.
