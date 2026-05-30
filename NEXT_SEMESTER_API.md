@@ -40,6 +40,11 @@ The web app deployment must also be configured for public access. If even `?acti
 
 These pages are not linked into the current Grade 10 or Teacher flow yet.
 
+## Verification Log
+
+- 2026-05-30: Public API smoke tests passed for `ping`, `healthCheck`, `getActiveClasses`, `getStudentsByClass`, and `getStudentDashboard`.
+- 2026-05-30: Preview login/dashboard passed desktop and mobile headless checks with `XE1` / `Student 1`; profile save, immediate refresh, and dashboard rendering work.
+
 ## Read Endpoints
 
 All endpoints use `GET` with an `action` parameter.

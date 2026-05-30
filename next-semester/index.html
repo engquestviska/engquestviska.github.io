@@ -151,6 +151,11 @@
       justify-content: center;
     }
 
+    .next-actions .btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
     .next-message {
       min-height: 44px;
       border-radius: 16px;
@@ -297,8 +302,8 @@
     function refreshSavedState() {
       var saved = savedProfile();
       document.getElementById('dashboardLink').style.display = saved.classId && saved.studentNo ? 'inline-flex' : 'none';
-      document.getElementById('changeBtn').disabled = !(saved.classId && saved.studentNo);
-      document.getElementById('logoutBtn').disabled = !(saved.classId && saved.studentNo);
+      document.getElementById('changeBtn').style.display = saved.classId && saved.studentNo ? 'inline-flex' : 'none';
+      document.getElementById('logoutBtn').style.display = saved.classId && saved.studentNo ? 'inline-flex' : 'none';
       if (saved.classId && saved.studentNo) {
         setMessage('Logged in as ' + saved.fullName + ' from ' + saved.classId + '. Open dashboard when ready.', 'ok');
       }

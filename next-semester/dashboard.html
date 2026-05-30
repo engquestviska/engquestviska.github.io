@@ -499,9 +499,11 @@
       document.getElementById('xpBar').style.width = xpProgress + '%';
       setText('xpText', number(xp.xp_to_next) + ' XP to next level.');
 
-      setText('attendanceValue', attendancePct ? attendancePct + '%' : '--');
+      setText('attendanceValue', attendance.total_records ? attendancePct + '%' : '0%');
       document.getElementById('attendanceBar').style.width = attendancePct + '%';
-      setText('attendanceText', number(attendance.present_like) + ' present-like records out of ' + number(attendance.total_records) + '.');
+      setText('attendanceText', attendance.total_records
+        ? number(attendance.present_like) + ' present-like records out of ' + number(attendance.total_records) + '.'
+        : 'No attendance records yet.');
 
       renderStrike(number(strikes.active_strikes), strikes.can_join_summative !== false, strikes.can_join_class !== false);
       renderTasks(data.tasks || []);
