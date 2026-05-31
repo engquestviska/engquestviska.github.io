@@ -74,7 +74,17 @@ The web app deployment must also be configured for public access. If even `?acti
 - `shared/js/next-semester-profile.js` - local profile storage helper shared by the preview pages.
 - `shared/css/next-semester.css` - isolated preview styling shared by the preview pages.
 
-These pages are not linked into the current Grade 10 or Teacher flow yet.
+These pages are isolated preview surfaces. The current Grade 10, Grade 11, and Teacher data flows do not depend on them.
+
+## Step 6 Migration Bridge
+
+The preview is now reachable from the real entry pages without replacing current-year behavior:
+
+- `grade10/index.html` links to the next-semester student preview, dashboard preview, and teacher console preview.
+- `grade11/index.html` links to the same preview surfaces while Grade 11 data remains placeholder-only.
+- `teacher/index.html` links to the next-semester teacher console and preview surfaces.
+
+This is a bridge, not the final migration. Current Grade 10, Grade 11, and Teacher pages still keep their existing data flows until the master Sheet is ready for real classes.
 
 ## Verification Log
 
@@ -83,6 +93,7 @@ These pages are not linked into the current Grade 10 or Teacher flow yet.
 - 2026-05-31: `getDataReadiness` deployed at version 2 and verified. Current template has 22 classes, 0 active classes, 792 placeholder students, and no structural errors.
 - 2026-05-31: `getProfileFormSpec` deployed at version 4 and verified. Current form spec has 10 questions, 3 required fields, and 22 template class choices with `includeInactive=true`.
 - 2026-05-31: `getTeacherControlSummary` deployed at version 5 and verified. Teacher console passed desktop/mobile checks with 22 classes, 10 profile questions, 6 XP rules, and 8 queued control areas.
+- 2026-05-31: Step 6 bridge added from Grade 10, Grade 11, and Teacher entry pages to the isolated next-semester preview surfaces.
 
 ## Read Endpoints
 
