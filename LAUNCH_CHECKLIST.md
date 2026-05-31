@@ -55,6 +55,18 @@ Use this checklist before merging `next-year` into `main`.
 - [x] Grade 10 spreadsheet tabs match the class names used by the frontend.
 - [x] Grade 11 remains disconnected until its roster, sheets, and API contract exist.
 
+## Next Semester Preview Checks
+
+- [x] `apps-script-next/` stays separate from the current-year Apps Script.
+- [x] `next-semester/` preview pages are reachable from Grade 10, Grade 11, and Teacher entry pages.
+- [x] Preview bridge links do not replace current Grade 10, Grade 11, or Teacher data flows.
+- [x] Data readiness, profile form spec, and teacher control summary endpoints are documented.
+- [x] `NEXT_SEMESTER_MIGRATION.md` records the promotion checklist before the preview becomes the real system.
+- [ ] Activate only real classes in the master Sheet.
+- [ ] Replace placeholder students for active classes.
+- [ ] Re-run readiness and resolve active-class warnings before real migration.
+- [ ] Review write contracts before building next-semester teacher controls.
+
 ## Device Checks
 
 - [x] Test on desktop width.

@@ -51,6 +51,7 @@ This roadmap keeps the next-year rebuild focused. The goal is one English Quest 
    - Start with read-only endpoints for active classes, students, profiles, XP, rankings, and student dashboards.
    - Use `getDataReadiness` to check active classes, placeholders, duplicate roster slots, and migration readiness before wiring real grade pages.
    - Keep preview frontend work in `next-semester/`; real Grade 10, Grade 11, and Teacher pages now link to it as a migration bridge without replacing current behavior.
+   - Use `NEXT_SEMESTER_MIGRATION.md` as the promotion checklist before the preview becomes the real student system.
 
 2. Final launch QA on `next-year`.
    - Keep `main` untouched until the planned switchover.
@@ -90,6 +91,7 @@ This roadmap keeps the next-year rebuild focused. The goal is one English Quest 
    - Decide how Google Sheets and Apps Script will separate Grade 10 and Grade 11.
    - Keep the current Apps Script as Grade 10 for now.
    - Add Grade 11 only when real data exists.
+   - Do not wire real grade pages to next-semester data until active classes and write contracts are reviewed.
 
 7. Improve mobile UX.
    - Larger tap targets.

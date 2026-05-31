@@ -86,6 +86,15 @@ The preview is now reachable from the real entry pages without replacing current
 
 This is a bridge, not the final migration. Current Grade 10, Grade 11, and Teacher pages still keep their existing data flows until the master Sheet is ready for real classes.
 
+## Step 7 Settlement
+
+The preview stays in the repo as a controlled bridge instead of being deleted or silently merged into the live student pages.
+
+- `NEXT_SEMESTER_MIGRATION.md` is the source-of-truth checklist for moving from preview to real rollout.
+- The bridge links are safe because they open isolated preview pages.
+- The bridge links are not permission to make Grade 10, Grade 11, or Teacher depend on the next-semester API.
+- The next real milestone is data readiness: active classes, real rosters, profile form responses, and reviewed write contracts.
+
 ## Verification Log
 
 - 2026-05-30: Public API smoke tests passed for `ping`, `healthCheck`, `getActiveClasses`, `getStudentsByClass`, and `getStudentDashboard`.
@@ -94,6 +103,7 @@ This is a bridge, not the final migration. Current Grade 10, Grade 11, and Teach
 - 2026-05-31: `getProfileFormSpec` deployed at version 4 and verified. Current form spec has 10 questions, 3 required fields, and 22 template class choices with `includeInactive=true`.
 - 2026-05-31: `getTeacherControlSummary` deployed at version 5 and verified. Teacher console passed desktop/mobile checks with 22 classes, 10 profile questions, 6 XP rules, and 8 queued control areas.
 - 2026-05-31: Step 6 bridge added from Grade 10, Grade 11, and Teacher entry pages to the isolated next-semester preview surfaces.
+- 2026-05-31: Step 7 settled the preview boundary and migration checklist without replacing current-year data flows.
 
 ## Read Endpoints
 
@@ -126,4 +136,6 @@ Pass `includeInactive=true` while the Sheet is still a template. Without it, the
 
 Do not add next-semester endpoints to `apps-script/ScoresAPI.js`.
 
-Do not point Grade 10 or teacher pages to the next-semester API until the new API has its own deployed URL and the user explicitly asks to start wiring the next-semester frontend.
+Do not make Grade 10, Grade 11, or teacher pages depend on the next-semester API until the user explicitly asks to start the real migration.
+
+Links from real entry pages into `next-semester/` are allowed as preview bridge links only.
