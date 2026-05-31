@@ -34,6 +34,7 @@ function doGet(e) {
     else if (action === 'getSettings') result = getSettings();
     else if (action === 'getDataReadiness') result = getDataReadiness();
     else if (action === 'getProfileFormSpec') result = getProfileFormSpec(isTruthy(params.includeInactive));
+    else if (action === 'getTeacherControlSummary') result = getTeacherControlSummary();
     else if (action === 'getActiveClasses') result = getActiveClasses(isTruthy(params.includeInactive));
     else if (action === 'getStudentsByClass') result = getStudentsByClass(params.classId || params.class_id, isTruthy(params.includeInactive));
     else if (action === 'getStudentProfile') result = getStudentProfile(params.classId || params.class_id, params.studentNo || params.student_no);
@@ -269,6 +270,73 @@ function getProfileFormSpec(includeInactive) {
       approved_values: ['TRUE', 'FALSE', ''],
       read_behavior: 'Student dashboard reads the latest approved profile row for the logged-in class_id and student_no.'
     }
+  };
+}
+
+function getTeacherControlSummary() {
+  const readiness = getDataReadiness();
+  const profileForm = getProfileFormSpec(true);
+  const settings = getSettings().settings;
+  const xpRules = readRecords(SHEETS.XP_RULES)
+    .filter(function(row) { return row.source; })
+    .map(function(row) {
+      return {
+        source: String(row.source || '').trim(),
+        default_xp: normalizeNumber(row.default_xp),
+        category: String(row.category || '').trim(),
+        active: isTruthy(row.active),
+        notes: String(row.notes || '').trim()
+      };
+    });
+  const ranks = readRecords(SHEETS.RANKS)
+    .filter(function(row) { return row.level !== '' && row.level !== undefined; })
+    .map(function(row) {
+      return {
+        level: normalizeNumber(row.level),
+        total_xp_min: normalizeNumber(row.total_xp_min),
+        xp_to_next: normalizeNumber(row.xp_to_next),
+        next_level_total: normalizeNumber(row.next_level_total),
+        rank_name: String(row.rank_name || '').trim()
+      };
+    });
+
+  return {
+    ok: true,
+    mode: 'read-only-preview',
+    settings: settings,
+    readiness: readiness,
+    profile_form: {
+      question_count: profileForm.questions.length,
+      required_count: profileForm.questions.filter(function(question) { return question.required; }).length,
+      questions: profileForm.questions,
+      rules: profileForm.rules
+    },
+    xp: {
+      rule_count: xpRules.length,
+      active_rule_count: xpRules.filter(function(rule) { return rule.active; }).length,
+      rank_count: ranks.length,
+      rules: xpRules,
+      ranks: ranks
+    },
+    records: {
+      scores: readRecords(SHEETS.SCORES).length,
+      tasks: readRecords(SHEETS.TASKS).length,
+      attendance: readRecords(SHEETS.ATTENDANCE).length,
+      submissions: readRecords(SHEETS.SUBMISSIONS).length,
+      xp_logs: readRecords(SHEETS.XP_LOG).length,
+      strikes: readRecords(SHEETS.STRIKES).length,
+      profiles: readRecords(SHEETS.PROFILES).length
+    },
+    controls: [
+      { id: 'classes', label: 'Active Classes', status: readiness.summary.active_classes ? 'Needs review' : 'Waiting', note: 'Set Classes.active to TRUE only for classes you will teach.' },
+      { id: 'profiles', label: 'Profile Approval', status: 'Queued', note: 'Write controls will approve or hide rows in Profiles.approved.' },
+      { id: 'xp', label: 'XP and Rank', status: xpRules.length ? 'Rules loaded' : 'Waiting', note: 'XP write controls will add rows to XP_Log.' },
+      { id: 'strikes', label: 'Strikes', status: 'Queued', note: 'Strike write controls will append rows to Strikes.' },
+      { id: 'attendance', label: 'Attendance', status: 'Queued', note: 'Attendance controls will write meeting records.' },
+      { id: 'scores', label: 'Scores', status: 'Queued', note: 'Score controls will write rows to Scores.' },
+      { id: 'tasks', label: 'Tasks', status: 'Queued', note: 'Task controls will publish rows from Tasks.' },
+      { id: 'submissions', label: 'Submissions', status: 'Queued', note: 'Submission review will update Submissions.status and teacher notes.' }
+    ]
   };
 }
 

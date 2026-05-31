@@ -1,5 +1,6 @@
 .next-page,
-.next-dashboard {
+.next-dashboard,
+.next-teacher {
   --primary: #2563eb;
   --primary-dark: #1e3a8a;
   --primary-soft: #dbeafe;
@@ -12,6 +13,12 @@
 
 .next-shell,
 .dash-shell {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  padding: 22px;
+}
+
+.teacher-preview-shell {
   width: min(1180px, 100%);
   margin: 0 auto;
   padding: 22px;
@@ -39,6 +46,20 @@
 .dash-hero {
   color: #fff;
   background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 52%, #1e3a8a 100%);
+}
+
+.teacher-preview-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.35fr);
+  gap: 22px;
+  align-items: end;
+  margin: 28px 0 22px;
+  padding: clamp(28px, 5vw, 54px);
+  color: #fff;
+  border: 1.5px solid var(--line);
+  border-radius: 30px;
+  background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 54%, #1e3a8a 100%);
+  box-shadow: 0 22px 60px rgba(37, 99, 235, 0.1);
 }
 
 .next-hero-main {
@@ -221,6 +242,89 @@
   gap: 16px;
 }
 
+.teacher-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.teacher-panel,
+.teacher-control-card {
+  border: 1.5px solid var(--line);
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 20px 54px rgba(37, 99, 235, 0.08);
+  padding: 22px;
+}
+
+.teacher-panel {
+  grid-column: span 6;
+}
+
+.teacher-panel.full {
+  grid-column: 1 / -1;
+}
+
+.teacher-control-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.teacher-control-card {
+  display: grid;
+  gap: 10px;
+  min-height: 170px;
+  box-shadow: none;
+}
+
+.teacher-control-card strong {
+  font-size: 1rem;
+}
+
+.teacher-control-card p {
+  color: #64748b;
+  line-height: 1.55;
+}
+
+.teacher-control-status {
+  width: fit-content;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  padding: 7px 10px;
+  font: 800 0.72rem 'IBM Plex Mono', monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.teacher-list {
+  display: grid;
+  gap: 10px;
+}
+
+.teacher-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  align-items: center;
+  border: 1px solid #dbeafe;
+  border-radius: 16px;
+  background: #f8fbff;
+  padding: 13px 14px;
+}
+
+.teacher-row-title {
+  font-weight: 800;
+}
+
+.teacher-row-meta {
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
 .dash-card {
   grid-column: span 4;
   min-height: 210px;
@@ -369,20 +473,26 @@
   .next-hero,
   .next-status-grid,
   .dash-hero,
-  .dash-grid {
+  .dash-grid,
+  .teacher-preview-hero,
+  .teacher-preview-grid,
+  .teacher-control-grid {
     grid-template-columns: 1fr;
   }
 
   .dash-card,
   .dash-card.wide,
-  .dash-card.full {
+  .dash-card.full,
+  .teacher-panel,
+  .teacher-panel.full {
     grid-column: auto;
   }
 }
 
 @media (max-width: 560px) {
   .next-shell,
-  .dash-shell {
+  .dash-shell,
+  .teacher-preview-shell {
     padding: 18px;
   }
 
@@ -390,13 +500,17 @@
   .next-login,
   .dash-hero,
   .dash-card,
-  .dash-guard {
+  .dash-guard,
+  .teacher-preview-hero,
+  .teacher-panel,
+  .teacher-control-card {
     border-radius: 24px;
     padding: 22px;
   }
 
   .mini-grid,
-  .list-item {
+  .list-item,
+  .teacher-row {
     grid-template-columns: 1fr;
   }
 }

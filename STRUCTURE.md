@@ -12,7 +12,7 @@ English Quest is being reorganized into three tracks.
 - `STRUCTURE.md` - current folder structure.
 - `apps-script/` - current-year Apps Script source.
 - `apps-script-next/` - separate next-semester Apps Script source for the uploaded master spreadsheet.
-- `next-semester/` - isolated preview pages for the next-semester profile login and student dashboard.
+- `next-semester/` - isolated preview pages for the next-semester profile login, student dashboard, and read-only teacher console.
 - `shared/` - shared CSS and JavaScript for the new structure.
 
 ## Grade 10

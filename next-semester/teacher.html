@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Next Semester Teacher Console · English Quest</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css"/>
+  <link rel="stylesheet" href="../shared/css/next-semester.css"/>
+  <script src="../shared/js/next-semester-api.js"></script>
+</head>
+<body class="next-teacher">
+  <div class="teacher-preview-shell">
+    <header class="topbar">
+      <div class="brand">
+        <img src="../logo.jpg" alt="English Quest Logo"/>
+        <div>
+          <div class="brand-title">English Quest</div>
+          <div class="brand-sub">Next Semester Teacher Console</div>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Preview navigation">
+        <a href="index.html">Student Preview</a>
+        <a href="dashboard.html">Dashboard Preview</a>
+        <a href="../teacher/">Current Teacher</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="teacher-preview-hero">
+        <div>
+          <div class="dash-kicker">Teacher Console</div>
+          <h1>Control room for the new master sheet.</h1>
+          <p class="dash-copy">A read-only teacher preview for class readiness, profile form setup, XP rules, and the manager surfaces that will become write controls later.</p>
+        </div>
+        <aside class="student-tile">
+          <div class="dash-kicker">Mode</div>
+          <div class="student-name" id="modeValue">Loading</div>
+          <div class="student-meta" id="sheetValue">Master Sheet</div>
+        </aside>
+      </section>
+
+      <section class="teacher-preview-grid" aria-label="Teacher control summary">
+        <article class="teacher-panel">
+          <div class="dash-label">Readiness</div>
+          <div class="dash-title">Sheet status</div>
+          <div class="mini-grid">
+            <div class="mini"><span class="dash-label">Classes</span><strong id="totalClasses">--</strong></div>
+            <div class="mini"><span class="dash-label">Active</span><strong id="activeClasses">--</strong></div>
+            <div class="mini"><span class="dash-label">Issues</span><strong id="issueCount">--</strong></div>
+          </div>
+          <p class="dash-muted" id="readinessText">Loading readiness...</p>
+        </article>
+
+        <article class="teacher-panel">
+          <div class="dash-label">Profile Form</div>
+          <div class="dash-title">Student profile contract</div>
+          <div class="mini-grid">
+            <div class="mini"><span class="dash-label">Questions</span><strong id="questionCount">--</strong></div>
+            <div class="mini"><span class="dash-label">Required</span><strong id="requiredCount">--</strong></div>
+            <div class="mini"><span class="dash-label">Profiles</span><strong id="profileRows">--</strong></div>
+          </div>
+          <div class="teacher-list" id="questionList"></div>
+        </article>
+
+        <article class="teacher-panel">
+          <div class="dash-label">XP / Rank</div>
+          <div class="dash-title">Level system</div>
+          <div class="mini-grid">
+            <div class="mini"><span class="dash-label">Rules</span><strong id="xpRules">--</strong></div>
+            <div class="mini"><span class="dash-label">Active</span><strong id="activeXpRules">--</strong></div>
+            <div class="mini"><span class="dash-label">Ranks</span><strong id="rankCount">--</strong></div>
+          </div>
+          <div class="teacher-list" id="xpList"></div>
+        </article>
+
+        <article class="teacher-panel">
+          <div class="dash-label">Records</div>
+          <div class="dash-title">Current data volume</div>
+          <div class="teacher-list" id="recordList"></div>
+        </article>
+
+        <article class="teacher-panel full">
+          <div class="dash-label">Queued Controls</div>
+          <div class="dash-title">Teacher managers to build</div>
+          <div class="teacher-control-grid" id="controlGrid"></div>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <footer>© 2026 English Quest · Next Semester Teacher Console</footer>
+
+  <script>
+    function setText(id, value) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = value;
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[ch];
+      });
+    }
+
+    function renderRows(items, renderer, emptyText) {
+      if (!items || !items.length) return '<p class="dash-muted">' + escapeHtml(emptyText) + '</p>';
+      return items.map(renderer).join('');
+    }
+
+    function row(title, meta, badge) {
+      return '<div class="teacher-row">' +
+        '<div><div class="teacher-row-title">' + escapeHtml(title) + '</div><div class="teacher-row-meta">' + escapeHtml(meta) + '</div></div>' +
+        (badge ? '<span class="pill">' + escapeHtml(badge) + '</span>' : '') +
+      '</div>';
+    }
+
+    function renderSummary(data) {
+      var readiness = data.readiness || {};
+      var summary = readiness.summary || {};
+      var records = data.records || {};
+      var profile = data.profile_form || {};
+      var xp = data.xp || {};
+      var issueCount = Number(summary.errors || 0) + Number(summary.warnings || 0);
+
+      setText('modeValue', data.mode || 'Read only');
+      setText('sheetValue', data.settings && data.settings.school_year ? data.settings.school_year : 'Master Sheet');
+      setText('totalClasses', summary.total_classes || 0);
+      setText('activeClasses', summary.active_classes || 0);
+      setText('issueCount', issueCount);
+      setText('readinessText', readiness.ready_for_frontend_migration
+        ? 'The Sheet is ready for frontend migration.'
+        : 'Keep this in preview until active classes and roster placeholders are reviewed.');
+
+      setText('questionCount', profile.question_count || 0);
+      setText('requiredCount', profile.required_count || 0);
+      setText('profileRows', records.profiles || 0);
+      document.getElementById('questionList').innerHTML = renderRows((profile.questions || []).slice(0, 5), function(question) {
+        return row(question.question, question.field_key, question.required ? 'Required' : 'Optional');
+      }, 'No profile form questions found.');
+
+      setText('xpRules', xp.rule_count || 0);
+      setText('activeXpRules', xp.active_rule_count || 0);
+      setText('rankCount', xp.rank_count || 0);
+      document.getElementById('xpList').innerHTML = renderRows((xp.rules || []).slice(0, 5), function(rule) {
+        return row(rule.source, rule.category + ' · ' + rule.default_xp + ' XP', rule.active ? 'Active' : 'Off');
+      }, 'No XP rules found.');
+
+      document.getElementById('recordList').innerHTML = Object.keys(records).map(function(key) {
+        return row(key.replace(/_/g, ' '), 'Rows currently in ' + key, records[key]);
+      }).join('');
+
+      document.getElementById('controlGrid').innerHTML = renderRows(data.controls || [], function(control) {
+        return '<div class="teacher-control-card">' +
+          '<span class="teacher-control-status">' + escapeHtml(control.status) + '</span>' +
+          '<strong>' + escapeHtml(control.label) + '</strong>' +
+          '<p>' + escapeHtml(control.note) + '</p>' +
+        '</div>';
+      }, 'No controls listed yet.');
+    }
+
+    async function init() {
+      try {
+        var data = await EQNextAPI.get({ action: 'getTeacherControlSummary' });
+        renderSummary(data);
+      } catch (err) {
+        setText('modeValue', 'API error');
+        setText('readinessText', err.message);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
