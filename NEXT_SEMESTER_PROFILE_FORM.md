@@ -7,7 +7,8 @@ The form is not for scores, attendance, XP, strikes, or submissions. It only col
 ## Target Sheet
 
 - Spreadsheet: `English_Quest_Next_Semester_Template`
-- Destination tab: `Profiles`
+- Raw response tab: `Form responses 1`
+- Dashboard profile source: approved rows from `Profiles` and approved rows from `Form responses 1`
 - Join key: `class_id + student_no`
 - Approval field: `approved`
 
@@ -15,7 +16,8 @@ The dashboard reads the latest profile row where:
 
 - `class_id` matches the logged-in student.
 - `student_no` matches the logged-in student.
-- `approved` is blank or `TRUE`.
+- `Profiles.approved` is blank or `TRUE`.
+- `Form responses 1.Approved` is `TRUE`.
 
 ## Form Questions
 
@@ -37,15 +39,16 @@ Build the Google Form using the `Profile_Form_Questions` tab as the source of tr
 ## Setup Rules
 
 1. Link the Google Form response destination to the master spreadsheet.
-2. Either send responses directly into `Profiles`, or copy/normalize responses into `Profiles` with the exact headers below:
+2. Keep raw responses in `Form responses 1`.
+3. Add an `Approved` column to the right of the form response headers.
+4. Type `TRUE` for rows that can appear on the student dashboard, or `FALSE` for rows that should stay hidden.
+5. Optional later: copy/normalize approved responses into `Profiles` with the exact headers below:
 
 ```text
 timestamp, class_id, student_no, full_name, preferred_name, photo_url, learning_goal, english_strength, english_weakness, favorite_activity, quote, approved
 ```
 
-3. Keep `student_no` stable. Do not use names as the primary connection because names can change or be typed differently.
-4. Keep `approved` blank for permissive preview behavior, or set it to `TRUE` after teacher approval.
-5. Set `approved` to `FALSE` for rows that should not appear on student dashboards.
+6. Keep `student_no` stable. Do not use names as the primary connection because names can change or be typed differently.
 
 ## API Check
 

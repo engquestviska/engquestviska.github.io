@@ -1,5 +1,5 @@
 (function(global) {
-  var API_URL = 'https://script.google.com/macros/s/AKfycbyNLYf1615P2rAZsW16sGxPO3jCGGK6TpOwpBmmwNNnCRI8hmwR0eN6d2DVAqj4EsELbg/exec';
+  var API_URL = 'https://script.google.com/macros/s/AKfycbzWnQIk7l7nsjaseTrzULYgTm1FbwJJcO4T7eRNGcj-NsMjsTLsE1EQmyD2F6By-l4WEQ/exec';
 
   function buildUrl(params) {
     var query = new URLSearchParams(params || {});

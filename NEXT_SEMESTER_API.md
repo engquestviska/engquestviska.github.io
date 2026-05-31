@@ -12,6 +12,7 @@ Current-year data stays on the existing Apps Script deployment. Next-semester wo
   - `Classes`
   - `Students`
   - `Profiles`
+  - `Form responses 1`
   - `Scores`
   - `Tasks`
   - `Attendance`
@@ -42,14 +43,16 @@ The master Sheet can stay as a full template, but only active classes should be 
 
 ## Step 4 Profile Form Rules
 
-The student profile form feeds the `Profiles` tab only. It should not be used for scores, attendance, XP, strikes, or submissions.
+The student profile form feeds profile data only. It should not be used for scores, attendance, XP, strikes, or submissions.
 
 - Form source-of-truth tab: `Profile_Form_Questions`
-- Response/normalized destination tab: `Profiles`
+- Raw Google Form response tab: `Form responses 1`
+- Manual/normalized profile tab: `Profiles`
 - Required join fields: `class_id`, `student_no`, `full_name`
 - Optional profile fields: `preferred_name`, `photo_url`, `learning_goal`, `english_strength`, `english_weakness`, `favorite_activity`, `quote`
 - Approval field: `approved`
-  - Blank or `TRUE` is visible to the student dashboard.
+  - `Profiles`: blank or `TRUE` is visible to the student dashboard.
+  - `Form responses 1`: only `TRUE` is visible to the student dashboard.
   - `FALSE` is hidden from the student dashboard.
 
 See `NEXT_SEMESTER_PROFILE_FORM.md` for the full form checklist.
@@ -58,7 +61,7 @@ See `NEXT_SEMESTER_PROFILE_FORM.md` for the full form checklist.
 
 - Folder: `apps-script-next/`
 - Script ID: `1WvWDIGD-FX67lSLjSbC6Gx1pufZ87WN6Kv1o74sKf_dU7aYBQ8p7v6Hq`
-- Deployment URL: `https://script.google.com/macros/s/AKfycbyNLYf1615P2rAZsW16sGxPO3jCGGK6TpOwpBmmwNNnCRI8hmwR0eN6d2DVAqj4EsELbg/exec`
+- Deployment URL: `https://script.google.com/macros/s/AKfycbzWnQIk7l7nsjaseTrzULYgTm1FbwJJcO4T7eRNGcj-NsMjsTLsE1EQmyD2F6By-l4WEQ/exec`
 - Purpose: next-semester read API only until the data model is proven.
 
 The source spreadsheet must be shared with the Google account that owns/runs this Apps Script project. If it is not shared, public endpoint tests will return Google Drive access denied even though the web app deployment exists.
@@ -104,6 +107,7 @@ The preview stays in the repo as a controlled bridge instead of being deleted or
 - 2026-05-31: `getTeacherControlSummary` deployed at version 5 and verified. Teacher console passed desktop/mobile checks with 22 classes, 10 profile questions, 6 XP rules, and 8 queued control areas.
 - 2026-05-31: Step 6 bridge added from Grade 10, Grade 11, and Teacher entry pages to the isolated next-semester preview surfaces.
 - 2026-05-31: Step 7 settled the preview boundary and migration checklist without replacing current-year data flows.
+- 2026-05-31: Google Form responses were connected through `Form responses 1`; approved form rows can now feed student dashboards without making the raw form tab the frontend contract. Deployed at version 6 and verified with `XE1` / `Student 1`.
 
 ## Read Endpoints
 
@@ -113,6 +117,7 @@ All endpoints use `GET` with an `action` parameter.
 - `healthCheck`
 - `getDataReadiness`
 - `getProfileFormSpec`
+- `getApprovedProfileResponses`
 - `getTeacherControlSummary`
 - `getSettings`
 - `getActiveClasses`
@@ -127,6 +132,8 @@ All endpoints use `GET` with an `action` parameter.
 `getDataReadiness` checks active classes, roster placeholders, duplicate student slots, unknown class references, capacity mismatches, and whether the Sheet is ready for frontend migration.
 
 `getProfileFormSpec` returns the profile question list, required fields, target profile headers, active/template class choices, and approval behavior.
+
+`getApprovedProfileResponses` returns normalized rows from `Form responses 1` where `Approved` is `TRUE`.
 
 Pass `includeInactive=true` while the Sheet is still a template. Without it, the class list only includes rows where `Classes.active` is `TRUE`.
 

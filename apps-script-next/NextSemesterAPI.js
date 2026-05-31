@@ -11,6 +11,7 @@ const SHEETS = {
   CLASSES: 'Classes',
   STUDENTS: 'Students',
   PROFILES: 'Profiles',
+  FORM_RESPONSES: 'Form responses 1',
   SCORES: 'Scores',
   TASKS: 'Tasks',
   ATTENDANCE: 'Attendance',
@@ -34,6 +35,7 @@ function doGet(e) {
     else if (action === 'getSettings') result = getSettings();
     else if (action === 'getDataReadiness') result = getDataReadiness();
     else if (action === 'getProfileFormSpec') result = getProfileFormSpec(isTruthy(params.includeInactive));
+    else if (action === 'getApprovedProfileResponses') result = getApprovedProfileResponses();
     else if (action === 'getTeacherControlSummary') result = getTeacherControlSummary();
     else if (action === 'getActiveClasses') result = getActiveClasses(isTruthy(params.includeInactive));
     else if (action === 'getStudentsByClass') result = getStudentsByClass(params.classId || params.class_id, isTruthy(params.includeInactive));
@@ -265,11 +267,19 @@ function getProfileFormSpec(includeInactive) {
     ],
     rules: {
       destination_tab: SHEETS.PROFILES,
+      raw_response_tab: SHEETS.FORM_RESPONSES,
       join_key: 'class_id + student_no',
       approval_field: 'approved',
       approved_values: ['TRUE', 'FALSE', ''],
-      read_behavior: 'Student dashboard reads the latest approved profile row for the logged-in class_id and student_no.'
+      read_behavior: 'Student dashboard reads approved rows from Profiles and TRUE-approved rows from Form responses 1.'
     }
+  };
+}
+
+function getApprovedProfileResponses() {
+  return {
+    response_tab: SHEETS.FORM_RESPONSES,
+    profiles: readApprovedFormProfiles()
   };
 }
 
@@ -325,7 +335,9 @@ function getTeacherControlSummary() {
       submissions: readRecords(SHEETS.SUBMISSIONS).length,
       xp_logs: readRecords(SHEETS.XP_LOG).length,
       strikes: readRecords(SHEETS.STRIKES).length,
-      profiles: readRecords(SHEETS.PROFILES).length
+      profiles: readRecords(SHEETS.PROFILES).length,
+      form_responses: readOptionalRecords(SHEETS.FORM_RESPONSES).length,
+      approved_form_profiles: readApprovedFormProfiles().length
     },
     controls: [
       { id: 'classes', label: 'Active Classes', status: readiness.summary.active_classes ? 'Needs review' : 'Waiting', note: 'Set Classes.active to TRUE only for classes you will teach.' },
@@ -487,6 +499,12 @@ function readRecords(sheetName) {
   return records;
 }
 
+function readOptionalRecords(sheetName) {
+  const sheet = getSpreadsheet().getSheetByName(sheetName);
+  if (!sheet) return [];
+  return readRecords(sheetName);
+}
+
 function normalizeKey(value) {
   return String(value || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
 }
@@ -525,6 +543,23 @@ function normalizeStudent(row) {
   };
 }
 
+function normalizeProfileResponse(row) {
+  return {
+    timestamp: row.timestamp || '',
+    class_id: normalizeClassId(row.class || row.class_id),
+    student_no: normalizeNumber(row.student_number || row.student_no),
+    full_name: String(row.full_name || '').trim(),
+    preferred_name: String(row.preferred_name || '').trim(),
+    photo_url: String(row.profile_photo || row.photo_url || '').trim(),
+    learning_goal: String(row.my_learning_goal || row.learning_goal || '').trim(),
+    english_strength: String(row.my_english_strength || row.english_strength || '').trim(),
+    english_weakness: String(row.my_english_weakness || row.english_weakness || '').trim(),
+    favorite_activity: String(row.favorite_english_class_activity || row.favorite_activity || '').trim(),
+    quote: String(row.profile_quote || row.quote || '').trim(),
+    approved: row.approved
+  };
+}
+
 function isPlaceholderStudent(name) {
   return /^student\s+\d+$/i.test(String(name || '').trim());
 }
@@ -544,14 +579,31 @@ function findStudent(classId, studentNo) {
 }
 
 function findLatestProfile(classId, studentNo) {
-  const profiles = readRecords(SHEETS.PROFILES)
+  const manualProfiles = readRecords(SHEETS.PROFILES)
     .filter(function(row) {
       return normalizeClassId(row.class_id) === classId &&
         String(row.student_no || '').trim() === String(studentNo) &&
         (row.approved === '' || isTruthy(row.approved));
     });
+  const formProfiles = readApprovedFormProfiles()
+    .filter(function(row) {
+      return normalizeClassId(row.class_id) === classId &&
+        String(row.student_no || '').trim() === String(studentNo);
+    });
+  const profiles = manualProfiles.concat(formProfiles);
   if (!profiles.length) return null;
   return profiles[profiles.length - 1];
+}
+
+function readApprovedFormProfiles() {
+  return readOptionalRecords(SHEETS.FORM_RESPONSES)
+    .filter(function(row) {
+      return isTruthy(row.approved);
+    })
+    .map(normalizeProfileResponse)
+    .filter(function(row) {
+      return row.class_id && row.student_no && row.full_name;
+    });
 }
 
 function findStudentRows(sheetName, student) {
