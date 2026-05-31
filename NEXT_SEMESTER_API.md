@@ -20,6 +20,7 @@ Current-year data stays on the existing Apps Script deployment. Next-semester wo
   - `XP_Rules`
   - `Ranks`
   - `Strikes`
+  - `Profile_Form_Questions`
 
 ## Step 3 Data Rules
 
@@ -38,6 +39,20 @@ The master Sheet can stay as a full template, but only active classes should be 
   - Preview can use inactive/template classes with `includeInactive=true`.
   - Real Grade 10/Grade 11 pages should use active classes only.
   - Do not migrate the preview into real grade pages until active classes are chosen and readiness warnings are understood.
+
+## Step 4 Profile Form Rules
+
+The student profile form feeds the `Profiles` tab only. It should not be used for scores, attendance, XP, strikes, or submissions.
+
+- Form source-of-truth tab: `Profile_Form_Questions`
+- Response/normalized destination tab: `Profiles`
+- Required join fields: `class_id`, `student_no`, `full_name`
+- Optional profile fields: `preferred_name`, `photo_url`, `learning_goal`, `english_strength`, `english_weakness`, `favorite_activity`, `quote`
+- Approval field: `approved`
+  - Blank or `TRUE` is visible to the student dashboard.
+  - `FALSE` is hidden from the student dashboard.
+
+See `NEXT_SEMESTER_PROFILE_FORM.md` for the full form checklist.
 
 ## Apps Script Project
 
@@ -65,6 +80,7 @@ These pages are not linked into the current Grade 10 or Teacher flow yet.
 - 2026-05-30: Public API smoke tests passed for `ping`, `healthCheck`, `getActiveClasses`, `getStudentsByClass`, and `getStudentDashboard`.
 - 2026-05-30: Preview login/dashboard passed desktop and mobile headless checks with `XE1` / `Student 1`; profile save, immediate refresh, and dashboard rendering work.
 - 2026-05-31: `getDataReadiness` deployed at version 2 and verified. Current template has 22 classes, 0 active classes, 792 placeholder students, and no structural errors.
+- 2026-05-31: `getProfileFormSpec` deployed at version 4 and verified. Current form spec has 10 questions, 3 required fields, and 22 template class choices with `includeInactive=true`.
 
 ## Read Endpoints
 
@@ -73,6 +89,7 @@ All endpoints use `GET` with an `action` parameter.
 - `ping`
 - `healthCheck`
 - `getDataReadiness`
+- `getProfileFormSpec`
 - `getSettings`
 - `getActiveClasses`
 - `getStudentsByClass&classId=XE1`
@@ -84,6 +101,10 @@ All endpoints use `GET` with an `action` parameter.
 `getActiveClasses` and `getStudentsByClass` support `includeInactive=true` for template/testing work.
 
 `getDataReadiness` checks active classes, roster placeholders, duplicate student slots, unknown class references, capacity mismatches, and whether the Sheet is ready for frontend migration.
+
+`getProfileFormSpec` returns the profile question list, required fields, target profile headers, active/template class choices, and approval behavior.
+
+Pass `includeInactive=true` while the Sheet is still a template. Without it, the class list only includes rows where `Classes.active` is `TRUE`.
 
 ## Important Boundary
 

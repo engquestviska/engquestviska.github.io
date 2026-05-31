@@ -18,7 +18,8 @@ const SHEETS = {
   XP_LOG: 'XP_Log',
   XP_RULES: 'XP_Rules',
   RANKS: 'Ranks',
-  STRIKES: 'Strikes'
+  STRIKES: 'Strikes',
+  PROFILE_FORM_QUESTIONS: 'Profile_Form_Questions'
 };
 
 function doGet(e) {
@@ -32,6 +33,7 @@ function doGet(e) {
     else if (action === 'healthCheck') result = healthCheck();
     else if (action === 'getSettings') result = getSettings();
     else if (action === 'getDataReadiness') result = getDataReadiness();
+    else if (action === 'getProfileFormSpec') result = getProfileFormSpec(isTruthy(params.includeInactive));
     else if (action === 'getActiveClasses') result = getActiveClasses(isTruthy(params.includeInactive));
     else if (action === 'getStudentsByClass') result = getStudentsByClass(params.classId || params.class_id, isTruthy(params.includeInactive));
     else if (action === 'getStudentProfile') result = getStudentProfile(params.classId || params.class_id, params.studentNo || params.student_no);
@@ -219,6 +221,54 @@ function getDataReadiness() {
     },
     classes: classSummaries,
     issues: issues
+  };
+}
+
+function getProfileFormSpec(includeInactive) {
+  const questions = readRecords(SHEETS.PROFILE_FORM_QUESTIONS)
+    .filter(function(row) {
+      return row.question || row.field_key;
+    })
+    .map(function(row) {
+      return {
+        question: String(row.question || '').trim(),
+        field_key: normalizeKey(row.field_key),
+        required: isTruthy(row.required),
+        answer_type: String(row.answer_type || '').trim(),
+        notes: String(row.notes || '').trim()
+      };
+    });
+  const requiredProfileHeaders = readRecords(SHEETS.PROFILE_FORM_QUESTIONS)
+    .filter(function(row) { return isTruthy(row.required); })
+    .map(function(row) { return normalizeKey(row.field_key); });
+  const classes = getActiveClasses(includeInactive).classes;
+
+  return {
+    questions: questions,
+    required_profile_headers: ['timestamp'].concat(requiredProfileHeaders).concat(['approved']),
+    classes: classes,
+    active_classes: classes,
+    profile_sheet_headers: [
+      'timestamp',
+      'class_id',
+      'student_no',
+      'full_name',
+      'preferred_name',
+      'photo_url',
+      'learning_goal',
+      'english_strength',
+      'english_weakness',
+      'favorite_activity',
+      'quote',
+      'approved'
+    ],
+    rules: {
+      destination_tab: SHEETS.PROFILES,
+      join_key: 'class_id + student_no',
+      approval_field: 'approved',
+      approved_values: ['TRUE', 'FALSE', ''],
+      read_behavior: 'Student dashboard reads the latest approved profile row for the logged-in class_id and student_no.'
+    }
   };
 }
 
