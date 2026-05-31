@@ -5,7 +5,7 @@
 const FOLDER_ID = '1mrV8NBGb8SyxX6oyxU_GNSJM_Q9GF3bP';
 const SHEET_NAME = 'Students';
 const RESPONSES_SHEET = 'Responses';
-const SUBMISSIONS_OPEN = false;
+const SUBMISSIONS_OPEN = true;
 
 function doGet(e) {
   if (!SUBMISSIONS_OPEN) {
