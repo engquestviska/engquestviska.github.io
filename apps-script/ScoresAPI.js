@@ -1342,9 +1342,33 @@ function semClassLabel_(className) {
   return String(className || '').replace(/^XE/, 'X E-');
 }
 
+function semNameKey_(name) {
+  return String(name || '').toUpperCase().replace(/\s+/g, ' ').trim();
+}
+
+function getSemRosterStudents_(className) {
+  const result = getStudents(className);
+  return result && result.students ? result.students : [];
+}
+
 function getSemComparisonStudents(className) {
   const cls = String(className || '').trim();
   const rows = getSemComparisonRows_().filter(function(row) { return !cls || row.className === cls; });
+  const rosterStudents = cls ? getSemRosterStudents_(cls) : [];
+
+  if (rosterStudents.length) {
+    const rowsByName = {};
+    rows.forEach(function(row) { rowsByName[semNameKey_(row.name)] = row; });
+    return {
+      success: true,
+      className: cls,
+      students: rosterStudents
+        .filter(function(student) { return !!rowsByName[semNameKey_(student.name)]; })
+        .map(function(student) {
+          return { no: student.no, name: student.name };
+        })
+    };
+  }
 
   return {
     success: true,
@@ -1362,8 +1386,18 @@ function getSemComparison(className, studentNo) {
 
   const allRows = getSemComparisonRows_();
   const classRows = allRows.filter(function(row) { return row.className === cls; });
-  const student = classRows.find(function(row) { return String(row.studentNo) === no; });
-  if (!student) return { success: false, error: 'Student not found' };
+  const rosterStudent = getSemRosterStudents_(cls).find(function(student) { return String(student.no) === no; });
+  const matchedStudent = rosterStudent
+    ? classRows.find(function(row) { return semNameKey_(row.name) === semNameKey_(rosterStudent.name); })
+    : null;
+  const studentRow = matchedStudent || classRows.find(function(row) { return String(row.studentNo) === no; });
+  if (!studentRow) return { success: false, error: 'Student not found' };
+
+  const student = Object.assign({}, studentRow);
+  if (rosterStudent) {
+    student.studentNo = rosterStudent.no;
+    student.name = rosterStudent.name;
+  }
 
   const sem1Rows = classRows.filter(function(row) { return row.sem1 !== '' && !isNaN(Number(row.sem1)); });
   const sem2Rows = classRows.filter(function(row) { return row.sem2 !== '' && !isNaN(Number(row.sem2)); });
