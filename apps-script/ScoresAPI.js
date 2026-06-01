@@ -17,6 +17,8 @@ const SCORE_SHEETS = {
 };
 
 const TASK_SHEET_NAME = 'Task_Status';
+const FINAL_COMPARISON_SHEET_ID = '1UjlcC2zOy5usrkzwL1gqgt3BDfNFb-heak-jdeIxIcM';
+const FINAL_COMPARISON_SHEET_NAME = 'Sem 1 vs Sem 2';
 const TEACHER_USER    = 'teacher';
 const TEACHER_HASH    = '39de0394764747426b997b945770fd60661cbd072051131da2cb99d6d8dd8430';
 const WRITES_ENABLED  = true;
@@ -186,6 +188,8 @@ function doGet(e) {
     else if (action === 'getChapterScores')  result = getChapterScores(e.parameter.className, e.parameter.chapter);
     else if (action === 'saveChapterScore')  result = saveChapterScore(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.chapter, e.parameter.studentNo, e.parameter.column, e.parameter.value);
     else if (action === 'getFinalScores')    result = getFinalScores(e.parameter.className);
+    else if (action === 'getSemComparisonStudents') result = getSemComparisonStudents(e.parameter.className);
+    else if (action === 'getSemComparison')  result = getSemComparison(e.parameter.className, e.parameter.studentNo);
     else if (action === 'saveFinalScore')    result = saveFinalScore(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.studentNo, e.parameter.column, e.parameter.value);
     else if (action === 'getSubmissions')    result = getSubmissions();
     else if (action === 'getTaskStatus')  result = getTaskStatus(e.parameter.className, e.parameter.studentNo);
@@ -1284,6 +1288,104 @@ function getFinalScores(className) {
     students.push({ no, name: String(name).trim(), nickname: String(data[r][2] || '').trim(), scores, calc });
   }
   return { students, inputCols: inputCols.map(function(c) { return c.name; }), calcCols: calcCols.map(function(c) { return c.name; }) };
+}
+
+// ── SEMESTER FINAL SCORE COMPARISON (read-only) ──────────────
+function getSemComparisonRows_() {
+  const sheet = SpreadsheetApp.openById(FINAL_COMPARISON_SHEET_ID).getSheetByName(FINAL_COMPARISON_SHEET_NAME);
+  if (!sheet) throw new Error(FINAL_COMPARISON_SHEET_NAME + ' sheet not found');
+
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 4) return [];
+
+  return sheet.getRange(4, 1, lastRow - 3, 8).getValues()
+    .filter(function(row) { return row[1] && row[3]; })
+    .map(function(row) {
+      return {
+        globalNo: row[0],
+        className: String(row[1] || '').trim(),
+        studentNo: row[2],
+        name: String(row[3] || '').trim(),
+        sem1: normalizeSemScore_(row[4]),
+        sem2: normalizeSemScore_(row[5]),
+        difference: normalizeSemScore_(row[6]),
+        result: String(row[7] || '').trim()
+      };
+    });
+}
+
+function normalizeSemScore_(value) {
+  if (value === '' || value === null || value === undefined) return '';
+  const num = Number(value);
+  return isNaN(num) ? value : Math.round(num * 100) / 100;
+}
+
+function averageSemScores_(values) {
+  const nums = values.map(Number).filter(function(num) { return !isNaN(num); });
+  if (!nums.length) return '';
+  return Math.round((nums.reduce(function(sum, num) { return sum + num; }, 0) / nums.length) * 100) / 100;
+}
+
+function rankSemScore_(rows, student, key) {
+  const studentValue = Number(student[key]);
+  if (isNaN(studentValue)) return '';
+
+  const scores = rows
+    .map(function(row) { return Number(row[key]); })
+    .filter(function(num) { return !isNaN(num); })
+    .sort(function(a, b) { return b - a; });
+
+  return scores.findIndex(function(score) { return score === studentValue; }) + 1;
+}
+
+function semClassLabel_(className) {
+  return String(className || '').replace(/^XE/, 'X E-');
+}
+
+function getSemComparisonStudents(className) {
+  const cls = String(className || '').trim();
+  const rows = getSemComparisonRows_().filter(function(row) { return !cls || row.className === cls; });
+
+  return {
+    success: true,
+    className: cls,
+    students: rows.map(function(row) {
+      return { no: row.studentNo, name: row.name };
+    })
+  };
+}
+
+function getSemComparison(className, studentNo) {
+  const cls = String(className || '').trim();
+  const no = String(studentNo || '').trim();
+  if (!cls || !no) return { success: false, error: 'Missing className or studentNo' };
+
+  const allRows = getSemComparisonRows_();
+  const classRows = allRows.filter(function(row) { return row.className === cls; });
+  const student = classRows.find(function(row) { return String(row.studentNo) === no; });
+  if (!student) return { success: false, error: 'Student not found' };
+
+  const sem1Rows = classRows.filter(function(row) { return row.sem1 !== '' && !isNaN(Number(row.sem1)); });
+  const sem2Rows = classRows.filter(function(row) { return row.sem2 !== '' && !isNaN(Number(row.sem2)); });
+
+  return {
+    success: true,
+    className: cls,
+    classLabel: semClassLabel_(cls),
+    student: student,
+    summary: {
+      classSize: classRows.length,
+      completedSem2Count: sem2Rows.length,
+      sem1Average: averageSemScores_(sem1Rows.map(function(row) { return row.sem1; })),
+      sem2Average: averageSemScores_(sem2Rows.map(function(row) { return row.sem2; })),
+      rankSem1: rankSemScore_(classRows, student, 'sem1'),
+      rankSem2: rankSemScore_(classRows, student, 'sem2'),
+      improvedCount: classRows.filter(function(row) { return String(row.result).toLowerCase() === 'improved'; }).length,
+      decreasedCount: classRows.filter(function(row) { return String(row.result).toLowerCase() === 'decreased'; }).length,
+      sameCount: classRows.filter(function(row) { return String(row.result).toLowerCase() === 'same'; }).length
+    },
+    updatedAt: new Date().toISOString()
+  };
 }
 
 function saveFinalScore(username, password, className, studentNo, column, value) {
