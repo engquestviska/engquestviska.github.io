@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Final Score Comparison - English Quest</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --blue:#2563EB;
+      --blue-soft:#DBEAFE;
+      --purple:#7C3AED;
+      --purple-soft:#EDE9FE;
+      --green:#16A34A;
+      --green-soft:#DCFCE7;
+      --amber:#F59E0B;
+      --amber-soft:#FEF3C7;
+      --red:#DC2626;
+      --red-soft:#FEE2E2;
+      --white:#FFFFFF;
+      --off:#F8FAFC;
+      --text:#0B1744;
+      --muted:#536386;
+      --border:#DDE7F7;
+      --shadow:0 18px 48px rgba(15,23,42,0.08);
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      min-height:100vh;
+      font-family:'IBM Plex Sans', sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 18% 12%, rgba(37,99,235,0.10), transparent 32%),
+        radial-gradient(circle at 86% 20%, rgba(124,58,237,0.10), transparent 30%),
+        var(--off);
+    }
+    header {
+      min-height:210px;
+      padding:30px 20px 74px;
+      color:#fff;
+      text-align:center;
+      background:linear-gradient(135deg,#1D4ED8,#4C1D95);
+      position:relative;
+      overflow:hidden;
+    }
+    header::after {
+      content:'';
+      position:absolute;
+      left:-6%;
+      right:-6%;
+      bottom:-42px;
+      height:86px;
+      background:var(--off);
+      border-radius:50% 50% 0 0;
+    }
+    .hamburger {
+      position:fixed;
+      top:18px;
+      right:20px;
+      z-index:300;
+      width:42px;
+      height:42px;
+      border:0;
+      border-radius:12px;
+      background:rgba(255,255,255,0.16);
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      gap:5px;
+      backdrop-filter:blur(8px);
+    }
+    .hamburger span { width:20px; height:2px; background:#fff; border-radius:2px; }
+    .brand { position:relative; z-index:1; display:flex; justify-content:center; align-items:center; gap:12px; margin-bottom:14px; }
+    .brand img { width:48px; height:48px; border-radius:14px; object-fit:cover; border:2px solid rgba(255,255,255,0.35); }
+    .brand-title { font-family:'Playfair Display', serif; font-size:1.45rem; font-weight:800; line-height:1; text-align:left; }
+    .brand-sub { font-size:0.76rem; opacity:0.78; margin-top:4px; text-align:left; }
+    .page-title { position:relative; z-index:1; font-family:'Playfair Display', serif; font-size:clamp(2rem,6vw,3rem); font-weight:800; }
+    .page-sub { position:relative; z-index:1; margin-top:8px; color:rgba(255,255,255,0.80); font-size:0.98rem; }
+    main {
+      width:min(1180px, calc(100% - 28px));
+      margin:-54px auto 0;
+      position:relative;
+      z-index:2;
+      padding-bottom:56px;
+    }
+    .panel {
+      background:#fff;
+      border:1.5px solid var(--border);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      margin-bottom:22px;
+    }
+    .panel-pad { padding:22px; }
+    .form-grid { display:grid; grid-template-columns:1fr 1.5fr auto; gap:12px; align-items:end; }
+    label {
+      display:block;
+      margin-bottom:8px;
+      color:var(--muted);
+      font:800 0.70rem 'IBM Plex Mono', monospace;
+      text-transform:uppercase;
+      letter-spacing:0.12em;
+    }
+    select, button {
+      min-height:48px;
+      border-radius:14px;
+      font-family:inherit;
+      font-size:0.95rem;
+    }
+    select {
+      width:100%;
+      border:1.5px solid var(--border);
+      background:#FBFDFF;
+      color:var(--text);
+      padding:0 14px;
+      outline:none;
+    }
+    select:focus { border-color:#93C5FD; box-shadow:0 0 0 4px rgba(37,99,235,0.10); }
+    .primary {
+      border:0;
+      background:linear-gradient(135deg,#2563EB,#7C3AED);
+      color:#fff;
+      font-weight:800;
+      padding:0 24px;
+      cursor:pointer;
+    }
+    .primary:disabled { opacity:0.55; cursor:not-allowed; }
+    .state {
+      text-align:center;
+      padding:34px 22px;
+      color:var(--muted);
+      font-weight:700;
+    }
+    .spinner {
+      width:26px;
+      height:26px;
+      border:3px solid var(--border);
+      border-top-color:var(--blue);
+      border-radius:50%;
+      margin:0 auto 12px;
+      animation:spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .result { display:none; }
+    .profile {
+      display:flex;
+      align-items:center;
+      gap:14px;
+      padding:22px;
+      background:linear-gradient(135deg,#0F172A,#1D4ED8);
+      color:#fff;
+    }
+    .avatar {
+      width:56px;
+      height:56px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:rgba(255,255,255,0.16);
+      border:2px solid rgba(255,255,255,0.30);
+      font-family:'Playfair Display', serif;
+      font-size:1.45rem;
+      font-weight:800;
+      flex:0 0 auto;
+    }
+    .profile-name { font-family:'Playfair Display', serif; font-size:1.35rem; font-weight:800; }
+    .profile-meta { margin-top:3px; color:rgba(255,255,255,0.74); font-size:0.86rem; }
+    .cards {
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:16px;
+      padding:22px;
+    }
+    .score-card {
+      border:1.5px solid var(--border);
+      border-radius:20px;
+      padding:20px;
+      min-height:168px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      background:#fff;
+    }
+    .score-card.sem1 { background:linear-gradient(135deg,#EFF6FF,#fff); border-color:#BFDBFE; }
+    .score-card.diff { background:linear-gradient(135deg,#F0FDF4,#fff); border-color:#BBF7D0; }
+    .score-card.sem2 { background:linear-gradient(135deg,#F5F3FF,#fff); border-color:#DDD6FE; }
+    .card-label { font-weight:800; color:var(--muted); font-size:0.8rem; }
+    .score-value {
+      font-family:'Playfair Display', serif;
+      font-size:clamp(2.2rem,7vw,3rem);
+      font-weight:800;
+      line-height:1;
+      margin:10px 0;
+    }
+    .sem1 .score-value { color:var(--blue); }
+    .diff .score-value { color:var(--green); }
+    .sem2 .score-value { color:var(--purple); }
+    .pill {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:max-content;
+      max-width:100%;
+      border-radius:999px;
+      padding:7px 12px;
+      font:800 0.78rem 'IBM Plex Sans', sans-serif;
+    }
+    .pill.blue { color:#1D4ED8; background:#DBEAFE; }
+    .pill.green { color:#15803D; background:#DCFCE7; }
+    .pill.red { color:#B91C1C; background:#FEE2E2; }
+    .pill.amber { color:#92400E; background:#FEF3C7; }
+    .message {
+      margin:0 22px 22px;
+      border:1.5px solid var(--border);
+      border-radius:18px;
+      padding:18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      background:#fff;
+    }
+    .message-main { display:flex; gap:14px; align-items:center; }
+    .message-icon {
+      width:54px;
+      height:54px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:1.45rem;
+      background:var(--amber-soft);
+    }
+    .message-text { font-size:1rem; line-height:1.55; font-weight:700; }
+    .message-status { min-width:170px; }
+    .bar-panel { padding:22px; }
+    .bar-title { font-family:'Playfair Display', serif; font-size:1.25rem; font-weight:800; margin-bottom:18px; }
+    .bar-row {
+      display:grid;
+      grid-template-columns:96px 1fr 72px;
+      gap:14px;
+      align-items:center;
+      margin-bottom:18px;
+    }
+    .bar-label { font-weight:800; }
+    .bar-track { height:14px; background:#E8EEF7; border-radius:999px; overflow:hidden; }
+    .bar-fill { height:100%; border-radius:999px; width:0; transition:width 0.7s ease; }
+    .bar-fill.sem1 { background:linear-gradient(90deg,#2563EB,#60A5FA); }
+    .bar-fill.sem2 { background:linear-gradient(90deg,#7C3AED,#A855F7); }
+    .bar-value { text-align:right; font-weight:800; font-family:'IBM Plex Mono', monospace; }
+    .note {
+      margin-top:18px;
+      border:1.5px solid #BFDBFE;
+      background:#EFF6FF;
+      color:#1E40AF;
+      border-radius:14px;
+      padding:13px 15px;
+      font-weight:700;
+      line-height:1.45;
+    }
+    footer {
+      padding:28px 20px;
+      text-align:center;
+      color:var(--muted);
+      font-size:0.82rem;
+    }
+    footer strong { color:var(--purple); }
+    @media (max-width:860px) {
+      .form-grid, .cards { grid-template-columns:1fr; }
+      .message { align-items:flex-start; flex-direction:column; }
+      .message-status { min-width:0; }
+    }
+    @media (max-width:560px) {
+      header { padding-top:26px; }
+      .brand { justify-content:flex-start; padding-right:48px; }
+      .page-title, .page-sub { text-align:left; }
+      .cards, .panel-pad, .bar-panel, .profile { padding:18px; }
+      .message { margin:0 18px 18px; }
+      .bar-row { grid-template-columns:1fr 54px; gap:8px; }
+      .bar-label { grid-column:1 / -1; }
+    }
+  </style>
+</head>
+<body data-page="final-score">
+  <header>
+    <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
+    <div class="brand">
+      <img src="logo.jpg" alt="English Quest Logo"/>
+      <div>
+        <div class="brand-title">English Quest</div>
+        <div class="brand-sub">SMA Negeri 6 Surakarta</div>
+      </div>
+    </div>
+    <h1 class="page-title">Semester 1 vs Semester 2</h1>
+    <p class="page-sub">See how your Final Score changed from Semester 1 to Semester 2.</p>
+  </header>
+
+  <main>
+    <section class="panel">
+      <div class="panel-pad">
+        <div class="form-grid">
+          <div>
+            <label for="classSelect">Your Class</label>
+            <select id="classSelect" onchange="onClassChange()"></select>
+          </div>
+          <div>
+            <label for="studentSelect">Your Name</label>
+            <select id="studentSelect"></select>
+          </div>
+          <button class="primary" id="viewBtn" onclick="viewComparison()">View Comparison</button>
+        </div>
+      </div>
+      <div class="state" id="stateBox">Choose your class and name to view your comparison.</div>
+      <div class="result" id="resultBox"></div>
+    </section>
+  </main>
+
+  <footer>© 2026 <strong>English Quest</strong> · Final Score Comparison</footer>
+
+  <script src="sidebar.js"></script>
+  <script>
+    const FINAL_SCORE_API = 'https://script.google.com/macros/s/AKfycbzsPC9XeIg8eMWBD_6Xk6CiQ9F8M9-wQjh3c_I17_PaNVoMLmgOjqzXQbaBtpM5EKmU/exec';
+    const CLASSES = ['XE1','XE4','XE5','XE6','XE7','XE8','XE9','XE10','XE11'];
+    const CLASS_LABELS = { XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
+    let currentStudents = [];
+
+    function apiGet(params) {
+      const parts = [];
+      for (const key in params) parts.push(encodeURIComponent(key) + '=' + encodeURIComponent(params[key]));
+      const url = FINAL_SCORE_API + '?' + parts.join('&');
+
+      return new Promise(function(resolve, reject) {
+        const cb = 'final_cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+        const script = document.createElement('script');
+        const timer = setTimeout(function() {
+          cleanup();
+          reject(new Error('Connection timed out. Please try again.'));
+        }, 15000);
+
+        function cleanup() {
+          clearTimeout(timer);
+          delete window[cb];
+          try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
+        }
+
+        window[cb] = function(data) { cleanup(); resolve(data); };
+        script.onerror = function() { cleanup(); reject(new Error('Could not connect to the score database.')); };
+        script.src = url + '&callback=' + cb + '&_t=' + Date.now();
+        (document.body || document.head).appendChild(script);
+      });
+    }
+
+    function init() {
+      const clsSel = document.getElementById('classSelect');
+      clsSel.innerHTML = CLASSES.map(function(cls) {
+        return '<option value="' + cls + '">' + CLASS_LABELS[cls] + '</option>';
+      }).join('');
+
+      const params = new URLSearchParams(location.search);
+      const savedClass = params.get('cls') || localStorage.getItem('eq_student_class') || 'XE1';
+      const savedNo = params.get('no') || localStorage.getItem('eq_student_no') || '';
+
+      if (CLASSES.indexOf(savedClass) !== -1) clsSel.value = savedClass;
+      onClassChange(savedNo);
+    }
+
+    function setState(html) {
+      const state = document.getElementById('stateBox');
+      state.style.display = 'block';
+      state.innerHTML = html;
+      document.getElementById('resultBox').style.display = 'none';
+    }
+
+    function onClassChange(preselectNo) {
+      const cls = document.getElementById('classSelect').value;
+      const sel = document.getElementById('studentSelect');
+      sel.innerHTML = '<option value="">Loading...</option>';
+      setState('<div class="spinner"></div>Loading students...');
+
+      apiGet({ action:'getStudents', className:cls }).then(function(res) {
+        if (!res.success) throw new Error(res.error || 'Could not load students');
+        currentStudents = res.students || [];
+        sel.innerHTML = '<option value="">Select your name</option>' + currentStudents.map(function(s) {
+          return '<option value="' + s.no + '">' + escapeHtml(s.name) + '</option>';
+        }).join('');
+        if (preselectNo) sel.value = preselectNo;
+        setState('Choose your name, then open your Semester 1 vs Semester 2 comparison.');
+        if (preselectNo && sel.value) viewComparison();
+      }).catch(function(err) {
+        sel.innerHTML = '<option value="">Could not load</option>';
+        setState('Could not load students: ' + escapeHtml(err.message));
+      });
+    }
+
+    function viewComparison() {
+      const cls = document.getElementById('classSelect').value;
+      const no = document.getElementById('studentSelect').value;
+      if (!cls || !no) {
+        setState('Please select your class and name first.');
+        return;
+      }
+
+      document.getElementById('viewBtn').disabled = true;
+      setState('<div class="spinner"></div>Loading your comparison...');
+
+      apiGet({ action:'getComparison', className:cls, studentNo:no }).then(function(res) {
+        document.getElementById('viewBtn').disabled = false;
+        if (!res.success) throw new Error(res.error || 'Could not load comparison');
+        renderResult(res);
+      }).catch(function(err) {
+        document.getElementById('viewBtn').disabled = false;
+        setState('Could not load comparison: ' + escapeHtml(err.message));
+      });
+    }
+
+    function renderResult(data) {
+      const student = data.student;
+      const summary = data.summary || {};
+      localStorage.setItem('eq_student_class', data.className);
+      localStorage.setItem('eq_student_no', student.studentNo);
+      localStorage.setItem('eq_student_name', student.name);
+
+      const sem1 = numberOrDash(student.sem1);
+      const sem2 = numberOrDash(student.sem2);
+      const diff = Number(student.difference);
+      const hasDiff = !isNaN(diff);
+      const result = String(student.result || '').toLowerCase();
+      const status = getStatus(result, diff);
+      const percent = hasDiff && Number(student.sem1) ? Math.round((diff / Number(student.sem1)) * 10000) / 100 : '';
+
+      const html =
+        '<div class="profile">' +
+          '<div class="avatar">' + escapeHtml(student.name.charAt(0).toUpperCase()) + '</div>' +
+          '<div><div class="profile-name">' + escapeHtml(student.name) + '</div><div class="profile-meta">' + escapeHtml(data.classLabel) + ' · Student No. ' + escapeHtml(student.studentNo) + '</div></div>' +
+        '</div>' +
+        '<div class="cards">' +
+          buildScoreCard('sem1', 'Semester 1 Final Score', sem1, rankText(summary.rankSem1, summary.classSize), 'blue') +
+          buildScoreCard('diff', 'Difference', hasDiff ? signed(diff) : '-', percent !== '' ? Math.abs(percent) + '% ' + status.label : 'Waiting data', status.pill) +
+          buildScoreCard('sem2', 'Semester 2 Final Score', sem2, rankText(summary.rankSem2, summary.classSize), 'purple') +
+        '</div>' +
+        '<div class="message">' +
+          '<div class="message-main"><div class="message-icon">' + status.icon + '</div><div class="message-text">' + buildMessage(student, status) + '</div></div>' +
+          '<div class="message-status"><span class="pill ' + status.pill + '">' + status.title + '</span></div>' +
+        '</div>' +
+        '<div class="bar-panel">' +
+          '<div class="bar-title">Final Score Comparison</div>' +
+          buildBar('Semester 1', student.sem1, 'sem1') +
+          buildBar('Semester 2', student.sem2, 'sem2') +
+          '<div class="note">This comparison is based on your live Final Score data from the Semester 1 vs Semester 2 spreadsheet. Class average: Semester 1 ' + numberOrDash(summary.sem1Average) + ' · Semester 2 ' + numberOrDash(summary.sem2Average) + '.</div>' +
+        '</div>';
+
+      document.getElementById('stateBox').style.display = 'none';
+      const box = document.getElementById('resultBox');
+      box.innerHTML = html;
+      box.style.display = 'block';
+    }
+
+    function buildScoreCard(type, label, value, sub, pillClass) {
+      return '<div class="score-card ' + type + '">' +
+        '<div><div class="card-label">' + label + '</div><div class="score-value">' + value + '</div></div>' +
+        '<span class="pill ' + pillClass + '">' + sub + '</span>' +
+      '</div>';
+    }
+
+    function buildBar(label, value, type) {
+      const num = Number(value);
+      const width = isNaN(num) ? 0 : Math.max(0, Math.min(100, num));
+      return '<div class="bar-row"><div class="bar-label">' + label + '</div><div class="bar-track"><div class="bar-fill ' + type + '" style="width:' + width + '%"></div></div><div class="bar-value">' + numberOrDash(value) + '</div></div>';
+    }
+
+    function getStatus(result, diff) {
+      if (result === 'improved' || diff > 0) return { title:'Improved', label:'Increase', pill:'green', icon:'🏆' };
+      if (result === 'decreased' || diff < 0) return { title:'Decreased', label:'Decrease', pill:'red', icon:'💪' };
+      if (result === 'same' || diff === 0) return { title:'Stable', label:'Same', pill:'amber', icon:'🎯' };
+      return { title:'Waiting Data', label:'Waiting', pill:'amber', icon:'⏳' };
+    }
+
+    function buildMessage(student, status) {
+      const diff = Number(student.difference);
+      if (status.title === 'Improved') return 'Great job! You improved your Final Score by <strong>' + Math.abs(diff).toFixed(2) + '</strong> points from Semester 1 to Semester 2.';
+      if (status.title === 'Decreased') return 'Your Final Score decreased by <strong>' + Math.abs(diff).toFixed(2) + '</strong> points. Stay calm, use this as your next target, and keep learning.';
+      if (status.title === 'Stable') return 'Your Final Score stayed the same. Keep your consistency and look for one small thing to improve next.';
+      return 'Your comparison is waiting for complete Semester 1 and Semester 2 final score data.';
+    }
+
+    function rankText(rank, total) {
+      if (!rank || !total) return 'Rank waiting';
+      return 'Rank: ' + rank + ' / ' + total;
+    }
+
+    function signed(value) {
+      const num = Number(value);
+      if (isNaN(num)) return '-';
+      return (num > 0 ? '+' : '') + num.toFixed(2);
+    }
+
+    function numberOrDash(value) {
+      const num = Number(value);
+      if (value === '' || value === null || value === undefined || isNaN(num)) return '-';
+      return num.toFixed(2);
+    }
+
+    function escapeHtml(value) {
+      return String(value || '').replace(/[&<>"']/g, function(ch) {
+        return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[ch];
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
