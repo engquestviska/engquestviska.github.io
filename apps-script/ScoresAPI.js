@@ -1358,12 +1358,14 @@ function getSemComparisonStudents(className) {
 
   if (rosterStudents.length) {
     const rowsByName = {};
+    const rowsByNo = {};
     rows.forEach(function(row) { rowsByName[semNameKey_(row.name)] = row; });
+    rows.forEach(function(row) { rowsByNo[String(row.studentNo)] = row; });
     return {
       success: true,
       className: cls,
       students: rosterStudents
-        .filter(function(student) { return !!rowsByName[semNameKey_(student.name)]; })
+        .filter(function(student) { return !!rowsByName[semNameKey_(student.name)] || !!rowsByNo[String(student.no)]; })
         .map(function(student) {
           return { no: student.no, name: student.name };
         })
