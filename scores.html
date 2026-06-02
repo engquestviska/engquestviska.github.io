@@ -164,6 +164,13 @@
 
   <script>
     const API = 'https://script.google.com/macros/s/AKfycbxetSr-mhLVgk_gHeWaWLk-zDmQ1NYUv7yOK4X93Zn42nGb37U8RFAMaNHLfX20Hak9/exec';
+    const SCORE_SHEET_ID = '1UjlcC2zOy5usrkzwL1gqgt3BDfNFb-heak-jdeIxIcM';
+    const REMEDIAL_LINKS = {
+      enrichment: 'https://chat.whatsapp.com/L9isr7aTbeJKZh5YeMCnBE',
+      gap1: 'https://chat.whatsapp.com/JTrmrhnBz1v0yhBpMGatpZ',
+      gap2: 'https://chat.whatsapp.com/GIIRbntJuQYK32dwI3xnEV',
+      gap3: 'https://chat.whatsapp.com/BnUByekB5QR3wvMb3Vkmf4'
+    };
     const CLASSES = ['XE1','XE4','XE5','XE6','XE7','XE8','XE9','XE10','XE11'];
     const CLASS_LABELS = { XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
     let students = [];
@@ -187,6 +194,192 @@
       });
     }
 
+    function scoreGet(params) {
+      return apiGet(params).catch(function() {
+        if (params.action === 'getFinalDashboardStudents') return directStudents(params.className);
+        if (params.action === 'getFinalDashboard') return directDashboard(params.className, params.studentNo);
+        throw new Error('Could not connect to the score database.');
+      });
+    }
+
+    function gvizRows(sheetName) {
+      return new Promise(function(resolve, reject) {
+        const cb = 'eq_sheet_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+        window[cb] = function(payload) {
+          delete window[cb];
+          if (script.parentNode) script.parentNode.removeChild(script);
+          try {
+            const table = payload && payload.table ? payload.table : { cols: [], rows: [] };
+            const headers = table.cols.map(function(col, index) {
+              return cleanHeader(col.label || col.id || ('Column ' + (index + 1)));
+            });
+            const rows = table.rows.map(function(row) {
+              const item = {};
+              headers.forEach(function(header, index) {
+                const cell = row.c && row.c[index] ? row.c[index] : null;
+                item[header] = cell ? (cell.v == null ? '' : cell.v) : '';
+              });
+              return item;
+            }).filter(function(row) { return field(row, ['No']) !== '' && field(row, ['Name']) !== ''; });
+            resolve(rows);
+          } catch (err) {
+            reject(err);
+          }
+        };
+        const script = document.createElement('script');
+        script.onerror = function() {
+          delete window[cb];
+          reject(new Error('Could not load the public score sheet.'));
+        };
+        script.src = 'https://docs.google.com/spreadsheets/d/' + SCORE_SHEET_ID + '/gviz/tq?' +
+          new URLSearchParams({ sheet: sheetName, tqx: 'out:json;responseHandler:' + cb }).toString();
+        document.body.appendChild(script);
+      });
+    }
+
+    function cleanHeader(header) {
+      const h = String(header || '').trim().replace(/\s+/g, ' ');
+      if (/score tracker.*no\.?$/i.test(h)) return 'No';
+      if (/comparison no\.?$/i.test(h)) return 'No';
+      return h;
+    }
+
+    function field(row, names) {
+      for (const name of names) {
+        if (Object.prototype.hasOwnProperty.call(row, name)) return row[name];
+      }
+      const keys = Object.keys(row);
+      for (const name of names) {
+        const wanted = String(name).toLowerCase();
+        const key = keys.find(function(k) { return k.toLowerCase() === wanted; });
+        if (key) return row[key];
+      }
+      return '';
+    }
+
+    function num(value) {
+      if (value === '' || value === null || value === undefined || value === '-') return '';
+      const n = Number(value);
+      return isNaN(n) ? '' : n;
+    }
+
+    function directStudents(className) {
+      return gvizRows(className).then(function(rows) {
+        return {
+          success: true,
+          className: className,
+          students: rows.map(function(row) {
+            return { no: field(row, ['No']), name: field(row, ['Name']) };
+          })
+        };
+      });
+    }
+
+    function directDashboard(className, studentNo) {
+      return Promise.all([gvizRows(className), gvizRows('Sem 1 vs Sem 2')]).then(function(results) {
+        const scoreRows = results[0];
+        const semRows = results[1].filter(function(row) { return field(row, ['Class']) === className; });
+        const row = scoreRows.find(function(item) { return String(field(item, ['No'])).trim() === String(studentNo).trim(); });
+        if (!row) return { success: false, error: 'Student not found' };
+        const sem = semRows.find(function(item) { return String(field(item, ['Student No.','Student No'])).trim() === String(studentNo).trim(); }) || {};
+        const asatScore = field(row, ['ASAT']);
+        const asatGap = field(row, ['ASAT Gap']);
+        const sem1 = field(sem, ['Sem 1 Final (AK)']);
+        const sem2 = field(row, ['Final Score Sem 2']) || field(sem, ['Sem 2 Average (R)']);
+        const diff = field(sem, ['Difference']);
+        const student = {
+          className: className,
+          studentNo: field(row, ['No']),
+          name: field(row, ['Name']),
+          sem1: sem1,
+          sem2: sem2,
+          difference: diff,
+          result: field(sem, ['Result']) || resultFromDiff(diff)
+        };
+        return {
+          success: true,
+          className: className,
+          classLabel: CLASS_LABELS[className] || className,
+          student: student,
+          chapters: [directChapter(row, 4), directChapter(row, 5)],
+          overall: { student: { calc: { Average: sem2, 'Final Score': sem2 } } },
+          asat: {
+            score: asatScore,
+            gap: asatGap,
+            remedial: field(row, ['Remedial']),
+            lacking: field(row, ['Lacking'])
+          },
+          remedial: remedialFor(asatScore, asatGap, field(row, ['Remedial'])),
+          summary: {
+            classSize: semRows.length || scoreRows.length,
+            completedSem2Count: semRows.length || scoreRows.length,
+            sem1Average: average(semRows.map(function(item) { return field(item, ['Sem 1 Final (AK)']); })),
+            sem2Average: average(semRows.map(function(item) { return field(item, ['Sem 2 Average (R)']); })),
+            rankSem1: rankRows(semRows, studentNo, 'Sem 1 Final (AK)'),
+            rankSem2: rankRows(semRows, studentNo, 'Sem 2 Average (R)')
+          },
+          updatedAt: new Date().toISOString()
+        };
+      });
+    }
+
+    function directChapter(row, chapter) {
+      const count = chapter === 4 ? 7 : 5;
+      const inputCols = [];
+      const scores = {};
+      for (let i = 1; i <= count; i++) {
+        const label = 'Task ' + i;
+        inputCols.push(label);
+        scores[label] = field(row, ['Ch. ' + chapter + ' Task ' + i]);
+      }
+      inputCols.push('Summative');
+      scores.Summative = field(row, ['Summative Ch. ' + chapter]);
+      return {
+        chapter: chapter,
+        inputCols: inputCols,
+        student: {
+          no: field(row, ['No']),
+          name: field(row, ['Name']),
+          scores: scores,
+          average: average(inputCols.map(function(col) { return scores[col]; })),
+          finalScore: average(inputCols.map(function(col) { return scores[col]; })),
+          indicator: average(inputCols.map(function(col) { return scores[col]; })) >= 75 ? 'Safe' : 'Needs work'
+        }
+      };
+    }
+
+    function remedialFor(asatScore, gapValue, taskText) {
+      const scoreNum = num(asatScore);
+      const gapNum = num(gapValue);
+      if (scoreNum === '' && gapNum === '') {
+        return { type:'pending', label:'Waiting for ASAT', task:'Your ASAT score is not available yet.', gap:'', link:'', linkLabel:'No group yet' };
+      }
+      const gap = gapNum === '' ? Math.max(0, Math.ceil((75 - scoreNum) * 100) / 100) : Math.max(0, gapNum);
+      if (gap <= 0) return { type:'enrichment', label:'Enrichment', task: taskText || 'No remedial needed. You may join enrichment to improve your ASAT score by 1-10 points.', gap:0, link:REMEDIAL_LINKS.enrichment, linkLabel:'Join Enrichment Group' };
+      if (gap <= 15) return { type:'gap1', label:'Gap 1-15', task: taskText || 'Read a paragraph offline and meet the teacher.', gap:gap, link:REMEDIAL_LINKS.gap1, linkLabel:'Join Gap 1-15 Group' };
+      if (gap <= 25) return { type:'gap2', label:'Gap 16-25', task: taskText || 'Make a poster summary of Semester 2 material.', gap:gap, link:REMEDIAL_LINKS.gap2, linkLabel:'Join Gap 16-25 Group' };
+      return { type:'gap3', label:'Gap 26+', task: taskText || 'Write a complete written summary of Semester 2 material.', gap:gap, link:REMEDIAL_LINKS.gap3, linkLabel:'Join Gap 26+ Group' };
+    }
+
+    function resultFromDiff(value) {
+      const n = num(value);
+      return n === '' ? 'Waiting' : n > 0 ? 'Improved' : n < 0 ? 'Decreased' : 'Same';
+    }
+
+    function average(values) {
+      const nums = values.map(num).filter(function(value) { return value !== ''; });
+      if (!nums.length) return '';
+      return Math.round((nums.reduce(function(a, b) { return a + b; }, 0) / nums.length) * 100) / 100;
+    }
+
+    function rankRows(rows, studentNo, fieldName) {
+      const ranked = rows.map(function(row) {
+        return { no: String(field(row, ['Student No.','Student No'])).trim(), score: num(field(row, [fieldName])) };
+      }).filter(function(item) { return item.score !== ''; }).sort(function(a, b) { return b.score - a.score; });
+      const index = ranked.findIndex(function(item) { return item.no === String(studentNo).trim(); });
+      return index < 0 ? '' : index + 1;
+    }
+
     function init() {
       const clsSel = document.getElementById('classSelect');
       clsSel.innerHTML = CLASSES.map(function(cls) { return '<option value="' + cls + '">' + CLASS_LABELS[cls] + '</option>'; }).join('');
@@ -208,7 +401,7 @@
       const sel = document.getElementById('studentSelect');
       sel.innerHTML = '<option>Loading...</option>';
       setState('<div class="spinner"></div>Loading students...');
-      apiGet({ action:'getFinalDashboardStudents', className:cls }).then(function(res) {
+      scoreGet({ action:'getFinalDashboardStudents', className:cls }).then(function(res) {
         if (!res.success) throw new Error(res.error || 'Could not load students');
         students = res.students || [];
         sel.innerHTML = '<option value="">Select your name</option>' + students.map(function(s) {
@@ -229,7 +422,7 @@
       if (!cls || !no) return setState('Please select your class and name first.');
       document.getElementById('viewBtn').disabled = true;
       setState('<div class="spinner"></div>Loading your dashboard...');
-      apiGet({ action:'getFinalDashboard', className:cls, studentNo:no }).then(function(res) {
+      scoreGet({ action:'getFinalDashboard', className:cls, studentNo:no }).then(function(res) {
         document.getElementById('viewBtn').disabled = false;
         if (!res.success) throw new Error(res.error || 'Could not load score');
         render(res);
