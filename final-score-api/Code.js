@@ -1,4 +1,11 @@
 const CLASSES = ["XE1", "XE4", "XE5", "XE6", "XE7", "XE8", "XE9", "XE10", "XE11"];
+const FINAL_DASHBOARD_SHEET_GID = 1145427024;
+const REMEDIAL_LINKS = {
+  enrichment: "https://chat.whatsapp.com/L9isr7aTbeJKZh5YeMCnBE",
+  gap1to15: "https://chat.whatsapp.com/JTrmrhnBz1v0yhBpMGatpZ",
+  gap16to25: "https://chat.whatsapp.com/GIIRbntJuQYK32dwI3xnEV",
+  gap26plus: "https://chat.whatsapp.com/BnUByekB5QR3wvMb3Vkmf4"
+};
 
 const SOURCES = {
   XE1: "https://docs.google.com/spreadsheets/d/1X3PBpMCEvglTA92HST8286dY_OWe5lw7tdJHPpNjggk/edit",
@@ -499,6 +506,14 @@ function doGet(e) {
       return outputJson_(getFinalScoreComparison(e.parameter.className, e.parameter.studentNo), callback);
     }
 
+    if (action === "getFinalDashboardStudents") {
+      return outputJson_(getFinalDashboardStudents(e.parameter.className), callback);
+    }
+
+    if (action === "getFinalDashboard") {
+      return outputJson_(getFinalDashboard(e.parameter.className, e.parameter.studentNo), callback);
+    }
+
     return outputJson_({ success: false, error: "Unknown action" }, callback);
   } catch (err) {
     return outputJson_({ success: false, error: String(err && err.message ? err.message : err) }, callback);
@@ -608,6 +623,230 @@ function rankByScore_(rows, student, key) {
     .sort((a, b) => b - a);
 
   return scores.findIndex(score => score === studentValue) + 1;
+}
+
+function sourceId_(className) {
+  const url = SOURCES[className];
+  const match = String(url || "").match(/\/d\/([^/]+)/);
+  return match ? match[1] : "";
+}
+
+function classSpreadsheet_(className) {
+  const id = sourceId_(className);
+  if (!id) throw new Error("Class source not found: " + className);
+  return SpreadsheetApp.openById(id);
+}
+
+function getSheetByGid_(spreadsheet, gid) {
+  const target = Number(gid);
+  const sheets = spreadsheet.getSheets();
+  for (let i = 0; i < sheets.length; i++) {
+    if (sheets[i].getSheetId() === target) return sheets[i];
+  }
+  return null;
+}
+
+function getRosterStudents_(className) {
+  const sheet = classSpreadsheet_(className).getSheets()[0];
+  const data = sheet.getDataRange().getValues();
+  const students = [];
+  for (let r = 1; r < data.length; r++) {
+    const no = data[r][0];
+    const name = data[r][1];
+    if (!no || !name || String(name).trim() === "") break;
+    students.push({ no: no, name: String(name).trim(), nickname: String(data[r][2] || "").trim() });
+  }
+  return students;
+}
+
+function getChapterScoresForStudent_(className, studentNo, chapter) {
+  const sheet = classSpreadsheet_(className).getSheetByName("Chapter_" + chapter);
+  if (!sheet) return { chapter: chapter, inputCols: [], student: null };
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0] || [];
+  const inputCols = [];
+  headers.forEach((h, i) => {
+    const key = String(h || "").trim();
+    if (/^Task\s*\d+$/i.test(key) || key === "Formative" || key === "Summative") inputCols.push({ name: key, col: i });
+  });
+
+  let row = null;
+  for (let r = 1; r < data.length; r++) {
+    if (String(data[r][0]) === String(studentNo)) {
+      row = data[r];
+      break;
+    }
+  }
+  if (!row) return { chapter: chapter, inputCols: inputCols.map(c => c.name), student: null };
+
+  const scores = {};
+  inputCols.forEach(c => {
+    const value = row[c.col];
+    scores[c.name] = (value === "" || value === null || value === undefined || value === "#DIV/0!") ? "" : value;
+  });
+  const avgCol = headers.findIndex(h => String(h).trim() === "Average");
+  const finalCol = headers.findIndex(h => String(h).trim() === "Final Score");
+  const indCol = headers.findIndex(h => String(h).trim().toLowerCase().startsWith("ind"));
+  return {
+    chapter: chapter,
+    inputCols: inputCols.map(c => c.name),
+    student: {
+      no: row[0],
+      name: String(row[1] || "").trim(),
+      nickname: String(row[2] || "").trim(),
+      scores: scores,
+      average: avgCol >= 0 ? normalizeScore_(row[avgCol]) : "",
+      finalScore: finalCol >= 0 ? normalizeScore_(row[finalCol]) : "",
+      indicator: indCol >= 0 ? String(row[indCol] || "").trim() : ""
+    }
+  };
+}
+
+function getOverallScoresForStudent_(className, studentNo) {
+  const sheet = classSpreadsheet_(className).getSheetByName("Scores");
+  if (!sheet) return null;
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0] || [];
+  let row = null;
+  for (let r = 1; r < data.length; r++) {
+    if (String(data[r][0]) === String(studentNo)) {
+      row = data[r];
+      break;
+    }
+  }
+  if (!row) return null;
+
+  const inputCols = ["Chapter 4", "Chapter 5", "ASAT"];
+  const calcCols = ["Average", "Final Score", "Indicator"];
+  const scores = {};
+  const calc = {};
+  inputCols.forEach(name => {
+    const idx = headers.findIndex(h => String(h).trim() === name);
+    const value = idx >= 0 ? row[idx] : "";
+    scores[name] = (value === "" || value === null || value === undefined || value === "#DIV/0!" || value === "-") ? "" : value;
+  });
+  calcCols.forEach(name => {
+    const idx = headers.findIndex(h => String(h).trim() === name);
+    const value = idx >= 0 ? row[idx] : "";
+    calc[name] = (value === "" || value === null || value === undefined || value === "#DIV/0!") ? "" : value;
+  });
+  return {
+    inputCols: inputCols,
+    calcCols: calcCols,
+    student: {
+      no: row[0],
+      name: String(row[1] || "").trim(),
+      nickname: String(row[2] || "").trim(),
+      scores: scores,
+      calc: calc
+    }
+  };
+}
+
+function getFinalDashboardRows_() {
+  const sheet = getSheetByGid_(SpreadsheetApp.getActiveSpreadsheet(), FINAL_DASHBOARD_SHEET_GID);
+  if (!sheet) throw new Error("Final dashboard sheet not found");
+  const data = sheet.getDataRange().getValues();
+  const rows = [];
+  for (let r = 1; r < data.length; r++) {
+    for (let c = 0; c + 7 < data[r].length; c += 9) {
+      const className = String(data[r][c + 1] || "").trim();
+      const studentNo = data[r][c + 2];
+      const name = String(data[r][c + 3] || "").trim();
+      if (!className || !studentNo || !name || className === "Class" || name === "Name") continue;
+      rows.push({
+        globalNo: data[r][c],
+        className: className,
+        studentNo: studentNo,
+        name: name,
+        sem1: normalizeScore_(data[r][c + 4]),
+        sem2: normalizeScore_(data[r][c + 5]),
+        difference: normalizeScore_(data[r][c + 6]),
+        result: String(data[r][c + 7] || "").trim()
+      });
+    }
+  }
+  return rows;
+}
+
+function remedialForAsat_(asatScore) {
+  if (asatScore === "" || asatScore === null || asatScore === undefined || asatScore === "-") {
+    return { type: "pending", label: "Waiting for ASAT", task: "Your ASAT score is not available yet.", gap: "", link: "", linkLabel: "No group yet" };
+  }
+  const score = Number(asatScore);
+  if (isNaN(score)) return { type: "pending", label: "Waiting for ASAT", task: "Your ASAT score is not available yet.", gap: "", link: "", linkLabel: "No group yet" };
+  if (score >= 75) {
+    return { type: "enrichment", label: "Enrichment", task: "No remedial needed. You may join enrichment to improve your ASAT score by 1-10 points.", gap: 0, link: REMEDIAL_LINKS.enrichment, linkLabel: "Join Enrichment Group" };
+  }
+  const gap = Math.ceil((75 - score) * 100) / 100;
+  if (gap <= 15) return { type: "gap1", label: "Gap 1-15", task: "Read a paragraph offline and meet the teacher.", gap: gap, link: REMEDIAL_LINKS.gap1to15, linkLabel: "Join Gap 1-15 Group" };
+  if (gap <= 25) return { type: "gap2", label: "Gap 16-25", task: "Make a poster summary of Semester 2 material.", gap: gap, link: REMEDIAL_LINKS.gap16to25, linkLabel: "Join Gap 16-25 Group" };
+  return { type: "gap3", label: "Gap 26+", task: "Write a complete written summary of Semester 2 material.", gap: gap, link: REMEDIAL_LINKS.gap26plus, linkLabel: "Join Gap 26+ Group" };
+}
+
+function getFinalDashboardStudents(className) {
+  const cls = String(className || "").trim();
+  const rows = getFinalDashboardRows_().filter(row => !cls || row.className === cls);
+  const roster = cls ? getRosterStudents_(cls) : [];
+  if (roster.length) {
+    const rowsByNo = {};
+    rows.forEach(row => rowsByNo[String(row.studentNo)] = row);
+    return {
+      success: true,
+      className: cls,
+      students: roster.filter(student => !!rowsByNo[String(student.no)]).map(student => ({ no: student.no, name: student.name }))
+    };
+  }
+  return { success: true, className: cls, students: rows.map(row => ({ no: row.studentNo, name: row.name })) };
+}
+
+function getFinalDashboard(className, studentNo) {
+  const cls = String(className || "").trim();
+  const no = String(studentNo || "").trim();
+  if (!cls || !no) return { success: false, error: "Missing className or studentNo" };
+
+  const classRows = getFinalDashboardRows_().filter(row => row.className === cls);
+  const row = classRows.find(item => String(item.studentNo) === no);
+  if (!row) return { success: false, error: "Student not found" };
+
+  const rosterStudent = getRosterStudents_(cls).find(student => String(student.no) === no);
+  const student = Object.assign({}, row);
+  if (rosterStudent) {
+    student.studentNo = rosterStudent.no;
+    student.name = rosterStudent.name;
+  }
+
+  const sem1Rows = classRows.filter(item => item.sem1 !== "" && !isNaN(Number(item.sem1)));
+  const sem2Rows = classRows.filter(item => item.sem2 !== "" && !isNaN(Number(item.sem2)));
+  const overall = getOverallScoresForStudent_(cls, no);
+  const asatScore = overall && overall.student && overall.student.scores ? overall.student.scores.ASAT : "";
+  const asatNum = (asatScore === "" || asatScore === null || asatScore === undefined || asatScore === "-") ? NaN : Number(asatScore);
+
+  return {
+    success: true,
+    className: cls,
+    classLabel: classLabel_(cls),
+    student: student,
+    chapters: [
+      getChapterScoresForStudent_(cls, no, 4),
+      getChapterScoresForStudent_(cls, no, 5)
+    ],
+    overall: overall,
+    asat: {
+      score: asatScore,
+      gap: isNaN(asatNum) ? "" : Math.max(0, Math.ceil((75 - asatNum) * 100) / 100)
+    },
+    remedial: remedialForAsat_(asatScore),
+    summary: {
+      classSize: classRows.length,
+      completedSem2Count: sem2Rows.length,
+      sem1Average: average_(sem1Rows.map(item => item.sem1)),
+      sem2Average: average_(sem2Rows.map(item => item.sem2)),
+      rankSem1: rankByScore_(classRows, student, "sem1"),
+      rankSem2: rankByScore_(classRows, student, "sem2")
+    },
+    updatedAt: new Date().toISOString()
+  };
 }
 
 function syncAllAverageBackToClassSheets() {
