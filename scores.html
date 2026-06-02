@@ -68,6 +68,11 @@
     .score-cell.summative .score-cell-value { color:#C2410C; }
     .asat-panel { padding:22px; display:grid; grid-template-columns:1fr auto; gap:18px; align-items:center; }
     .asat-score { font:800 2.3rem 'IBM Plex Mono',monospace; color:var(--purple); }
+    .asat-side { text-align:right; min-width:180px; }
+    .asat-details { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+    .asat-chip { border:1px solid var(--line); background:#F8FBFF; color:#40527A; border-radius:999px; padding:7px 10px; font:800 .76rem 'IBM Plex Mono',monospace; }
+    .asat-chip.good { border-color:#BBF7D0; background:#F0FDF4; color:#166534; }
+    .asat-chip.warn { border-color:#FED7AA; background:#FFF7ED; color:#9A3412; }
     .section { padding:22px; }
     .section-title { font-size:1rem; font-weight:800; margin-bottom:16px; }
     .message { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:22px; margin-bottom:18px; background:#fff; border:1px solid var(--line); border-radius:18px; box-shadow:0 12px 30px rgba(15,23,42,.04); }
@@ -210,14 +215,24 @@
           if (script.parentNode) script.parentNode.removeChild(script);
           try {
             const table = payload && payload.table ? payload.table : { cols: [], rows: [] };
-            const headers = table.cols.map(function(col, index) {
+            const matrix = [];
+            matrix.push(table.cols.map(function(col, index) {
               return cleanHeader(col.label || col.id || ('Column ' + (index + 1)));
+            }));
+            table.rows.forEach(function(row) {
+              matrix.push(table.cols.map(function(_, index) {
+                const cell = row.c && row.c[index] ? row.c[index] : null;
+                return cell ? (cell.v == null ? '' : cell.v) : '';
+              }));
             });
-            const rows = table.rows.map(function(row) {
+            const headerIndex = findHeaderRow(matrix);
+            if (headerIndex < 0) throw new Error('Could not read the score sheet headers.');
+            const headers = matrix[headerIndex].map(cleanHeader);
+            const rows = matrix.slice(headerIndex + 1).map(function(values) {
               const item = {};
               headers.forEach(function(header, index) {
-                const cell = row.c && row.c[index] ? row.c[index] : null;
-                item[header] = cell ? (cell.v == null ? '' : cell.v) : '';
+                const key = Object.prototype.hasOwnProperty.call(item, header) ? header + ' ' + (index + 1) : header;
+                item[key] = values[index] == null ? '' : values[index];
               });
               return item;
             }).filter(function(row) { return field(row, ['No']) !== '' && field(row, ['Name']) !== ''; });
@@ -237,8 +252,20 @@
       });
     }
 
+    function findHeaderRow(matrix) {
+      for (let i = 0; i < Math.min(matrix.length, 10); i++) {
+        const row = matrix[i].map(function(cell) { return cleanHeader(cell).toLowerCase(); });
+        const hasName = row.indexOf('name') !== -1;
+        const hasNo = row.some(function(text) { return text === 'no' || text === 'student no.' || text === 'student no'; });
+        const hasScoreMarker = row.indexOf('asat') !== -1 || row.indexOf('class') !== -1 || row.some(function(text) { return text.indexOf('sem 1 final') !== -1; });
+        if (hasName && hasNo && hasScoreMarker) return i;
+      }
+      return -1;
+    }
+
     function cleanHeader(header) {
       const h = String(header || '').trim().replace(/\s+/g, ' ');
+      if (/^no\.?$/i.test(h)) return 'No';
       if (/score tracker.*no\.?$/i.test(h)) return 'No';
       if (/comparison no\.?$/i.test(h)) return 'No';
       return h;
@@ -499,11 +526,10 @@
     function asatBlock(data) {
       const asat = data.asat || {};
       const rem = data.remedial || {};
-      const overall = data.overall && data.overall.student ? data.overall.student : null;
-      const avg = overall && overall.calc ? overall.calc.Average : '';
-      const final = overall && overall.calc ? overall.calc['Final Score'] : '';
-      const lacking = asat.lacking ? ' · Lacking: ' + escapeHtml(asat.lacking) : '';
-      return '<div class="panel asat-panel"><div><div class="section-title">ASAT Result</div><div class="meta">ASAT is separated from your task and summative scores. The remedial/enrichment group below is based on this ASAT status.</div></div><div style="text-align:right"><div class="score-cell-label">ASAT Score</div><div class="asat-score">' + score(asat.score) + '</div><div class="meta">Average ' + score(avg) + ' · Final ' + score(final) + ' · ' + escapeHtml(rem.label || 'Waiting') + lacking + '</div></div></div>';
+      const gap = asat.gap === 0 ? '0' : score(asat.gap);
+      const lacking = asat.lacking ? escapeHtml(asat.lacking) : 'Complete';
+      const statusClass = rem.type === 'enrichment' ? 'good' : rem.type === 'pending' ? 'warn' : 'warn';
+      return '<div class="panel asat-panel"><div><div class="section-title">ASAT Result</div><div class="meta">ASAT is separate from task and summative scores. Your remedial or enrichment group is based on this score.</div><div class="asat-details"><span class="asat-chip ' + statusClass + '">' + escapeHtml(rem.label || 'Waiting') + '</span><span class="asat-chip">Gap: ' + gap + '</span><span class="asat-chip">Lacking: ' + lacking + '</span></div></div><div class="asat-side"><div class="score-cell-label">ASAT Score</div><div class="asat-score">' + score(asat.score) + '</div></div></div>';
     }
     function chapterFinal(chapter) {
       return chapter && chapter.student ? score(chapter.student.finalScore) : '-';
