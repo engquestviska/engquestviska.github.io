@@ -53,6 +53,21 @@
     .metric-sub { color:var(--muted); font-weight:700; font-size:.86rem; }
     .metric.blue .metric-value { color:var(--blue); } .metric.purple .metric-value { color:var(--purple); } .metric.green .metric-value { color:var(--green); } .metric.amber .metric-value { color:var(--amber); } .metric.red .metric-value { color:var(--red); }
     .grid { display:grid; grid-template-columns:1.08fr .92fr; gap:18px; }
+    .score-sections { display:grid; gap:18px; margin-top:18px; }
+    .chapter-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
+    .chapter-card { padding:22px; }
+    .chapter-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; margin-bottom:16px; }
+    .chapter-title { font-size:1.05rem; font-weight:800; }
+    .chapter-final { text-align:right; font-weight:800; color:var(--muted); }
+    .chapter-final strong { display:block; color:var(--ink); font:800 1.6rem 'IBM Plex Mono',monospace; }
+    .score-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(112px,1fr)); gap:10px; }
+    .score-cell { border:1px solid var(--line); background:#F8FBFF; border-radius:14px; padding:12px; min-height:78px; }
+    .score-cell-label { color:#52617F; font:.72rem 'IBM Plex Mono',monospace; font-weight:800; text-transform:uppercase; letter-spacing:.04em; }
+    .score-cell-value { margin-top:8px; color:var(--ink); font:800 1.35rem 'IBM Plex Mono',monospace; }
+    .score-cell.summative { background:#FFF7ED; border-color:#FED7AA; }
+    .score-cell.summative .score-cell-value { color:#C2410C; }
+    .asat-panel { padding:22px; display:grid; grid-template-columns:1fr auto; gap:18px; align-items:center; }
+    .asat-score { font:800 2.3rem 'IBM Plex Mono',monospace; color:var(--purple); }
     .section { padding:22px; }
     .section-title { font-size:1rem; font-weight:800; margin-bottom:16px; }
     .message { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:22px; margin-bottom:18px; background:#fff; border:1px solid var(--line); border-radius:18px; box-shadow:0 12px 30px rgba(15,23,42,.04); }
@@ -99,7 +114,7 @@
     .sidebar-home-btn-text { font-size:.85rem; font-weight:700; color:#fff; }
     .sidebar-home-btn-sub { font-size:.7rem; color:rgba(255,255,255,.4); }
     @media (max-width:900px) {
-      .picker, .grid, .remedial { grid-template-columns:1fr; }
+      .picker, .grid, .remedial, .chapter-grid, .asat-panel { grid-template-columns:1fr; }
       .cards { grid-template-columns:repeat(2,1fr); }
       .student-head, .message { align-items:flex-start; flex-direction:column; }
     }
@@ -118,11 +133,11 @@
   <header class="hero">
     <div class="hero-inner">
       <div class="topline">
-        <img class="logo" src="logo.png" alt="English Quest"/>
+        <img class="logo" src="logo.jpg" alt="English Quest"/>
         <div class="brand"><div class="brand-title">English Quest</div><div class="brand-sub">SMA Negeri 6 Surakarta</div></div>
       </div>
       <h1>Final Score Dashboard</h1>
-      <p class="hero-copy">See your Semester 1 and Semester 2 final score comparison, class position, and the remedial or enrichment group you need.</p>
+      <p class="hero-copy">See your task scores, summative scores, ASAT status, and the remedial or enrichment group you need.</p>
     </div>
   </header>
   <svg class="wave" viewBox="0 0 1440 48" preserveAspectRatio="none" aria-hidden="true">
@@ -228,6 +243,7 @@
       const s = data.student;
       const sum = data.summary || {};
       const rem = data.remedial || {};
+      const asat = data.asat || {};
       const diff = Number(s.difference);
       const diffClass = isNaN(diff) ? 'amber' : diff > 0 ? 'green' : diff < 0 ? 'red' : 'blue';
       const statusClass = String(s.result || '').toLowerCase() === 'improved' ? 'improved' : String(s.result || '').toLowerCase() === 'same' ? 'same' : 'decreased';
@@ -244,18 +260,22 @@
           metric('Semester 1', score(s.sem1), rank(sum.rankSem1, sum.classSize), 'blue') +
           metric('Semester 2', score(s.sem2), rank(sum.rankSem2, sum.classSize), 'purple') +
           metric('Difference', signed(diff), differenceText(diff), diffClass) +
-          metric('ASAT Gap', rem.gap === 0 ? '0' : rem.gap || '-', rem.label || 'Waiting', rem.type === 'enrichment' ? 'green' : rem.type === 'pending' ? 'amber' : 'red') +
+          metric('ASAT Gap', asat.gap === 0 ? '0' : asat.gap || '-', rem.label || 'Waiting', rem.type === 'enrichment' ? 'green' : rem.type === 'pending' ? 'amber' : 'red') +
         '</div>' +
         messageBlock(s, diff, statusClass) +
-        '<div class="grid">' +
-          '<div class="panel section"><div class="section-title">Final Score Comparison</div><div class="bars">' + bar('Semester 1', s.sem1) + bar('Semester 2', s.sem2) + '</div></div>' +
-          '<div class="panel section"><div class="section-title">Class Score Breakdown</div><div class="breakdown">' + bands(sum.bands || []) + '</div></div>' +
+        '<div class="score-sections">' +
+          '<div class="chapter-grid">' + chapterCard(data.chapters && data.chapters[0]) + chapterCard(data.chapters && data.chapters[1]) + '</div>' +
+          asatBlock(data) +
+          '<div class="panel section"><div class="section-title">Final Score Comparison</div><div class="bars">' + bar('Semester 1 Final', s.sem1) + bar('Semester 2 Final', s.sem2) + '</div></div>' +
         '</div>' +
         remedialBlock(rem) +
         '<div class="panel section" style="margin-top:18px;"><div class="section-title">Detailed Comparison</div><div class="table-wrap">' +
-          '<table><thead><tr><th>Item</th><th>Your Score</th><th>Class Average</th><th>Your Rank</th><th>Status</th></tr></thead><tbody>' +
-          '<tr class="you-row"><td>Semester 1 Final Score</td><td>' + score(s.sem1) + '</td><td>' + score(sum.sem1Average) + '</td><td>' + rank(sum.rankSem1, sum.classSize) + '</td><td>' + escapeHtml(s.result || '-') + '</td></tr>' +
-          '<tr class="you-row"><td>Semester 2 Final Score</td><td>' + score(s.sem2) + '</td><td>' + score(sum.sem2Average) + '</td><td>' + rank(sum.rankSem2, sum.classSize) + '</td><td>' + escapeHtml(rem.label || '-') + '</td></tr>' +
+          '<table><thead><tr><th>Item</th><th>Your Score</th><th>Context</th><th>Status</th></tr></thead><tbody>' +
+          '<tr class="you-row"><td>Chapter 4 Final</td><td>' + chapterFinal(data.chapters && data.chapters[0]) + '</td><td>Tasks + Summative</td><td>' + indicator(data.chapters && data.chapters[0]) + '</td></tr>' +
+          '<tr class="you-row"><td>Chapter 5 Final</td><td>' + chapterFinal(data.chapters && data.chapters[1]) + '</td><td>Tasks + Summative</td><td>' + indicator(data.chapters && data.chapters[1]) + '</td></tr>' +
+          '<tr class="you-row"><td>ASAT</td><td>' + score(asat.score) + '</td><td>Separated from task and summative scores</td><td>' + escapeHtml(rem.label || '-') + '</td></tr>' +
+          '<tr><td>Semester 1 Final Score</td><td>' + score(s.sem1) + '</td><td>' + rank(sum.rankSem1, sum.classSize) + '</td><td>' + escapeHtml(s.result || '-') + '</td></tr>' +
+          '<tr><td>Semester 2 Final Score</td><td>' + score(s.sem2) + '</td><td>' + rank(sum.rankSem2, sum.classSize) + '</td><td>' + escapeHtml(rem.label || '-') + '</td></tr>' +
           '</tbody></table></div></div>';
       document.getElementById('state').style.display = 'none';
       const dash = document.getElementById('dashboard');
@@ -270,9 +290,32 @@
       const text = isNaN(diff) ? 'Your comparison is waiting for complete data.' :
         diff > 0 ? 'Great job. Your final score improved by ' + score(Math.abs(diff)) + ' points from Semester 1 to Semester 2.' :
         diff < 0 ? 'Your score decreased by ' + score(Math.abs(diff)) + ' points. Use the remedial guidance below to recover with a clear next step.' :
-        'Your score stayed stable. Keep your consistency and use enrichment if you want an extra push.';
+        'Your final score stayed stable. Check your task, summative, and ASAT details below for the exact picture.';
       const mark = statusClass === 'improved' ? '+' : statusClass === 'same' ? '=' : '!';
       return '<div class="message"><div class="message-main"><div class="message-icon">' + mark + '</div><div class="message-text">' + escapeHtml(text) + '</div></div><span class="status-pill ' + statusClass + '">' + escapeHtml(s.result || 'Waiting') + '</span></div>';
+    }
+    function chapterCard(chapter) {
+      if (!chapter || !chapter.student) return '<div class="panel chapter-card"><div class="chapter-title">Chapter</div><div class="meta">No score data yet.</div></div>';
+      const st = chapter.student;
+      const cells = (chapter.inputCols || []).map(function(col) {
+        const isSumm = /summative/i.test(col);
+        return '<div class="score-cell ' + (isSumm ? 'summative' : '') + '"><div class="score-cell-label">' + escapeHtml(col) + '</div><div class="score-cell-value">' + score(st.scores ? st.scores[col] : '') + '</div></div>';
+      }).join('');
+      return '<div class="panel chapter-card"><div class="chapter-head"><div><div class="chapter-title">Chapter ' + escapeHtml(chapter.chapter) + '</div><div class="meta">Task scores and summative score</div></div><div class="chapter-final">Final<strong>' + score(st.finalScore) + '</strong></div></div><div class="score-list">' + cells + '</div></div>';
+    }
+    function asatBlock(data) {
+      const asat = data.asat || {};
+      const rem = data.remedial || {};
+      const overall = data.overall && data.overall.student ? data.overall.student : null;
+      const avg = overall && overall.calc ? overall.calc.Average : '';
+      const final = overall && overall.calc ? overall.calc['Final Score'] : '';
+      return '<div class="panel asat-panel"><div><div class="section-title">ASAT Result</div><div class="meta">ASAT is separated from your task and summative scores. The remedial/enrichment group below is based on this ASAT status.</div></div><div style="text-align:right"><div class="score-cell-label">ASAT Score</div><div class="asat-score">' + score(asat.score) + '</div><div class="meta">Average ' + score(avg) + ' · Final ' + score(final) + ' · ' + escapeHtml(rem.label || 'Waiting') + '</div></div></div>';
+    }
+    function chapterFinal(chapter) {
+      return chapter && chapter.student ? score(chapter.student.finalScore) : '-';
+    }
+    function indicator(chapter) {
+      return chapter && chapter.student ? escapeHtml(chapter.student.indicator || '-') : '-';
     }
     function remedialBlock(rem) {
       const good = rem.type === 'enrichment';

@@ -1514,13 +1514,23 @@ function finalDashboardRows_() {
   return rows;
 }
 
-function finalDashboardRemedial_(sem2) {
-  const score = Number(sem2);
+function finalDashboardRemedial_(asatScore) {
+  if (asatScore === '' || asatScore === null || asatScore === undefined || asatScore === '-') {
+    return {
+      type: 'pending',
+      label: 'Waiting for ASAT',
+      task: 'Your ASAT score is not available yet.',
+      gap: '',
+      link: '',
+      linkLabel: 'No group yet'
+    };
+  }
+  const score = Number(asatScore);
   if (isNaN(score)) {
     return {
       type: 'pending',
       label: 'Waiting for score',
-      task: 'Your final score is not available yet.',
+      task: 'Your ASAT score is not available yet.',
       gap: '',
       link: '',
       linkLabel: 'No group yet'
@@ -1530,7 +1540,7 @@ function finalDashboardRemedial_(sem2) {
     return {
       type: 'enrichment',
       label: 'Enrichment',
-      task: 'No remedial needed. You may join enrichment to add 1-5 points.',
+      task: 'No remedial needed. You may join enrichment to improve your ASAT score by 1-5 points.',
       gap: 0,
       link: REMEDIAL_LINKS.enrichment,
       linkLabel: 'Join Enrichment Group'
@@ -1564,6 +1574,29 @@ function finalDashboardRemedial_(sem2) {
     gap: gap,
     link: REMEDIAL_LINKS.gap26plus,
     linkLabel: 'Join Gap 26+ Group'
+  };
+}
+
+function getDashboardChapter_(className, studentNo, chapter) {
+  const data = getChapterScores(className, chapter);
+  const students = data && data.students ? data.students : [];
+  const row = students.find(function(student) { return String(student.no) === String(studentNo); });
+  return {
+    chapter: chapter,
+    inputCols: data && data.inputCols ? data.inputCols : [],
+    student: row || null
+  };
+}
+
+function getDashboardOverall_(className, studentNo) {
+  const data = getFinalScores(className);
+  const students = data && data.students ? data.students : [];
+  const row = students.find(function(student) { return String(student.no) === String(studentNo); });
+  if (!row) return null;
+  return {
+    inputCols: data.inputCols || [],
+    calcCols: data.calcCols || [],
+    student: row
   };
 }
 
@@ -1630,12 +1663,25 @@ function getFinalDashboard(className, studentNo) {
 
   const sem1Rows = classRows.filter(function(item) { return item.sem1 !== '' && !isNaN(Number(item.sem1)); });
   const sem2Rows = classRows.filter(function(item) { return item.sem2 !== '' && !isNaN(Number(item.sem2)); });
+  const chapters = [
+    getDashboardChapter_(cls, no, 4),
+    getDashboardChapter_(cls, no, 5)
+  ];
+  const overall = getDashboardOverall_(cls, no);
+  const asatScore = overall && overall.student && overall.student.scores ? overall.student.scores.ASAT : '';
+  const asatNum = (asatScore === '' || asatScore === null || asatScore === undefined || asatScore === '-') ? NaN : Number(asatScore);
   return {
     success: true,
     className: cls,
     classLabel: semClassLabel_(cls),
     student: student,
-    remedial: finalDashboardRemedial_(student.sem2),
+    chapters: chapters,
+    overall: overall,
+    asat: {
+      score: asatScore,
+      gap: isNaN(asatNum) ? '' : Math.max(0, Math.ceil((75 - asatNum) * 100) / 100)
+    },
+    remedial: finalDashboardRemedial_(asatScore),
     summary: {
       classSize: classRows.length,
       sem1Average: averageSemScores_(sem1Rows.map(function(item) { return item.sem1; })),
