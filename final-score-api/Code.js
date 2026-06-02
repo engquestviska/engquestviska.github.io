@@ -743,6 +743,37 @@ function getOverallScoresForStudent_(className, studentNo) {
   };
 }
 
+function getAllScoreRow_(className, studentNo) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(className);
+  if (!sheet) return null;
+  const data = sheet.getDataRange().getValues();
+  const headers = data[0] || [];
+  let row = null;
+  for (let r = 1; r < data.length; r++) {
+    if (String(data[r][0]) === String(studentNo)) {
+      row = data[r];
+      break;
+    }
+  }
+  if (!row) return null;
+
+  function valueOf(header) {
+    const idx = headers.findIndex(h => String(h).trim().toLowerCase() === String(header).trim().toLowerCase());
+    const value = idx >= 0 ? row[idx] : "";
+    return (value === null || value === undefined || value === "#DIV/0!") ? "" : value;
+  }
+
+  return {
+    no: row[0],
+    name: String(row[1] || "").trim(),
+    asat: valueOf("ASAT"),
+    finalScoreSem2: valueOf("Final Score Sem 2"),
+    asatGap: valueOf("ASAT Gap"),
+    remedial: String(valueOf("Remedial") || "").trim(),
+    lacking: String(valueOf("Lacking") || "").trim()
+  };
+}
+
 function getFinalDashboardRows_() {
   const sheet = getSheetByGid_(SpreadsheetApp.getActiveSpreadsheet(), FINAL_DASHBOARD_SHEET_GID);
   if (!sheet) throw new Error("Final dashboard sheet not found");
@@ -784,6 +815,41 @@ function remedialForAsat_(asatScore) {
   return { type: "gap3", label: "Gap 26+", task: "Write a complete written summary of Semester 2 material.", gap: gap, link: REMEDIAL_LINKS.gap26plus, linkLabel: "Join Gap 26+ Group" };
 }
 
+function remedialFromAllScore_(allScore, fallbackAsatScore) {
+  const sheetGap = allScore && allScore.asatGap !== "" ? Number(allScore.asatGap) : NaN;
+  const asatScore = allScore && allScore.asat !== "" ? allScore.asat : fallbackAsatScore;
+  const base = remedialForAsat_(asatScore);
+  if (!allScore) return base;
+
+  const sheetTask = String(allScore.remedial || "").trim();
+  if (sheetTask) base.task = sheetTask;
+  if (!isNaN(sheetGap)) {
+    base.gap = Math.max(0, sheetGap);
+    if (sheetGap <= 0) {
+      base.type = "enrichment";
+      base.label = "Enrichment";
+      base.link = REMEDIAL_LINKS.enrichment;
+      base.linkLabel = "Join Enrichment Group";
+    } else if (sheetGap <= 15) {
+      base.type = "gap1";
+      base.label = "Gap 1-15";
+      base.link = REMEDIAL_LINKS.gap1to15;
+      base.linkLabel = "Join Gap 1-15 Group";
+    } else if (sheetGap <= 25) {
+      base.type = "gap2";
+      base.label = "Gap 16-25";
+      base.link = REMEDIAL_LINKS.gap16to25;
+      base.linkLabel = "Join Gap 16-25 Group";
+    } else {
+      base.type = "gap3";
+      base.label = "Gap 26+";
+      base.link = REMEDIAL_LINKS.gap26plus;
+      base.linkLabel = "Join Gap 26+ Group";
+    }
+  }
+  return base;
+}
+
 function getFinalDashboardStudents(className) {
   const cls = String(className || "").trim();
   const rows = getFinalDashboardRows_().filter(row => !cls || row.className === cls);
@@ -819,8 +885,10 @@ function getFinalDashboard(className, studentNo) {
   const sem1Rows = classRows.filter(item => item.sem1 !== "" && !isNaN(Number(item.sem1)));
   const sem2Rows = classRows.filter(item => item.sem2 !== "" && !isNaN(Number(item.sem2)));
   const overall = getOverallScoresForStudent_(cls, no);
-  const asatScore = overall && overall.student && overall.student.scores ? overall.student.scores.ASAT : "";
+  const allScore = getAllScoreRow_(cls, no);
+  const asatScore = allScore && allScore.asat !== "" ? allScore.asat : (overall && overall.student && overall.student.scores ? overall.student.scores.ASAT : "");
   const asatNum = (asatScore === "" || asatScore === null || asatScore === undefined || asatScore === "-") ? NaN : Number(asatScore);
+  const sheetGap = allScore && allScore.asatGap !== "" ? Number(allScore.asatGap) : NaN;
 
   return {
     success: true,
@@ -834,9 +902,11 @@ function getFinalDashboard(className, studentNo) {
     overall: overall,
     asat: {
       score: asatScore,
-      gap: isNaN(asatNum) ? "" : Math.max(0, Math.ceil((75 - asatNum) * 100) / 100)
+      gap: isNaN(sheetGap) ? (isNaN(asatNum) ? "" : Math.max(0, Math.ceil((75 - asatNum) * 100) / 100)) : Math.max(0, sheetGap),
+      remedial: allScore ? allScore.remedial : "",
+      lacking: allScore ? allScore.lacking : ""
     },
-    remedial: remedialForAsat_(asatScore),
+    remedial: remedialFromAllScore_(allScore, asatScore),
     summary: {
       classSize: classRows.length,
       completedSem2Count: sem2Rows.length,

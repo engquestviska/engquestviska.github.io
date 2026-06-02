@@ -309,7 +309,8 @@
       const overall = data.overall && data.overall.student ? data.overall.student : null;
       const avg = overall && overall.calc ? overall.calc.Average : '';
       const final = overall && overall.calc ? overall.calc['Final Score'] : '';
-      return '<div class="panel asat-panel"><div><div class="section-title">ASAT Result</div><div class="meta">ASAT is separated from your task and summative scores. The remedial/enrichment group below is based on this ASAT status.</div></div><div style="text-align:right"><div class="score-cell-label">ASAT Score</div><div class="asat-score">' + score(asat.score) + '</div><div class="meta">Average ' + score(avg) + ' · Final ' + score(final) + ' · ' + escapeHtml(rem.label || 'Waiting') + '</div></div></div>';
+      const lacking = asat.lacking ? ' · Lacking: ' + escapeHtml(asat.lacking) : '';
+      return '<div class="panel asat-panel"><div><div class="section-title">ASAT Result</div><div class="meta">ASAT is separated from your task and summative scores. The remedial/enrichment group below is based on this ASAT status.</div></div><div style="text-align:right"><div class="score-cell-label">ASAT Score</div><div class="asat-score">' + score(asat.score) + '</div><div class="meta">Average ' + score(avg) + ' · Final ' + score(final) + ' · ' + escapeHtml(rem.label || 'Waiting') + lacking + '</div></div></div>';
     }
     function chapterFinal(chapter) {
       return chapter && chapter.student ? score(chapter.student.finalScore) : '-';
@@ -336,6 +337,7 @@
       }).join('');
     }
     function score(v) {
+      if (v === '' || v === null || v === undefined || v === '-') return '-';
       const n = Number(v);
       return isNaN(n) ? '-' : n.toFixed(2).replace(/\.00$/, '');
     }
