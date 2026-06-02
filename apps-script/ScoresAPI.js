@@ -19,6 +19,13 @@ const SCORE_SHEETS = {
 const TASK_SHEET_NAME = 'Task_Status';
 const FINAL_COMPARISON_SHEET_ID = '1UjlcC2zOy5usrkzwL1gqgt3BDfNFb-heak-jdeIxIcM';
 const FINAL_COMPARISON_SHEET_NAME = 'Sem 1 vs Sem 2';
+const FINAL_DASHBOARD_SHEET_GID = 1145427024;
+const REMEDIAL_LINKS = {
+  enrichment: 'https://chat.whatsapp.com/L9isr7aTbeJKZh5YeMCnBE',
+  gap1to15: 'https://chat.whatsapp.com/JTrmrhnBz1v0yhBpMGatpZ',
+  gap16to25: 'https://chat.whatsapp.com/GIIRbntJuQYK32dwI3xnEV',
+  gap26plus: 'https://chat.whatsapp.com/BnUByekB5QR3wvMb3Vkmf4'
+};
 const TEACHER_USER    = 'teacher';
 const TEACHER_HASH    = '39de0394764747426b997b945770fd60661cbd072051131da2cb99d6d8dd8430';
 const WRITES_ENABLED  = true;
@@ -190,6 +197,8 @@ function doGet(e) {
     else if (action === 'getFinalScores')    result = getFinalScores(e.parameter.className);
     else if (action === 'getSemComparisonStudents') result = getSemComparisonStudents(e.parameter.className);
     else if (action === 'getSemComparison')  result = getSemComparison(e.parameter.className, e.parameter.studentNo);
+    else if (action === 'getFinalDashboardStudents') result = getFinalDashboardStudents(e.parameter.className);
+    else if (action === 'getFinalDashboard') result = getFinalDashboard(e.parameter.className, e.parameter.studentNo);
     else if (action === 'saveFinalScore')    result = saveFinalScore(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.studentNo, e.parameter.column, e.parameter.value);
     else if (action === 'getSubmissions')    result = getSubmissions();
     else if (action === 'getTaskStatus')  result = getTaskStatus(e.parameter.className, e.parameter.studentNo);
@@ -1463,6 +1472,184 @@ function saveFinalScore(username, password, className, studentNo, column, value)
     }
   });
   return { success: true, calc };
+}
+
+// ── FINAL DASHBOARD + REMEDIAL (read-only) ───────────────────
+function getSheetByGid_(spreadsheet, gid) {
+  const target = Number(gid);
+  const sheets = spreadsheet.getSheets();
+  for (let i = 0; i < sheets.length; i++) {
+    if (sheets[i].getSheetId() === target) return sheets[i];
+  }
+  return null;
+}
+
+function finalDashboardRows_() {
+  const ss = SpreadsheetApp.openById(FINAL_COMPARISON_SHEET_ID);
+  const sheet = getSheetByGid_(ss, FINAL_DASHBOARD_SHEET_GID);
+  if (!sheet) throw new Error('Final dashboard sheet not found');
+
+  const data = sheet.getDataRange().getValues();
+  const rows = [];
+  for (let r = 1; r < data.length; r++) {
+    for (let c = 0; c + 7 < data[r].length; c += 9) {
+      const globalNo = data[r][c];
+      const className = String(data[r][c + 1] || '').trim();
+      const studentNo = data[r][c + 2];
+      const name = String(data[r][c + 3] || '').trim();
+      const result = String(data[r][c + 7] || '').trim();
+      if (!className || !studentNo || !name || className === 'Class' || name === 'Name') continue;
+      rows.push({
+        globalNo: globalNo,
+        className: className,
+        studentNo: studentNo,
+        name: name,
+        sem1: normalizeSemScore_(data[r][c + 4]),
+        sem2: normalizeSemScore_(data[r][c + 5]),
+        difference: normalizeSemScore_(data[r][c + 6]),
+        result: result
+      });
+    }
+  }
+  return rows;
+}
+
+function finalDashboardRemedial_(sem2) {
+  const score = Number(sem2);
+  if (isNaN(score)) {
+    return {
+      type: 'pending',
+      label: 'Waiting for score',
+      task: 'Your final score is not available yet.',
+      gap: '',
+      link: '',
+      linkLabel: 'No group yet'
+    };
+  }
+  if (score >= 75) {
+    return {
+      type: 'enrichment',
+      label: 'Enrichment',
+      task: 'No remedial needed. You may join enrichment to add 1-5 points.',
+      gap: 0,
+      link: REMEDIAL_LINKS.enrichment,
+      linkLabel: 'Join Enrichment Group'
+    };
+  }
+  const gap = Math.ceil((75 - score) * 100) / 100;
+  if (gap <= 15) {
+    return {
+      type: 'gap1',
+      label: 'Gap 1-15',
+      task: 'Read a paragraph offline and meet the teacher.',
+      gap: gap,
+      link: REMEDIAL_LINKS.gap1to15,
+      linkLabel: 'Join Gap 1-15 Group'
+    };
+  }
+  if (gap <= 25) {
+    return {
+      type: 'gap2',
+      label: 'Gap 16-25',
+      task: 'Make a poster summary of Semester 2 material.',
+      gap: gap,
+      link: REMEDIAL_LINKS.gap16to25,
+      linkLabel: 'Join Gap 16-25 Group'
+    };
+  }
+  return {
+    type: 'gap3',
+    label: 'Gap 26+',
+    task: 'Write a complete written summary of Semester 2 material.',
+    gap: gap,
+    link: REMEDIAL_LINKS.gap26plus,
+    linkLabel: 'Join Gap 26+ Group'
+  };
+}
+
+function finalScoreBands_(rows) {
+  const bands = [
+    { label: '90-100', count: 0 },
+    { label: '80-89', count: 0 },
+    { label: '75-79', count: 0 },
+    { label: 'Below 75', count: 0 }
+  ];
+  const scores = rows.map(function(row) { return Number(row.sem2); }).filter(function(num) { return !isNaN(num); });
+  scores.forEach(function(score) {
+    if (score >= 90) bands[0].count++;
+    else if (score >= 80) bands[1].count++;
+    else if (score >= 75) bands[2].count++;
+    else bands[3].count++;
+  });
+  return bands.map(function(band) {
+    return {
+      label: band.label,
+      count: band.count,
+      percent: scores.length ? Math.round((band.count / scores.length) * 1000) / 10 : 0
+    };
+  });
+}
+
+function getFinalDashboardStudents(className) {
+  const cls = String(className || '').trim();
+  const rows = finalDashboardRows_().filter(function(row) { return !cls || row.className === cls; });
+  const rosterStudents = cls ? getSemRosterStudents_(cls) : [];
+  if (rosterStudents.length) {
+    const rowsByNo = {};
+    rows.forEach(function(row) { rowsByNo[String(row.studentNo)] = row; });
+    return {
+      success: true,
+      className: cls,
+      students: rosterStudents
+        .filter(function(student) { return !!rowsByNo[String(student.no)]; })
+        .map(function(student) { return { no: student.no, name: student.name }; })
+    };
+  }
+  return {
+    success: true,
+    className: cls,
+    students: rows.map(function(row) { return { no: row.studentNo, name: row.name }; })
+  };
+}
+
+function getFinalDashboard(className, studentNo) {
+  const cls = String(className || '').trim();
+  const no = String(studentNo || '').trim();
+  if (!cls || !no) return { success: false, error: 'Missing className or studentNo' };
+
+  const classRows = finalDashboardRows_().filter(function(row) { return row.className === cls; });
+  const row = classRows.find(function(item) { return String(item.studentNo) === no; });
+  if (!row) return { success: false, error: 'Student not found' };
+
+  const rosterStudent = getSemRosterStudents_(cls).find(function(student) { return String(student.no) === no; });
+  const student = Object.assign({}, row);
+  if (rosterStudent) {
+    student.studentNo = rosterStudent.no;
+    student.name = rosterStudent.name;
+  }
+
+  const sem1Rows = classRows.filter(function(item) { return item.sem1 !== '' && !isNaN(Number(item.sem1)); });
+  const sem2Rows = classRows.filter(function(item) { return item.sem2 !== '' && !isNaN(Number(item.sem2)); });
+  return {
+    success: true,
+    className: cls,
+    classLabel: semClassLabel_(cls),
+    student: student,
+    remedial: finalDashboardRemedial_(student.sem2),
+    summary: {
+      classSize: classRows.length,
+      sem1Average: averageSemScores_(sem1Rows.map(function(item) { return item.sem1; })),
+      sem2Average: averageSemScores_(sem2Rows.map(function(item) { return item.sem2; })),
+      rankSem1: rankSemScore_(classRows, student, 'sem1'),
+      rankSem2: rankSemScore_(classRows, student, 'sem2'),
+      improvedCount: classRows.filter(function(item) { return String(item.result).toLowerCase() === 'improved'; }).length,
+      sameCount: classRows.filter(function(item) { return String(item.result).toLowerCase() === 'same'; }).length,
+      decreasedCount: classRows.filter(function(item) { return String(item.result).toLowerCase() === 'decreased'; }).length,
+      completeCount: sem2Rows.length,
+      bands: finalScoreBands_(classRows)
+    },
+    updatedAt: new Date().toISOString()
+  };
 }
 
 // ── SUBMISSION STATUS (Chapter 4) ────────────────────────────

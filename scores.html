@@ -3,964 +3,314 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Chapter Scores · English Quest</title>
+  <title>Final Score Dashboard · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet"/>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; }
     :root {
-      --purple: #7C3AED; --purple-light: #A78BFA; --purple-soft: #EDE9FE;
-      --purple-mid: #C4B5FD; --white: #FFFFFF; --off-white: #F9F7FF;
-      --text-dark: #1E1040; --text-muted: #6B5B95; --border: #E5DEFF;
-      --accent: #F59E0B; --green: #10B981; --red: #EF4444;
+      --ink:#07153B; --muted:#52617F; --line:#DBE4F4; --soft:#F6F9FF; --white:#FFF;
+      --blue:#2563EB; --purple:#7C3AED; --green:#16A34A; --amber:#F59E0B; --red:#EF4444;
+      --shadow:0 20px 50px rgba(37,99,235,.10);
     }
-    body { font-family: 'IBM Plex Sans', sans-serif; background: var(--off-white); color: var(--text-dark); min-height: 100vh; }
-
-    header { background: linear-gradient(135deg, #7C3AED 0%, #5B21B6 50%, #4C1D95 100%); padding: 36px 24px 52px; text-align: center; position: relative; overflow: hidden; }
-    header::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px); background-size: 28px 28px; pointer-events: none; }
-    .back-btn { position: absolute; top: 20px; left: 20px; z-index: 2; background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #fff; font-size: 0.88rem; font-weight: 600; padding: 8px 18px; border-radius: 999px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-family: inherit; }
-    .back-btn:hover { background: rgba(255,255,255,0.25); }
-    header h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem,5vw,2.8rem); font-weight: 800; color: #fff; position: relative; z-index: 1; }
-    header h1 span { color: var(--accent); font-style: italic; }
-    .header-sub { color: rgba(255,255,255,0.75); font-size: 0.95rem; margin-top: 8px; position: relative; z-index: 1; }
-    .wave { display: block; width: 100%; margin-top: -2px; }
-
-    main { max-width: 1100px; margin: 0 auto; padding: 28px 20px 80px; }
-
-    /* MODE BADGE */
-    .mode-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; font-family: 'IBM Plex Mono', monospace; margin-bottom: 20px; }
-    .mode-badge.teacher { background: #FEF3C7; color: #92400E; border: 1.5px solid #FCD34D; }
-    .mode-badge.student { background: var(--purple-soft); color: var(--purple); border: 1.5px solid var(--purple-mid); }
-
-    /* FILTERS */
-    .filters { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
-    .filter-label { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; }
-    .filter-select { padding: 10px 16px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.9rem; color: var(--text-dark); background: var(--white); outline: none; cursor: pointer; }
-    .filter-select:focus { border-color: var(--purple-light); }
-
-    /* STUDENT PICKER (student mode) */
-    .student-picker { background: var(--white); border: 1.5px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
-    .picker-field { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 160px; }
-    .picker-field label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; font-family: 'IBM Plex Mono', monospace; }
-    .picker-field select { padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.9rem; color: var(--text-dark); background: var(--off-white); outline: none; }
-    .picker-field select:focus { border-color: var(--purple-light); background: #fff; }
-    .btn-view-scores { padding: 11px 24px; background: linear-gradient(135deg, var(--purple), #5B21B6); color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 0.9rem; cursor: pointer; font-family: inherit; white-space: nowrap; }
-
-    /* STUDENT SCORE CARD */
-    .student-score-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; margin-bottom: 20px; }
-    .score-card-header { background: linear-gradient(135deg, var(--purple), #5B21B6); padding: 20px 24px; display: flex; align-items: center; gap: 16px; }
-    .score-card-avatar { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 800; color: #fff; font-family: 'Playfair Display', serif; flex-shrink: 0; }
-    .score-card-name { color: #fff; }
-    .score-card-name .name { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
-    .score-card-name .meta { font-size: 0.8rem; opacity: 0.8; margin-top: 2px; }
-    .score-card-body { padding: 20px 24px; }
-
-    /* CHAPTER TABS */
-    .chapter-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
-    .ch-tab { padding: 9px 20px; border-radius: 999px; border: 1.5px solid var(--border); background: var(--white); color: var(--text-muted); font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Mono', monospace; transition: all 0.15s; }
-    .ch-tab.active { background: var(--purple); color: #fff; border-color: var(--purple); }
-
-    /* SCORE GRID (student view) */
-    .score-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
-    .score-tile { background: var(--off-white); border: 1.5px solid var(--border); border-radius: 14px; padding: 14px 16px; text-align: center; }
-    .score-tile-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-family: 'IBM Plex Mono', monospace; margin-bottom: 8px; }
-    .score-tile-val { font-size: 1.5rem; font-weight: 800; font-family: 'IBM Plex Mono', monospace; color: var(--text-dark); }
-    .score-tile-val.empty { color: var(--border); font-size: 1.2rem; }
-    .score-tile.highlight { background: linear-gradient(135deg, var(--purple-soft), #F3E8FF); border-color: var(--purple-mid); }
-    .score-tile.highlight .score-tile-val { color: var(--purple); }
-    .score-preview-link { display:inline-flex; align-items:center; justify-content:center; width:100%; margin-top:10px; padding:7px 8px; border-radius:10px; background:#fff; border:1.5px solid rgba(16,185,129,0.35); color:#065F46; font-size:0.72rem; font-weight:800; font-family:'IBM Plex Mono',monospace; text-decoration:none; }
-    .score-preview-link:hover { border-color:#10B981; background:#ECFDF5; }
-
-    /* FINAL SUMMARY */
-    .final-summary { display: flex; gap: 12px; flex-wrap: wrap; }
-    .summary-item { flex: 1; min-width: 120px; background: var(--off-white); border: 1.5px solid var(--border); border-radius: 14px; padding: 14px 16px; text-align: center; }
-    .summary-item.grade { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); border-color: #6EE7B7; }
-    .summary-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-family: 'IBM Plex Mono', monospace; margin-bottom: 6px; }
-    .summary-val { font-size: 1.6rem; font-weight: 800; font-family: 'IBM Plex Mono', monospace; color: var(--text-dark); }
-    .grade-badge { display: inline-block; font-size: 1.6rem; font-weight: 800; font-family: 'IBM Plex Mono', monospace; }
-    .grade-A { color: #065F46; } .grade-B { color: #1E40AF; } .grade-C { color: #92400E; } .grade-D { color: #991B1B; }
-
-    /* TEACHER TABLE */
-    .table-wrap { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; min-width: 600px; }
-    thead th { background: linear-gradient(135deg, var(--purple), #5B21B6); color: #fff; padding: 12px 14px; font-size: 0.78rem; font-family: 'IBM Plex Mono', monospace; font-weight: 600; letter-spacing: 0.04em; text-align: center; white-space: nowrap; }
-    thead th:first-child { text-align: left; min-width: 160px; }
-    thead th.col-calc { background: rgba(255,255,255,0.15); }
-    tbody tr { border-bottom: 1px solid var(--border); }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: var(--off-white); }
-    tbody td { padding: 10px 14px; font-size: 0.88rem; text-align: center; }
-    tbody td:first-child { text-align: left; font-weight: 600; }
-    .student-nickname { font-size: 0.75rem; color: var(--text-muted); font-weight: 400; }
-    .score-input { width: 58px; padding: 6px 8px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 0.88rem; text-align: center; color: var(--text-dark); background: var(--off-white); outline: none; transition: all 0.15s; }
-    .score-input:focus { border-color: var(--purple-light); background: #fff; box-shadow: 0 0 0 3px rgba(124,58,237,0.1); }
-    .score-input.saving { border-color: var(--accent); background: #FFFBEB; }
-    .score-input.saved { border-color: var(--green); background: #ECFDF5; }
-    .score-input.error { border-color: var(--red); background: #FEF2F2; }
-    .calc-val { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; color: var(--text-muted); }
-    .ind-badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; font-family: 'IBM Plex Mono', monospace; }
-    .ind-A { background: #D1FAE5; color: #065F46; } .ind-B { background: #DBEAFE; color: #1E40AF; }
-    .ind-C { background: #FEF3C7; color: #92400E; } .ind-D { background: #FEE2E2; color: #991B1B; }
-    .ind-X { background: var(--off-white); color: var(--text-muted); }
-
-    /* STATE CARDS */
-    .state-card { text-align: center; padding: 60px 20px; }
-    .state-icon { font-size: 2.5rem; margin-bottom: 12px; }
-    .state-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
-    .state-sub { font-size: 0.85rem; color: var(--text-muted); }
-    .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--purple); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .btn-csv { display: inline-flex; align-items: center; gap: 7px; padding: 8px 18px; background: var(--green); color: #fff; border: none; border-radius: 10px; font-size: 0.82rem; font-weight: 700; cursor: pointer; font-family: inherit; margin-bottom: 14px; }
-    .btn-csv:hover { opacity: 0.88; }
-    .save-bar { position: fixed; bottom: 24px; right: 24px; background: var(--text-dark); color: #fff; padding: 12px 20px; border-radius: 14px; font-size: 0.85rem; font-weight: 600; z-index: 100; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
-    .save-bar.show { display: block; }
-    .save-bar.green { background: var(--green); }
-    .save-bar.red { background: var(--red); }
-
-    footer { background: var(--text-dark); color: rgba(255,255,255,0.5); text-align: center; padding: 20px; font-size: 0.85rem; }
-    footer strong { color: var(--purple-light); }
-    @media (max-width: 600px) {
-      .filters { flex-direction: column; align-items: stretch; }
-      .score-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    /* ── LEADERBOARD ─────────────────────────────────────────── */
-    .leaderboard { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; margin-top: 28px; }
-    .leaderboard-header { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); padding: 16px 24px; display: flex; align-items: center; gap: 10px; }
-    .leaderboard-header h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 800; color: #fff; margin: 0; }
-    .leaderboard-header .lb-sub { font-size: 0.78rem; color: rgba(255,255,255,0.8); margin-top: 2px; }
-    .leaderboard-body { padding: 16px 20px; }
-    .lb-row { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 14px; margin-bottom: 8px; background: var(--off-white); border: 1.5px solid var(--border); transition: background 0.15s; }
-    .lb-row:last-child { margin-bottom: 0; }
-    .lb-row.rank-1 { background: linear-gradient(135deg, #FFFBEB, #FEF3C7); border-color: #FCD34D; }
-    .lb-row.rank-2 { background: linear-gradient(135deg, #F8FAFC, #F1F5F9); border-color: #CBD5E1; }
-    .lb-row.rank-3 { background: linear-gradient(135deg, #FFF7ED, #FFEDD5); border-color: #FDBA74; }
-    .lb-medal { font-size: 1.4rem; width: 32px; text-align: center; flex-shrink: 0; }
-    .lb-rank-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); width: 20px; text-align: center; flex-shrink: 0; }
-    .lb-name { flex: 1; font-weight: 600; font-size: 0.92rem; color: var(--text-dark); }
-    .lb-name .lb-nick { font-size: 0.75rem; color: var(--text-muted); font-weight: 400; display: block; }
-    .lb-avg { font-family: 'IBM Plex Mono', monospace; font-size: 1.1rem; font-weight: 800; color: var(--purple); background: var(--purple-soft); border: 1.5px solid var(--purple-mid); padding: 4px 12px; border-radius: 999px; flex-shrink: 0; }
-    .lb-row.rank-1 .lb-avg { color: #92400E; background: #FEF3C7; border-color: #FCD34D; }
-    .lb-filters { display: flex; gap: 8px; margin-bottom: 14px; }
-    .lb-filter-btn { padding: 6px 16px; border-radius: 999px; border: 1.5px solid var(--border); background: var(--white); color: var(--text-muted); font-size: 0.78rem; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Mono', monospace; transition: all 0.15s; }
-    .lb-filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-    .lb-loading { text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.88rem; }
-    .lb-empty { text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.85rem; }
-
-    .logout-btn { position: absolute; top: 20px; right: 20px; z-index: 2; background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.85); font-size: 0.78rem; font-weight: 600; padding: 6px 14px; border-radius: 999px; cursor: pointer; font-family: inherit; display: none; align-items: center; gap: 5px; }
-    .logout-btn:hover { background: rgba(255,255,255,0.22); }
-    .teacher-active .logout-btn { display: flex; }
-
-    /* ── SIDEBAR (shared) ───────────────────────────────────── */
-    .hamburger { position:absolute; top:20px; right:20px; z-index:10; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); border-radius:10px; width:40px; height:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; cursor:pointer; padding:0; }
-    .hamburger span { display:block; width:18px; height:2px; background:#fff; border-radius:999px; transition:all 0.3s; }
-    .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
-    .hamburger.open span:nth-child(2) { opacity:0; }
-    .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
-    .sidebar-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.6); backdrop-filter:blur(6px); z-index:300; opacity:0; pointer-events:none; transition:opacity 0.3s; }
+    body { margin:0; min-height:100vh; font-family:'IBM Plex Sans',sans-serif; color:var(--ink); background:linear-gradient(135deg,#F8FBFF 0%,#F7F2FF 100%); }
+    .hamburger { position:fixed; top:20px; right:20px; z-index:20; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); border-radius:10px; width:42px; height:42px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; cursor:pointer; }
+    .hamburger span { width:19px; height:2px; background:#fff; border-radius:99px; }
+    .hero { position:relative; overflow:hidden; padding:34px 20px 92px; color:#fff; background:linear-gradient(130deg,#0F5FD7 0%,#2563EB 42%,#6D28D9 100%); }
+    .hero::before { content:""; position:absolute; inset:0; background-image:radial-gradient(circle,rgba(255,255,255,.12) 1px,transparent 1px); background-size:30px 30px; opacity:.7; }
+    .hero-inner { position:relative; max-width:1180px; margin:0 auto; text-align:center; }
+    .topline { display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:22px; }
+    .logo { width:46px; height:46px; border-radius:12px; object-fit:cover; box-shadow:0 8px 20px rgba(0,0,0,.18); }
+    .brand { text-align:left; line-height:1.05; }
+    .brand-title { font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:800; }
+    .brand-sub { font-size:.78rem; opacity:.75; font-weight:700; }
+    h1 { margin:0; font-family:'Playfair Display',serif; font-size:clamp(2.2rem,7vw,4.5rem); line-height:.98; letter-spacing:0; }
+    .hero-copy { margin:14px auto 0; max-width:680px; color:rgba(255,255,255,.84); font-size:1rem; line-height:1.6; }
+    .wave { display:block; width:100%; height:46px; margin-top:-45px; position:relative; z-index:2; }
+    main { max-width:1180px; margin:-34px auto 0; padding:0 20px 80px; position:relative; z-index:3; }
+    .panel { background:rgba(255,255,255,.92); border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow); }
+    .picker { padding:22px; display:grid; grid-template-columns:1fr 1.6fr auto; gap:14px; align-items:end; }
+    label { display:block; font-family:'IBM Plex Mono',monospace; font-size:.72rem; font-weight:800; color:#40527A; text-transform:uppercase; letter-spacing:.08em; margin:0 0 8px; }
+    select { width:100%; min-height:48px; border:1px solid var(--line); background:#F9FBFF; border-radius:12px; padding:0 14px; color:var(--ink); font:600 .95rem 'IBM Plex Sans',sans-serif; outline:none; }
+    select:focus { border-color:#93B4FF; box-shadow:0 0 0 4px rgba(37,99,235,.10); background:#fff; }
+    button, .cta { min-height:48px; border:0; border-radius:12px; padding:0 22px; background:linear-gradient(135deg,var(--blue),var(--purple)); color:#fff; font:800 .94rem 'IBM Plex Sans',sans-serif; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; justify-content:center; gap:8px; }
+    button:disabled { opacity:.6; cursor:wait; }
+    .state { padding:34px 22px; text-align:center; color:var(--muted); font-weight:700; }
+    .spinner { width:34px; height:34px; border:3px solid #DCE7F8; border-top-color:var(--blue); border-radius:50%; margin:0 auto 14px; animation:spin .8s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .dashboard { display:none; margin-top:22px; }
+    .student-head { padding:24px; display:flex; align-items:center; justify-content:space-between; gap:18px; margin-bottom:18px; }
+    .identity { display:flex; align-items:center; gap:14px; min-width:0; }
+    .avatar { width:56px; height:56px; border-radius:16px; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#E0ECFF,#F0E7FF); color:var(--blue); font:800 1.35rem 'Playfair Display',serif; flex-shrink:0; }
+    .name { font-size:1.25rem; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .meta { color:var(--muted); font-size:.9rem; margin-top:3px; font-weight:600; }
+    .status-pill { border-radius:999px; padding:8px 13px; font:800 .78rem 'IBM Plex Mono',monospace; white-space:nowrap; }
+    .improved { background:#DCFCE7; color:#166534; } .same { background:#E0E7FF; color:#3730A3; } .decreased { background:#FEE2E2; color:#991B1B; }
+    .cards { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:18px; }
+    .metric { padding:20px; border-radius:18px; border:1px solid var(--line); background:#fff; box-shadow:0 12px 30px rgba(15,23,42,.04); min-height:148px; display:flex; flex-direction:column; justify-content:space-between; }
+    .metric-label { color:#40527A; font-size:.82rem; font-weight:800; }
+    .metric-value { font:800 2.35rem 'IBM Plex Mono',monospace; margin:10px 0 2px; }
+    .metric-sub { color:var(--muted); font-weight:700; font-size:.86rem; }
+    .metric.blue .metric-value { color:var(--blue); } .metric.purple .metric-value { color:var(--purple); } .metric.green .metric-value { color:var(--green); } .metric.amber .metric-value { color:var(--amber); } .metric.red .metric-value { color:var(--red); }
+    .grid { display:grid; grid-template-columns:1.08fr .92fr; gap:18px; }
+    .section { padding:22px; }
+    .section-title { font-size:1rem; font-weight:800; margin-bottom:16px; }
+    .message { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:22px; margin-bottom:18px; background:#fff; border:1px solid var(--line); border-radius:18px; box-shadow:0 12px 30px rgba(15,23,42,.04); }
+    .message-main { display:flex; align-items:center; gap:16px; }
+    .message-icon { width:68px; height:68px; border-radius:20px; background:#ECFDF5; color:var(--green); display:flex; align-items:center; justify-content:center; font-size:2rem; font-weight:800; }
+    .message-text { font-size:1.05rem; line-height:1.55; font-weight:700; }
+    .bars { display:grid; gap:16px; }
+    .bar-row { display:grid; grid-template-columns:96px 1fr 58px; gap:14px; align-items:center; font-weight:800; }
+    .bar-track { height:14px; background:#E8EEF8; border-radius:999px; overflow:hidden; }
+    .bar-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--blue),var(--purple)); width:0; transition:width .4s ease; }
+    .breakdown { display:grid; gap:12px; }
+    .band { display:grid; grid-template-columns:86px 1fr 56px; gap:12px; align-items:center; color:var(--muted); font-weight:800; }
+    .mini-track { height:10px; background:#E8EEF8; border-radius:999px; overflow:hidden; }
+    .mini-fill { height:100%; background:var(--blue); border-radius:999px; }
+    .remedial { margin-top:18px; display:grid; grid-template-columns:1fr auto; gap:18px; align-items:center; padding:22px; border-radius:18px; border:1px solid #FED7AA; background:linear-gradient(135deg,#FFF7ED,#FFFFFF); }
+    .remedial.good { border-color:#BBF7D0; background:linear-gradient(135deg,#F0FDF4,#FFFFFF); }
+    .remedial-title { font-size:1.2rem; font-weight:800; margin-bottom:6px; }
+    .remedial-copy { color:var(--muted); font-weight:700; line-height:1.55; }
+    .table-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; min-width:620px; }
+    th, td { padding:13px 14px; border-bottom:1px solid var(--line); text-align:center; font-weight:700; }
+    th { color:#40527A; background:#F8FBFF; font-size:.78rem; text-transform:uppercase; letter-spacing:.06em; }
+    td:first-child, th:first-child { text-align:left; }
+    .you-row { background:#F0FDF4; }
+    footer { padding:24px; text-align:center; color:var(--muted); font-size:.86rem; font-weight:700; }
+    footer strong { color:var(--purple); }
+    .sidebar-overlay { position:fixed; inset:0; background:rgba(7,15,43,.58); backdrop-filter:blur(6px); z-index:300; opacity:0; pointer-events:none; transition:opacity .25s; }
     .sidebar-overlay.open { opacity:1; pointer-events:all; }
-    .sidebar { position:fixed; top:0; right:0; height:100%; width:min(320px,85vw); background:#1E1040; z-index:301; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.34,1.1,0.64,1); display:flex; flex-direction:column; overflow-y:auto; }
+    .sidebar { position:fixed; top:0; right:0; width:min(320px,85vw); height:100%; background:#1E1040; z-index:301; transform:translateX(100%); transition:transform .3s; display:flex; flex-direction:column; overflow-y:auto; }
     .sidebar.open { transform:translateX(0); }
-    .sidebar-head { padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; gap:12px; }
+    .sidebar-head { padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,.08); display:flex; align-items:center; gap:12px; }
     .sidebar-logo { width:36px; height:36px; border-radius:10px; object-fit:cover; }
-    .sidebar-head-text { flex:1; }
     .sidebar-head-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:800; color:#fff; }
-    .sidebar-head-sub { font-size:0.7rem; color:rgba(255,255,255,0.45); margin-top:1px; }
-    .sidebar-close { width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,0.08); border:none; color:rgba(255,255,255,0.5); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
+    .sidebar-head-sub { font-size:.7rem; color:rgba(255,255,255,.45); margin-top:1px; }
+    .sidebar-close { width:30px; height:30px; border-radius:50%; background:rgba(255,255,255,.08); border:none; color:rgba(255,255,255,.5); cursor:pointer; font-size:1rem; padding:0; }
     .sidebar-section { padding:14px 16px 4px; }
-    .sidebar-section-label { font-size:0.65rem; font-weight:700; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.12em; font-family:'IBM Plex Mono',monospace; padding:0 4px; margin-bottom:6px; }
-    .sidebar-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; text-decoration:none; transition:background 0.15s; margin-bottom:2px; }
-    .sidebar-item:hover, .sidebar-item:active { background:rgba(255,255,255,0.08); }
-    .sidebar-item.active { background:rgba(255,255,255,0.12); border-left:3px solid #A78BFA; padding-left:9px; }
-    .sidebar-item-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0; }
-    .sidebar-item-name { font-size:0.88rem; font-weight:600; color:#fff; flex:1; }
-    .sidebar-item-badge { font-size:0.6rem; font-weight:800; padding:2px 7px; border-radius:999px; font-family:'IBM Plex Mono',monospace; background:#F59E0B; color:#fff; }
-    .sidebar-divider { height:1px; background:rgba(255,255,255,0.07); margin:8px 16px; }
-    .sidebar-teacher { margin:12px 16px 20px; background:rgba(124,58,237,0.2); border:1px solid rgba(124,58,237,0.35); border-radius:14px; padding:12px 14px; }
-    .sidebar-teacher-label { font-size:0.68rem; font-weight:700; color:#A78BFA; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
-    .sidebar-teacher-logged { font-size:0.82rem; color:#A78BFA; font-weight:600; display:flex; align-items:center; gap:8px; }
-    .sidebar-teacher-logged span { cursor:pointer; color:rgba(255,255,255,0.4); font-size:0.75rem; margin-left:auto; }
-    .sidebar-home-btn { display:flex; align-items:center; gap:10px; margin:12px 16px 4px; padding:11px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:12px; text-decoration:none; }
-    .sidebar-home-btn:hover { background:rgba(255,255,255,0.1); }
-    .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
-    .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
-
+    .sidebar-section-label { font-size:.65rem; font-weight:700; color:rgba(255,255,255,.3); text-transform:uppercase; letter-spacing:.12em; font-family:'IBM Plex Mono',monospace; padding:0 4px; margin-bottom:6px; }
+    .sidebar-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; text-decoration:none; margin-bottom:2px; }
+    .sidebar-item:hover, .sidebar-item.active { background:rgba(255,255,255,.1); }
+    .sidebar-item-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:.95rem; flex-shrink:0; }
+    .sidebar-item-name { font-size:.88rem; font-weight:600; color:#fff; flex:1; }
+    .sidebar-divider { height:1px; background:rgba(255,255,255,.07); margin:8px 16px; }
+    .sidebar-home-btn { display:flex; align-items:center; gap:10px; margin:12px 16px 4px; padding:11px 14px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:12px; text-decoration:none; }
+    .sidebar-home-btn-text { font-size:.85rem; font-weight:700; color:#fff; }
+    .sidebar-home-btn-sub { font-size:.7rem; color:rgba(255,255,255,.4); }
+    @media (max-width:900px) {
+      .picker, .grid, .remedial { grid-template-columns:1fr; }
+      .cards { grid-template-columns:repeat(2,1fr); }
+      .student-head, .message { align-items:flex-start; flex-direction:column; }
+    }
+    @media (max-width:560px) {
+      main { padding-left:14px; padding-right:14px; }
+      .cards { grid-template-columns:1fr; }
+      .name { white-space:normal; }
+      .bar-row { grid-template-columns:80px 1fr 48px; }
+    }
   </style>
   <script src="sidebar.js"></script>
   <script src="security-lock.js?v=20260522b"></script>
 </head>
 <body data-page="scores">
-
-<header>
   <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
-  
-  
-  <a class="back-btn" href="index.html">&#8592; Back</a>
-  <h1>Chapter <span>Scores</span></h1>
-  <p class="header-sub">English Quest &middot; SMA Negeri 6 Surakarta</p>
-</header>
-<svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
-  <path fill="#4C1D95" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
-  <path fill="#F9F7FF" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
-</svg>
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="topline">
+        <img class="logo" src="logo.png" alt="English Quest"/>
+        <div class="brand"><div class="brand-title">English Quest</div><div class="brand-sub">SMA Negeri 6 Surakarta</div></div>
+      </div>
+      <h1>Final Score Dashboard</h1>
+      <p class="hero-copy">See your Semester 1 and Semester 2 final score comparison, class position, and the remedial or enrichment group you need.</p>
+    </div>
+  </header>
+  <svg class="wave" viewBox="0 0 1440 48" preserveAspectRatio="none" aria-hidden="true">
+    <path fill="#F8FBFF" d="M0,16 C360,54 1080,-10 1440,22 L1440,48 L0,48 Z"></path>
+  </svg>
 
-<main id="mainContent"></main>
+  <main>
+    <section class="panel picker">
+      <div>
+        <label for="classSelect">Your Class</label>
+        <select id="classSelect" onchange="loadStudents()"></select>
+      </div>
+      <div>
+        <label for="studentSelect">Your Name</label>
+        <select id="studentSelect"></select>
+      </div>
+      <button id="viewBtn" onclick="viewDashboard()">View Score</button>
+    </section>
+    <div id="state" class="panel state"><div class="spinner"></div>Loading students...</div>
+    <section id="dashboard" class="dashboard"></section>
+  </main>
 
-<div class="save-bar" id="saveBar"></div>
+  <footer>© 2026 <strong>English Quest</strong> · Final score dashboard</footer>
 
-<footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
+  <script>
+    const API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
+    const CLASSES = ['XE1','XE4','XE5','XE6','XE7','XE8','XE9','XE10','XE11'];
+    const CLASS_LABELS = { XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
+    let students = [];
 
-<script>
-const SCORES_API = 'https://script.google.com/macros/s/AKfycbxBTC4vnFB3A73QwThdRxrUruvUNZRlpwwLFBjt5C0cJGIh8wz461ZCn3b9Y6wWPpyAGg/exec';
-const CLASSES = ['XE1','XE4','XE5','XE6','XE7','XE8','XE9','XE10','XE11'];
-const CLASS_LABELS = { XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
-
-var savedUser = localStorage.getItem('eq_tu') || '';
-var savedPass = localStorage.getItem('eq_tp') || '';
-var isTeacher = !!savedUser;
-var currentClass   = localStorage.getItem('eq_last_class') || 'XE1';
-var currentChapter = 4;
-var allStudents    = [];
-
-
-// ── CACHE LAYER ───────────────────────────────────────────────
-var CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-
-function cacheKey(params) {
-  var sorted = Object.keys(params).sort();
-  var parts = sorted.map(function(k) { return k + '=' + params[k]; });
-  return 'eq_cache_' + parts.join('_').replace(/[^a-zA-Z0-9_=]/g, '_');
-}
-
-function cacheGet(params) {
-  try {
-    var raw = localStorage.getItem(cacheKey(params));
-    if (!raw) return null;
-    var entry = JSON.parse(raw);
-    if (Date.now() - entry.ts > CACHE_TTL) { localStorage.removeItem(cacheKey(params)); return null; }
-    return entry.data;
-  } catch(e) { return null; }
-}
-
-function cacheSet(params, data) {
-  try { localStorage.setItem(cacheKey(params), JSON.stringify({ ts: Date.now(), data: data })); } catch(e) {}
-}
-
-function cachedApiGet(params) {
-  var cached = cacheGet(params);
-  if (cached) {
-    // Return cache immediately, refresh in background
-    apiGet(params).then(function(fresh) { cacheSet(params, fresh); }).catch(function() {});
-    return Promise.resolve(cached);
-  }
-  return apiGet(params).then(function(data) { cacheSet(params, data); return data; });
-}
-
-function apiGet(params) {
-  var base = SCORES_API + '?';
-  var parts = [];
-  for (var k in params) parts.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k]));
-  var url = base + parts.join('&');
-
-  function attempt(retries) {
-    return new Promise(function(resolve, reject) {
-      var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-      var script = document.createElement('script');
-      var timer = setTimeout(function() {
-        cleanup();
-        if (retries > 0) { attempt(retries - 1).then(resolve).catch(reject); }
-        else { reject(new Error('Connection timed out. Please check your internet and try again 🙏')); }
-      }, 15000);
-      function cleanup() {
-        clearTimeout(timer); delete window[cb];
-        try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
-      }
-      window[cb] = function(data) { cleanup(); resolve(data); };
-      script.onerror = function() {
-        cleanup();
-        if (retries > 0) { attempt(retries - 1).then(resolve).catch(reject); }
-        else { reject(new Error('Could not connect. Please check your internet and try again.')); }
-      };
-      script.src = url + '&callback=' + cb;
-      (document.body || document.head).appendChild(script);
-    });
-  }
-  return attempt(1);
-}
-
-function escapeAttr(value) {
-  return String(value || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
-}
-
-function taskKeyForScoreColumn(col, chapter) {
-  var m = String(col || '').match(/^Task\s*(\d+)$/i);
-  return m ? 'C' + chapter + 'T' + m[1] : '';
-}
-
-function init() {
-  if (isTeacher) {
-    renderTeacherMode();
-  } else {
-    renderStudentMode();
-  }
-}
-
-// ── STUDENT MODE ─────────────────────────────────────────────
-function renderStudentMode() {
-  var main = document.getElementById('mainContent');
-
-  // Check if student identity is saved
-  var savedCls  = localStorage.getItem('eq_student_class');
-  var savedNo   = localStorage.getItem('eq_student_no');
-  var savedName = localStorage.getItem('eq_student_name');
-
-  if (savedCls && savedNo && savedName) {
-    // Auto-load their scores directly
-    var clsLabel = CLASS_LABELS[savedCls] || savedCls;
-    main.innerHTML =
-      '<div class="mode-badge student">&#128203; ' + savedName.split(' ')[0] + ' &mdash; ' + clsLabel + ' <span onclick="forgetStudent()" style="margin-left:8px;cursor:pointer;opacity:0.7;font-size:0.85em;">&#10005; Not you?</span></div>' +
-      '<div id="sResult"><div class="state-card"><div class="spinner"></div><div class="state-title">Loading your scores...</div></div></div>';
-
-    currentClass = savedCls;
-    autoLoadStudentScores(savedCls, savedNo, savedName);
-    return;
-  }
-
-  // No identity saved — show picker
-  var classOptions = CLASSES.map(function(c) {
-    return '<option value="' + c + '"' + (c === currentClass ? ' selected' : '') + '>' + CLASS_LABELS[c] + '</option>';
-  }).join('');
-
-  main.innerHTML =
-    '<div class="mode-badge student">&#128203; Student View</div>' +
-    '<div style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:20px 24px;margin-bottom:20px;text-align:center;">' +
-      '<div style="font-size:1.5rem;margin-bottom:8px;">👤</div>' +
-      '<div style="font-family:Georgia,serif;font-size:1rem;font-weight:700;margin-bottom:4px;">Who are you?</div>' +
-      '<div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:16px;">Select your class and name to view your scores</div>' +
-      '<div style="display:flex;gap:10px;flex-wrap:wrap;">' +
-        '<div style="flex:1;min-width:140px;"><select class="filter-select" style="width:100%;" id="sClass">' + classOptions + '</select></div>' +
-        '<div style="flex:2;min-width:180px;"><select class="filter-select" style="width:100%;" id="sStudent"><option value="">-- Select class first --</option></select></div>' +
-      '</div>' +
-    '</div>' +
-    '<div id="sResult"></div>';
-
-  document.getElementById('sClass').addEventListener('change', function() {
-    currentClass = this.value;
-    localStorage.setItem('eq_last_class', currentClass);
-    loadStudentList();
-    document.getElementById('sResult').innerHTML = '';
-  });
-  document.addEventListener('change', function(e) {
-    if (e.target && e.target.id === 'sStudent' && e.target.value) {
-      viewStudentScores();
-    }
-  });
-  loadStudentList();
-}
-
-function forgetStudent() {
-  localStorage.removeItem('eq_student_class');
-  localStorage.removeItem('eq_student_no');
-  localStorage.removeItem('eq_student_name');
-  renderStudentMode();
-}
-
-function autoLoadStudentScores(cls, no, name) {
-  Promise.all([
-    cachedApiGet({ action: 'getChapterScores', className: cls, chapter: 4 }),
-    cachedApiGet({ action: 'getChapterScores', className: cls, chapter: 5 }),
-    apiGet({ action: 'getCh4StudentFiles', className: cls, studentNo: no, _t: Date.now() }).catch(function() { return null; }),
-    apiGet({ action: 'getCh5StudentFiles', className: cls, studentNo: no, _t: Date.now() }).catch(function() { return null; }),
-    cachedApiGet({ action: 'getFinalScores', className: cls }).then(function(r) { return r && !r.error ? r : {}; }).catch(function() { return {}; })
-  ]).then(function(responses) {
-    var ch4 = responses[0].students ? responses[0].students.find(function(s) { return String(s.no) === String(no); }) : null;
-    var ch5 = responses[1].students ? responses[1].students.find(function(s) { return String(s.no) === String(no); }) : null;
-    var ch4Files = responses[2] && responses[2].success ? (responses[2].files || {}) : {};
-    var ch5Files = responses[3] && responses[3].success ? (responses[3].files || {}) : {};
-    var finRes = responses[4] || {};
-    var fin = finRes.students ? finRes.students.find(function(s) { return String(s.no) === String(no); }) : null;
-
-    var ch4Html = buildStudentChapterHTML(ch4, responses[0].inputCols, 4, ch4Files);
-    var ch5Html = buildStudentChapterHTML(ch5, responses[1].inputCols, 5, ch5Files);
-    var finHtml = buildStudentFinalHTML(fin, finRes.inputCols, finRes.calcCols);
-
-    var result = document.getElementById('sResult');
-    result.innerHTML =
-      '<div class="student-score-card">' +
-        '<div class="score-card-header">' +
-          '<div class="score-card-avatar">' + name.charAt(0).toUpperCase() + '</div>' +
-          '<div class="score-card-name">' +
-            '<div class="name">' + name + '</div>' +
-            '<div class="meta">' + (CLASS_LABELS[cls] || cls) + '</div>' +
-          '</div>' +
-        '</div>' +
-        '<div class="score-card-body">' +
-          '<div class="chapter-tabs"><button class="ch-tab active" id="stab4" onclick="switchStudentTab(4)">Chapter 4</button><button class="ch-tab" id="stab5" onclick="switchStudentTab(5)">Chapter 5</button><button class="ch-tab" id="stabF" onclick="switchStudentTab(&apos;F&apos;)">&#127942; Final Score</button></div>' +
-          '<div id="sScoreCh4">' + ch4Html + '</div>' +
-          '<div id="sScoreCh5" style="display:none">' + ch5Html + '</div>' +
-          '<div id="sScoreF" style="display:none">' + finHtml + '</div>' +
-        '</div>' +
-      '</div>' +
-      '<div id="leaderboardArea"></div>';
-    renderLeaderboard(cls);
-  }).catch(function(e) {
-    document.getElementById('sResult').innerHTML = '<div class="state-card"><div class="state-icon">&#9203;</div><div class="state-title">Connection problem</div><div class="state-sub">' + e.message + '</div></div>';
-  });
-}
-function loadStudentList() {
-  var sel = document.getElementById('sStudent');
-  sel.innerHTML = '<option value="">Loading...</option>';
-  apiGet({ action: 'getStudents', className: currentClass }).then(function(res) {
-    if (res.error || !res.students) { sel.innerHTML = '<option value="">Error loading</option>'; return; }
-    allStudents = res.students;
-    sel.innerHTML = '<option value="">-- Select your name --</option>';
-    res.students.forEach(function(s) {
-      var label = s.nickname ? s.name + ' (' + s.nickname + ')' : s.name;
-      sel.innerHTML += '<option value="' + s.no + '">' + label + '</option>';
-    });
-  });
-}
-
-function viewStudentScores() {
-  var studentNo = document.getElementById('sStudent').value;
-  if (!studentNo) { showBar('Please select your name first', 'red'); setTimeout(hideBar, 2000); return; }
-  var student = allStudents.find(function(s) { return String(s.no) === String(studentNo); });
-  var result = document.getElementById('sResult');
-  result.innerHTML = '<div class="state-card"><div class="spinner"></div><div class="state-title">Loading scores...</div></div>';
-
-  // Save identity so tasks.html and strikes.html can auto-load
-  if (student) {
-    localStorage.setItem('eq_student_class', currentClass);
-    localStorage.setItem('eq_student_no', studentNo);
-    localStorage.setItem('eq_student_name', student.name);
-  }
-
-  // Load chapters + final in parallel (final gracefully degrades if GS not yet deployed)
-  Promise.all([
-    cachedApiGet({ action: 'getChapterScores', className: currentClass, chapter: 4 }),
-    cachedApiGet({ action: 'getChapterScores', className: currentClass, chapter: 5 }),
-    apiGet({ action: 'getCh4StudentFiles', className: currentClass, studentNo: studentNo, _t: Date.now() }).catch(function() { return null; }),
-    apiGet({ action: 'getCh5StudentFiles', className: currentClass, studentNo: studentNo, _t: Date.now() }).catch(function() { return null; }),
-    cachedApiGet({ action: 'getFinalScores', className: currentClass }).then(function(r) { return r && !r.error ? r : {}; }).catch(function() { return {}; })
-  ]).then(function(responses) {
-    var ch4Data = responses[0];
-    var ch5Data = responses[1];
-    var ch4Files = responses[2] && responses[2].success ? (responses[2].files || {}) : {};
-    var ch5Files = responses[3] && responses[3].success ? (responses[3].files || {}) : {};
-    var finData = responses[4];
-
-    var ch4Student = ch4Data.students ? ch4Data.students.find(function(s) { return String(s.no) === String(studentNo); }) : null;
-    var ch5Student = ch5Data.students ? ch5Data.students.find(function(s) { return String(s.no) === String(studentNo); }) : null;
-    var finData2 = finData || {};
-    var finStudent = finData2.students ? finData2.students.find(function(s) { return String(s.no) === String(studentNo); }) : null;
-
-    renderStudentScoreCard(student, ch4Student, ch5Student, finStudent, ch4Data.inputCols, ch5Data.inputCols, finData2.inputCols, finData2.calcCols, ch4Files, ch5Files);
-  });
-}
-
-function renderStudentScoreCard(student, ch4, ch5, fin, cols4, cols5, colsF, calcColsF, ch4Files, ch5Files) {
-  var result = document.getElementById('sResult');
-  var initial = student ? student.name.charAt(0).toUpperCase() : '?';
-
-  var html = '<div class="student-score-card">';
-  html += '<div class="score-card-header"><div class="score-card-avatar">' + initial + '</div><div class="score-card-name"><div class="name">' + (student ? student.name : '') + '</div><div class="meta">' + CLASS_LABELS[currentClass] + ' &middot; ' + (student && student.nickname ? student.nickname : '') + '</div></div></div>';
-  html += '<div class="score-card-body">';
-  html += '<div class="chapter-tabs"><button class="ch-tab active" id="stab4" onclick="switchStudentTab(4)">Chapter 4</button><button class="ch-tab" id="stab5" onclick="switchStudentTab(5)">Chapter 5</button><button class="ch-tab" id="stabF" onclick="switchStudentTab(&apos;F&apos;)">&#127942; Final Score</button></div>';
-  html += '<div id="sScoreCh4">' + buildStudentChapterHTML(ch4, cols4, 4, ch4Files || {}) + '</div>';
-  html += '<div id="sScoreCh5" style="display:none">' + buildStudentChapterHTML(ch5, cols5, 5, ch5Files || {}) + '</div>';
-  html += '<div id="sScoreF" style="display:none">' + buildStudentFinalHTML(fin, colsF, calcColsF) + '</div>';
-  html += '</div></div>';
-  html += '<div id="leaderboardArea"></div>';
-  result.innerHTML = html;
-  renderLeaderboard(currentClass);
-}
-
-function buildStudentChapterHTML(chData, cols, ch, files) {
-  if (!chData) return '<div class="state-card"><div class="state-icon">&#128203;</div><div class="state-title">No data yet</div><div class="state-sub">Chapter ' + ch + ' scores haven\'t been entered yet.</div></div>';
-
-  var html = '<div class="score-grid">';
-  if (cols) {
-    cols.forEach(function(col) {
-      var val = chData.scores[col];
-      var isEmpty = val === '' || val === undefined || val === null;
-      var taskKey = taskKeyForScoreColumn(col, ch);
-      var fileUrl = taskKey && files ? files[taskKey] : '';
-      html += '<div class="score-tile"><div class="score-tile-label">' + col + '</div><div class="score-tile-val' + (isEmpty ? ' empty' : '') + '">' + (isEmpty ? '-' : val) + '</div>' +
-        (fileUrl ? '<a class="score-preview-link" href="' + escapeAttr(fileUrl) + '" target="_blank" rel="noopener">Preview</a>' : '') +
-        '</div>';
-    });
-  }
-  html += '</div>';
-
-  // Summary row
-  var avg   = chData.average   !== '' && chData.average   !== undefined ? Number(chData.average).toFixed(1)   : '-';
-  var final = chData.finalScore !== '' && chData.finalScore !== undefined ? Number(chData.finalScore).toFixed(1) : '-';
-  var ind   = chData.indicator || '-';
-  var gradeClass = ind !== '-' ? 'grade-' + ind.charAt(0).toUpperCase() : '';
-
-  html += '<div class="final-summary">';
-  html += '<div class="summary-item"><div class="summary-label">Final Score</div><div class="summary-val">' + final + '</div></div>';
-  html += '<div class="summary-item grade"><div class="summary-label">Grade</div><div class="summary-val"><span class="grade-badge ' + gradeClass + '">' + ind + '</span></div></div>';
-  html += '</div>';
-
-  return html;
-}
-
-function buildStudentFinalHTML(finData, inputCols, calcCols) {
-  if (!finData) return '<div class="state-card"><div class="state-icon">&#128203;</div><div class="state-title">No data yet</div><div class="state-sub">Final scores haven&#39;t been entered yet.</div></div>';
-
-  var html = '<div class="score-grid">';
-
-  // Input cols — plain tiles
-  if (inputCols) {
-    inputCols.forEach(function(col) {
-      var val = finData.scores ? finData.scores[col] : '';
-      var isEmpty = val === '' || val === undefined || val === null;
-      html += '<div class="score-tile"><div class="score-tile-label">' + col + '</div><div class="score-tile-val' + (isEmpty ? ' empty' : '') + '">' + (isEmpty ? '-' : val) + '</div></div>';
-    });
-  }
-
-  // Calc cols — highlighted purple tiles (same style as chapter summary)
-  if (calcCols && calcCols.length && finData.calc) {
-    calcCols.forEach(function(col) {
-      var val = finData.calc[col];
-      var isEmpty = val === '' || val === undefined || val === null;
-      var isGrade = /indicator|grade|indikator/i.test(col);
-      if (isGrade) {
-        var ind = isEmpty ? '-' : String(val);
-        var gradeClass = ind !== '-' ? 'grade-' + ind.charAt(0).toUpperCase() : '';
-        html += '<div class="score-tile highlight"><div class="score-tile-label">' + col + '</div><div class="score-tile-val"><span class="grade-badge ' + gradeClass + '">' + ind + '</span></div></div>';
-      } else {
-        var num = isEmpty ? '-' : (isNaN(Number(val)) ? val : Number(val).toFixed(1));
-        html += '<div class="score-tile highlight"><div class="score-tile-label">' + col + '</div><div class="score-tile-val">' + (isEmpty ? '-' : num) + '</div></div>';
-      }
-    });
-  }
-
-  html += '</div>';
-  return html;
-}
-
-function switchStudentTab(ch) {
-  document.getElementById('stab4').className = 'ch-tab' + (ch === 4 ? ' active' : '');
-  document.getElementById('stab5').className = 'ch-tab' + (ch === 5 ? ' active' : '');
-  var stabF = document.getElementById('stabF');
-  if (stabF) stabF.className = 'ch-tab' + (ch === 'F' ? ' active' : '');
-  document.getElementById('sScoreCh4').style.display = ch === 4 ? '' : 'none';
-  document.getElementById('sScoreCh5').style.display = ch === 5 ? '' : 'none';
-  var sScoreF = document.getElementById('sScoreF');
-  if (sScoreF) sScoreF.style.display = ch === 'F' ? '' : 'none';
-}
-
-// ── TEACHER MODE ─────────────────────────────────────────────
-function previewAsStudent() {
-  renderStudentMode();
-}
-
-function renderTeacherMode() {
-  var main = document.getElementById('mainContent');
-  var classOptions = CLASSES.map(function(c) {
-    return '<option value="' + c + '"' + (c === currentClass ? ' selected' : '') + '>' + CLASS_LABELS[c] + '</option>';
-  }).join('');
-
-  main.innerHTML =
-    '<div class="mode-badge teacher" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">&#9997; Teacher Mode &mdash; Editable <button onclick="previewAsStudent()" style="font-size:0.75rem;padding:5px 12px;background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.4);color:#fff;border-radius:999px;cursor:pointer;font-family:inherit;font-weight:700;">&#128203; Student View</button></div>' +
-    '<div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;">Having display issues? <span onclick="clearScoreCache()" style="color:var(--purple);cursor:pointer;font-weight:700;text-decoration:underline;">Clear cache</span></div>' +
-    '<div class="filters"><span class="filter-label">Class</span><select class="filter-select" id="tClassSelect">' + classOptions + '</select></div>' +
-    '<div class="chapter-tabs"><button class="ch-tab active" id="ttab4" onclick="switchTeacherChapter(4)">Chapter 4</button><button class="ch-tab" id="ttab5" onclick="switchTeacherChapter(5)">Chapter 5</button><button class="ch-tab" id="ttabF" onclick="switchTeacherChapter(&apos;F&apos;)">&#127942; Final Score</button></div>' +
-    '<div id="tTableArea"><div class="state-card"><div class="spinner"></div><div class="state-title">Loading...</div></div></div>';
-
-  document.getElementById('tClassSelect').addEventListener('change', function() {
-    currentClass = this.value;
-    localStorage.setItem('eq_last_class', currentClass);
-    loadTeacherScores();
-  });
-
-  loadTeacherScores();
-}
-
-function switchTeacherChapter(ch) {
-  currentChapter = ch;
-  document.getElementById('ttab4').className = 'ch-tab' + (ch === 4 ? ' active' : '');
-  document.getElementById('ttab5').className = 'ch-tab' + (ch === 5 ? ' active' : '');
-  var ttabF = document.getElementById('ttabF');
-  if (ttabF) ttabF.className = 'ch-tab' + (ch === 'F' ? ' active' : '');
-  loadTeacherScores();
-}
-
-function loadTeacherScores() {
-  var area = document.getElementById('tTableArea');
-  area.innerHTML = '<div class="state-card"><div class="spinner"></div><div class="state-title">Loading...</div></div>';
-  if (currentChapter === 'F') {
-    apiGet({ action: 'getFinalScores', className: currentClass })
-      .then(function(res) {
-        if (res.error) { area.innerHTML = '<div class="state-card"><div class="state-icon">&#128580;</div><div class="state-title">Error: ' + res.error + '</div><div class="state-sub">Make sure ScoresAPI.gs is redeployed with the latest version.</div></div>'; return; }
-        renderTeacherFinalTable(res.students, res.inputCols, res.calcCols);
-      }).catch(function(e) {
-        area.innerHTML = '<div class="state-card"><div class="state-icon">&#9203;</div><div class="state-title">Connection problem</div><div class="state-sub">' + e.message + '</div></div>';
+    function apiGet(params) {
+      return new Promise(function(resolve, reject) {
+        const cb = 'eq_cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+        params.callback = cb;
+        window[cb] = function(data) {
+          delete window[cb];
+          if (script.parentNode) script.parentNode.removeChild(script);
+          resolve(data);
+        };
+        const script = document.createElement('script');
+        script.onerror = function() {
+          delete window[cb];
+          reject(new Error('Could not connect to the score database.'));
+        };
+        script.src = API + '?' + new URLSearchParams(params).toString();
+        document.body.appendChild(script);
       });
-  } else {
-    apiGet({ action: 'getChapterScores', className: currentClass, chapter: currentChapter })
-      .then(function(res) {
-        if (res.error) { area.innerHTML = '<div class="state-card"><div class="state-icon">&#128580;</div><div class="state-title">Error</div><div class="state-sub">' + res.error + '</div></div>'; return; }
-        renderTeacherTable(res.students, res.inputCols);
-      }).catch(function(e) {
-        area.innerHTML = '<div class="state-card"><div class="state-icon">&#9203;</div><div class="state-title">Connection problem</div><div class="state-sub">' + e.message + '</div></div>';
+    }
+
+    function init() {
+      const clsSel = document.getElementById('classSelect');
+      clsSel.innerHTML = CLASSES.map(function(cls) { return '<option value="' + cls + '">' + CLASS_LABELS[cls] + '</option>'; }).join('');
+      const qs = new URLSearchParams(location.search);
+      const savedClass = qs.get('cls') || localStorage.getItem('eq_student_class') || 'XE1';
+      const savedNo = qs.get('no') || localStorage.getItem('eq_student_no') || '';
+      if (CLASSES.indexOf(savedClass) !== -1) clsSel.value = savedClass;
+      loadStudents(savedNo);
+    }
+
+    function setState(html) {
+      document.getElementById('state').style.display = 'block';
+      document.getElementById('state').innerHTML = html;
+      document.getElementById('dashboard').style.display = 'none';
+    }
+
+    function loadStudents(preselectNo) {
+      const cls = document.getElementById('classSelect').value;
+      const sel = document.getElementById('studentSelect');
+      sel.innerHTML = '<option>Loading...</option>';
+      setState('<div class="spinner"></div>Loading students...');
+      apiGet({ action:'getFinalDashboardStudents', className:cls }).then(function(res) {
+        if (!res.success) throw new Error(res.error || 'Could not load students');
+        students = res.students || [];
+        sel.innerHTML = '<option value="">Select your name</option>' + students.map(function(s) {
+          return '<option value="' + escapeHtml(s.no) + '">' + escapeHtml(s.name) + '</option>';
+        }).join('');
+        if (preselectNo) sel.value = preselectNo;
+        setState('Choose your name, then open your final score dashboard.');
+        if (preselectNo && sel.value) viewDashboard();
+      }).catch(function(err) {
+        sel.innerHTML = '<option value="">Could not load</option>';
+        setState('Could not load students: ' + escapeHtml(err.message));
       });
-  }
-}
-
-function renderTeacherTable(students, inputCols) {
-  var area = document.getElementById('tTableArea');
-  if (!students || !students.length) { area.innerHTML = '<div class="state-card"><div class="state-icon">&#128203;</div><div class="state-title">No students found</div></div>'; return; }
-
-  var thead = '<thead><tr><th>Student</th>';
-  inputCols.forEach(function(col) { thead += '<th>' + col + '</th>'; });
-  thead += '<th class="col-calc">Average</th><th class="col-calc">Final</th><th class="col-calc">Grade</th></tr></thead>';
-
-  var tbody = '<tbody>';
-  students.forEach(function(s) {
-    tbody += '<tr>';
-    tbody += '<td><div>' + s.name + '</div><div class="student-nickname">' + (s.nickname || '') + '</div></td>';
-    inputCols.forEach(function(col) {
-      var val = s.scores[col] !== undefined ? s.scores[col] : '';
-      tbody += '<td><input class="score-input" type="number" min="0" max="100" value="' + val + '" data-no="' + s.no + '" data-col="' + col + '" onchange="saveScore(this)"/></td>';
-    });
-    var avg   = s.average   !== '' && s.average   !== undefined ? Number(s.average).toFixed(1)   : '-';
-    var final = s.finalScore !== '' && s.finalScore !== undefined ? Number(s.finalScore).toFixed(1) : '-';
-    var ind   = s.indicator || '-';
-    var indClass = ind && ind !== '-' ? 'ind-' + ind.charAt(0).toUpperCase() : 'ind-X';
-    tbody += '<td class="calc-val">' + avg + '</td><td class="calc-val">' + final + '</td>';
-    tbody += '<td><span class="ind-badge ' + indClass + '">' + ind + '</span></td></tr>';
-  });
-  tbody += '</tbody>';
-
-  area.innerHTML =
-    '<button class="btn-csv" onclick="downloadCSV()">&#11015;&#65039; Download CSV</button>' +
-    '<div class="table-wrap"><table>' + thead + tbody + '</table></div>' +
-    '<div id="leaderboardArea"></div>';
-  renderLeaderboard(currentClass);
-}
-
-function renderTeacherFinalTable(students, inputCols, calcCols) {
-  var area = document.getElementById('tTableArea');
-  if (!students || !students.length) { area.innerHTML = '<div class="state-card"><div class="state-icon">&#128203;</div><div class="state-title">No students found</div></div>'; return; }
-
-  var thead = '<thead><tr><th>Student</th>';
-  (inputCols || []).forEach(function(col) { thead += '<th>' + col + '</th>'; });
-  (calcCols  || []).forEach(function(col) { thead += '<th class="col-calc">' + col + '</th>'; });
-  thead += '</tr></thead>';
-
-  var tbody = '<tbody>';
-  students.forEach(function(s) {
-    tbody += '<tr>';
-    tbody += '<td><div>' + s.name + '</div><div class="student-nickname">' + (s.nickname || '') + '</div></td>';
-    (inputCols || []).forEach(function(col) {
-      var val = s.scores && s.scores[col] !== undefined ? s.scores[col] : '';
-      tbody += '<td><input class="score-input" type="number" min="0" max="100" value="' + val + '" data-no="' + s.no + '" data-col="' + col + '" onchange="saveFinalScoreCell(this)"/></td>';
-    });
-    (calcCols || []).forEach(function(col) {
-      var val = s.calc && s.calc[col] !== undefined ? s.calc[col] : '';
-      var isEmpty = val === '' || val === undefined;
-      var isGrade = /indicator|grade|indikator/i.test(col);
-      if (isGrade) {
-        var ind = isEmpty ? '-' : String(val);
-        var indClass = ind && ind !== '-' ? 'ind-' + ind.charAt(0).toUpperCase() : 'ind-X';
-        tbody += '<td><span class="ind-badge ' + indClass + '">' + ind + '</span></td>';
-      } else {
-        tbody += '<td class="calc-val">' + (isEmpty ? '-' : Number(val).toFixed(1)) + '</td>';
-      }
-    });
-    tbody += '</tr>';
-  });
-  tbody += '</tbody>';
-
-  area.innerHTML =
-    '<button class="btn-csv" onclick="downloadCSV()">&#11015;&#65039; Download CSV</button>' +
-    '<div class="table-wrap"><table>' + thead + tbody + '</table></div>' +
-    '<div id="leaderboardArea"></div>';
-  renderLeaderboard(currentClass);
-}
-
-function saveFinalScoreCell(input) {
-  var studentNo = input.getAttribute('data-no');
-  var col       = input.getAttribute('data-col');
-  var value     = input.value.trim();
-
-  if (value !== '' && (isNaN(value) || Number(value) < 0 || Number(value) > 100)) {
-    input.className = 'score-input error';
-    showBar('Value must be 0-100', 'red');
-    return;
-  }
-
-  input.className = 'score-input saving';
-  showBar('Saving...', '');
-
-  apiGet({ action: 'saveFinalScore', username: savedUser, password: savedPass, className: currentClass, studentNo: studentNo, column: col, value: value })
-    .then(function(res) {
-      if (res.success) {
-        input.className = 'score-input saved';
-        showBar('Saved!', 'green');
-        setTimeout(function() { input.className = 'score-input'; hideBar(); }, 1800);
-        // Update calculated cells in the same row
-        if (res.calc) {
-          var row = input.closest('tr');
-          if (row) {
-            Object.keys(res.calc).forEach(function(col) {
-              var val = res.calc[col];
-              var isGrade = /indicator|grade|indikator/i.test(col);
-              var cells = row.querySelectorAll('.calc-val, .ind-badge');
-              cells.forEach(function(cell) {
-                if (isGrade && cell.classList.contains('ind-badge')) {
-                  var ind = val === '' ? '-' : String(val);
-                  cell.textContent = ind;
-                  cell.className = 'ind-badge ' + (ind && ind !== '-' ? 'ind-' + ind.charAt(0).toUpperCase() : 'ind-X');
-                } else if (!isGrade && cell.classList.contains('calc-val')) {
-                  cell.textContent = val === '' ? '-' : Number(val).toFixed(1);
-                }
-              });
-            });
-          }
-        }
-      } else {
-        input.className = 'score-input error';
-        showBar('Error: ' + (res.error || 'Failed'), 'red');
-      }
-    }).catch(function() { input.className = 'score-input error'; showBar('Connection error', 'red'); });
-}
-
-function downloadCSV() {
-  var table = document.querySelector('#tTableArea table');
-  if (!table) return;
-
-  var rows = table.querySelectorAll('tr');
-  var csv  = [];
-  var chapterLabel = currentChapter === 'F' ? 'Final Score' : 'Chapter ' + currentChapter;
-  var classLabel   = CLASS_LABELS[currentClass] || currentClass;
-
-  rows.forEach(function(row) {
-    var cols = row.querySelectorAll('th, td');
-    var rowData = [];
-    cols.forEach(function(col) {
-      // Get text, skip input values via .value
-      var input = col.querySelector('input');
-      var text  = input ? input.value : col.innerText.trim();
-      // Wrap in quotes if contains comma or newline
-      if (text.indexOf(',') > -1 || text.indexOf('\n') > -1) text = '"' + text + '"';
-      rowData.push(text);
-    });
-    csv.push(rowData.join(','));
-  });
-
-  var blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
-  var url  = URL.createObjectURL(blob);
-  var a    = document.createElement('a');
-  a.href     = url;
-  a.download = 'EnglishQuest_' + classLabel + '_' + chapterLabel.replace(' ','') + '.csv';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-
-function saveScore(input) {
-  var studentNo = input.getAttribute('data-no');
-  var col       = input.getAttribute('data-col');
-  var value     = input.value.trim();
-
-  if (value !== '' && (isNaN(value) || Number(value) < 0 || Number(value) > 100)) {
-    input.className = 'score-input error';
-    showBar('Value must be 0-100', 'red');
-    return;
-  }
-
-  input.className = 'score-input saving';
-  showBar('Saving...', '');
-
-  apiGet({ action: 'saveChapterScore', username: savedUser, password: savedPass, className: currentClass, chapter: currentChapter, studentNo: studentNo, column: col, value: value })
-    .then(function(res) {
-      if (res.success) {
-        input.className = 'score-input saved';
-        showBar('Saved!', 'green');
-        setTimeout(function() { input.className = 'score-input'; hideBar(); }, 1800);
-        setTimeout(function() { refreshRow(studentNo); }, 700);
-      } else {
-        input.className = 'score-input error';
-        showBar('Error: ' + (res.error || 'Failed'), 'red');
-      }
-    }).catch(function() { input.className = 'score-input error'; showBar('Connection error', 'red'); });
-}
-
-function refreshRow(studentNo) {
-  apiGet({ action: 'getChapterScores', className: currentClass, chapter: currentChapter }).then(function(res) {
-    if (!res.students) return;
-    var s = res.students.find(function(x) { return String(x.no) === String(studentNo); });
-    if (!s) return;
-    var inputs = document.querySelectorAll('input[data-no="' + studentNo + '"]');
-    if (!inputs.length) return;
-    var row = inputs[0].closest('tr');
-    if (!row) return;
-    var calcCells = row.querySelectorAll('.calc-val');
-    if (calcCells[0]) calcCells[0].textContent = s.average   !== '' ? Number(s.average).toFixed(1)   : '-';
-    if (calcCells[1]) calcCells[1].textContent = s.finalScore !== '' ? Number(s.finalScore).toFixed(1) : '-';
-    var badge = row.querySelector('.ind-badge');
-    if (badge) {
-      var ind = s.indicator || '-';
-      badge.textContent = ind;
-      badge.className = 'ind-badge ' + (ind && ind !== '-' ? 'ind-' + ind.charAt(0).toUpperCase() : 'ind-X');
     }
-  });
-}
 
-// ── LEADERBOARD ───────────────────────────────────────────────
-var lbChapter = 'overall'; // 'overall' | '4' | '5'
+    function viewDashboard() {
+      const cls = document.getElementById('classSelect').value;
+      const no = document.getElementById('studentSelect').value;
+      if (!cls || !no) return setState('Please select your class and name first.');
+      document.getElementById('viewBtn').disabled = true;
+      setState('<div class="spinner"></div>Loading your dashboard...');
+      apiGet({ action:'getFinalDashboard', className:cls, studentNo:no }).then(function(res) {
+        document.getElementById('viewBtn').disabled = false;
+        if (!res.success) throw new Error(res.error || 'Could not load score');
+        render(res);
+      }).catch(function(err) {
+        document.getElementById('viewBtn').disabled = false;
+        setState('Could not load score: ' + escapeHtml(err.message));
+      });
+    }
 
-function renderLeaderboard(cls) {
-  var container = document.getElementById('leaderboardArea');
-  if (!container) return;
-  var clsLabel = CLASS_LABELS[cls] || cls;
-  container.innerHTML =
-    '<div class="leaderboard">' +
-      '<div class="leaderboard-header">' +
-        '<div>' +
-          '<h3>&#127942; Class Leaderboard</h3>' +
-          '<div class="lb-sub">' + clsLabel + ' &mdash; Top 5 by Average Score</div>' +
+    function render(data) {
+      const s = data.student;
+      const sum = data.summary || {};
+      const rem = data.remedial || {};
+      const diff = Number(s.difference);
+      const diffClass = isNaN(diff) ? 'amber' : diff > 0 ? 'green' : diff < 0 ? 'red' : 'blue';
+      const statusClass = String(s.result || '').toLowerCase() === 'improved' ? 'improved' : String(s.result || '').toLowerCase() === 'same' ? 'same' : 'decreased';
+      localStorage.setItem('eq_student_class', data.className);
+      localStorage.setItem('eq_student_no', s.studentNo);
+      localStorage.setItem('eq_student_name', s.name);
+
+      const html =
+        '<div class="panel student-head">' +
+          '<div class="identity"><div class="avatar">' + escapeHtml(String(s.name || '?').charAt(0)) + '</div><div><div class="name">' + escapeHtml(s.name) + '</div><div class="meta">' + escapeHtml(data.classLabel) + ' · Student No. ' + escapeHtml(s.studentNo) + '</div></div></div>' +
+          '<span class="status-pill ' + statusClass + '">' + escapeHtml(s.result || 'Waiting') + '</span>' +
         '</div>' +
-      '</div>' +
-      '<div class="leaderboard-body">' +
-        '<div class="lb-filters" id="lbFilters"></div>' +
-        '<div id="lbRankings"><div class="lb-loading"><div class="spinner" style="width:24px;height:24px;margin:0 auto 8px;"></div>Loading leaderboard...</div></div>' +
-      '</div>' +
-    '</div>';
-
-  loadLbRankings(cls);
-  // Build filter buttons via JS (avoids string escaping issues)
-  var lbFilters = document.getElementById('lbFilters');
-  if (lbFilters) {
-    [['overall','Overall'],['4','Chapter 4'],['5','Chapter 5']].forEach(function(f) {
-      var btn = document.createElement('button');
-      btn.className = 'lb-filter-btn' + (lbChapter === f[0] ? ' active' : '');
-      btn.textContent = f[1];
-      btn.onclick = function() { switchLbFilter(cls, f[0]); };
-      lbFilters.appendChild(btn);
-    });
-  }
-}
-
-function switchLbFilter(cls, chapter) {
-  lbChapter = chapter;
-  // Update button styles
-  document.querySelectorAll('.lb-filter-btn').forEach(function(btn) {
-    var isActive = (btn.textContent.toLowerCase().replace('chapter ','') === chapter) ||
-                   (chapter === 'overall' && btn.textContent === 'Overall');
-    btn.classList.toggle('active', isActive);
-  });
-  document.getElementById('lbRankings').innerHTML = '<div class="lb-loading"><div class="spinner" style="width:24px;height:24px;margin:0 auto 8px;"></div>Loading...</div>';
-  loadLbRankings(cls);
-}
-
-function loadLbRankings(cls) {
-  Promise.all([
-    cachedApiGet({ action: 'getChapterScores', className: cls, chapter: 4 }),
-    cachedApiGet({ action: 'getChapterScores', className: cls, chapter: 5 })
-  ]).then(function(responses) {
-    var ch4Students = (responses[0].students || []);
-    var ch5Students = (responses[1].students || []);
-
-    // Build map: studentNo -> { name, nickname, avgs[] }
-    var map = {};
-    ch4Students.forEach(function(s) {
-      if (!map[s.no]) map[s.no] = { name: s.name, nickname: s.nickname || '', ch4: null, ch5: null };
-      var v = Number(s.average);
-      if (s.average !== '' && s.average !== undefined && s.average !== null && !isNaN(v))
-        map[s.no].ch4 = v;
-    });
-    ch5Students.forEach(function(s) {
-      if (!map[s.no]) map[s.no] = { name: s.name, nickname: s.nickname || '', ch4: null, ch5: null };
-      var v = Number(s.average);
-      if (s.average !== '' && s.average !== undefined && s.average !== null && !isNaN(v))
-        map[s.no].ch5 = v;
-    });
-
-    // Compute score based on selected filter
-    var ranked = [];
-    Object.keys(map).forEach(function(no) {
-      var entry = map[no];
-      var score = null;
-      if (lbChapter === '4') {
-        score = entry.ch4;
-      } else if (lbChapter === '5') {
-        score = entry.ch5;
-      } else {
-        // Overall: average of available chapters
-        var avgs = [entry.ch4, entry.ch5].filter(function(v) { return v !== null; });
-        if (avgs.length) score = avgs.reduce(function(a, b) { return a + b; }, 0) / avgs.length;
-      }
-      if (score === null || isNaN(score)) return;
-      ranked.push({ name: entry.name, nickname: entry.nickname, avg: score });
-    });
-
-    ranked.sort(function(a, b) { return b.avg - a.avg; });
-    var top5 = ranked.slice(0, 5);
-    var rankings = document.getElementById('lbRankings');
-    if (!rankings) return;
-
-    if (!top5.length) {
-      rankings.innerHTML = '<div class="lb-empty">No scores available yet.</div>';
-      return;
+        '<div class="cards">' +
+          metric('Semester 1', score(s.sem1), rank(sum.rankSem1, sum.classSize), 'blue') +
+          metric('Semester 2', score(s.sem2), rank(sum.rankSem2, sum.classSize), 'purple') +
+          metric('Difference', signed(diff), differenceText(diff), diffClass) +
+          metric('ASAT Gap', rem.gap === 0 ? '0' : rem.gap || '-', rem.label || 'Waiting', rem.type === 'enrichment' ? 'green' : rem.type === 'pending' ? 'amber' : 'red') +
+        '</div>' +
+        messageBlock(s, diff, statusClass) +
+        '<div class="grid">' +
+          '<div class="panel section"><div class="section-title">Final Score Comparison</div><div class="bars">' + bar('Semester 1', s.sem1) + bar('Semester 2', s.sem2) + '</div></div>' +
+          '<div class="panel section"><div class="section-title">Class Score Breakdown</div><div class="breakdown">' + bands(sum.bands || []) + '</div></div>' +
+        '</div>' +
+        remedialBlock(rem) +
+        '<div class="panel section" style="margin-top:18px;"><div class="section-title">Detailed Comparison</div><div class="table-wrap">' +
+          '<table><thead><tr><th>Item</th><th>Your Score</th><th>Class Average</th><th>Your Rank</th><th>Status</th></tr></thead><tbody>' +
+          '<tr class="you-row"><td>Semester 1 Final Score</td><td>' + score(s.sem1) + '</td><td>' + score(sum.sem1Average) + '</td><td>' + rank(sum.rankSem1, sum.classSize) + '</td><td>' + escapeHtml(s.result || '-') + '</td></tr>' +
+          '<tr class="you-row"><td>Semester 2 Final Score</td><td>' + score(s.sem2) + '</td><td>' + score(sum.sem2Average) + '</td><td>' + rank(sum.rankSem2, sum.classSize) + '</td><td>' + escapeHtml(rem.label || '-') + '</td></tr>' +
+          '</tbody></table></div></div>';
+      document.getElementById('state').style.display = 'none';
+      const dash = document.getElementById('dashboard');
+      dash.innerHTML = html;
+      dash.style.display = 'block';
     }
 
-    var medals = ['&#129351;','&#129352;','&#129353;'];
-    var html = '';
-    var displayRank = 1;
-    top5.forEach(function(s, i) {
-      if (i > 0 && s.avg === top5[i - 1].avg) { /* tied */ }
-      else { displayRank = i + 1; }
-      var rankClass = displayRank <= 3 ? ' rank-' + displayRank : '';
-      var medal     = displayRank <= 3 ? medals[displayRank - 1] : '';
-      var rankNum   = displayRank > 3  ? '#' + displayRank : '';
-      html += '<div class="lb-row' + rankClass + '">';
-      html += '<div class="lb-medal">' + medal + '</div>';
-      html += '<div class="lb-rank-num">' + rankNum + '</div>';
-      html += '<div class="lb-name">' + s.name + (s.nickname ? '<span class="lb-nick">' + s.nickname + '</span>' : '') + '</div>';
-      html += '<div class="lb-avg">' + s.avg.toFixed(1) + '</div>';
-      html += '</div>';
-    });
-    rankings.innerHTML = html;
-  }).catch(function() {
-    var rankings = document.getElementById('lbRankings');
-    if (rankings) rankings.innerHTML = '<div class="lb-empty">Could not load leaderboard.</div>';
-  });
-}
-
-function clearScoreCache() {
-  var keys = [];
-  for (var i = 0; i < localStorage.length; i++) {
-    var k = localStorage.key(i);
-    if (k && k.startsWith('eq_cache_')) keys.push(k);
-  }
-  keys.forEach(function(k) { localStorage.removeItem(k); });
-  showBar('Cache cleared! Reloading...', 'green');
-  setTimeout(function() { location.reload(); }, 1000);
-}
-
-var barTimer = null;
-function showBar(msg, type) {
-  var bar = document.getElementById('saveBar');
-  bar.textContent = msg;
-  bar.className = 'save-bar show' + (type ? ' ' + type : '');
-  if (barTimer) clearTimeout(barTimer);
-}
-function hideBar() { document.getElementById('saveBar').className = 'save-bar'; }
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
-</script>
-
+    function metric(label, value, sub, tone) {
+      return '<div class="metric ' + tone + '"><div><div class="metric-label">' + escapeHtml(label) + '</div><div class="metric-value">' + escapeHtml(value) + '</div></div><div class="metric-sub">' + escapeHtml(sub) + '</div></div>';
+    }
+    function messageBlock(s, diff, statusClass) {
+      const text = isNaN(diff) ? 'Your comparison is waiting for complete data.' :
+        diff > 0 ? 'Great job. Your final score improved by ' + score(Math.abs(diff)) + ' points from Semester 1 to Semester 2.' :
+        diff < 0 ? 'Your score decreased by ' + score(Math.abs(diff)) + ' points. Use the remedial guidance below to recover with a clear next step.' :
+        'Your score stayed stable. Keep your consistency and use enrichment if you want an extra push.';
+      const mark = statusClass === 'improved' ? '+' : statusClass === 'same' ? '=' : '!';
+      return '<div class="message"><div class="message-main"><div class="message-icon">' + mark + '</div><div class="message-text">' + escapeHtml(text) + '</div></div><span class="status-pill ' + statusClass + '">' + escapeHtml(s.result || 'Waiting') + '</span></div>';
+    }
+    function remedialBlock(rem) {
+      const good = rem.type === 'enrichment';
+      const href = rem.link ? ' href="' + escapeHtml(rem.link) + '" target="_blank" rel="noopener"' : '';
+      return '<div class="remedial ' + (good ? 'good' : '') + '"><div><div class="remedial-title">' + escapeHtml(rem.label || 'Remedial') + '</div><div class="remedial-copy">' + escapeHtml(rem.task || '') + '</div></div>' +
+        (rem.link ? '<a class="cta" ' + href + '>' + escapeHtml(rem.linkLabel || 'Join Group') + '</a>' : '<span class="status-pill same">No link yet</span>') + '</div>';
+    }
+    function bar(label, value) {
+      const n = Number(value);
+      const pct = isNaN(n) ? 0 : Math.max(0, Math.min(100, n));
+      return '<div class="bar-row"><div>' + escapeHtml(label) + '</div><div class="bar-track"><div class="bar-fill" style="width:' + pct + '%"></div></div><div>' + score(value) + '</div></div>';
+    }
+    function bands(items) {
+      if (!items.length) return '<div class="state" style="padding:18px;">No class data yet.</div>';
+      return items.map(function(b, i) {
+        const colors = ['#22C55E','#2563EB','#F59E0B','#EF4444'];
+        return '<div class="band"><div>' + escapeHtml(b.label) + '</div><div class="mini-track"><div class="mini-fill" style="width:' + Number(b.percent || 0) + '%;background:' + colors[i] + '"></div></div><div>' + escapeHtml(String(b.count || 0)) + '</div></div>';
+      }).join('');
+    }
+    function score(v) {
+      const n = Number(v);
+      return isNaN(n) ? '-' : n.toFixed(2).replace(/\.00$/, '');
+    }
+    function signed(n) {
+      return isNaN(n) ? '-' : (n > 0 ? '+' : '') + score(n);
+    }
+    function differenceText(n) {
+      return isNaN(n) ? 'Waiting data' : n > 0 ? 'Improved' : n < 0 ? 'Decreased' : 'Same score';
+    }
+    function rank(r, total) {
+      return r ? 'Rank ' + r + ' of ' + total : 'No rank yet';
+    }
+    function escapeHtml(value) {
+      return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+        return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[ch];
+      });
+    }
+    init();
+  </script>
 </body>
 </html>
