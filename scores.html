@@ -178,6 +178,9 @@
     };
     const CLASSES = ['XE1','XE4','XE5','XE6','XE7','XE8','XE9','XE10','XE11'];
     const CLASS_LABELS = { XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
+    const MISSING_STUDENTS = {
+      XE5: [{ no:'missing-XE5-2', displayNo:'2', name:'AIRA KARUNIA PRATIWI' }]
+    };
     let students = [];
 
     function apiGet(params) {
@@ -200,6 +203,8 @@
     }
 
     function scoreGet(params) {
+      if (params.action === 'getFinalDashboardStudents') return directStudents(params.className);
+      if (params.action === 'getFinalDashboard') return directDashboard(params.className, params.studentNo);
       return apiGet(params).catch(function() {
         if (params.action === 'getFinalDashboardStudents') return directStudents(params.className);
         if (params.action === 'getFinalDashboard') return directDashboard(params.className, params.studentNo);
@@ -284,6 +289,10 @@
       return '';
     }
 
+    function normalizeName(value) {
+      return String(value || '').trim().replace(/\s+/g, ' ').toUpperCase();
+    }
+
     function num(value) {
       if (value === '' || value === null || value === undefined || value === '-') return '';
       const n = Number(value);
@@ -292,17 +301,27 @@
 
     function directStudents(className) {
       return gvizRows(className).then(function(rows) {
+        const listed = rows.map(function(row) {
+          return { no: field(row, ['No']), displayNo: field(row, ['No']), name: field(row, ['Name']) };
+        });
+        (MISSING_STUDENTS[className] || []).forEach(function(student) {
+          if (!listed.some(function(item) { return normalizeName(item.name) === normalizeName(student.name); })) {
+            listed.splice(Math.max(0, Number(student.displayNo) - 1), 0, student);
+          }
+        });
         return {
           success: true,
           className: className,
-          students: rows.map(function(row) {
-            return { no: field(row, ['No']), name: field(row, ['Name']) };
-          })
+          students: listed
         };
       });
     }
 
     function directDashboard(className, studentNo) {
+      const missing = (MISSING_STUDENTS[className] || []).find(function(student) {
+        return String(student.no) === String(studentNo);
+      });
+      if (missing) return Promise.resolve(missingDashboard(className, missing));
       return Promise.all([gvizRows(className), gvizRows('Sem 1 vs Sem 2')]).then(function(results) {
         const scoreRows = results[0];
         const semRows = results[1].filter(function(row) { return field(row, ['Class']) === className; });
@@ -348,6 +367,47 @@
           updatedAt: new Date().toISOString()
         };
       });
+    }
+
+    function missingDashboard(className, missing) {
+      return {
+        success: true,
+        className: className,
+        classLabel: CLASS_LABELS[className] || className,
+        student: {
+          className: className,
+          studentNo: missing.displayNo,
+          name: missing.name,
+          sem1: '',
+          sem2: '',
+          difference: '',
+          result: 'Waiting'
+        },
+        chapters: [emptyChapter(missing, 4), emptyChapter(missing, 5)],
+        overall: { student: { calc: { Average: '', 'Final Score': '' } } },
+        asat: { score: '', gap: '', remedial: '', lacking: 'Score row missing from final-score spreadsheet' },
+        remedial: { type:'pending', label:'Waiting for score data', task:'Your name is on the student roster, but your final-score row is not available in the score spreadsheet yet.', gap:'', link:'', linkLabel:'No group yet' },
+        summary: { classSize:'', completedSem2Count:'', sem1Average:'', sem2Average:'', rankSem1:'', rankSem2:'' },
+        updatedAt: new Date().toISOString()
+      };
+    }
+
+    function emptyChapter(student, chapter) {
+      const count = chapter === 4 ? 7 : 5;
+      const inputCols = [];
+      const scores = {};
+      for (let i = 1; i <= count; i++) {
+        const label = 'Task ' + i;
+        inputCols.push(label);
+        scores[label] = '';
+      }
+      inputCols.push('Summative');
+      scores.Summative = '';
+      return {
+        chapter: chapter,
+        inputCols: inputCols,
+        student: { no: student.displayNo, name: student.name, scores: scores, average: '', finalScore: '', indicator: 'Waiting for score data' }
+      };
     }
 
     function directChapter(row, chapter) {
