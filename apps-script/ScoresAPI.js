@@ -1540,7 +1540,7 @@ function finalDashboardRemedial_(asatScore) {
     return {
       type: 'enrichment',
       label: 'Enrichment',
-      task: 'No remedial needed. You may join enrichment to improve your ASAT score by 1-5 points.',
+      task: 'No remedial needed. You may join enrichment to improve your ASAT score by 1-10 points.',
       gap: 0,
       link: REMEDIAL_LINKS.enrichment,
       linkLabel: 'Join Enrichment Group'
