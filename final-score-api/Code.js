@@ -747,10 +747,23 @@ function getAllScoreRow_(className, studentNo) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(className);
   if (!sheet) return null;
   const data = sheet.getDataRange().getValues();
-  const headers = data[0] || [];
+  let headerRowIndex = -1;
+  for (let r = 0; r < Math.min(data.length, 8); r++) {
+    const rowText = data[r].map(cell => String(cell || "").trim().toLowerCase());
+    if (rowText.some(text => text === "asat") && rowText.some(text => text === "name")) {
+      headerRowIndex = r;
+      break;
+    }
+  }
+  if (headerRowIndex < 0) return null;
+
+  const headers = data[headerRowIndex] || [];
+  const noCol = headers.findIndex(h => /no\.?|number/i.test(String(h || "")));
+  const nameCol = headers.findIndex(h => String(h || "").trim().toLowerCase() === "name");
+  const studentNoCol = noCol >= 0 ? noCol : 0;
   let row = null;
-  for (let r = 1; r < data.length; r++) {
-    if (String(data[r][0]) === String(studentNo)) {
+  for (let r = headerRowIndex + 1; r < data.length; r++) {
+    if (String(data[r][studentNoCol]).trim() === String(studentNo).trim()) {
       row = data[r];
       break;
     }
@@ -764,8 +777,8 @@ function getAllScoreRow_(className, studentNo) {
   }
 
   return {
-    no: row[0],
-    name: String(row[1] || "").trim(),
+    no: row[studentNoCol],
+    name: String(nameCol >= 0 ? row[nameCol] : "").trim(),
     asat: valueOf("ASAT"),
     finalScoreSem2: valueOf("Final Score Sem 2"),
     asatGap: valueOf("ASAT Gap"),
