@@ -1035,6 +1035,8 @@
     .class-progress-refresh { border:1.5px solid rgba(124,58,237,0.25); background:#F5F0FF; color:#6D28D9; border-radius:999px; padding:8px 13px; font-family:'IBM Plex Sans',sans-serif; font-size:0.78rem; font-weight:800; cursor:pointer; white-space:nowrap; }
     .class-progress-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; }
     .class-progress-row { border:1.5px solid #E5DEFF; border-radius:16px; padding:14px; background:#FBFAFF; }
+    .class-progress-row { cursor:pointer; transition:border-color 0.16s, box-shadow 0.16s, transform 0.16s; }
+    .class-progress-row:hover, .class-progress-row.active { border-color:#A78BFA; box-shadow:0 10px 26px rgba(124,58,237,0.14); transform:translateY(-1px); }
     .class-progress-class { font-weight:800; color:var(--text-dark); margin-bottom:10px; }
     .class-progress-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
     .class-progress-stat { border-radius:12px; padding:10px 8px; text-align:center; }
@@ -1045,9 +1047,26 @@
     .class-progress-stat.decreased { background:#FEE2E2; color:#991B1B; }
     .class-progress-loading { padding:18px; text-align:center; color:var(--text-muted); font-weight:700; }
     .class-progress-note { margin-top:12px; font-size:0.76rem; color:var(--text-muted); font-family:'IBM Plex Mono',monospace; }
+    .class-progress-detail { margin-top:16px; border:1.5px solid #E5DEFF; border-radius:18px; background:#FCFBFF; padding:16px; display:none; }
+    .class-progress-detail.show { display:block; }
+    .class-progress-detail-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+    .class-progress-detail-title { font-weight:800; color:var(--text-dark); }
+    .class-progress-detail-close { border:0; background:#F5F0FF; color:#6D28D9; border-radius:999px; padding:7px 11px; font-size:0.76rem; font-weight:800; cursor:pointer; }
+    .class-progress-detail-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    .class-progress-group { border-radius:14px; padding:12px; background:#fff; border:1px solid #EDE9FE; min-width:0; }
+    .class-progress-group-title { font-size:0.78rem; font-weight:900; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:10px; font-family:'IBM Plex Mono',monospace; }
+    .class-progress-group.improved .class-progress-group-title { color:#166534; }
+    .class-progress-group.same .class-progress-group-title { color:#3730A3; }
+    .class-progress-group.decreased .class-progress-group-title { color:#991B1B; }
+    .class-progress-student-list { display:grid; gap:7px; max-height:360px; overflow:auto; padding-right:2px; }
+    .class-progress-student { display:grid; grid-template-columns:1fr auto; gap:8px; align-items:center; border-radius:10px; background:#F8F7FF; padding:9px 10px; }
+    .class-progress-student-name { font-size:0.78rem; font-weight:800; color:var(--text-dark); line-height:1.25; min-width:0; overflow:hidden; text-overflow:ellipsis; }
+    .class-progress-student-score { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color:var(--text-muted); white-space:nowrap; }
+    .class-progress-empty { color:var(--text-muted); font-size:0.82rem; font-weight:700; padding:8px 0; }
     @media(max-width:520px) {
       .class-progress-head { flex-direction:column; }
       .class-progress-refresh { width:100%; justify-content:center; }
+      .class-progress-detail-grid { grid-template-columns:1fr; }
     }
 
 
@@ -1386,6 +1405,8 @@
   var SCORE_SHEET_ID = '1UjlcC2zOy5usrkzwL1gqgt3BDfNFb-heak-jdeIxIcM';
   var CLASS_ORDER = ['XE1','XE4','XE5','XE6','XE7','XE8','XE9','XE10','XE11'];
   var CLASS_LABELS = { XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
+  var progressRows = [];
+  var selectedProgressClass = '';
 
   window.loadClassProgress = function(force) {
     var content = document.getElementById('classProgressContent');
@@ -1398,6 +1419,7 @@
     }
 
     loadProgressRows().then(function(rows) {
+      progressRows = rows;
       var counts = {};
       CLASS_ORDER.forEach(function(cls) {
         counts[cls] = { improved:0, same:0, decreased:0 };
@@ -1416,7 +1438,7 @@
       content.innerHTML = CLASS_ORDER.map(function(cls) {
         var c = counts[cls];
         return '' +
-          '<div class="class-progress-row">' +
+          '<div class="class-progress-row' + (selectedProgressClass === cls ? ' active' : '') + '" onclick="showClassProgressDetail(\'' + cls + '\')">' +
             '<div class="class-progress-class">' + escapeProgressHtml(CLASS_LABELS[cls] || cls) + '</div>' +
             '<div class="class-progress-stats">' +
               '<div class="class-progress-stat improved"><strong>' + c.improved + '</strong><span>Improved</span></div>' +
@@ -1426,11 +1448,24 @@
           '</div>';
       }).join('');
       if (note) note.textContent = 'Updated from the live Sem 1 vs Sem 2 sheet.';
+      if (selectedProgressClass) renderClassProgressDetail(selectedProgressClass);
     }).catch(function() {
       content.className = 'class-progress-loading';
       content.textContent = 'Could not load class progress. Please refresh again.';
       if (note) note.textContent = '';
     });
+  };
+
+  window.showClassProgressDetail = function(cls) {
+    selectedProgressClass = selectedProgressClass === cls ? '' : cls;
+    updateClassProgressActive();
+    renderClassProgressDetail(selectedProgressClass);
+  };
+
+  window.closeClassProgressDetail = function() {
+    selectedProgressClass = '';
+    updateClassProgressActive();
+    renderClassProgressDetail('');
   };
 
   function loadProgressRows() {
@@ -1470,6 +1505,79 @@
     });
   }
 
+  function renderClassProgressDetail(cls) {
+    var detail = document.getElementById('classProgressDetail');
+    if (!detail) return;
+    if (!cls) {
+      detail.className = 'class-progress-detail';
+      detail.innerHTML = '';
+      return;
+    }
+
+    var rows = progressRows.filter(function(row) {
+      return String(row.Class || '').trim() === cls;
+    });
+    var groups = {
+      improved: rows.filter(function(row) { return normalizeProgressResult(row.Result) === 'improved'; }),
+      same: rows.filter(function(row) { return normalizeProgressResult(row.Result) === 'same'; }),
+      decreased: rows.filter(function(row) { return normalizeProgressResult(row.Result) === 'decreased'; })
+    };
+
+    detail.className = 'class-progress-detail show';
+    detail.innerHTML =
+      '<div class="class-progress-detail-head">' +
+        '<div class="class-progress-detail-title">' + escapeProgressHtml(CLASS_LABELS[cls] || cls) + ' Details</div>' +
+        '<button class="class-progress-detail-close" onclick="closeClassProgressDetail()">Close</button>' +
+      '</div>' +
+      '<div class="class-progress-detail-grid">' +
+        progressGroupHtml('improved', 'Improved', groups.improved) +
+        progressGroupHtml('same', 'Same', groups.same) +
+        progressGroupHtml('decreased', 'Decreased', groups.decreased) +
+      '</div>';
+  }
+
+  function progressGroupHtml(type, label, rows) {
+    var list = rows.length ? rows.map(function(row) {
+      return '<div class="class-progress-student">' +
+        '<div class="class-progress-student-name">' + escapeProgressHtml(row.Name) + '</div>' +
+        '<div class="class-progress-student-score">' + scoreText(row['Sem 1 Final (AK)']) + ' -> ' + scoreText(row['Sem 2 Average (R)']) + ' (' + signedText(row.Difference) + ')</div>' +
+      '</div>';
+    }).join('') : '<div class="class-progress-empty">No students.</div>';
+
+    return '<div class="class-progress-group ' + type + '">' +
+      '<div class="class-progress-group-title">' + label + ' (' + rows.length + ')</div>' +
+      '<div class="class-progress-student-list">' + list + '</div>' +
+    '</div>';
+  }
+
+  function updateClassProgressActive() {
+    var rows = document.querySelectorAll('.class-progress-row');
+    rows.forEach(function(row) {
+      row.classList.remove('active');
+    });
+    if (!selectedProgressClass) return;
+    var active = Array.from(rows).find(function(row) {
+      return row.getAttribute('onclick') === "showClassProgressDetail('" + selectedProgressClass + "')";
+    });
+    if (active) active.classList.add('active');
+  }
+
+  function normalizeProgressResult(value) {
+    return String(value || '').trim().toLowerCase();
+  }
+
+  function scoreText(value) {
+    if (value === '' || value === null || value === undefined) return '-';
+    var n = Number(value);
+    return isNaN(n) ? '-' : n.toFixed(2).replace(/\.00$/, '');
+  }
+
+  function signedText(value) {
+    var n = Number(value);
+    if (isNaN(n)) return '-';
+    return (n > 0 ? '+' : '') + n.toFixed(2).replace(/\.00$/, '');
+  }
+
   function cleanProgressHeader(header) {
     var h = String(header || '').trim().replace(/\s+/g, ' ');
     if (/^semester 1 vs semester 2 comparison no\.?$/i.test(h)) return 'No';
@@ -1502,6 +1610,7 @@
         <button class="class-progress-refresh" onclick="loadClassProgress(true)">Refresh</button>
       </div>
       <div id="classProgressContent" class="class-progress-loading">Loading class progress...</div>
+      <div id="classProgressDetail" class="class-progress-detail"></div>
       <div class="class-progress-note" id="classProgressNote"></div>
     </div>
   </div>
