@@ -1026,6 +1026,30 @@
     .res-status { font-size:0.78rem; color:var(--green); margin-top:8px; display:none; }
     .res-status.show { display:block; }
 
+    /* FINAL SCORE CLASS PROGRESS */
+    .class-progress-section { margin-bottom: 26px; }
+    .class-progress-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 22px; padding: 20px; box-shadow: 0 14px 36px rgba(91,33,182,0.08); }
+    .class-progress-head { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:16px; }
+    .class-progress-title { font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:800; color:var(--text-dark); }
+    .class-progress-sub { color:var(--text-muted); font-size:0.86rem; margin-top:2px; }
+    .class-progress-refresh { border:1.5px solid rgba(124,58,237,0.25); background:#F5F0FF; color:#6D28D9; border-radius:999px; padding:8px 13px; font-family:'IBM Plex Sans',sans-serif; font-size:0.78rem; font-weight:800; cursor:pointer; white-space:nowrap; }
+    .class-progress-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px; }
+    .class-progress-row { border:1.5px solid #E5DEFF; border-radius:16px; padding:14px; background:#FBFAFF; }
+    .class-progress-class { font-weight:800; color:var(--text-dark); margin-bottom:10px; }
+    .class-progress-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    .class-progress-stat { border-radius:12px; padding:10px 8px; text-align:center; }
+    .class-progress-stat strong { display:block; font-family:'IBM Plex Mono',monospace; font-size:1.1rem; line-height:1; }
+    .class-progress-stat span { display:block; font-size:0.68rem; font-weight:800; text-transform:uppercase; letter-spacing:0.04em; margin-top:6px; }
+    .class-progress-stat.improved { background:#DCFCE7; color:#166534; }
+    .class-progress-stat.same { background:#E0E7FF; color:#3730A3; }
+    .class-progress-stat.decreased { background:#FEE2E2; color:#991B1B; }
+    .class-progress-loading { padding:18px; text-align:center; color:var(--text-muted); font-weight:700; }
+    .class-progress-note { margin-top:12px; font-size:0.76rem; color:var(--text-muted); font-family:'IBM Plex Mono',monospace; }
+    @media(max-width:520px) {
+      .class-progress-head { flex-direction:column; }
+      .class-progress-refresh { width:100%; justify-content:center; }
+    }
+
 
     /* STRIKE WARNING ON GREETING */
     .student-greeting.has-strike { background: linear-gradient(135deg, rgba(239,68,68,0.25), rgba(220,38,38,0.2)); border-color: rgba(239,68,68,0.5); }
@@ -1355,6 +1379,132 @@
 
 
 
+
+<script>
+// ── CLASS PROGRESS FROM FINAL SCORE SHEET ───────────────────
+(function() {
+  var SCORE_SHEET_ID = '1UjlcC2zOy5usrkzwL1gqgt3BDfNFb-heak-jdeIxIcM';
+  var CLASS_ORDER = ['XE1','XE4','XE5','XE6','XE7','XE8','XE9','XE10','XE11'];
+  var CLASS_LABELS = { XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
+
+  window.loadClassProgress = function(force) {
+    var content = document.getElementById('classProgressContent');
+    var note = document.getElementById('classProgressNote');
+    if (!content) return;
+    if (force) {
+      content.className = 'class-progress-loading';
+      content.textContent = 'Refreshing class progress...';
+      if (note) note.textContent = '';
+    }
+
+    loadProgressRows().then(function(rows) {
+      var counts = {};
+      CLASS_ORDER.forEach(function(cls) {
+        counts[cls] = { improved:0, same:0, decreased:0 };
+      });
+
+      rows.forEach(function(row) {
+        var cls = String(row.Class || '').trim();
+        var result = String(row.Result || '').trim().toLowerCase();
+        if (!counts[cls]) return;
+        if (result === 'improved') counts[cls].improved++;
+        else if (result === 'same') counts[cls].same++;
+        else if (result === 'decreased') counts[cls].decreased++;
+      });
+
+      content.className = 'class-progress-grid';
+      content.innerHTML = CLASS_ORDER.map(function(cls) {
+        var c = counts[cls];
+        return '' +
+          '<div class="class-progress-row">' +
+            '<div class="class-progress-class">' + escapeProgressHtml(CLASS_LABELS[cls] || cls) + '</div>' +
+            '<div class="class-progress-stats">' +
+              '<div class="class-progress-stat improved"><strong>' + c.improved + '</strong><span>Improved</span></div>' +
+              '<div class="class-progress-stat same"><strong>' + c.same + '</strong><span>Same</span></div>' +
+              '<div class="class-progress-stat decreased"><strong>' + c.decreased + '</strong><span>Decreased</span></div>' +
+            '</div>' +
+          '</div>';
+      }).join('');
+      if (note) note.textContent = 'Updated from the live Sem 1 vs Sem 2 sheet.';
+    }).catch(function() {
+      content.className = 'class-progress-loading';
+      content.textContent = 'Could not load class progress. Please refresh again.';
+      if (note) note.textContent = '';
+    });
+  };
+
+  function loadProgressRows() {
+    return new Promise(function(resolve, reject) {
+      var cb = 'class_progress_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+      var script = document.createElement('script');
+      window[cb] = function(payload) {
+        delete window[cb];
+        try { if (script.parentNode) script.parentNode.removeChild(script); } catch(e) {}
+        try { resolve(parseProgressPayload(payload)); } catch(err) { reject(err); }
+      };
+      script.onerror = function() {
+        delete window[cb];
+        reject(new Error('Network error'));
+      };
+      script.src = 'https://docs.google.com/spreadsheets/d/' + SCORE_SHEET_ID + '/gviz/tq?' +
+        new URLSearchParams({ sheet:'Sem 1 vs Sem 2', tqx:'out:json;responseHandler:' + cb, t:Date.now() }).toString();
+      document.body.appendChild(script);
+    });
+  }
+
+  function parseProgressPayload(payload) {
+    var table = payload && payload.table ? payload.table : { cols: [], rows: [] };
+    var headers = table.cols.map(function(col, index) {
+      return cleanProgressHeader(col.label || col.id || ('Column ' + (index + 1)));
+    });
+    return table.rows.map(function(row) {
+      var item = {};
+      headers.forEach(function(header, index) {
+        var key = Object.prototype.hasOwnProperty.call(item, header) ? header + ' ' + (index + 1) : header;
+        var cell = row.c && row.c[index] ? row.c[index] : null;
+        item[key] = cell ? (cell.v == null ? '' : cell.v) : '';
+      });
+      return item;
+    }).filter(function(row) {
+      return row.Class && row.Name && row.Result;
+    });
+  }
+
+  function cleanProgressHeader(header) {
+    var h = String(header || '').trim().replace(/\s+/g, ' ');
+    if (/^semester 1 vs semester 2 comparison no\.?$/i.test(h)) return 'No';
+    if (/^no\.?$/i.test(h)) return 'No';
+    return h;
+  }
+
+  function escapeProgressHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+      return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[ch];
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { window.loadClassProgress(false); });
+  } else {
+    window.loadClassProgress(false);
+  }
+})();
+</script>
+
+  <!-- CLASS FINAL SCORE PROGRESS -->
+  <div class="class-progress-section" id="classProgressSection">
+    <div class="class-progress-card">
+      <div class="class-progress-head">
+        <div>
+          <div class="class-progress-title">Class Progress</div>
+          <div class="class-progress-sub">Live Semester 1 vs Semester 2 changes by class.</div>
+        </div>
+        <button class="class-progress-refresh" onclick="loadClassProgress(true)">Refresh</button>
+      </div>
+      <div id="classProgressContent" class="class-progress-loading">Loading class progress...</div>
+      <div class="class-progress-note" id="classProgressNote"></div>
+    </div>
+  </div>
 
   <!-- BANNER SLIDER -->
   <div class="banner-wrap visually-removed" id="bannerWrap" style="display:none;">
