@@ -3,244 +3,243 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Teacher Dashboard · English Quest</title>
+  <title>Teacher Homepage · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="../shared/css/system.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/teacher-dashboard.css"/>
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
   <script src="../shared/js/api.js"></script>
   <script src="../shared/js/auth.js"></script>
-  <script src="../shared/js/teacher-sidebar.js"></script>
 </head>
-<body class="teacher-page" data-page="teacher-home">
-  <header>
-    <div class="nav">
-      <div class="brand">
-        <img src="../logo.jpg" alt="English Quest Logo"/>
+<body class="teacher-dashboard-page">
+  <aside class="dashboard-sidebar" id="dashboardSidebar">
+    <a class="sidebar-brand" href="index.html">
+      <span class="brand-mark"><i data-lucide="graduation-cap"></i></span>
+      <span>English Quest</span>
+    </a>
+
+    <nav class="primary-nav" aria-label="Teacher navigation">
+      <a class="active" href="index.html"><i data-lucide="house"></i><span>Homepage</span></a>
+      <a href="#overview"><i data-lucide="chart-no-axes-column-increasing"></i><span>Dashboard</span></a>
+      <a href="#classes"><i data-lucide="users-round"></i><span>Classes</span></a>
+      <a href="scores.html"><i data-lucide="user-round"></i><span>Students</span></a>
+      <a href="tasks.html"><i data-lucide="clipboard-list"></i><span>Tasks</span></a>
+      <a href="submissions.html"><i data-lucide="file-text"></i><span>Submissions</span></a>
+      <a href="attendance.html"><i data-lucide="chart-bar-big"></i><span>Reports</span></a>
+    </nav>
+
+    <section class="class-nav" id="classes">
+      <div class="sidebar-label">My Classes <span>(8)</span></div>
+      <a href="scores.html?class=XE1"><i data-lucide="graduation-cap"></i><span>XE1</span></a>
+      <a href="scores.html?class=XE2"><i data-lucide="graduation-cap"></i><span>XE2</span></a>
+      <a href="scores.html?class=XE3"><i data-lucide="graduation-cap"></i><span>XE3</span></a>
+      <a href="scores.html?class=XE4"><i data-lucide="graduation-cap"></i><span>XE4</span></a>
+      <a href="scores.html?class=XE5"><i data-lucide="graduation-cap"></i><span>XE5</span></a>
+      <a href="../grade11/"><i data-lucide="graduation-cap"></i><span>XIF7</span></a>
+      <a href="../grade11/"><i data-lucide="graduation-cap"></i><span>XIF8</span></a>
+      <a href="../grade11/"><i data-lucide="graduation-cap"></i><span>XIF9</span></a>
+    </section>
+
+    <div class="sidebar-footer">
+      <a href="#settings"><i data-lucide="settings"></i><span>Settings</span></a>
+      <button type="button" onclick="teacherLogout()"><i data-lucide="log-out"></i><span>Logout</span></button>
+    </div>
+  </aside>
+
+  <div class="mobile-backdrop" id="mobileBackdrop" onclick="closeMobileSidebar()"></div>
+
+  <main class="dashboard-main">
+    <header class="dashboard-topbar">
+      <div class="welcome-wrap">
+        <button class="mobile-menu" type="button" aria-label="Open navigation" onclick="openMobileSidebar()">
+          <i data-lucide="menu"></i>
+        </button>
         <div>
-          <div class="brand-title">English Quest</div>
-          <div class="brand-sub">Teacher Control Room</div>
+          <h1>Welcome back, <span id="welcomeName">Teacher</span>! <span aria-hidden="true">👋</span></h1>
+          <p>Here is what is happening across your eight English classes.</p>
         </div>
       </div>
-      <div class="nav-actions">
-        <a href="../index.html">Landing</a>
-        <a href="../grade10/" onclick="localStorage.setItem('eq_grade','10')">Grade 10 View</a>
-        <a href="../grade11/" onclick="localStorage.setItem('eq_grade','11')">Grade 11 Preview</a>
-        <a href="../next-semester/teacher.html">Next Console</a>
+
+      <div class="teacher-account">
+        <button class="icon-button" type="button" aria-label="Notifications">
+          <i data-lucide="bell"></i>
+          <span class="notification-dot">0</span>
+        </button>
+        <div class="teacher-avatar" id="teacherAvatar">T</div>
+        <div class="teacher-identity">
+          <strong id="teacherName">Teacher</strong>
+          <span>English Teacher</span>
+        </div>
       </div>
+    </header>
+
+    <div class="dashboard-toolbar">
+      <span class="data-note"><i data-lucide="database"></i> Live totals appear when class data is connected.</span>
+      <label class="semester-select">
+        <i data-lucide="calendar-days"></i>
+        <select aria-label="Semester">
+          <option>Semester 1</option>
+          <option>Semester 2</option>
+        </select>
+      </label>
     </div>
 
-    <section class="hero">
-      <div>
-        <div class="kicker">Teacher Dashboard</div>
-        <h1>Run English Quest from one control room.</h1>
-        <p class="hero-copy">Teacher tools live here. Student tracks stay focused on viewing, submitting, and checking personal progress.</p>
+    <section class="champion-panel" id="overview">
+      <div class="champion-heading">
+        <span class="trophy-icon"><i data-lucide="trophy"></i></span>
+        <h2>Champions of the Semester</h2>
+        <p>Top students will appear here when final-score data is available.</p>
       </div>
 
-      <div class="login-panel">
-        <div id="loginForm">
-          <div class="login-title">Teacher Login</div>
-          <div class="login-copy">Log in once, then open any teacher manager without signing in again.</div>
-          <input type="text" id="teacherUser" placeholder="Username"/>
-          <input type="password" id="teacherPass" placeholder="Password" onkeydown="if(event.key==='Enter')teacherLogin()"/>
-          <div class="error" id="loginError">Incorrect username or password.</div>
-          <div class="login-row">
-            <button class="primary-btn" type="button" onclick="teacherLogin()">Login</button>
-          </div>
-        </div>
-        <div class="logged-card" id="loggedCard">
-          <div class="login-title">Logged in</div>
-          <div class="logged-name" id="loggedName">Teacher</div>
-          <div class="logged-copy">Your session is active for materials, assignments, submissions, attendance, activeness, announcements, scores, tasks, and strikes.</div>
-          <div class="login-row">
-            <button class="ghost-btn" type="button" onclick="teacherLogout()">Logout</button>
-            <a class="primary-btn" href="scores.html">Open Scores</a>
-          </div>
-        </div>
+      <div class="podium" aria-label="Leaderboard awaiting score data">
+        <article class="podium-card fourth">
+          <span class="rank-badge">4</span>
+          <div class="podium-avatar"><i data-lucide="user-round"></i></div>
+          <strong>Awaiting scores</strong>
+          <span>Class rank</span>
+          <b>--</b>
+        </article>
+        <article class="podium-card second">
+          <span class="rank-badge">2</span>
+          <div class="podium-avatar"><i data-lucide="user-round"></i></div>
+          <strong>Awaiting scores</strong>
+          <span>Class rank</span>
+          <b>--</b>
+        </article>
+        <article class="podium-card first">
+          <span class="rank-badge">1</span>
+          <div class="podium-avatar"><i data-lucide="user-round"></i></div>
+          <strong>Awaiting scores</strong>
+          <span>Semester champion</span>
+          <b>--</b>
+        </article>
+        <article class="podium-card third">
+          <span class="rank-badge">3</span>
+          <div class="podium-avatar"><i data-lucide="user-round"></i></div>
+          <strong>Awaiting scores</strong>
+          <span>Class rank</span>
+          <b>--</b>
+        </article>
+        <article class="podium-card fifth">
+          <span class="rank-badge">5</span>
+          <div class="podium-avatar"><i data-lucide="user-round"></i></div>
+          <strong>Awaiting scores</strong>
+          <span>Class rank</span>
+          <b>--</b>
+        </article>
       </div>
-    </section>
-  </header>
 
-  <main>
-    <section>
-      <div class="section-head">
-        <div>
-          <div class="section-kicker">Grade 10</div>
-          <h2>Live management tools</h2>
-        </div>
-        <a class="btn ghost" href="../grade10/">Open student view</a>
-      </div>
-
-      <div class="teacher-control-grid">
-        <a class="control-card live" href="scores.html">
-          <div class="control-meta">
-            <span class="control-code">Scores</span>
-            <span class="control-state live">Live</span>
-          </div>
-          <h3>Score Manager</h3>
-          <p>Edit Chapter 4, Chapter 5, and final score tables from the teacher side.</p>
-        </a>
-
-        <a class="control-card live" href="tasks.html">
-          <div class="control-meta">
-            <span class="control-code">Tasks</span>
-            <span class="control-state live">Live</span>
-          </div>
-          <h3>Task Status Manager</h3>
-          <p>Update each student task status while Grade 10 pages stay read-only.</p>
-        </a>
-
-        <a class="control-card live" href="strikes.html">
-          <div class="control-meta">
-            <span class="control-code">Strikes</span>
-            <span class="control-state live">Live</span>
-          </div>
-          <h3>Strike Manager</h3>
-          <p>Add or remove warning strikes and keep summative/class restrictions traceable.</p>
-        </a>
-      </div>
+      <a class="leaderboard-link" href="scores.html"><i data-lucide="trophy"></i> View Score Manager <i data-lucide="arrow-right"></i></a>
     </section>
 
-    <section>
-      <div class="section-head">
-        <div>
-          <div class="section-kicker">Next Semester</div>
-          <h2>New master-sheet system</h2>
-        </div>
-        <a class="btn ghost" href="../next-semester/teacher.html">Open teacher console</a>
-      </div>
-
-      <div class="teacher-control-grid compact">
-        <a class="control-card live" href="../next-semester/teacher.html">
-          <div class="control-meta">
-            <span class="control-code">Console</span>
-            <span class="control-state live">Preview</span>
-          </div>
-          <h3>Teacher Console</h3>
-          <p>Readiness, profile form, XP rules, record counts, and queued control areas for the new master spreadsheet.</p>
-        </a>
-
-        <a class="control-card live" href="../next-semester/">
-          <div class="control-meta">
-            <span class="control-code">Student</span>
-            <span class="control-state live">Preview</span>
-          </div>
-          <h3>Profile Login</h3>
-          <p>Student-facing preview for class/name login using the next-semester template sheet.</p>
-        </a>
-
-        <a class="control-card live" href="../next-semester/dashboard.html">
-          <div class="control-meta">
-            <span class="control-code">Dashboard</span>
-            <span class="control-state live">Preview</span>
-          </div>
-          <h3>Student Dashboard</h3>
-          <p>Preview XP, rank, strikes, attendance, submissions, profile answers, and task status from the new API.</p>
-        </a>
-      </div>
+    <section class="metric-grid" aria-label="Teacher overview">
+      <article class="metric-card blue">
+        <span class="metric-icon"><i data-lucide="users-round"></i></span>
+        <div><span>Total Classes</span><strong>8</strong><small>5 Grade X · 3 Grade XI</small></div>
+      </article>
+      <article class="metric-card green">
+        <span class="metric-icon"><i data-lucide="user-round"></i></span>
+        <div><span>Total Students</span><strong>--</strong><small>Waiting for confirmed rosters</small></div>
+      </article>
+      <article class="metric-card purple">
+        <span class="metric-icon"><i data-lucide="clipboard-list"></i></span>
+        <div><span>Tasks Assigned</span><strong>--</strong><small>Connect task data to summarize</small></div>
+      </article>
+      <article class="metric-card amber">
+        <span class="metric-icon"><i data-lucide="folder-open"></i></span>
+        <div><span>Submissions</span><strong>--</strong><small>Connect submission records</small></div>
+      </article>
+      <article class="metric-card cyan">
+        <span class="metric-icon"><i data-lucide="shield-check"></i></span>
+        <div><span>Tasks Completed</span><strong>--</strong><small>Calculated after task data exists</small></div>
+      </article>
     </section>
 
-    <section>
-      <div class="section-head">
-        <div>
-          <div class="section-kicker">Teacher Tools</div>
-          <h2>Daily class managers</h2>
+    <section class="dashboard-lower-grid">
+      <article class="dashboard-panel quick-access">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">Teacher tools</span>
+            <h2>Quick Access</h2>
+          </div>
         </div>
-      </div>
+        <div class="quick-grid">
+          <a href="materials.html"><span class="quick-icon blue"><i data-lucide="book-open"></i></span><div><strong>Materials</strong><p>Publish and manage lesson resources.</p><b>Open materials <i data-lucide="arrow-right"></i></b></div></a>
+          <a href="scores.html"><span class="quick-icon green"><i data-lucide="users-round"></i></span><div><strong>Students & Scores</strong><p>Review student progress and scores.</p><b>Open scores <i data-lucide="arrow-right"></i></b></div></a>
+          <a href="tasks.html"><span class="quick-icon purple"><i data-lucide="clipboard-list"></i></span><div><strong>Tasks</strong><p>Create and manage class tasks.</p><b>Open tasks <i data-lucide="arrow-right"></i></b></div></a>
+          <a href="submissions.html"><span class="quick-icon amber"><i data-lucide="inbox"></i></span><div><strong>Submissions</strong><p>Review student work and status.</p><b>Open submissions <i data-lucide="arrow-right"></i></b></div></a>
+          <a href="attendance.html"><span class="quick-icon red"><i data-lucide="chart-no-axes-column-increasing"></i></span><div><strong>Attendance</strong><p>Review class attendance records.</p><b>Open attendance <i data-lucide="arrow-right"></i></b></div></a>
+          <a href="activeness.html"><span class="quick-icon cyan"><i data-lucide="chart-pie"></i></span><div><strong>Activeness</strong><p>Track participation and engagement.</p><b>Open activeness <i data-lucide="arrow-right"></i></b></div></a>
+        </div>
+      </article>
 
-      <div class="teacher-control-grid compact">
-        <a class="control-card live" href="materials.html">
-          <div class="control-meta">
-            <span class="control-code">Materials</span>
-            <span class="control-state live">Live</span>
+      <article class="dashboard-panel activity-panel">
+        <div class="panel-heading">
+          <div>
+            <span class="eyebrow">Latest updates</span>
+            <h2>Recent Activities</h2>
           </div>
-          <h3>Materials Manager</h3>
-          <p>Add or remove dynamic lesson materials while students only view and download files.</p>
-        </a>
-
-        <a class="control-card live" href="assignments.html">
-          <div class="control-meta">
-            <span class="control-code">Assignments</span>
-            <span class="control-state live">Live</span>
-          </div>
-          <h3>Assignment Manager</h3>
-          <p>Publish task files from teacher tools while students only view or download them.</p>
-        </a>
-
-        <a class="control-card live" href="submissions.html">
-          <div class="control-meta">
-            <span class="control-code">Submissions</span>
-            <span class="control-state live">Live</span>
-          </div>
-          <h3>Submission Review</h3>
-          <p>Review received work, latest previews, and missing submissions in one place.</p>
-        </a>
-
-        <a class="control-card live" href="attendance.html">
-          <div class="control-meta">
-            <span class="control-code">Attendance</span>
-            <span class="control-state live">Live</span>
-          </div>
-          <h3>Attendance Review</h3>
-          <p>Review class attendance records separately from the student statistics view.</p>
-        </a>
-
-        <a class="control-card live" href="activeness.html">
-          <div class="control-meta">
-            <span class="control-code">Activeness</span>
-            <span class="control-state live">Live</span>
-          </div>
-          <h3>Activeness Manager</h3>
-          <p>Update participation records without exposing teacher controls to students.</p>
-        </a>
-
-        <a class="control-card live" href="announcements.html">
-          <div class="control-meta">
-            <span class="control-code">Announcements</span>
-            <span class="control-state live">Live</span>
-          </div>
-          <h3>Announcements</h3>
-          <p>Post the current Grade 10 update from the teacher side while students only read it.</p>
-        </a>
-      </div>
+        </div>
+        <div class="empty-activity">
+          <span><i data-lucide="clock-3"></i></span>
+          <strong>No activity feed yet</strong>
+          <p>Recent publishing, submissions, scoring, and announcements will appear here after a shared activity log is connected.</p>
+        </div>
+        <div class="teacher-quote">
+          <i data-lucide="lightbulb"></i>
+          <p>Great teachers inspire, motivate, and change lives. Keep up the amazing work.</p>
+        </div>
+      </article>
     </section>
 
-    <section class="planning">
-      <div class="section-head slim">
+    <section class="dashboard-panel class-overview">
+      <div class="panel-heading">
         <div>
-          <div class="section-kicker">Grade 11</div>
-          <h2>Prepared, not wired yet</h2>
+          <span class="eyebrow">Confirmed teaching assignment</span>
+          <h2>Your Classes</h2>
         </div>
-        <a class="btn ghost" href="../grade11/">Open preview</a>
       </div>
-      <div class="grade-note">
-        Grade 11 pages are structural placeholders for now. Do not connect management tools until the real Grade 11 spreadsheet and data rules exist.
-      </div>
-      <div class="teacher-control-grid compact disabled-grid">
-        <article class="control-card locked"><span class="control-code">Scores</span><h3>Grade 11 Scores</h3><p>Waiting for real Grade 11 score data.</p></article>
-        <article class="control-card locked"><span class="control-code">Tasks</span><h3>Grade 11 Tasks</h3><p>Waiting for task structure and class roster.</p></article>
-        <article class="control-card locked"><span class="control-code">Attendance</span><h3>Grade 11 Attendance</h3><p>Waiting for attendance sheet separation.</p></article>
+      <div class="class-grid">
+        <a href="scores.html?class=XE1"><strong>XE1</strong><span>Grade X</span></a>
+        <a href="scores.html?class=XE2"><strong>XE2</strong><span>Grade X</span></a>
+        <a href="scores.html?class=XE3"><strong>XE3</strong><span>Grade X</span></a>
+        <a href="scores.html?class=XE4"><strong>XE4</strong><span>Grade X</span></a>
+        <a href="scores.html?class=XE5"><strong>XE5</strong><span>Grade X</span></a>
+        <a href="../grade11/"><strong>XIF7</strong><span>Grade XI</span></a>
+        <a href="../grade11/"><strong>XIF8</strong><span>Grade XI</span></a>
+        <a href="../grade11/"><strong>XIF9</strong><span>Grade XI</span></a>
       </div>
     </section>
   </main>
 
-  <footer>© 2026 English Quest · Teacher Dashboard</footer>
+  <section class="login-gate" id="loginGate" hidden>
+    <form class="login-card" onsubmit="teacherLogin(event)">
+      <span class="login-mark"><i data-lucide="graduation-cap"></i></span>
+      <h2>Teacher Login</h2>
+      <p>Sign in to open your English Quest control room.</p>
+      <label>Username<input id="teacherUser" autocomplete="username" required/></label>
+      <label>Password<input id="teacherPass" type="password" autocomplete="current-password" required/></label>
+      <div class="login-error" id="loginError"></div>
+      <button type="submit">Login</button>
+      <a href="../index.html">Back to landing page</a>
+    </form>
+  </section>
 
   <script>
-    function showLoggedIn(user) {
-      document.getElementById('loginForm').style.display = 'none';
-      document.getElementById('loggedCard').style.display = 'block';
-      document.getElementById('loggedName').textContent = user || 'Teacher';
+    function displayTeacher(username) {
+      var cleanName = username || 'Teacher';
+      document.getElementById('welcomeName').textContent = cleanName;
+      document.getElementById('teacherName').textContent = cleanName;
+      document.getElementById('teacherAvatar').textContent = cleanName.charAt(0).toUpperCase();
     }
 
-    function showLoggedOut() {
-      document.getElementById('loginForm').style.display = 'block';
-      document.getElementById('loggedCard').style.display = 'none';
+    function showLogin(message) {
+      document.getElementById('loginGate').hidden = false;
+      document.getElementById('loginError').textContent = message || '';
     }
 
-    function setLoginError(message) {
-      var error = document.getElementById('loginError');
-      error.textContent = message;
-      error.style.display = 'block';
+    function hideLogin() {
+      document.getElementById('loginGate').hidden = true;
     }
 
     function hashPass(plain) {
@@ -251,49 +250,57 @@
       });
     }
 
-    function teacherLogin() {
+    function teacherLogin(event) {
+      event.preventDefault();
       var username = document.getElementById('teacherUser').value.trim();
       var password = document.getElementById('teacherPass').value.trim();
-      document.getElementById('loginError').style.display = 'none';
-      if (!username || !password) {
-        setLoginError('Enter both username and password.');
-        return;
-      }
+      document.getElementById('loginError').textContent = '';
 
       EQApi.get({ action: 'checkLogin', username: username, password: password }).then(function(data) {
-        if (!data.ok) {
-          setLoginError('Incorrect username or password.');
-          return;
-        }
-        return hashPass(password).then(function(hashed) {
-          localStorage.setItem('eq_tu', username);
-          localStorage.setItem('eq_tp', hashed);
-          showLoggedIn(username);
-        });
-      }).catch(function() {
-        setLoginError('Connection error. Try again.');
+        if (!data.ok) throw new Error('Incorrect username or password.');
+        return hashPass(password);
+      }).then(function(hashed) {
+        localStorage.setItem('eq_tu', username);
+        localStorage.setItem('eq_tp', hashed);
+        displayTeacher(username);
+        hideLogin();
+      }).catch(function(error) {
+        showLogin(error.message || 'Connection error. Try again.');
       });
     }
 
     function teacherLogout() {
       EQAuth.logoutTeacher();
-      showLoggedOut();
+      showLogin();
     }
 
-    function initTeacherDashboard() {
+    function openMobileSidebar() {
+      document.getElementById('dashboardSidebar').classList.add('open');
+      document.getElementById('mobileBackdrop').classList.add('open');
+    }
+
+    function closeMobileSidebar() {
+      document.getElementById('dashboardSidebar').classList.remove('open');
+      document.getElementById('mobileBackdrop').classList.remove('open');
+    }
+
+    function initDashboard() {
+      if (window.lucide) lucide.createIcons();
       var teacher = EQAuth.getTeacher();
       if (!teacher.username || !teacher.password) {
-        showLoggedOut();
+        showLogin();
         return;
       }
-
+      displayTeacher(teacher.username);
       EQApi.get({ action: 'checkLogin', username: teacher.username, password: teacher.password }).then(function(data) {
-        if (data && data.ok) showLoggedIn(teacher.username);
-        else showLoggedOut();
-      }).catch(showLoggedOut);
+        if (data && data.ok) hideLogin();
+        else showLogin('Your teacher session expired. Please log in again.');
+      }).catch(function() {
+        showLogin('Could not verify your teacher session.');
+      });
     }
 
-    document.addEventListener('DOMContentLoaded', initTeacherDashboard);
+    document.addEventListener('DOMContentLoaded', initDashboard);
   </script>
 </body>
 </html>
