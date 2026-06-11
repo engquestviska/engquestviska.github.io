@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system-20260611.css"/>
   <link rel="stylesheet" href="../shared/css/app-shell-20260611.css"/>
-  <link rel="stylesheet" href="../shared/css/grade10-home.css"/>
+  <link rel="stylesheet" href="../shared/css/grade10-home-figma-20260612.css"/>
   <style>
     .profile-login-card {
       align-content: stretch;
@@ -143,44 +143,39 @@
 <body class="track-page grade10-page">
   <div class="shell">
     <header class="topbar">
-      <div class="brand">
+      <div class="brand mobile-track-brand">
         <img src="../logo.jpg" alt="English Quest Logo"/>
         <div>
           <div class="brand-title">English Quest</div>
           <div class="brand-sub">Grade 10 Student Track</div>
         </div>
       </div>
-      <nav class="nav" aria-label="Main navigation">
-        <a href="dashboard.html">My Statistics</a>
-        <a href="strikes.html">My Strikes</a>
-        <a href="../index.html">Choose Grade</a>
-      </nav>
+      <a class="student-account-chip" href="#profile">
+        <span class="student-account-avatar" id="accountAvatar">ST</span>
+        <span><strong id="accountName">Student</strong><small id="accountClass">Grade 10 Student</small></span>
+        <i data-lucide="chevron-down"></i>
+      </a>
     </header>
 
     <main class="student-home-main">
       <header class="student-home-header">
         <div>
-          <div class="student-home-eyebrow">Grade X Student Portal</div>
-          <h1>Welcome back, <span id="welcomeName">Student</span>.</h1>
-          <p>Your classwork, progress, and English Quest updates are all in one place.</p>
+          <h1>Welcome back, <span id="welcomeName">Student</span></h1>
+          <p>Your Grade 10 English class hub for materials, tasks, submissions, progress, and class updates.</p>
         </div>
-        <a class="student-header-action" href="../index.html">Choose grade</a>
+        <a class="student-header-action" href="../index.html">Grade 10 Homepage</a>
       </header>
 
       <section class="student-home-overview">
         <article class="student-welcome-panel">
           <div>
-            <span class="student-panel-kicker">English Quest</span>
-            <h2>Ready for your next English class?</h2>
-            <p>Continue your materials, check current tasks, submit your work, and follow your personal progress.</p>
+            <span class="student-panel-kicker">Grade 10 Student Track</span>
+            <h2>Your English class hub.</h2>
+            <p>Focus on your current chapter, score improvement, and task completion.</p>
           </div>
           <div class="student-welcome-actions">
-            <a href="lessons.html">Open materials</a>
-            <a href="tasks.html">Check tasks</a>
-          </div>
-          <div class="student-welcome-detail">
-            <span><i data-lucide="graduation-cap"></i> Grade X</span>
-            <span id="welcomeClass"><i data-lucide="users"></i> Choose your profile</span>
+            <a href="tasks.html">Continue Task</a>
+            <a href="lessons.html">View Materials</a>
           </div>
         </article>
 
@@ -298,6 +293,15 @@
       return value ? value.replace(/^XE/, 'XE-') : '';
     }
 
+    function refreshSidebarClass() {
+      var cls = localStorage.getItem('eq_student_class') || '';
+      var no = localStorage.getItem('eq_student_no') || '';
+      var sidebarClass = document.querySelector('.student-app-sidebar .class-nav a:first-of-type span');
+      if (sidebarClass) {
+        sidebarClass.textContent = cls && no ? classLabel(cls) + ' · No. ' + no : 'Choose your class';
+      }
+    }
+
     function refreshProfileDisplay() {
       var cls = localStorage.getItem('eq_student_class') || '';
       var no = localStorage.getItem('eq_student_no') || '';
@@ -307,9 +311,12 @@
       document.getElementById('profile').classList.toggle('logged-in', hasProfile);
       document.getElementById('profileStatus').textContent = hasProfile ? 'Logged in' : 'Not logged in';
       document.getElementById('welcomeName').textContent = hasProfile ? name.split(' ')[0] : 'Student';
-      document.getElementById('welcomeClass').innerHTML = hasProfile
-        ? '<i data-lucide="users"></i> ' + classLabel(cls) + ' · No. ' + no
-        : '<i data-lucide="users"></i> Choose your profile';
+      document.getElementById('accountName').textContent = hasProfile ? name : 'Student';
+      document.getElementById('accountClass').textContent = hasProfile ? classLabel(cls) + ' · No. ' + no : 'Grade 10 Student';
+      document.getElementById('accountAvatar').textContent = hasProfile
+        ? name.split(/\s+/).slice(0, 2).map(function(part) { return part.charAt(0); }).join('').toUpperCase()
+        : 'ST';
+      refreshSidebarClass();
       document.getElementById('profileTitle').textContent = hasProfile ? name : 'Personalize your space';
       document.getElementById('profileCopy').textContent = hasProfile
         ? classLabel(cls) + ' · No. ' + no + '. Your saved student profile is active on this browser.'
@@ -457,6 +464,7 @@
     document.getElementById('logoutProfile').addEventListener('click', logoutProfile);
 
     refreshProfileDisplay();
+    document.addEventListener('DOMContentLoaded', refreshSidebarClass);
     if (document.getElementById('studentClass').value) {
       loadStudentsForClass();
     }
