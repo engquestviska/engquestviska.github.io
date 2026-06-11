@@ -7,7 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css"/>
-  <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260611b"/>
+  <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260611c"/>
   <style>
     .profile-login-card {
       align-content: stretch;
@@ -217,93 +217,71 @@
         </aside>
       </section>
 
-      <section class="home-announcement" id="homeAnnouncement" aria-live="polite">
-        <div class="announcement-meta" id="announcementMeta">Class Announcement</div>
-        <h2 class="announcement-title" id="announcementTitle"></h2>
-        <p class="announcement-copy" id="announcementCopy"></p>
+      <section class="student-summary-grid" aria-label="Student summary">
+        <a class="student-summary-card blue" href="scores.html"><span><i data-lucide="chart-no-axes-column-increasing"></i></span><div><small>Current Score</small><strong>--</strong><p>Open scores</p></div></a>
+        <a class="student-summary-card green" href="tasks.html"><span><i data-lucide="circle-check-big"></i></span><div><small>Tasks Done</small><strong>--</strong><p>Open task status</p></div></a>
+        <a class="student-summary-card amber" href="submission.html"><span><i data-lucide="send"></i></span><div><small>Submissions</small><strong>--</strong><p>Open records</p></div></a>
+        <a class="student-summary-card red" href="strikes.html"><span><i data-lucide="shield-alert"></i></span><div><small>Strikes</small><strong>--</strong><p>Check eligibility</p></div></a>
+        <a class="student-summary-card purple" href="activeness.html"><span><i data-lucide="zap"></i></span><div><small>Activeness</small><strong>--</strong><p>Open progress</p></div></a>
       </section>
 
-      <section class="student-home-section">
+      <section class="student-home-section clean-section">
         <div class="student-section-heading">
           <div>
             <span>Class Work</span>
-            <h2>Continue learning</h2>
+            <h2>Your next steps</h2>
           </div>
           <a href="tasks.html">View task status</a>
         </div>
-        <div class="student-action-grid">
-          <a class="student-action-card blue" href="lessons.html">
-            <span class="student-action-icon"><i data-lucide="book-open"></i></span>
-            <div><strong>Lesson Materials</strong><p>Open slides, files, and lesson resources.</p><b>Open materials <i data-lucide="arrow-right"></i></b></div>
+        <div class="student-next-grid">
+          <a class="student-next-card blue" href="assignments.html">
+            <span class="student-next-icon"><i data-lucide="clipboard-list"></i></span>
+            <small>Assignments</small>
+            <strong>Check current work</strong>
+            <p>Review instructions and files for your current chapter.</p>
+            <i class="student-next-arrow" data-lucide="arrow-right"></i>
           </a>
-          <a class="student-action-card amber" href="assignments.html">
-            <span class="student-action-icon"><i data-lucide="clipboard-list"></i></span>
-            <div><strong>Assignments</strong><p>Review instructions and assignment files.</p><b>View assignments <i data-lucide="arrow-right"></i></b></div>
+          <a class="student-next-card purple" href="tasks.html">
+            <span class="student-next-icon"><i data-lucide="list-checks"></i></span>
+            <small>Task Status</small>
+            <strong>Review missing tasks</strong>
+            <p>See which class tasks are complete or still missing.</p>
+            <i class="student-next-arrow" data-lucide="arrow-right"></i>
           </a>
-          <a class="student-action-card green" href="submission.html">
-            <span class="student-action-icon"><i data-lucide="send"></i></span>
-            <div><strong>Submission</strong><p>Send your work and check submission records.</p><b>Submit work <i data-lucide="arrow-right"></i></b></div>
+          <a class="student-next-card green" href="../quiz.html">
+            <span class="student-next-icon"><i data-lucide="gamepad-2"></i></span>
+            <small>Practice</small>
+            <strong>Class activities</strong>
+            <p>Continue review games and classroom quiz activities.</p>
+            <i class="student-next-arrow" data-lucide="arrow-right"></i>
           </a>
-          <a class="student-action-card pink" href="session.html">
-            <span class="student-action-icon"><i data-lucide="library"></i></span>
-            <div><strong>Reading</strong><p>Open classroom texts and reading materials.</p><b>Start reading <i data-lucide="arrow-right"></i></b></div>
-          </a>
-          <a class="student-action-card cyan" href="../quiz.html">
-            <span class="student-action-icon"><i data-lucide="gamepad-2"></i></span>
-            <div><strong>Class Activities</strong><p>Open review games and classroom quizzes.</p><b>Open activities <i data-lucide="arrow-right"></i></b></div>
-          </a>
-        </div>
-      </section>
-
-      <section class="student-home-section">
-        <div class="student-section-heading">
-          <div>
-            <span>Your Progress</span>
-            <h2>Personal overview</h2>
-          </div>
-          <a href="dashboard.html">Open full dashboard</a>
-        </div>
-        <div class="student-progress-grid">
-          <a class="student-progress-card blue" href="dashboard.html">
-            <span><i data-lucide="chart-no-axes-column-increasing"></i></span>
-            <div><small>My Statistics</small><strong>Overview</strong><p>Scores, attendance, tasks, and participation.</p></div>
-          </a>
-          <a class="student-progress-card red" href="strikes.html">
-            <span><i data-lucide="shield-alert"></i></span>
-            <div><small>My Strikes</small><strong>Check status</strong><p>Review warnings and class eligibility.</p></div>
-          </a>
-          <a class="student-progress-card green" href="attendance.html">
-            <span><i data-lucide="calendar-check"></i></span>
-            <div><small>Attendance</small><strong>Presence</strong><p>Review your attendance and class records.</p></div>
-          </a>
-          <a class="student-progress-card amber" href="scores.html">
-            <span><i data-lucide="trophy"></i></span>
-            <div><small>Student Scores</small><strong>Results</strong><p>Check chapter scores and score progress.</p></div>
-          </a>
-          <a class="student-progress-card purple" href="tasks.html">
-            <span><i data-lucide="list-checks"></i></span>
-            <div><small>Task Status</small><strong>Completion</strong><p>See completed and missing class work.</p></div>
-          </a>
-          <a class="student-progress-card cyan" href="activeness.html">
-            <span><i data-lucide="zap"></i></span>
-            <div><small>Activeness</small><strong>Participation</strong><p>Follow classroom participation and activity points.</p></div>
+          <a class="student-next-card amber" href="submission.html">
+            <span class="student-next-icon"><i data-lucide="send"></i></span>
+            <small>Submission</small>
+            <strong>Check your records</strong>
+            <p>Submit work and confirm that your files were received.</p>
+            <i class="student-next-arrow" data-lucide="arrow-right"></i>
           </a>
         </div>
       </section>
 
-      <section class="student-home-bottom">
-        <article class="student-home-panel">
+      <section class="student-home-bottom compact-bottom">
+        <article class="student-home-panel resource-panel">
           <div class="student-section-heading compact">
-            <div><span>Class Community</span><h2>Your class</h2></div>
+            <div><span>Learning Center</span><h2>Materials and resources</h2></div>
+            <a href="lessons.html">View all materials</a>
           </div>
-          <div class="student-community-links">
-            <a href="students.html"><i data-lucide="users-round"></i><div><strong>Student List</strong><p>Browse classmates in your class.</p></div><i data-lucide="chevron-right"></i></a>
-            <a href="dashboard.html"><i data-lucide="circle-user-round"></i><div><strong>My Dashboard</strong><p>See your complete personal statistics.</p></div><i data-lucide="chevron-right"></i></a>
+          <div class="student-resource-grid">
+            <a href="lessons.html"><i data-lucide="book-open"></i><strong>Lesson Materials</strong><p>Slides, files, and lesson resources.</p><span>Open</span></a>
+            <a href="session.html"><i data-lucide="library"></i><strong>Reading</strong><p>Classroom texts and reading materials.</p><span>Open</span></a>
+            <a href="dashboard.html"><i data-lucide="chart-no-axes-column-increasing"></i><strong>My Statistics</strong><p>Your complete personal dashboard.</p><span>Open</span></a>
           </div>
         </article>
-        <article class="student-home-panel student-home-note">
-          <span class="student-note-icon"><i data-lucide="lightbulb"></i></span>
-          <div><small>Today’s reminder</small><h2>Stay curious. Keep improving.</h2><p>Check your task status before class and make sure your latest work has been submitted.</p></div>
+        <article class="home-announcement student-home-panel announcement-panel" id="homeAnnouncement" aria-live="polite">
+          <div class="announcement-meta" id="announcementMeta">Latest Update</div>
+          <h2 class="announcement-title" id="announcementTitle">No announcement yet</h2>
+          <p class="announcement-copy" id="announcementCopy">New class announcements will appear here.</p>
+          <a href="dashboard.html">Open dashboard</a>
         </article>
       </section>
     </main>
@@ -325,6 +303,7 @@
       var name = localStorage.getItem('eq_student_name') || '';
       var hasProfile = !!(cls && no && name);
 
+      document.getElementById('profile').classList.toggle('logged-in', hasProfile);
       document.getElementById('profileStatus').textContent = hasProfile ? 'Logged in' : 'Not logged in';
       document.getElementById('welcomeName').textContent = hasProfile ? name.split(' ')[0] : 'Student';
       document.getElementById('welcomeClass').innerHTML = hasProfile
@@ -449,18 +428,22 @@
         var data = await EQApi.get({ action: 'getAnnouncement' });
         var announcement = data.announcement || null;
         if (!announcement || (!announcement.title && !announcement.body)) {
-          card.style.display = 'none';
+          card.className = 'home-announcement student-home-panel announcement-panel';
+          document.getElementById('announcementMeta').textContent = 'Latest Update';
+          document.getElementById('announcementTitle').textContent = 'No announcement yet';
+          document.getElementById('announcementCopy').textContent = 'New class announcements will appear here.';
+          card.style.display = 'grid';
           return;
         }
 
         var type = safeAnnouncementType(announcement.type || 'info');
-        card.className = 'home-announcement ' + type;
+        card.className = 'home-announcement student-home-panel announcement-panel ' + type;
         document.getElementById('announcementMeta').textContent = 'Class Announcement' + (announcement.postedAt ? ' · ' + announcementDate(announcement.postedAt) : '');
         document.getElementById('announcementTitle').textContent = announcement.title || 'Class Announcement';
         document.getElementById('announcementCopy').textContent = announcement.body || '';
-        card.style.display = 'block';
+        card.style.display = 'grid';
       } catch(e) {
-        card.style.display = 'none';
+        card.style.display = 'grid';
       }
     }
 
