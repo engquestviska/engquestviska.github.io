@@ -7,7 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css"/>
-  <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260611"/>
+  <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260611b"/>
   <style>
     .profile-login-card {
       align-content: stretch;
@@ -156,16 +156,34 @@
       </nav>
     </header>
 
-    <main>
-      <section class="hero">
-        <div class="hero-main">
-          <div>
-            <div class="kicker">Grade 10</div>
-            <h1>Your English class hub.</h1>
-            <p class="hero-copy">Everything Grade 10 students need for class materials, tasks, submissions, reading, progress, and class participation.</p>
-          </div>
+    <main class="student-home-main">
+      <header class="student-home-header">
+        <div>
+          <div class="student-home-eyebrow">Grade X Student Portal</div>
+          <h1>Welcome back, <span id="welcomeName">Student</span>.</h1>
+          <p>Your classwork, progress, and English Quest updates are all in one place.</p>
         </div>
-        <aside class="profile-card profile-login-card">
+        <a class="student-header-action" href="../index.html">Choose grade</a>
+      </header>
+
+      <section class="student-home-overview">
+        <article class="student-welcome-panel">
+          <div>
+            <span class="student-panel-kicker">English Quest</span>
+            <h2>Ready for your next English class?</h2>
+            <p>Continue your materials, check current tasks, submit your work, and follow your personal progress.</p>
+          </div>
+          <div class="student-welcome-actions">
+            <a href="lessons.html">Open materials</a>
+            <a href="tasks.html">Check tasks</a>
+          </div>
+          <div class="student-welcome-detail">
+            <span><i data-lucide="graduation-cap"></i> Grade X</span>
+            <span id="welcomeClass"><i data-lucide="users"></i> Choose your profile</span>
+          </div>
+        </article>
+
+        <aside class="profile-card profile-login-card" id="profile">
           <div>
             <div class="profile-label">Student Profile</div>
             <div class="profile-title" id="profileTitle">Personalize your space</div>
@@ -205,100 +223,89 @@
         <p class="announcement-copy" id="announcementCopy"></p>
       </section>
 
-      <section>
-        <div class="section-head">
+      <section class="student-home-section">
+        <div class="student-section-heading">
           <div>
-            <div class="section-kicker">Class Work</div>
-            <h2>Materials and tasks</h2>
+            <span>Class Work</span>
+            <h2>Continue learning</h2>
           </div>
+          <a href="tasks.html">View task status</a>
         </div>
-        <div class="module-grid">
-          <a class="module" href="lessons.html">
-            <div class="module-icon">📚</div>
-            <div class="module-title">Lesson Materials</div>
-            <p class="module-copy">Open PPT files, class slides, and lesson resources.</p>
-            <div class="module-link">Open materials →</div>
+        <div class="student-action-grid">
+          <a class="student-action-card blue" href="lessons.html">
+            <span class="student-action-icon"><i data-lucide="book-open"></i></span>
+            <div><strong>Lesson Materials</strong><p>Open slides, files, and lesson resources.</p><b>Open materials <i data-lucide="arrow-right"></i></b></div>
           </a>
-          <a class="module amber" href="assignments.html">
-            <div class="module-icon">📋</div>
-            <div class="module-title">Assignments</div>
-            <p class="module-copy">Check task instructions and assignment files.</p>
-            <div class="module-link">View assignments →</div>
+          <a class="student-action-card amber" href="assignments.html">
+            <span class="student-action-icon"><i data-lucide="clipboard-list"></i></span>
+            <div><strong>Assignments</strong><p>Review instructions and assignment files.</p><b>View assignments <i data-lucide="arrow-right"></i></b></div>
           </a>
-          <a class="module green" href="submission.html">
-            <div class="module-icon">📝</div>
-            <div class="module-title">Submission</div>
-            <p class="module-copy">Submit task files and check submission instructions.</p>
-            <div class="module-link">Submit work →</div>
+          <a class="student-action-card green" href="submission.html">
+            <span class="student-action-icon"><i data-lucide="send"></i></span>
+            <div><strong>Submission</strong><p>Send your work and check submission records.</p><b>Submit work <i data-lucide="arrow-right"></i></b></div>
           </a>
-          <a class="module pink" href="session.html">
-            <div class="module-icon">📖</div>
-            <div class="module-title">Reading</div>
-            <p class="module-copy">Open classroom texts and reading materials.</p>
-            <div class="module-link">Start reading →</div>
+          <a class="student-action-card pink" href="session.html">
+            <span class="student-action-icon"><i data-lucide="library"></i></span>
+            <div><strong>Reading</strong><p>Open classroom texts and reading materials.</p><b>Start reading <i data-lucide="arrow-right"></i></b></div>
           </a>
-          <a class="module green" href="../quiz.html">
-            <div class="module-icon">QZ</div>
-            <div class="module-title">Class Activities</div>
-            <p class="module-copy">Open review games and classroom quiz activities.</p>
-            <div class="module-link">Open activities -></div>
+          <a class="student-action-card cyan" href="../quiz.html">
+            <span class="student-action-icon"><i data-lucide="gamepad-2"></i></span>
+            <div><strong>Class Activities</strong><p>Open review games and classroom quizzes.</p><b>Open activities <i data-lucide="arrow-right"></i></b></div>
           </a>
         </div>
       </section>
 
-      <section>
-        <div class="section-head">
+      <section class="student-home-section">
+        <div class="student-section-heading">
           <div>
-            <div class="section-kicker">Class Data</div>
-            <h2>Progress and participation</h2>
+            <span>Your Progress</span>
+            <h2>Personal overview</h2>
           </div>
+          <a href="dashboard.html">Open full dashboard</a>
         </div>
-        <div class="module-grid">
-          <a class="module" href="dashboard.html">
-            <div class="module-icon">ST</div>
-            <div class="module-title">My Statistics</div>
-            <p class="module-copy">Open your personal dashboard for scores, attendance, tasks, submissions, and activeness.</p>
-            <div class="module-link">Open dashboard -></div>
+        <div class="student-progress-grid">
+          <a class="student-progress-card blue" href="dashboard.html">
+            <span><i data-lucide="chart-no-axes-column-increasing"></i></span>
+            <div><small>My Statistics</small><strong>Overview</strong><p>Scores, attendance, tasks, and participation.</p></div>
           </a>
-          <a class="module amber" href="strikes.html">
-            <div class="module-icon">WR</div>
-            <div class="module-title">My Strikes</div>
-            <p class="module-copy">Check your warning status and summative or class eligibility.</p>
-            <div class="module-link">Check strikes -></div>
+          <a class="student-progress-card red" href="strikes.html">
+            <span><i data-lucide="shield-alert"></i></span>
+            <div><small>My Strikes</small><strong>Check status</strong><p>Review warnings and class eligibility.</p></div>
           </a>
-          <a class="module" href="students.html">
-            <div class="module-icon">🎓</div>
-            <div class="module-title">Student List</div>
-            <p class="module-copy">Browse class members and student information.</p>
-            <div class="module-link">Open list →</div>
+          <a class="student-progress-card green" href="attendance.html">
+            <span><i data-lucide="calendar-check"></i></span>
+            <div><small>Attendance</small><strong>Presence</strong><p>Review your attendance and class records.</p></div>
           </a>
-          <a class="module green" href="attendance.html">
-            <div class="module-icon">✅</div>
-            <div class="module-title">Attendance</div>
-            <p class="module-copy">Check attendance and class presence records.</p>
-            <div class="module-link">View attendance →</div>
+          <a class="student-progress-card amber" href="scores.html">
+            <span><i data-lucide="trophy"></i></span>
+            <div><small>Student Scores</small><strong>Results</strong><p>Check chapter scores and score progress.</p></div>
           </a>
-          <a class="module amber" href="scores.html">
-            <div class="module-icon">🏆</div>
-            <div class="module-title">Student Scores</div>
-            <p class="module-copy">Check chapter scores and score progress.</p>
-            <div class="module-link">Check scores →</div>
+          <a class="student-progress-card purple" href="tasks.html">
+            <span><i data-lucide="list-checks"></i></span>
+            <div><small>Task Status</small><strong>Completion</strong><p>See completed and missing class work.</p></div>
           </a>
-          <a class="module" href="tasks.html">
-            <div class="module-icon">📌</div>
-            <div class="module-title">Task Status</div>
-            <p class="module-copy">See which tasks are complete or still missing.</p>
-            <div class="module-link">Check tasks →</div>
-          </a>
-          <a class="module pink" href="activeness.html">
-            <div class="module-icon">⚡</div>
-            <div class="module-title">Activeness</div>
-            <p class="module-copy">Track classroom participation and activity points.</p>
-            <div class="module-link">View activeness →</div>
+          <a class="student-progress-card cyan" href="activeness.html">
+            <span><i data-lucide="zap"></i></span>
+            <div><small>Activeness</small><strong>Participation</strong><p>Follow classroom participation and activity points.</p></div>
           </a>
         </div>
       </section>
 
+      <section class="student-home-bottom">
+        <article class="student-home-panel">
+          <div class="student-section-heading compact">
+            <div><span>Class Community</span><h2>Your class</h2></div>
+          </div>
+          <div class="student-community-links">
+            <a href="students.html"><i data-lucide="users-round"></i><div><strong>Student List</strong><p>Browse classmates in your class.</p></div><i data-lucide="chevron-right"></i></a>
+            <a href="dashboard.html"><i data-lucide="circle-user-round"></i><div><strong>My Dashboard</strong><p>See your complete personal statistics.</p></div><i data-lucide="chevron-right"></i></a>
+          </div>
+        </article>
+        <article class="student-home-panel student-home-note">
+          <span class="student-note-icon"><i data-lucide="lightbulb"></i></span>
+          <div><small>Today’s reminder</small><h2>Stay curious. Keep improving.</h2><p>Check your task status before class and make sure your latest work has been submitted.</p></div>
+        </article>
+      </section>
     </main>
   </div>
 
@@ -319,6 +326,10 @@
       var hasProfile = !!(cls && no && name);
 
       document.getElementById('profileStatus').textContent = hasProfile ? 'Logged in' : 'Not logged in';
+      document.getElementById('welcomeName').textContent = hasProfile ? name.split(' ')[0] : 'Student';
+      document.getElementById('welcomeClass').innerHTML = hasProfile
+        ? '<i data-lucide="users"></i> ' + classLabel(cls) + ' · No. ' + no
+        : '<i data-lucide="users"></i> Choose your profile';
       document.getElementById('profileTitle').textContent = hasProfile ? name : 'Personalize your space';
       document.getElementById('profileCopy').textContent = hasProfile
         ? classLabel(cls) + ' · No. ' + no + '. Your saved student profile is active on this browser.'
@@ -328,6 +339,7 @@
       document.getElementById('changeProfile').disabled = !hasProfile;
       document.getElementById('dashboardProfileLink').style.display = hasProfile ? 'inline-flex' : 'none';
       document.getElementById('strikesProfileLink').style.display = hasProfile ? 'inline-flex' : 'none';
+      if (window.lucide) window.lucide.createIcons();
     }
 
     function resetStudentSelect(message) {
