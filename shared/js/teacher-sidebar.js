@@ -25,10 +25,10 @@
   ];
 
   function ensureStyles() {
-    if (!document.querySelector('link[href="../shared/css/teacher-dashboard.css"]')) {
+    if (!document.querySelector('link[href*="shared/css/app-shell.css"]')) {
       var link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = '../shared/css/teacher-dashboard.css';
+      link.href = '../shared/css/app-shell.css?v=20260611';
       document.head.appendChild(link);
     }
   }
@@ -89,6 +89,21 @@
     topbar.insertBefore(button, topbar.firstChild);
   }
 
+  function bindMobileControls() {
+    var button = document.querySelector('.mobile-menu, .teacher-shell-mobile-button');
+    var backdrop = document.getElementById('mobileBackdrop');
+    if (button && !button.dataset.shellBound) {
+      button.removeAttribute('onclick');
+      button.addEventListener('click', window.openTeacherShell);
+      button.dataset.shellBound = 'true';
+    }
+    if (backdrop && !backdrop.dataset.shellBound) {
+      backdrop.removeAttribute('onclick');
+      backdrop.addEventListener('click', window.closeTeacherShell);
+      backdrop.dataset.shellBound = 'true';
+    }
+  }
+
   window.openTeacherShell = function () {
     document.getElementById('dashboardSidebar').classList.add('open');
     document.getElementById('mobileBackdrop').classList.add('open');
@@ -114,6 +129,7 @@
       document.body.insertAdjacentHTML('afterbegin', shellMarkup());
     }
     addMobileButton();
+    bindMobileControls();
     ensureIcons();
   });
 

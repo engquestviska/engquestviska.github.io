@@ -69,7 +69,8 @@ English Quest is being reorganized into three tracks.
 - `shared/js/next-semester-profile.js` - next-semester preview profile storage helper.
 - `shared/js/sidebar.js` - shared sidebar for Grade 10 secondary pages.
 - `shared/js/teacher-sidebar.js` - shared sidebar for teacher dashboard and manager pages.
-- `shared/css/system.css` - shared design system styles for landing, track pages, student pages, teacher pages, and reusable UI patterns.
+- `shared/css/system.css` - shared legacy/content styles used by existing pages.
+- `shared/css/app-shell.css` - universal app-shell layout for Teacher, Grade X, and Grade XI pages.
 - `shared/css/next-semester.css` - isolated preview styles for the next-semester login and dashboard.
 
 ## Legacy Root Pages

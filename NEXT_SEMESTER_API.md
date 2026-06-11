@@ -79,15 +79,11 @@ The web app deployment must also be configured for public access. If even `?acti
 
 These pages are isolated preview surfaces. The current Grade 10, Grade 11, and Teacher data flows do not depend on them.
 
-## Step 6 Migration Bridge
+## Preview Isolation
 
-The preview is now reachable from the real entry pages without replacing current-year behavior:
+The preview remains available inside `next-semester/` for reference and backend experiments, but it is no longer promoted from the real Grade X, Grade XI, or Teacher homepages.
 
-- `grade10/index.html` links to the next-semester student preview, dashboard preview, and teacher console preview.
-- `grade11/index.html` links to the same preview surfaces while Grade 11 data remains placeholder-only.
-- `teacher/index.html` links to the next-semester teacher console and preview surfaces.
-
-This is a bridge, not the final migration. Current Grade 10, Grade 11, and Teacher pages still keep their existing data flows until the master Sheet is ready for real classes.
+Current Grade X, Grade XI, and Teacher pages keep their existing data flows until a future replacement architecture is explicitly approved.
 
 ## Step 7 Settlement
 

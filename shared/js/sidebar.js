@@ -1,102 +1,113 @@
-/* sidebar.js — shared sidebar for all secondary pages */
+/* Shared student app shell for Grade X and Grade XI pages. */
 (function () {
+  var grade = document.body && document.body.classList.contains('grade11-page') ? '11' : '';
 
-  var HTML = [
-    '<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>',
-    '<nav class="sidebar" id="sidebar">',
-    '  <div class="sidebar-head">',
-    '    <img class="sidebar-logo" src="../logo.jpg" alt="Logo"/>',
-    '    <div class="sidebar-head-text">',
-    '      <div class="sidebar-head-title">English Quest</div>',
-    '      <div class="sidebar-head-sub">SMA Negeri 6 Surakarta</div>',
-    '    </div>',
-    '    <button class="sidebar-close" onclick="closeSidebar()">&#x2715;</button>',
-    '  </div>',
-    '  <a href="index.html" class="sidebar-home-btn">',
-    '    <div>',
-    '      <div class="sidebar-home-btn-text">&#127968; Grade 10</div>',
-    '      <div class="sidebar-home-btn-sub">Back to dashboard</div>',
-    '    </div>',
-    '  </a>',
-    '  <div class="sidebar-divider"></div>',
-    '  <div class="sidebar-section">',
-    '    <div class="sidebar-section-label">&#128200; My Space</div>',
-    '    <a href="dashboard.html" class="sidebar-item" data-page="dashboard"><div class="sidebar-item-icon" style="background:rgba(37,99,235,0.2)">ST</div><div class="sidebar-item-name">My Statistics</div></a>',
-    '    <a href="strikes.html" class="sidebar-item" data-page="strikes"><div class="sidebar-item-icon" style="background:rgba(239,68,68,0.2)">WR</div><div class="sidebar-item-name">My Strikes</div></a>',
-    '    <a href="../quiz.html" class="sidebar-item" data-page="activities"><div class="sidebar-item-icon" style="background:rgba(124,58,237,0.2)">QZ</div><div class="sidebar-item-name">Class Activities</div></a>',
-    '  </div>',
-    '  <div class="sidebar-divider"></div>',
-    '  <div class="sidebar-section">',
-    '    <div class="sidebar-section-label">&#128194; Documents</div>',
-    '    <a href="lessons.html" class="sidebar-item" data-page="lessons"><div class="sidebar-item-icon" style="background:rgba(37,99,235,0.2)">&#128209;</div><div class="sidebar-item-name">Lesson Materials</div></a>',
-    '    <a href="session.html" class="sidebar-item" data-page="session"><div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#128214;</div><div class="sidebar-item-name">Reading</div></a>',
-    '    <a href="assignments.html" class="sidebar-item" data-page="assignments"><div class="sidebar-item-icon" style="background:rgba(59,130,246,0.2)">&#128203;</div><div class="sidebar-item-name">Assignments</div></a>',
-    '    <a href="submission.html" class="sidebar-item" data-page="submission"><div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#128221;</div><div class="sidebar-item-name">Submission</div></a>',
-    '  </div>',
-    '  <div class="sidebar-divider"></div>',
-    '  <div class="sidebar-section">',
-    '    <div class="sidebar-section-label">&#128101; Student Data</div>',
-    '    <a href="students.html" class="sidebar-item" data-page="students"><div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">&#127891;</div><div class="sidebar-item-name">Student List</div></a>',
-    '    <a href="attendance.html" class="sidebar-item" data-page="attendance"><div class="sidebar-item-icon" style="background:rgba(20,184,166,0.2)">&#9989;</div><div class="sidebar-item-name">Attendance</div></a>',
-    '    <a href="scores.html" class="sidebar-item" data-page="scores"><div class="sidebar-item-icon" style="background:rgba(249,115,22,0.2)">&#127942;</div><div class="sidebar-item-name">Student Scores</div></a>',
-    '    <a href="tasks.html" class="sidebar-item" data-page="tasks"><div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">&#128204;</div><div class="sidebar-item-name">Task Status</div></a>',
-    '    <a href="activeness.html" class="sidebar-item" data-page="activeness"><div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">&#9889;</div><div class="sidebar-item-name">Activeness</div></a>',
-    '  </div>',
-    '</nav>'
-  ].join('\n');
+  function detectGrade() {
+    if (grade) return grade;
+    if (location.pathname.indexOf('/grade11/') !== -1) return '11';
+    return '10';
+  }
 
-  /* Keep shared sidebars consistent on secondary student pages. */
-  var style = document.createElement('style');
-  style.textContent =
-    '.sidebar { display:flex !important; flex-direction:column !important; overflow-y:auto !important; }' +
-    '#hamburgerBtn { width:92px !important; min-width:92px !important; height:42px !important; align-items:flex-start !important; padding:0 14px !important; border-radius:999px !important; position:absolute !important; }' +
-    '#hamburgerBtn::after { content:"Menu"; position:absolute; right:14px; top:50%; transform:translateY(-50%); color:#fff; font:700 0.82rem "IBM Plex Sans", sans-serif; }' +
-    '#hamburgerBtn.open::after { content:"Close"; }' +
-    '#hamburgerBtn span { margin-left:0 !important; }';
-  document.head.appendChild(style);
+  function icon(name) {
+    return '<i data-lucide="' + name + '"></i>';
+  }
 
-  document.addEventListener('DOMContentLoaded', function () {
-    /* Skip if page already has its own sidebar (index.html) */
-    if (document.getElementById('sidebar')) return;
+  function ensureIcons() {
+    if (window.lucide) {
+      window.lucide.createIcons();
+      return;
+    }
+    var script = document.createElement('script');
+    script.src = 'https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js';
+    script.onload = function () { window.lucide.createIcons(); };
+    document.head.appendChild(script);
+  }
 
-    var wrap = document.createElement('div');
-    wrap.innerHTML = HTML;
-    while (wrap.firstChild) document.body.appendChild(wrap.firstChild);
+  function navItem(page, href, iconName, name, current) {
+    var active = page === current ? ' class="active"' : '';
+    return '<a' + active + ' href="' + href + '">' + icon(iconName) + '<span>' + name + '</span></a>';
+  }
 
-    /* Set active nav item */
-    var page = document.body.getAttribute('data-page') || '';
-    document.querySelectorAll('.sidebar-item[data-page]').forEach(function (el) {
-      el.classList.toggle('active', el.getAttribute('data-page') === page);
-    });
-  });
+  function shellMarkup() {
+    var filePage = (location.pathname.split('/').pop() || 'index.html').replace('.html', '');
+    var current = document.body.getAttribute('data-page') || (filePage === 'index' ? 'home' : filePage);
+    var currentGrade = detectGrade();
+    var classes = currentGrade === '11' ? ['XIF7', 'XIF8', 'XIF9'] : ['XE1', 'XE2', 'XE3', 'XE4', 'XE5'];
+    var activities = currentGrade === '10' ? navItem('activities', '../quiz.html', 'gamepad-2', 'Class Activities', current) : '';
+    var nav = [
+      navItem('home', 'index.html', 'house', 'Homepage', current),
+      navItem('dashboard', 'dashboard.html', 'chart-no-axes-column-increasing', 'My Dashboard', current),
+      navItem('profile', 'index.html#profile', 'user-round', 'My Profile', current),
+      navItem('lessons', 'lessons.html', 'book-open', 'Lesson Materials', current),
+      navItem('assignments', 'assignments.html', 'clipboard-list', 'Assignments', current),
+      navItem('submission', 'submission.html', 'file-up', 'Submission', current),
+      navItem('session', 'session.html', 'book-marked', 'Reading', current),
+      activities,
+      navItem('attendance', 'attendance.html', 'calendar-check', 'Attendance', current),
+      navItem('scores', 'scores.html', 'trophy', 'Student Scores', current),
+      navItem('tasks', 'tasks.html', 'list-checks', 'Task Status', current),
+      navItem('students', 'students.html', 'users-round', 'Student List', current),
+      navItem('activeness', 'activeness.html', 'zap', 'Activeness', current),
+      navItem('strikes', 'strikes.html', 'shield-alert', 'My Strikes', current)
+    ].join('');
+    var classLinks = classes.map(function (classId) {
+      return '<a href="students.html?class=' + classId + '">' + icon('graduation-cap') + '<span>' + classId + '</span></a>';
+    }).join('');
+
+    return [
+      '<aside class="dashboard-sidebar student-app-sidebar" id="dashboardSidebar">',
+      '  <a class="sidebar-brand" href="index.html"><span class="brand-mark">' + icon('graduation-cap') + '</span><span>English Quest</span></a>',
+      '  <div class="sidebar-label">Grade ' + (currentGrade === '11' ? 'XI' : 'X') + ' Student</div>',
+      '  <nav class="primary-nav" aria-label="Student navigation">' + nav + '</nav>',
+      '  <section class="class-nav"><div class="sidebar-label">Classes <span>(' + classes.length + ')</span></div>' + classLinks + '</section>',
+      '  <div class="sidebar-footer">',
+      '    <a href="../index.html">' + icon('layers') + '<span>Choose Grade</span></a>',
+      '    <button type="button" onclick="studentShellLogout()">' + icon('log-out') + '<span>Logout / Change Name</span></button>',
+      '  </div>',
+      '</aside>',
+      '<div class="mobile-backdrop" id="mobileBackdrop" onclick="closeSidebar()"></div>'
+    ].join('');
+  }
+
+  function addMobileButton() {
+    var topbar = document.querySelector('.topbar');
+    if (!topbar || topbar.querySelector('.student-shell-mobile-button')) return;
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'student-shell-mobile-button';
+    button.setAttribute('aria-label', 'Open navigation');
+    button.innerHTML = icon('menu');
+    button.onclick = window.toggleSidebar;
+    topbar.insertBefore(button, topbar.firstChild);
+  }
 
   window.toggleSidebar = function () {
-    var sb = document.getElementById('sidebar');
-    var ov = document.getElementById('sidebarOverlay');
-    var hb = document.getElementById('hamburgerBtn');
-    if (!sb) return;
-    var open = sb.classList.toggle('open');
-    if (ov) ov.classList.toggle('open', open);
-    if (hb) hb.classList.toggle('open', open);
-    document.body.style.overflow = open ? 'hidden' : '';
-    var page = document.body.getAttribute('data-page') || '';
-    document.querySelectorAll('.sidebar-item[data-page]').forEach(function (el) {
-      el.classList.toggle('active', el.getAttribute('data-page') === page);
-    });
+    document.getElementById('dashboardSidebar').classList.add('open');
+    document.getElementById('mobileBackdrop').classList.add('open');
   };
 
   window.closeSidebar = function () {
-    var sb = document.getElementById('sidebar');
-    var ov = document.getElementById('sidebarOverlay');
-    var hb = document.getElementById('hamburgerBtn');
-    if (sb) sb.classList.remove('open');
-    if (ov) ov.classList.remove('open');
-    if (hb) hb.classList.remove('open');
-    document.body.style.overflow = '';
+    document.getElementById('dashboardSidebar').classList.remove('open');
+    document.getElementById('mobileBackdrop').classList.remove('open');
   };
 
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') window.closeSidebar();
+  window.studentShellLogout = function () {
+    ['eq_student_class', 'eq_student_no', 'eq_student_name'].forEach(function (key) {
+      localStorage.removeItem(key);
+    });
+    location.href = 'index.html';
+  };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    document.body.classList.add('student-shell-enabled');
+    if (!document.getElementById('dashboardSidebar')) {
+      document.body.insertAdjacentHTML('afterbegin', shellMarkup());
+    }
+    addMobileButton();
+    ensureIcons();
   });
 
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') window.closeSidebar();
+  });
 })();

@@ -812,6 +812,172 @@ svg { width: 19px; height: 19px; stroke-width: 1.9; }
   cursor: pointer;
 }
 
+/* Shared student-page shell */
+.student-shell-enabled {
+  min-height: 100vh;
+  background: var(--paper);
+}
+
+.student-shell-enabled.grade11-page {
+  --blue: #0f8a78;
+  --blue-soft: #e5f7f3;
+}
+
+.student-shell-enabled .student-app-sidebar .brand-mark {
+  background: var(--blue);
+}
+
+.student-shell-enabled .student-app-sidebar .primary-nav a.active,
+.student-shell-enabled .student-app-sidebar .primary-nav a:hover,
+.student-shell-enabled .student-app-sidebar .class-nav a:hover,
+.student-shell-enabled .student-app-sidebar .sidebar-footer a:hover,
+.student-shell-enabled .student-app-sidebar .sidebar-footer button:hover {
+  background: var(--blue-soft);
+  color: var(--blue);
+}
+
+.student-shell-enabled .student-app-sidebar .primary-nav a.active::before {
+  background: var(--blue);
+}
+
+.student-shell-enabled > .shell,
+.student-shell-enabled > .dashboard-shell,
+.student-shell-enabled > .strikes-shell,
+.student-shell-enabled > header,
+.student-shell-enabled > main,
+.student-shell-enabled > footer {
+  width: auto;
+  margin-left: var(--sidebar-width);
+}
+
+.student-shell-enabled > .shell,
+.student-shell-enabled > .dashboard-shell,
+.student-shell-enabled > .strikes-shell {
+  max-width: none;
+  padding: 20px 28px 42px;
+}
+
+.student-shell-enabled .shell > .topbar,
+.student-shell-enabled .dashboard-shell > .topbar,
+.student-shell-enabled .strikes-shell > .topbar {
+  width: 100%;
+  display: none;
+  margin-bottom: 22px;
+}
+
+.student-shell-enabled > .subpage-header,
+.student-shell-enabled.grade10-subpage > header {
+  min-height: 0;
+  padding: 20px 28px 24px;
+  color: var(--ink);
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+}
+
+.student-shell-enabled .subpage-header .topbar,
+.student-shell-enabled.grade10-subpage > header .topbar {
+  width: 100%;
+  display: none;
+  margin: 0 0 20px;
+}
+
+.student-shell-enabled .subpage-header .brand-title,
+.student-shell-enabled .subpage-header .brand-sub,
+.student-shell-enabled .subpage-header .nav a {
+  color: var(--ink);
+}
+
+.student-shell-enabled .subpage-header .brand-sub { color: var(--muted); }
+
+.student-shell-enabled .subpage-header .nav a {
+  border: 1px solid var(--line);
+  background: #fff;
+}
+
+.student-shell-enabled .subpage-hero {
+  width: 100%;
+  padding: 0;
+}
+
+.student-shell-enabled .subpage-hero h1 {
+  margin: 6px 0 10px;
+  color: var(--ink);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: clamp(1.7rem, 3.5vw, 2.7rem);
+  line-height: 1.08;
+}
+
+.student-shell-enabled .subpage-hero .hero-copy {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.student-shell-enabled.grade10-subpage > main {
+  width: auto;
+  padding: 22px 28px 48px;
+}
+
+.student-shell-enabled .content-section {
+  width: 100%;
+  max-width: none;
+}
+
+.student-shell-enabled .module,
+.student-shell-enabled .profile-card,
+.student-shell-enabled .content-section > article,
+.student-shell-enabled .placeholder-card,
+.student-shell-enabled .placeholder-panel {
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.student-shell-enabled .module {
+  min-height: 155px;
+  padding: 18px;
+}
+
+.student-shell-enabled .module-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+
+.student-shell-enabled .hero-main {
+  min-height: 260px;
+  border-radius: 14px;
+  padding: 28px;
+}
+
+.student-shell-enabled .profile-card {
+  border-radius: 14px;
+}
+
+.student-shell-enabled .section-head {
+  margin-top: 26px;
+}
+
+.student-shell-enabled .section-head h2 {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 1.35rem;
+}
+
+.student-shell-mobile-button {
+  display: none;
+  width: 42px;
+  min-width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+}
+
 @media (max-width: 1180px) {
   .metric-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .class-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -833,6 +999,29 @@ svg { width: 19px; height: 19px; stroke-width: 1.9; }
     margin-left: 0;
   }
   .teacher-shell-mobile-button { display: inline-flex; }
+  .student-shell-enabled > .shell,
+  .student-shell-enabled > .dashboard-shell,
+  .student-shell-enabled > .strikes-shell,
+  .student-shell-enabled > header,
+  .student-shell-enabled > main,
+  .student-shell-enabled > footer {
+    margin-left: 0;
+  }
+  .student-shell-mobile-button { display: inline-flex; }
+  .student-shell-enabled .shell > .topbar,
+  .student-shell-enabled .dashboard-shell > .topbar,
+  .student-shell-enabled .strikes-shell > .topbar,
+  .student-shell-enabled .subpage-header .topbar,
+  .student-shell-enabled.grade10-subpage > header .topbar {
+    display: flex;
+    align-items: center;
+  }
+  .student-shell-enabled .topbar .nav {
+    display: none;
+  }
+  .student-shell-enabled .topbar .brand {
+    margin-right: auto;
+  }
   .teacher-shell-enabled header .topbar {
     align-items: center;
   }
@@ -862,6 +1051,24 @@ svg { width: 19px; height: 19px; stroke-width: 1.9; }
   .class-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .teacher-shell-enabled > header { padding: 14px; }
   .teacher-shell-enabled > main { padding: 14px 14px 36px; }
+  .student-shell-enabled > .shell,
+  .student-shell-enabled > .dashboard-shell,
+  .student-shell-enabled > .strikes-shell {
+    padding: 14px 14px 36px;
+  }
+  .student-shell-enabled > .subpage-header,
+  .student-shell-enabled.grade10-subpage > header {
+    padding: 14px;
+  }
+  .student-shell-enabled.grade10-subpage > main {
+    padding: 18px 14px 36px;
+  }
+  .student-shell-enabled .topbar .nav {
+    display: none;
+  }
+  .student-shell-enabled .hero {
+    grid-template-columns: 1fr;
+  }
   .teacher-shell-enabled header .topbar { margin-bottom: 16px; }
   .teacher-shell-enabled header .nav-actions a { display: none; }
   .teacher-shell-enabled header .nav-actions button {

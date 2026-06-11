@@ -50,7 +50,7 @@ This roadmap keeps the next-year rebuild focused. The goal is one English Quest 
    - Keep next-semester Apps Script in `apps-script-next/`, separate from current-year `apps-script/ScoresAPI.js`.
    - Start with read-only endpoints for active classes, students, profiles, XP, rankings, and student dashboards.
    - Use `getDataReadiness` to check active classes, placeholders, duplicate roster slots, and migration readiness before wiring real grade pages.
-   - Keep preview frontend work in `next-semester/`; real Grade 10, Grade 11, and Teacher pages now link to it as a migration bridge without replacing current behavior.
+   - Keep preview frontend work isolated in `next-semester/`; it is no longer promoted from real Grade X, Grade XI, or Teacher homepages.
    - Use `NEXT_SEMESTER_MIGRATION.md` as the promotion checklist before the preview becomes the real student system.
 
 2. Final launch QA on `next-year`.

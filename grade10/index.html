@@ -7,6 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css"/>
+  <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260611"/>
   <style>
     .profile-login-card {
       align-content: stretch;
@@ -136,6 +137,7 @@
     }
   </style>
   <script src="../shared/js/api.js"></script>
+  <script src="../shared/js/sidebar.js?v=20260611"></script>
 </head>
 <body class="track-page grade10-page">
   <div class="shell">
@@ -150,7 +152,6 @@
       <nav class="nav" aria-label="Main navigation">
         <a href="dashboard.html">My Statistics</a>
         <a href="strikes.html">My Strikes</a>
-        <a href="../next-semester/">Next Preview</a>
         <a href="../index.html">Choose Grade</a>
       </nav>
     </header>
@@ -176,9 +177,8 @@
               <label for="studentClass">Class</label>
               <select id="studentClass">
                 <option value="">Choose class</option>
-                <option>XE1</option><option>XE4</option><option>XE5</option>
-                <option>XE6</option><option>XE7</option><option>XE8</option>
-                <option>XE9</option><option>XE10</option><option>XE11</option>
+                <option>XE1</option><option>XE2</option><option>XE3</option>
+                <option>XE4</option><option>XE5</option>
               </select>
             </div>
             <div class="profile-field">
@@ -299,34 +299,6 @@
         </div>
       </section>
 
-      <section>
-        <div class="section-head">
-          <div>
-            <div class="section-kicker">Next Semester</div>
-            <h2>Preview the new profile system</h2>
-          </div>
-        </div>
-        <div class="module-grid">
-          <a class="module" href="../next-semester/">
-            <div class="module-icon">NS</div>
-            <div class="module-title">Profile Login Preview</div>
-            <p class="module-copy">Test the new master-sheet login flow with template classes and students.</p>
-            <div class="module-link">Open preview -></div>
-          </a>
-          <a class="module green" href="../next-semester/dashboard.html">
-            <div class="module-icon">XP</div>
-            <div class="module-title">Next Dashboard Preview</div>
-            <p class="module-copy">Preview XP, rank, attendance, task, profile, and strike cards from the new API.</p>
-            <div class="module-link">Open dashboard -></div>
-          </a>
-          <a class="module amber" href="../next-semester/teacher.html">
-            <div class="module-icon">TC</div>
-            <div class="module-title">Teacher Console Preview</div>
-            <p class="module-copy">Teacher-only readiness view for the new master spreadsheet system.</p>
-            <div class="module-link">Open console -></div>
-          </a>
-        </div>
-      </section>
     </main>
   </div>
 
