@@ -1,153 +1,123 @@
-/* teacher-sidebar.js - shared navigation for teacher dashboard and manager pages */
+/* Shared teacher app shell for manager pages. */
 (function () {
-  var ITEMS = [
-    { page: 'teacher-home', href: 'index.html', code: 'DB', name: 'Dashboard', section: 'Control Room' },
-    { page: 'materials', href: 'materials.html', code: 'MT', name: 'Materials', section: 'Grade 10 Managers' },
-    { page: 'assignments', href: 'assignments.html', code: 'AS', name: 'Assignments', section: 'Grade 10 Managers' },
-    { page: 'submissions', href: 'submissions.html', code: 'SB', name: 'Submissions', section: 'Grade 10 Managers' },
-    { page: 'attendance', href: 'attendance.html', code: 'AT', name: 'Attendance', section: 'Grade 10 Managers' },
-    { page: 'activeness', href: 'activeness.html', code: 'AC', name: 'Activeness', section: 'Grade 10 Managers' },
-    { page: 'announcements', href: 'announcements.html', code: 'AN', name: 'Announcements', section: 'Grade 10 Managers' },
-    { page: 'scores', href: 'scores.html', code: 'SC', name: 'Scores', section: 'Grade 10 Managers' },
-    { page: 'tasks', href: 'tasks.html', code: 'TS', name: 'Tasks', section: 'Grade 10 Managers' },
-    { page: 'strikes', href: 'strikes.html', code: 'ST', name: 'Strikes', section: 'Grade 10 Managers' }
+  var NAV_ITEMS = [
+    { page: 'teacher-home', href: 'index.html', icon: 'house', name: 'Homepage' },
+    { page: 'scores', href: 'scores.html', icon: 'user-round', name: 'Students & Scores' },
+    { page: 'materials', href: 'materials.html', icon: 'book-open', name: 'Materials' },
+    { page: 'assignments', href: 'assignments.html', icon: 'clipboard-list', name: 'Assignments' },
+    { page: 'tasks', href: 'tasks.html', icon: 'list-checks', name: 'Task Status' },
+    { page: 'submissions', href: 'submissions.html', icon: 'inbox', name: 'Submissions' },
+    { page: 'attendance', href: 'attendance.html', icon: 'calendar-check', name: 'Attendance' },
+    { page: 'activeness', href: 'activeness.html', icon: 'chart-pie', name: 'Activeness' },
+    { page: 'announcements', href: 'announcements.html', icon: 'megaphone', name: 'Announcements' },
+    { page: 'strikes', href: 'strikes.html', icon: 'shield-alert', name: 'Strikes' }
   ];
 
-  var style = document.createElement('style');
-  style.textContent =
-    '#hamburgerBtn.teacher-menu-button { position:relative; z-index:260; width:96px; min-width:96px; height:42px; display:flex; flex-direction:column; align-items:flex-start; justify-content:center; gap:5px; padding:0 14px; border:1.5px solid rgba(255,255,255,0.35); border-radius:999px; background:rgba(255,255,255,0.12); cursor:pointer; }' +
-    '#hamburgerBtn.teacher-menu-button::after { content:"Menu"; position:absolute; right:14px; top:50%; transform:translateY(-50%); color:#fff; font:800 0.82rem "IBM Plex Sans", sans-serif; }' +
-    '#hamburgerBtn.teacher-menu-button.open::after { content:"Close"; }' +
-    '#hamburgerBtn.teacher-menu-button span { display:block; width:18px; height:2px; border-radius:999px; background:#fff; transition:all 0.3s; }' +
-    '#hamburgerBtn.teacher-menu-button.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }' +
-    '#hamburgerBtn.teacher-menu-button.open span:nth-child(2) { opacity:0; }' +
-    '#hamburgerBtn.teacher-menu-button.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }' +
-    '.teacher-sidebar .sidebar-item-icon { background:rgba(37,99,235,0.22); color:#bfdbfe; }' +
-    '.teacher-sidebar .sidebar-item.active .sidebar-item-icon { background:#2563eb; color:#fff; }' +
-    '.teacher-sidebar-quick { display:grid; gap:8px; margin:12px 16px 20px; }' +
-    '.teacher-sidebar-quick a, .teacher-sidebar-quick button { min-height:40px; border:1px solid rgba(255,255,255,0.1); border-radius:12px; background:rgba(255,255,255,0.06); color:#fff; text-decoration:none; font:inherit; font-size:0.82rem; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; }' +
-    '.teacher-sidebar-quick .danger { color:#fecaca; }' +
-    '@media (max-width:760px) { #hamburgerBtn.teacher-menu-button { width:92px; min-width:92px; } }';
-  document.head.appendChild(style);
+  var CLASSES = [
+    { id: 'XE1', href: 'scores.html?class=XE1' },
+    { id: 'XE2', href: 'scores.html?class=XE2' },
+    { id: 'XE3', href: 'scores.html?class=XE3' },
+    { id: 'XE4', href: 'scores.html?class=XE4' },
+    { id: 'XE5', href: 'scores.html?class=XE5' },
+    { id: 'XIF7', href: '../grade11/' },
+    { id: 'XIF8', href: '../grade11/' },
+    { id: 'XIF9', href: '../grade11/' }
+  ];
 
-  function sectionMarkup(sectionName, items) {
-    return [
-      '<div class="sidebar-section">',
-      '  <div class="sidebar-section-label">' + sectionName + '</div>',
-      items.map(function (item) {
-        return '<a href="' + item.href + '" class="sidebar-item" data-page="' + item.page + '">' +
-          '<div class="sidebar-item-icon">' + item.code + '</div>' +
-          '<div class="sidebar-item-name">' + item.name + '</div>' +
-        '</a>';
-      }).join(''),
-      '</div>'
-    ].join('');
-  }
-
-  function buildSidebar() {
-    var sections = [];
-    var grouped = {};
-    ITEMS.forEach(function (item) {
-      grouped[item.section] = grouped[item.section] || [];
-      grouped[item.section].push(item);
-    });
-    Object.keys(grouped).forEach(function (section) {
-      sections.push(sectionMarkup(section, grouped[section]));
-    });
-
-    return [
-      '<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>',
-      '<nav class="sidebar teacher-sidebar" id="sidebar">',
-      '  <div class="sidebar-head">',
-      '    <img class="sidebar-logo" src="../logo.jpg" alt="Logo"/>',
-      '    <div class="sidebar-head-text">',
-      '      <div class="sidebar-head-title">English Quest</div>',
-      '      <div class="sidebar-head-sub">Teacher Control Room</div>',
-      '    </div>',
-      '    <button class="sidebar-close" type="button" onclick="closeSidebar()">&#x2715;</button>',
-      '  </div>',
-      '  <a href="../grade10/" class="sidebar-home-btn">',
-      '    <div>',
-      '      <div class="sidebar-home-btn-text">Grade 10 Student View</div>',
-      '      <div class="sidebar-home-btn-sub">Open the student track</div>',
-      '    </div>',
-      '  </a>',
-      '  <a href="../grade11/" class="sidebar-home-btn">',
-      '    <div>',
-      '      <div class="sidebar-home-btn-text">Grade 11 Preview</div>',
-      '      <div class="sidebar-home-btn-sub">Placeholder track</div>',
-      '    </div>',
-      '  </a>',
-      '  <div class="sidebar-divider"></div>',
-      sections.join('<div class="sidebar-divider"></div>'),
-      '  <div class="sidebar-divider"></div>',
-      '  <div class="teacher-sidebar-quick">',
-      '    <a href="../index.html">Landing Page</a>',
-      '    <button class="danger" type="button" onclick="teacherSidebarLogout()">Logout</button>',
-      '  </div>',
-      '</nav>'
-    ].join('');
-  }
-
-  function ensureMenuButton() {
-    if (document.getElementById('hamburgerBtn')) return;
-    var host = document.querySelector('.nav-actions');
-    if (!host) host = document.querySelector('.topbar') || document.querySelector('.nav') || document.querySelector('header') || document.body;
-    var btn = document.createElement('button');
-    btn.className = 'teacher-menu-button';
-    btn.id = 'hamburgerBtn';
-    btn.type = 'button';
-    btn.setAttribute('aria-label', 'Menu');
-    btn.onclick = window.toggleSidebar;
-    btn.innerHTML = '<span></span><span></span><span></span>';
-    host.appendChild(btn);
-  }
-
-  function setActiveItem() {
-    var page = document.body.getAttribute('data-page') || '';
-    document.querySelectorAll('.sidebar-item[data-page]').forEach(function (el) {
-      el.classList.toggle('active', el.getAttribute('data-page') === page);
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', function () {
-    ensureMenuButton();
-    if (!document.getElementById('sidebar')) {
-      var wrap = document.createElement('div');
-      wrap.innerHTML = buildSidebar();
-      while (wrap.firstChild) document.body.appendChild(wrap.firstChild);
+  function ensureStyles() {
+    if (!document.querySelector('link[href="../shared/css/teacher-dashboard.css"]')) {
+      var link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = '../shared/css/teacher-dashboard.css';
+      document.head.appendChild(link);
     }
-    setActiveItem();
-  });
+  }
 
-  window.toggleSidebar = function () {
-    var sidebar = document.getElementById('sidebar');
-    var overlay = document.getElementById('sidebarOverlay');
-    var button = document.getElementById('hamburgerBtn');
-    if (!sidebar) return;
-    var open = sidebar.classList.toggle('open');
-    if (overlay) overlay.classList.toggle('open', open);
-    if (button) button.classList.toggle('open', open);
-    document.body.style.overflow = open ? 'hidden' : '';
-    setActiveItem();
+  function ensureIcons() {
+    if (window.lucide) {
+      window.lucide.createIcons();
+      return;
+    }
+    var script = document.createElement('script');
+    script.src = 'https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js';
+    script.onload = function () { window.lucide.createIcons(); };
+    document.head.appendChild(script);
+  }
+
+  function icon(name) {
+    return '<i data-lucide="' + name + '"></i>';
+  }
+
+  function navMarkup() {
+    var current = document.body.getAttribute('data-page') || '';
+    return NAV_ITEMS.map(function (item) {
+      var active = item.page === current ? ' class="active"' : '';
+      return '<a' + active + ' href="' + item.href + '">' + icon(item.icon) + '<span>' + item.name + '</span></a>';
+    }).join('');
+  }
+
+  function classMarkup() {
+    return CLASSES.map(function (item) {
+      return '<a href="' + item.href + '">' + icon('graduation-cap') + '<span>' + item.id + '</span></a>';
+    }).join('');
+  }
+
+  function shellMarkup() {
+    return [
+      '<aside class="dashboard-sidebar teacher-manager-sidebar" id="dashboardSidebar">',
+      '  <a class="sidebar-brand" href="index.html"><span class="brand-mark">' + icon('graduation-cap') + '</span><span>English Quest</span></a>',
+      '  <nav class="primary-nav" aria-label="Teacher navigation">' + navMarkup() + '</nav>',
+      '  <section class="class-nav"><div class="sidebar-label">My Classes <span>(8)</span></div>' + classMarkup() + '</section>',
+      '  <div class="sidebar-footer">',
+      '    <a href="../index.html">' + icon('layers') + '<span>Choose Track</span></a>',
+      '    <button type="button" onclick="teacherSidebarLogout()">' + icon('log-out') + '<span>Logout</span></button>',
+      '  </div>',
+      '</aside>',
+      '<div class="mobile-backdrop" id="mobileBackdrop" onclick="closeTeacherShell()"></div>'
+    ].join('');
+  }
+
+  function addMobileButton() {
+    var topbar = document.querySelector('.teacher-tool-page header .topbar');
+    if (!topbar || topbar.querySelector('.teacher-shell-mobile-button')) return;
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'teacher-shell-mobile-button';
+    button.setAttribute('aria-label', 'Open navigation');
+    button.innerHTML = icon('menu');
+    button.onclick = window.openTeacherShell;
+    topbar.insertBefore(button, topbar.firstChild);
+  }
+
+  window.openTeacherShell = function () {
+    document.getElementById('dashboardSidebar').classList.add('open');
+    document.getElementById('mobileBackdrop').classList.add('open');
   };
 
-  window.closeSidebar = function () {
-    var sidebar = document.getElementById('sidebar');
-    var overlay = document.getElementById('sidebarOverlay');
-    var button = document.getElementById('hamburgerBtn');
-    if (sidebar) sidebar.classList.remove('open');
-    if (overlay) overlay.classList.remove('open');
-    if (button) button.classList.remove('open');
-    document.body.style.overflow = '';
+  window.closeTeacherShell = function () {
+    document.getElementById('dashboardSidebar').classList.remove('open');
+    document.getElementById('mobileBackdrop').classList.remove('open');
   };
+
+  window.toggleSidebar = window.openTeacherShell;
+  window.closeSidebar = window.closeTeacherShell;
 
   window.teacherSidebarLogout = function () {
     if (window.EQAuth) EQAuth.logoutTeacher('index.html');
     else window.location.href = 'index.html';
   };
 
+  document.addEventListener('DOMContentLoaded', function () {
+    ensureStyles();
+    document.body.classList.add('teacher-shell-enabled');
+    if (!document.getElementById('dashboardSidebar')) {
+      document.body.insertAdjacentHTML('afterbegin', shellMarkup());
+    }
+    addMobileButton();
+    ensureIcons();
+  });
+
   document.addEventListener('keydown', function (event) {
-    if (event.key === 'Escape') window.closeSidebar();
+    if (event.key === 'Escape') window.closeTeacherShell();
   });
 })();
