@@ -70,7 +70,10 @@ English Quest is being reorganized into three tracks.
 - `shared/js/sidebar.js` - shared sidebar for Grade 10 secondary pages.
 - `shared/js/teacher-sidebar.js` - shared sidebar for teacher dashboard and manager pages.
 - `shared/css/system.css` - shared legacy/content styles used by existing pages.
-- `shared/css/app-shell.css` - universal app-shell layout for Teacher, Grade X, and Grade XI pages.
+- `shared/css/app-shell-20260611.css` - active universal app-shell layout for Teacher, Grade X, and Grade XI pages.
+- `shared/css/system-20260611.css` - active shared content/component styles for app pages.
+- `shared/js/sidebar-20260611.js` and `shared/js/teacher-sidebar-20260611.js` - active student and teacher shell controllers.
+- Older shared stylesheet filenames remain as compatibility assets for cached previews.
 - `shared/css/next-semester.css` - isolated preview styles for the next-semester login and dashboard.
 
 ## Legacy Root Pages
