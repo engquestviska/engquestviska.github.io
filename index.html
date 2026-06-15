@@ -1069,6 +1069,43 @@
       .class-progress-detail-grid { grid-template-columns:1fr; }
     }
 
+    /* END-OF-YEAR FINAL SCORE RANKINGS */
+    .results-section { margin-bottom:26px; }
+    .results-panel { background:#fff; border:1.5px solid var(--border); border-radius:22px; padding:22px; box-shadow:0 14px 36px rgba(91,33,182,0.08); }
+    .results-heading { text-align:center; margin-bottom:20px; }
+    .results-kicker { color:#D99B00; font-size:2.1rem; line-height:1; margin-bottom:8px; }
+    .results-title { font-family:'Playfair Display',serif; color:var(--text-dark); font-size:clamp(1.45rem,4vw,2rem); font-weight:800; }
+    .results-sub { color:var(--text-muted); font-size:0.86rem; margin-top:5px; }
+    .champions-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; align-items:end; min-height:260px; }
+    .champion-card { position:relative; min-width:0; background:#fff; border:1.5px solid #E1E8F5; border-radius:16px 16px 4px 4px; padding:34px 12px 18px; text-align:center; box-shadow:0 12px 28px rgba(30,64,175,0.09); overflow:visible; }
+    .champion-card.rank-1 { min-height:240px; border-bottom:8px solid #F2B600; }
+    .champion-card.rank-2 { min-height:210px; border-bottom:8px solid #9CA3AF; }
+    .champion-card.rank-3 { min-height:190px; border-bottom:8px solid #D97706; }
+    .champion-card.rank-4, .champion-card.rank-5 { min-height:170px; border-bottom:8px solid #3B82F6; }
+    .champion-rank { position:absolute; top:-18px; left:50%; transform:translateX(-50%); width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:900; box-shadow:0 7px 14px rgba(15,23,42,0.18); }
+    .rank-1 .champion-rank { background:#E5A900; } .rank-2 .champion-rank { background:#8B95A5; } .rank-3 .champion-rank { background:#C96B12; } .rank-4 .champion-rank, .rank-5 .champion-rank { background:#2563EB; }
+    .champion-avatar { width:58px; height:58px; border-radius:50%; margin:0 auto 13px; background:#EEF3FA; color:#64748B; display:flex; align-items:center; justify-content:center; font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:800; }
+    .champion-name { color:var(--text-dark); font-size:0.82rem; font-weight:900; line-height:1.25; min-height:2.5em; display:flex; align-items:center; justify-content:center; overflow-wrap:anywhere; }
+    .champion-class { color:var(--text-muted); font-size:0.73rem; margin-top:6px; }
+    .champion-score { color:#2563EB; font-family:'IBM Plex Mono',monospace; font-size:1.25rem; font-weight:900; margin-top:9px; }
+    .ranking-head { display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:16px; }
+    .ranking-tabs { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:16px; }
+    .ranking-tab { border:1.5px solid #DCE4F4; background:#F8FAFC; color:#475569; border-radius:999px; padding:8px 13px; font-family:inherit; font-size:0.76rem; font-weight:800; cursor:pointer; }
+    .ranking-tab.active { background:#2563EB; border-color:#2563EB; color:#fff; }
+    .ranking-list { display:grid; gap:7px; }
+    .ranking-row { display:grid; grid-template-columns:42px minmax(0,1fr) auto; align-items:center; gap:10px; padding:10px 13px; border:1px solid #E5EAF4; border-radius:12px; background:#FBFCFF; }
+    .ranking-position { width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#E8EEFB; color:#1D4ED8; font-family:'IBM Plex Mono',monospace; font-weight:900; font-size:0.76rem; }
+    .ranking-row:nth-child(1) .ranking-position { background:#FEF3C7; color:#A16207; }
+    .ranking-name { min-width:0; color:var(--text-dark); font-size:0.84rem; font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .ranking-score { color:#2563EB; font-family:'IBM Plex Mono',monospace; font-size:0.9rem; font-weight:900; }
+    .results-loading { padding:28px; text-align:center; color:var(--text-muted); font-weight:700; }
+    @media(max-width:760px) {
+      .champions-grid { grid-template-columns:repeat(2,1fr); align-items:stretch; min-height:0; gap:28px 10px; }
+      .champion-card, .champion-card.rank-1, .champion-card.rank-2, .champion-card.rank-3, .champion-card.rank-4, .champion-card.rank-5 { min-height:0; border-bottom-width:6px; }
+      .champion-card.rank-1 { grid-column:1 / -1; width:min(240px,100%); justify-self:center; grid-row:1; }
+      .ranking-head { flex-direction:column; }
+    }
+
 
     /* STRIKE WARNING ON GREETING */
     .student-greeting.has-strike { background: linear-gradient(135deg, rgba(239,68,68,0.25), rgba(220,38,38,0.2)); border-color: rgba(239,68,68,0.5); }
@@ -1358,28 +1395,14 @@
   var wrap = document.createElement('div');
   wrap.style.cssText = 'display:grid;gap:12px;margin-bottom:20px;';
 
-  var scoreCard = document.createElement('div');
-  scoreCard.style.cssText = 'background:linear-gradient(135deg,#7C3AED,#4C1D95);border-radius:20px;padding:18px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:0 8px 24px rgba(124,58,237,0.25);';
-  scoreCard.innerHTML =
-    '<div style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-family:serif;font-weight:800;font-size:1.2rem;color:#fff;flex-shrink:0;">' + name.charAt(0) + '</div>' +
-    '<div style="flex:1;">' +
-      '<div style="font-size:0.72rem;color:rgba(255,255,255,0.65);font-family:monospace;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">My Scores</div>' +
-      '<div style="font-weight:700;font-size:1rem;color:#fff;">' + name.split(' ').slice(0,2).join(' ') + '</div>' +
-      '<div style="font-size:0.78rem;color:rgba(255,255,255,0.65);">' + (clsLabels[cls] || cls) + ' · Tap to view your scores</div>' +
-    '</div>' +
-    '<div style="font-size:1.3rem;color:rgba(255,255,255,0.5);">›</div>';
-  scoreCard.onclick = function() { window.location.href = 'scores.html'; };
-
-  wrap.appendChild(scoreCard);
-
   var finalCard = document.createElement('div');
   finalCard.style.cssText = 'background:linear-gradient(135deg,#2563EB,#7C3AED);border-radius:20px;padding:18px 20px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:0 8px 24px rgba(37,99,235,0.20);';
   finalCard.innerHTML =
     '<div style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#fff;flex-shrink:0;">📈</div>' +
     '<div style="flex:1;">' +
       '<div style="font-size:0.72rem;color:rgba(255,255,255,0.65);font-family:monospace;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">Final Score</div>' +
-      '<div style="font-weight:700;font-size:1rem;color:#fff;">Semester Comparison</div>' +
-      '<div style="font-size:0.78rem;color:rgba(255,255,255,0.65);">' + (clsLabels[cls] || cls) + ' · Sem 1 vs Sem 2</div>' +
+      '<div style="font-weight:700;font-size:1rem;color:#fff;">' + name.split(' ').slice(0,2).join(' ') + '</div>' +
+      '<div style="font-size:0.78rem;color:rgba(255,255,255,0.65);">' + (clsLabels[cls] || cls) + ' · View semester comparison</div>' +
     '</div>' +
     '<div style="font-size:1.3rem;color:rgba(255,255,255,0.5);">›</div>';
   finalCard.onclick = function() {
@@ -1599,6 +1622,169 @@
 })();
 </script>
 
+<script>
+// FINAL SCORE SEM 2 RANKINGS
+(function() {
+  var SCORE_SHEET_ID = '1UjlcC2zOy5usrkzwL1gqgt3BDfNFb-heak-jdeIxIcM';
+  var CLASSES = ['XE1','XE4','XE5','XE6','XE7','XE8','XE9','XE10','XE11'];
+  var LABELS = { XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
+  var allFinalScores = [];
+  var selectedRankClass = 'XE1';
+
+  window.loadFinalRankings = function() {
+    var champions = document.getElementById('championsContent');
+    var list = document.getElementById('classRankingContent');
+    if (champions) champions.innerHTML = '<div class="results-loading" style="grid-column:1/-1">Loading semester champions...</div>';
+    if (list) list.innerHTML = '<div class="results-loading">Loading class rankings...</div>';
+    Promise.all(CLASSES.map(loadFinalClass)).then(function(groups) {
+      allFinalScores = groups.reduce(function(items, group) { return items.concat(group); }, []);
+      renderChampions();
+      renderRankingTabs();
+      renderClassRanking(selectedRankClass);
+    }).catch(function() {
+      if (champions) champions.innerHTML = '<div class="results-loading" style="grid-column:1/-1">Could not load final scores. Please refresh.</div>';
+      if (list) list.innerHTML = '<div class="results-loading">Could not load class rankings.</div>';
+    });
+  };
+
+  window.selectRankClass = function(cls) {
+    selectedRankClass = cls;
+    renderRankingTabs();
+    renderClassRanking(cls);
+  };
+
+  function loadFinalClass(cls) {
+    return loadSheet(cls).then(function(rows) {
+      return rows.map(function(row) {
+        return { className:cls, name:field(row,'Name'), score:numberValue(field(row,'Final Score Sem 2')) };
+      }).filter(function(row) { return row.name && row.score !== null; });
+    });
+  }
+
+  function loadSheet(sheetName) {
+    return new Promise(function(resolve, reject) {
+      var cb = 'final_rank_' + sheetName + '_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+      var script = document.createElement('script');
+      window[cb] = function(payload) {
+        delete window[cb];
+        if (script.parentNode) script.parentNode.removeChild(script);
+        try {
+          var table = payload && payload.table ? payload.table : { cols:[], rows:[] };
+          var matrix = [table.cols.map(function(col) { return cleanHeader(col.label || col.id); })];
+          table.rows.forEach(function(row) {
+            matrix.push(table.cols.map(function(_, index) {
+              var cell = row.c && row.c[index] ? row.c[index] : null;
+              return cell && cell.v != null ? cell.v : '';
+            }));
+          });
+          var headerIndex = matrix.findIndex(function(row) {
+            var h = row.map(function(value) { return cleanHeader(value).toLowerCase(); });
+            return h.indexOf('name') !== -1 && h.indexOf('final score sem 2') !== -1;
+          });
+          if (headerIndex < 0) throw new Error('Headers not found');
+          var headers = matrix[headerIndex].map(cleanHeader);
+          resolve(matrix.slice(headerIndex + 1).map(function(values) {
+            var item = {};
+            headers.forEach(function(header,index) { item[header] = values[index] == null ? '' : values[index]; });
+            return item;
+          }));
+        } catch(err) { reject(err); }
+      };
+      script.onerror = function() { delete window[cb]; reject(new Error('Network error')); };
+      script.src = 'https://docs.google.com/spreadsheets/d/' + SCORE_SHEET_ID + '/gviz/tq?' +
+        new URLSearchParams({ sheet:sheetName, tqx:'out:json;responseHandler:' + cb, t:Date.now() }).toString();
+      document.body.appendChild(script);
+    });
+  }
+
+  function renderChampions() {
+    var el = document.getElementById('championsContent');
+    if (!el) return;
+    var top = sorted(allFinalScores).slice(0,5);
+    var displayOrder = [top[3], top[1], top[0], top[2], top[4]].filter(Boolean);
+    el.innerHTML = displayOrder.map(function(student) {
+      var rank = top.indexOf(student) + 1;
+      return '<div class="champion-card rank-' + rank + '">' +
+        '<div class="champion-rank">' + rank + '</div>' +
+        '<div class="champion-avatar">' + escapeRank(student.name.charAt(0)) + '</div>' +
+        '<div class="champion-name">' + escapeRank(student.name) + '</div>' +
+        '<div class="champion-class">' + escapeRank(LABELS[student.className] || student.className) + '</div>' +
+        '<div class="champion-score">' + formatRankScore(student.score) + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function renderRankingTabs() {
+    var el = document.getElementById('classRankingTabs');
+    if (!el) return;
+    el.innerHTML = CLASSES.map(function(cls) {
+      return '<button class="ranking-tab' + (cls === selectedRankClass ? ' active' : '') + '" onclick="selectRankClass(\'' + cls + '\')">' + LABELS[cls] + '</button>';
+    }).join('');
+  }
+
+  function renderClassRanking(cls) {
+    var title = document.getElementById('classRankingTitle');
+    var el = document.getElementById('classRankingContent');
+    if (title) title.textContent = (LABELS[cls] || cls) + ' Final Score Ranking';
+    if (!el) return;
+    var rows = sorted(allFinalScores.filter(function(student) { return student.className === cls; }));
+    el.innerHTML = rows.length ? rows.map(function(student,index) {
+      return '<div class="ranking-row"><div class="ranking-position">' + (index + 1) + '</div>' +
+        '<div class="ranking-name">' + escapeRank(student.name) + '</div>' +
+        '<div class="ranking-score">' + formatRankScore(student.score) + '</div></div>';
+    }).join('') : '<div class="results-loading">No final scores available for this class.</div>';
+  }
+
+  function sorted(rows) {
+    return rows.slice().sort(function(a,b) { return b.score - a.score || a.name.localeCompare(b.name); });
+  }
+  function field(row,name) {
+    var key = Object.keys(row).find(function(item) { return item.toLowerCase() === name.toLowerCase(); });
+    return key ? row[key] : '';
+  }
+  function cleanHeader(value) { return String(value || '').trim().replace(/\s+/g,' '); }
+  function numberValue(value) {
+    if (value === '' || value === null || value === undefined || value === '-') return null;
+    var n = Number(value);
+    return isNaN(n) ? null : n;
+  }
+  function formatRankScore(value) { return Number(value).toFixed(2).replace(/\.00$/,'').replace(/(\.\d)0$/,'$1'); }
+  function escapeRank(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g,function(ch) {
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[ch];
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',window.loadFinalRankings);
+  else window.loadFinalRankings();
+})();
+</script>
+
+  <div class="results-section">
+    <div class="results-panel">
+      <div class="results-heading">
+        <div class="results-kicker">&#127942;</div>
+        <div class="results-title">Champions of the Semester</div>
+        <div class="results-sub">Top 5 Final Score Sem 2 across all classes.</div>
+      </div>
+      <div id="championsContent" class="champions-grid"><div class="results-loading" style="grid-column:1/-1">Loading semester champions...</div></div>
+    </div>
+  </div>
+
+  <div class="results-section">
+    <div class="results-panel">
+      <div class="ranking-head">
+        <div>
+          <div class="class-progress-title" id="classRankingTitle">X E-1 Final Score Ranking</div>
+          <div class="class-progress-sub">Live ranking based only on Final Score Sem 2.</div>
+        </div>
+        <button class="class-progress-refresh" onclick="loadFinalRankings()">Refresh</button>
+      </div>
+      <div id="classRankingTabs" class="ranking-tabs"></div>
+      <div id="classRankingContent" class="ranking-list"><div class="results-loading">Loading class rankings...</div></div>
+    </div>
+  </div>
+
   <!-- CLASS FINAL SCORE PROGRESS -->
   <div class="class-progress-section" id="classProgressSection">
     <div class="class-progress-card">
@@ -1665,7 +1851,7 @@
   </div>
 
   <!-- DOCUMENTS / FILES -->
-  <div class="section" id="docs">
+  <div class="section visually-removed" id="docs">
     <div class="section-label">Documents & Files</div>
     <div class="section-title">Class Resources</div>
     <div class="card-grid">
@@ -1696,7 +1882,7 @@
   </div>
 
   <!-- STUDENT DATA -->
-  <div class="section" id="students">
+  <div class="section visually-removed" id="students">
     <div class="section-label">Staff & Student Data</div>
     <div class="section-title">Class Members</div>
     <div class="card-grid">
@@ -2643,37 +2829,14 @@ document.addEventListener('keydown', e => {
   </div>
 
   <div class="sidebar-section">
-    <div class="sidebar-section-label">📂 Documents</div>
-    <a href="lessons.html" class="sidebar-item">
-      <div class="sidebar-item-icon" style="background:rgba(124,58,237,0.2)">📑</div>
-      <div class="sidebar-item-name">Lesson Materials</div>
+    <div class="sidebar-section-label">Results</div>
+    <a href="final-score.html" class="sidebar-item">
+      <div class="sidebar-item-icon" style="background:rgba(37,99,235,0.22)">&#127942;</div>
+      <div class="sidebar-item-name">Final Score</div>
     </a>
-  </div>
-
-  <div class="sidebar-divider"></div>
-
-  <div class="sidebar-section">
-    <div class="sidebar-section-label">👥 Student Data</div>
-    <a href="students.html" class="sidebar-item">
-      <div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">👨‍🎓</div>
-      <div class="sidebar-item-name">Student List</div>
-    </a>
-    <a href="scores.html" class="sidebar-item">
-      <div class="sidebar-item-icon" style="background:rgba(249,115,22,0.2)">🏆</div>
-      <div class="sidebar-item-name">Student Scores</div>
-    </a>
-    <a href="tasks.html" class="sidebar-item">
-      <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">✅</div>
-      <div class="sidebar-item-name">Task Status</div>
-    </a>
-    <a href="activeness.html" class="sidebar-item">
-      <div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">⚡</div>
-      <div class="sidebar-item-name">Activeness</div>
-    </a>
-
-    <a href="strikes.html" class="sidebar-item">
-      <div class="sidebar-item-icon" style="background:rgba(220,38,38,0.2)">⚠️</div>
-      <div class="sidebar-item-name">Strikes</div>
+    <a href="#classProgressSection" class="sidebar-item" onclick="closeSidebar()">
+      <div class="sidebar-item-icon" style="background:rgba(16,185,129,0.22)">&#8599;</div>
+      <div class="sidebar-item-name">Class Progress</div>
     </a>
   </div>
 
