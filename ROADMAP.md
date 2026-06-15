@@ -1,5 +1,8 @@
 # English Quest Revamp Roadmap
 
+> Active execution order before official student names arrive:
+> see `PRE_ROSTER_PLAN.md`.
+
 This roadmap keeps the next-year rebuild focused. The goal is one English Quest system with three clean tracks:
 
 - Teacher Dashboard: manage both grades.

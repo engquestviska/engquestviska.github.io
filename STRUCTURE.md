@@ -6,6 +6,7 @@ English Quest is being reorganized into three tracks.
 
 - `index.html` - landing page for Grade 10, Grade 11, and Teacher.
 - `LAUNCH_CHECKLIST.md` - launch readiness checklist before merging `next-year` into `main`.
+- `PRE_ROSTER_PLAN.md` - active development order while official student rosters are unavailable.
 - `NEXT_SEMESTER_API.md` - next-semester spreadsheet/API contract and boundary notes.
 - `NEXT_SEMESTER_MIGRATION.md` - promotion checklist for moving the isolated preview into the real grade pages later.
 - `NEXT_SEMESTER_PROFILE_FORM.md` - next-semester student profile Google Form setup contract.
