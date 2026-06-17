@@ -13,16 +13,22 @@
     { page: 'strikes', href: 'strikes.html', icon: 'shield-alert', name: 'Strikes' }
   ];
 
-  var CLASSES = [
-    { id: 'XE1', href: 'scores.html?class=XE1' },
-    { id: 'XE2', href: 'scores.html?class=XE2' },
-    { id: 'XE3', href: 'scores.html?class=XE3' },
-    { id: 'XE4', href: 'scores.html?class=XE4' },
-    { id: 'XE5', href: 'scores.html?class=XE5' },
-    { id: 'XIF7', href: '../grade11/' },
-    { id: 'XIF8', href: '../grade11/' },
-    { id: 'XIF9', href: '../grade11/' }
-  ];
+  var CLASSES = (window.EQClasses ? window.EQClasses.all : [
+    { id: 'XE1', shortLabel: 'XE1', grade: '10' },
+    { id: 'XE2', shortLabel: 'XE2', grade: '10' },
+    { id: 'XE3', shortLabel: 'XE3', grade: '10' },
+    { id: 'XE4', shortLabel: 'XE4', grade: '10' },
+    { id: 'XE5', shortLabel: 'XE5', grade: '10' },
+    { id: 'XIF7', shortLabel: 'XIF7', grade: '11' },
+    { id: 'XIF8', shortLabel: 'XIF8', grade: '11' },
+    { id: 'XIF9', shortLabel: 'XIF9', grade: '11' }
+  ]).map(function(item) {
+    return {
+      id: item.id,
+      label: item.shortLabel || item.id,
+      href: item.grade === '11' ? '../grade11/' : 'scores.html?class=' + item.id
+    };
+  });
 
   function ensureStyles() {
     if (!document.querySelector('link[href*="shared/css/app-shell-20260611.css"]')) {
@@ -58,7 +64,7 @@
 
   function classMarkup() {
     return CLASSES.map(function (item) {
-      return '<a href="' + item.href + '">' + icon('graduation-cap') + '<span>' + item.id + '</span></a>';
+      return '<a href="' + item.href + '">' + icon('graduation-cap') + '<span>' + item.label + '</span></a>';
     }).join('');
   }
 

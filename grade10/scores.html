@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system-20260611.css"/>
   <link rel="stylesheet" href="../shared/css/app-shell-20260611.css"/>
+  <script src="../shared/js/classes-20260617.js"></script>
   <script src="../shared/js/api.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -434,10 +435,11 @@
 <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
 
 <script>
-const CLASSES = ['XE1','XE4','XE5','XE6','XE7','XE8','XE9','XE10','XE11'];
-const CLASS_LABELS = { XE1:'X E-1', XE4:'X E-4', XE5:'X E-5', XE6:'X E-6', XE7:'X E-7', XE8:'X E-8', XE9:'X E-9', XE10:'X E-10', XE11:'X E-11' };
+const CLASSES = window.EQClasses ? EQClasses.idsForGrade('10') : ['XE1','XE2','XE3','XE4','XE5'];
+const CLASS_LABELS = window.EQClasses ? EQClasses.labels : { XE1:'X E-1', XE2:'X E-2', XE3:'X E-3', XE4:'X E-4', XE5:'X E-5' };
 
 var currentClass   = localStorage.getItem('eq_last_class') || 'XE1';
+if (CLASSES.indexOf(currentClass) === -1) currentClass = 'XE1';
 var allStudents    = [];
 
 

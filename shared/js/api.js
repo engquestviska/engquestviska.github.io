@@ -1,18 +1,20 @@
 /* English Quest shared API helpers */
 (function(global) {
   var API_URL = 'https://script.google.com/macros/s/AKfycbxK9MSUe75KC7xMhZhy-9a4omw9rVf1RugYR72OaGlzuNiKJvS5XRoZRp9hcTzjibHuxg/exec';
-  var CLASS_LABELS = {
+  var classConfig = global.EQClasses || null;
+  var CLASS_LABELS = classConfig ? classConfig.labels : {
     XE1: 'X E-1',
+    XE2: 'X E-2',
+    XE3: 'X E-3',
     XE4: 'X E-4',
     XE5: 'X E-5',
-    XE6: 'X E-6',
-    XE7: 'X E-7',
-    XE8: 'X E-8',
-    XE9: 'X E-9',
-    XE10: 'X E-10',
-    XE11: 'X E-11'
+    XIF7: 'XI F-7',
+    XIF8: 'XI F-8',
+    XIF9: 'XI F-9'
   };
-  var CLASSES = Object.keys(CLASS_LABELS);
+  var CLASSES = classConfig ? classConfig.all.map(function(item) { return item.id; }) : Object.keys(CLASS_LABELS);
+  var GRADE10_CLASSES = classConfig ? classConfig.idsForGrade('10') : ['XE1', 'XE2', 'XE3', 'XE4', 'XE5'];
+  var GRADE11_CLASSES = classConfig ? classConfig.idsForGrade('11') : ['XIF7', 'XIF8', 'XIF9'];
 
   function apiGet(params) {
     var url = API_URL + '?' + new URLSearchParams(params);
@@ -41,6 +43,8 @@
   global.EQApi = {
     url: API_URL,
     classes: CLASSES,
+    grade10Classes: GRADE10_CLASSES,
+    grade11Classes: GRADE11_CLASSES,
     classLabels: CLASS_LABELS,
     get: apiGet
   };

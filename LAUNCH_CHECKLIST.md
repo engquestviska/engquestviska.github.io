@@ -7,7 +7,7 @@ Use this checklist before merging `next-year` into `main`.
 - Grade 10 student pages are the launch baseline: student-facing, read-only where they show class data, and separated from teacher management actions.
 - Teacher management pages live under `teacher/` and use the saved teacher session for write actions.
 - Chapter 5 task-status sync is teacher-authenticated; students can only check received files.
-- Grade 11 pages mirror the Grade 10 structure as placeholders and clear any saved Grade 10 student profile when opened.
+- Grade 11 pages mirror the Grade 10 structure as placeholders and preserve student profile state unless the student explicitly logs out or changes name.
 - `main` is still untouched; merge only when the user explicitly decides the new version should become live.
 
 ## Branch Safety
@@ -28,6 +28,7 @@ Use this checklist before merging `next-year` into `main`.
 - [x] Grade 10 strikes show student warning status only; strike edits stay in `teacher/`.
 - [x] Grade 11 pages remain placeholders until real Grade 11 data exists.
 - [x] Grade 11 pages do not read Grade 10 spreadsheets or APIs.
+- [x] Confirmed class configuration is centralized for `XE1-XE5` and `XIF7-XIF9`.
 
 ## Teacher Track Checks
 

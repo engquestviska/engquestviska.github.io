@@ -481,6 +481,7 @@
       }
     }
   </style>
+  <script src="../shared/js/classes-20260617.js"></script>
   <script src="../shared/js/api.js"></script>
   <script src="../shared/js/sidebar-20260611.js"></script>
 </head>
@@ -616,8 +617,8 @@
 <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
 
 <script>
-const classes    = ["XE-1","XE-4","XE-5","XE-6","XE-7","XE-8","XE-9","XE-10","XE-11"];
-const apiClsMap  = { "XE-1":"XE1","XE-4":"XE4","XE-5":"XE5","XE-6":"XE6","XE-7":"XE7","XE-8":"XE8","XE-9":"XE9","XE-10":"XE10","XE-11":"XE11" };
+const classes    = window.EQClasses ? EQClasses.idsForGrade('10').map(id => EQClasses.shortLabelFor(id).replace(/^XE/, 'XE-')) : ["XE-1","XE-2","XE-3","XE-4","XE-5"];
+const apiClsMap  = { "XE-1":"XE1", "XE-2":"XE2", "XE-3":"XE3", "XE-4":"XE4", "XE-5":"XE5" };
 let totalLoaded  = 0;
 let totalStudents = 0;
 
@@ -677,7 +678,7 @@ function autoOpenSavedStudent() {
   const savedCls  = localStorage.getItem('eq_student_class');
   const savedName = localStorage.getItem('eq_student_name');
   if (savedCls && savedName) {
-    const clsMap = { XE1:'XE-1', XE4:'XE-4', XE5:'XE-5', XE6:'XE-6', XE7:'XE-7', XE8:'XE-8', XE9:'XE-9', XE10:'XE-10', XE11:'XE-11' };
+    const clsMap = { XE1:'XE-1', XE2:'XE-2', XE3:'XE-3', XE4:'XE-4', XE5:'XE-5' };
     openActModal(savedName, clsMap[savedCls] || savedCls);
   }
 }

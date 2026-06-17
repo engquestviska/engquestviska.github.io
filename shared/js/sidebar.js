@@ -32,7 +32,9 @@
     var filePage = (location.pathname.split('/').pop() || 'index.html').replace('.html', '');
     var current = document.body.getAttribute('data-page') || (filePage === 'index' ? 'home' : filePage);
     var currentGrade = detectGrade();
-    var classes = currentGrade === '11' ? ['XIF7', 'XIF8', 'XIF9'] : ['XE1', 'XE2', 'XE3', 'XE4', 'XE5'];
+    var classes = window.EQClasses
+      ? window.EQClasses.idsForGrade(currentGrade)
+      : (currentGrade === '11' ? ['XIF7', 'XIF8', 'XIF9'] : ['XE1', 'XE2', 'XE3', 'XE4', 'XE5']);
     var activities = currentGrade === '10' ? navItem('activities', '../quiz.html', 'gamepad-2', 'Class Activities', current) : '';
     var nav = [
       navItem('home', 'index.html', 'house', 'Homepage', current),
@@ -51,7 +53,8 @@
       navItem('strikes', 'strikes.html', 'shield-alert', 'My Strikes', current)
     ].join('');
     var classLinks = classes.map(function (classId) {
-      return '<a href="students.html?class=' + classId + '">' + icon('graduation-cap') + '<span>' + classId + '</span></a>';
+      var label = window.EQClasses ? window.EQClasses.shortLabelFor(classId) : classId;
+      return '<a href="students.html?class=' + classId + '">' + icon('graduation-cap') + '<span>' + label + '</span></a>';
     }).join('');
 
     return [
