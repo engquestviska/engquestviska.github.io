@@ -65,7 +65,7 @@ English Quest is being reorganized into three tracks.
 
 - `shared/js/api.js` - shared Apps Script API helper and class labels.
 - `shared/js/classes-20260617.js` - canonical class configuration for confirmed Grade X and Grade XI classes.
-- `shared/js/auth.js` - shared teacher session helpers.
+- `shared/js/auth.js` - shared teacher session helpers with backend verification before teacher panels open.
 - `shared/js/attendance.js` - shared Grade 10 attendance API helper.
 - `shared/js/next-semester-api.js` - isolated client for the next-semester Apps Script deployment.
 - `shared/js/next-semester-profile.js` - next-semester preview profile storage helper.

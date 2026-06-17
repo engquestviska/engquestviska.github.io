@@ -214,7 +214,7 @@
     </section>
   </main>
 
-  <section class="login-gate" id="loginGate" hidden>
+  <section class="login-gate" id="loginGate">
     <form class="login-card" onsubmit="teacherLogin(event)">
       <span class="login-mark"><i data-lucide="graduation-cap"></i></span>
       <h2>Teacher Login</h2>
@@ -264,6 +264,7 @@
       }).then(function(hashed) {
         localStorage.setItem('eq_tu', username);
         localStorage.setItem('eq_tp', hashed);
+        EQAuth.markTeacherVerified(username);
         displayTeacher(username);
         hideLogin();
       }).catch(function(error) {
@@ -285,8 +286,13 @@
       }
       displayTeacher(teacher.username);
       EQApi.get({ action: 'checkLogin', username: teacher.username, password: teacher.password }).then(function(data) {
-        if (data && data.ok) hideLogin();
-        else showLogin('Your teacher session expired. Please log in again.');
+        if (data && data.ok) {
+          EQAuth.markTeacherVerified(teacher.username);
+          hideLogin();
+        } else {
+          EQAuth.logoutTeacher();
+          showLogin('Your teacher session expired. Please log in again.');
+        }
       }).catch(function() {
         showLogin('Could not verify your teacher session.');
       });

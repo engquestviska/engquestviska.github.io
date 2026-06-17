@@ -33,11 +33,13 @@ Use this checklist before merging `next-year` into `main`.
 ## Teacher Track Checks
 
 - [x] Teacher dashboard login works against the deployed Scores API.
+- [x] Teacher manager pages verify saved sessions with the backend before showing management panels.
 - [x] Teacher dashboard links open each Grade 10 manager.
 - [x] Teacher manager pages stay inside `teacher/`.
 - [x] Teacher-only actions are not linked from student pages.
 - [x] Materials and assignments can be managed from teacher pages only.
 - [x] Scores, task status, strikes, submissions, attendance, activeness, and announcements are checked from the teacher route.
+- [x] Browser storage is treated as convenience only; Apps Script credential checks remain the authority for protected writes.
 
 ## Legacy Route Checks
 
