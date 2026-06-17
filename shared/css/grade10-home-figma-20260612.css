@@ -60,11 +60,11 @@
 
 .grade10-page.student-shell-enabled .primary-nav a:nth-child(1)::before { content: "1"; }
 .grade10-page.student-shell-enabled .primary-nav a:nth-child(2)::before { content: "2"; }
-.grade10-page.student-shell-enabled .primary-nav a:nth-child(11)::before { content: "3"; }
-.grade10-page.student-shell-enabled .primary-nav a:nth-child(6)::before { content: "4"; }
-.grade10-page.student-shell-enabled .primary-nav a:nth-child(4)::before { content: "5"; }
-.grade10-page.student-shell-enabled .primary-nav a:nth-child(5)::before { content: "6"; }
-.grade10-page.student-shell-enabled .primary-nav a:nth-child(14)::before { content: "7"; }
+.grade10-page.student-shell-enabled .primary-nav a:nth-child(3)::before { content: "3"; }
+.grade10-page.student-shell-enabled .primary-nav a:nth-child(4)::before { content: "4"; }
+.grade10-page.student-shell-enabled .primary-nav a:nth-child(5)::before { content: "5"; }
+.grade10-page.student-shell-enabled .primary-nav a:nth-child(6)::before { content: "6"; }
+.grade10-page.student-shell-enabled .primary-nav a:nth-child(11)::before { content: "7"; }
 
 .grade10-page.student-shell-enabled .primary-nav a svg {
   display: none;
@@ -75,50 +75,34 @@
   color: #1760ed;
 }
 
-.grade10-page.student-shell-enabled .primary-nav a:nth-child(3),
 .grade10-page.student-shell-enabled .primary-nav a:nth-child(7),
 .grade10-page.student-shell-enabled .primary-nav a:nth-child(8),
 .grade10-page.student-shell-enabled .primary-nav a:nth-child(9),
-.grade10-page.student-shell-enabled .primary-nav a:nth-child(10),
-.grade10-page.student-shell-enabled .primary-nav a:nth-child(12),
-.grade10-page.student-shell-enabled .primary-nav a:nth-child(13) {
+.grade10-page.student-shell-enabled .primary-nav a:nth-child(10) {
   display: none;
 }
 
 .grade10-page.student-shell-enabled .primary-nav a:nth-child(1) { order: 1; }
 .grade10-page.student-shell-enabled .primary-nav a:nth-child(2) { order: 2; }
-.grade10-page.student-shell-enabled .primary-nav a:nth-child(11) { order: 3; }
-.grade10-page.student-shell-enabled .primary-nav a:nth-child(6) { order: 4; }
-.grade10-page.student-shell-enabled .primary-nav a:nth-child(4) { order: 5; }
-.grade10-page.student-shell-enabled .primary-nav a:nth-child(5) { order: 6; }
-.grade10-page.student-shell-enabled .primary-nav a:nth-child(14) { order: 7; }
+.grade10-page.student-shell-enabled .primary-nav a:nth-child(3) { order: 3; }
+.grade10-page.student-shell-enabled .primary-nav a:nth-child(4) { order: 4; }
+.grade10-page.student-shell-enabled .primary-nav a:nth-child(5) { order: 5; }
+.grade10-page.student-shell-enabled .primary-nav a:nth-child(6) { order: 6; }
+.grade10-page.student-shell-enabled .primary-nav a:nth-child(11) { order: 7; }
 
-.grade10-page.student-shell-enabled .class-nav {
+.grade10-page.student-shell-enabled .student-profile-nav {
   margin-top: 28px;
 }
 
-.grade10-page.student-shell-enabled .class-nav .sidebar-label {
+.grade10-page.student-shell-enabled .student-profile-nav .sidebar-label {
   padding: 0 10px 8px;
   color: var(--g10-muted);
   font-size: 0.62rem;
 }
 
-.grade10-page.student-shell-enabled .class-nav .sidebar-label {
-  font-size: 0;
-}
-
-.grade10-page.student-shell-enabled .class-nav .sidebar-label::before {
-  content: "My Class";
-  font-size: 0.62rem;
-}
-
-.grade10-page.student-shell-enabled .class-nav a {
-  display: none;
-}
-
-.grade10-page.student-shell-enabled .class-nav a:first-of-type {
+.grade10-page.student-shell-enabled .student-profile-link {
   display: flex;
-  min-height: 38px;
+  min-height: 48px;
   border-radius: 8px;
   background: #e7efff;
   color: #1760ed;

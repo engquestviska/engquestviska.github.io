@@ -28,41 +28,65 @@
     return '<a' + active + ' href="' + href + '">' + icon(iconName) + '<span>' + name + '</span></a>';
   }
 
+  function getStudentProfile(currentGrade) {
+    var classId = localStorage.getItem('eq_student_class') || '';
+    var studentNo = localStorage.getItem('eq_student_no') || '';
+    var studentName = localStorage.getItem('eq_student_name') || '';
+    var savedGrade = localStorage.getItem('eq_grade') || currentGrade;
+    var classGrade = window.EQClasses ? window.EQClasses.gradeFor(classId) : savedGrade;
+    var hasMatchingClass = classId && classGrade === currentGrade;
+    return {
+      classId: hasMatchingClass ? classId : '',
+      studentNo: hasMatchingClass ? studentNo : '',
+      studentName: hasMatchingClass ? studentName : ''
+    };
+  }
+
+  function classDisplay(classId) {
+    return window.EQClasses ? window.EQClasses.labelFor(classId) : classId;
+  }
+
+  function profileMarkup(currentGrade) {
+    var profile = getStudentProfile(currentGrade);
+    var classText = profile.classId ? classDisplay(profile.classId) : 'Choose your class';
+    var detailText = profile.studentName && profile.studentNo
+      ? profile.studentName + ' · No. ' + profile.studentNo
+      : 'Login on the homepage';
+    return [
+      '<section class="student-profile-nav" aria-label="Current student profile">',
+      '  <div class="sidebar-label">My Class</div>',
+      '  <a href="index.html#profile" class="student-profile-link">',
+      '    <span class="student-profile-icon">' + icon('id-card') + '</span>',
+      '    <span><strong id="studentSidebarClass">' + classText + '</strong><small id="studentSidebarDetail">' + detailText + '</small></span>',
+      '  </a>',
+      '</section>'
+    ].join('');
+  }
+
   function shellMarkup() {
     var filePage = (location.pathname.split('/').pop() || 'index.html').replace('.html', '');
     var current = document.body.getAttribute('data-page') || (filePage === 'index' ? 'home' : filePage);
     var currentGrade = detectGrade();
-    var classes = window.EQClasses
-      ? window.EQClasses.idsForGrade(currentGrade)
-      : (currentGrade === '11' ? ['XIF7', 'XIF8', 'XIF9'] : ['XE1', 'XE2', 'XE3', 'XE4', 'XE5']);
-    var activities = currentGrade === '10' ? navItem('activities', '../quiz.html', 'gamepad-2', 'Class Activities', current) : '';
     var nav = [
       navItem('home', 'index.html', 'house', 'Homepage', current),
-      navItem('dashboard', 'dashboard.html', 'chart-no-axes-column-increasing', 'My Dashboard', current),
-      navItem('profile', 'index.html#profile', 'user-round', 'My Profile', current),
-      navItem('lessons', 'lessons.html', 'book-open', 'Lesson Materials', current),
-      navItem('assignments', 'assignments.html', 'clipboard-list', 'Assignments', current),
+      navItem('dashboard', 'dashboard.html', 'chart-no-axes-column-increasing', 'My Statistics', current),
+      navItem('tasks', 'tasks.html', 'list-checks', 'Tasks', current),
       navItem('submission', 'submission.html', 'file-up', 'Submission', current),
+      navItem('lessons', 'lessons.html', 'book-open', 'Materials', current),
       navItem('session', 'session.html', 'book-marked', 'Reading', current),
-      activities,
       navItem('attendance', 'attendance.html', 'calendar-check', 'Attendance', current),
-      navItem('scores', 'scores.html', 'trophy', 'Student Scores', current),
-      navItem('tasks', 'tasks.html', 'list-checks', 'Task Status', current),
-      navItem('students', 'students.html', 'users-round', 'Student List', current),
-      navItem('activeness', 'activeness.html', 'zap', 'Activeness', current),
-      navItem('strikes', 'strikes.html', 'shield-alert', 'My Strikes', current)
+      navItem('scores', 'scores.html', 'trophy', 'Scores', current),
+      navItem('students', 'students.html', 'users-round', 'Classmates', current),
+      navItem('activeness', 'activeness.html', 'zap', 'Participation', current),
+      navItem('strikes', 'strikes.html', 'shield-alert', 'Strikes', current)
     ].join('');
-    var classLinks = classes.map(function (classId) {
-      var label = window.EQClasses ? window.EQClasses.shortLabelFor(classId) : classId;
-      return '<a href="students.html?class=' + classId + '">' + icon('graduation-cap') + '<span>' + label + '</span></a>';
-    }).join('');
 
     return [
       '<aside class="dashboard-sidebar student-app-sidebar" id="dashboardSidebar">',
       '  <a class="sidebar-brand" href="index.html"><span class="brand-mark">' + icon('graduation-cap') + '</span><span>English Quest</span></a>',
       '  <div class="sidebar-label">Grade ' + (currentGrade === '11' ? 'XI' : 'X') + ' Student</div>',
       '  <nav class="primary-nav" aria-label="Student navigation">' + nav + '</nav>',
-      '  <section class="class-nav"><div class="sidebar-label">Classes <span>(' + classes.length + ')</span></div>' + classLinks + '</section>',
+      '  ' + profileMarkup(currentGrade),
       '  <div class="sidebar-footer">',
       '    <a href="../index.html">' + icon('layers') + '<span>Choose Grade</span></a>',
       '    <button type="button" onclick="studentShellLogout()">' + icon('log-out') + '<span>Logout / Change Name</span></button>',

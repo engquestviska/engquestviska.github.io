@@ -64,6 +64,7 @@ svg { width: 19px; height: 19px; stroke-width: 1.9; }
 
 .primary-nav,
 .class-nav,
+.student-profile-nav,
 .sidebar-footer {
   display: grid;
   gap: 5px;
@@ -71,6 +72,7 @@ svg { width: 19px; height: 19px; stroke-width: 1.9; }
 
 .primary-nav a,
 .class-nav a,
+.student-profile-link,
 .sidebar-footer a,
 .sidebar-footer button {
   width: 100%;
@@ -92,6 +94,7 @@ svg { width: 19px; height: 19px; stroke-width: 1.9; }
 
 .primary-nav a:hover,
 .class-nav a:hover,
+.student-profile-link:hover,
 .sidebar-footer a:hover,
 .sidebar-footer button:hover,
 .primary-nav a.active {
@@ -115,6 +118,7 @@ svg { width: 19px; height: 19px; stroke-width: 1.9; }
 }
 
 .class-nav { margin-top: 24px; }
+.student-profile-nav { margin-top: 24px; }
 
 .sidebar-label {
   margin: 0 13px 8px;
@@ -128,6 +132,42 @@ svg { width: 19px; height: 19px; stroke-width: 1.9; }
 .sidebar-label span { color: var(--muted); }
 .class-nav a { min-height: 38px; }
 .class-nav svg { width: 17px; height: 17px; }
+.student-profile-link {
+  min-height: 58px;
+}
+.student-profile-link > span:last-child {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.student-profile-link strong,
+.student-profile-link small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.student-profile-link strong {
+  font-size: 0.8rem;
+}
+.student-profile-link small {
+  color: var(--muted);
+  font-size: 0.66rem;
+}
+.student-profile-icon {
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--blue-soft);
+  color: var(--blue);
+}
+.student-profile-icon svg {
+  width: 16px;
+  height: 16px;
+}
 
 .sidebar-footer {
   margin-top: auto;
@@ -830,6 +870,7 @@ svg { width: 19px; height: 19px; stroke-width: 1.9; }
 .student-shell-enabled .student-app-sidebar .primary-nav a.active,
 .student-shell-enabled .student-app-sidebar .primary-nav a:hover,
 .student-shell-enabled .student-app-sidebar .class-nav a:hover,
+.student-shell-enabled .student-app-sidebar .student-profile-link:hover,
 .student-shell-enabled .student-app-sidebar .sidebar-footer a:hover,
 .student-shell-enabled .student-app-sidebar .sidebar-footer button:hover {
   background: var(--blue-soft);

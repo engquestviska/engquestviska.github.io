@@ -296,10 +296,11 @@
     function refreshSidebarClass() {
       var cls = localStorage.getItem('eq_student_class') || '';
       var no = localStorage.getItem('eq_student_no') || '';
-      var sidebarClass = document.querySelector('.student-app-sidebar .class-nav a:first-of-type span');
-      if (sidebarClass) {
-        sidebarClass.textContent = cls && no ? classLabel(cls) + ' · No. ' + no : 'Choose your class';
-      }
+      var name = localStorage.getItem('eq_student_name') || '';
+      var sidebarClass = document.getElementById('studentSidebarClass');
+      var sidebarDetail = document.getElementById('studentSidebarDetail');
+      if (sidebarClass) sidebarClass.textContent = cls ? classLabel(cls) : 'Choose your class';
+      if (sidebarDetail) sidebarDetail.textContent = name && no ? name + ' · No. ' + no : 'Login on the homepage';
     }
 
     function refreshProfileDisplay() {
