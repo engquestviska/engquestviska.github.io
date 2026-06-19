@@ -65,6 +65,10 @@ Done when:
 Prepare a fast import path for the official roster without requiring the roster
 itself yet.
 
+Contract: `ROSTER_IMPORT_CONTRACT.md`
+
+Non-production test data: `samples/roster-import.sample.csv`
+
 Required fields:
 
 - Grade
@@ -134,4 +138,3 @@ When official names arrive:
 4. Resolve duplicates and missing values.
 5. Import the remaining classes.
 6. Run final privacy, teacher-write, desktop, and mobile QA.
-

@@ -57,6 +57,9 @@ Use this checklist before merging `next-year` into `main`.
 - [x] Chapter 5 single-student sync requires teacher credentials.
 - [x] Grade 10 spreadsheet tabs match the class names used by the frontend.
 - [x] Grade 11 remains disconnected until its roster, sheets, and API contract exist.
+- [x] Official roster columns, validation, duplicate handling, and spreadsheet mapping are documented.
+- [x] The roster contract has inactive synthetic sample rows for all eight confirmed classes.
+- [ ] Validate the official roster against `ROSTER_IMPORT_CONTRACT.md` when school data arrives.
 
 ## Next Semester Preview Checks
 
