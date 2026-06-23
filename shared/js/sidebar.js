@@ -29,6 +29,7 @@
   }
 
   function getStudentProfile(currentGrade) {
+    if (window.EQStudent) return window.EQStudent.read(currentGrade);
     var classId = localStorage.getItem('eq_student_class') || '';
     var studentNo = localStorage.getItem('eq_student_no') || '';
     var studentName = localStorage.getItem('eq_student_name') || '';
@@ -119,20 +120,27 @@
   };
 
   window.studentShellLogout = function () {
-    ['eq_student_class', 'eq_student_no', 'eq_student_name'].forEach(function (key) {
+    if (window.EQStudent) window.EQStudent.clear();
+    else ['eq_student_class', 'eq_student_no', 'eq_student_name'].forEach(function (key) {
       localStorage.removeItem(key);
     });
     location.href = 'index.html';
   };
 
-  document.addEventListener('DOMContentLoaded', function () {
+  function initStudentShell() {
     document.body.classList.add('student-shell-enabled');
     if (!document.getElementById('dashboardSidebar')) {
       document.body.insertAdjacentHTML('afterbegin', shellMarkup());
     }
     addMobileButton();
     ensureIcons();
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initStudentShell);
+  } else {
+    initStudentShell();
+  }
 
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') window.closeSidebar();

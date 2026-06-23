@@ -32,6 +32,7 @@ Use this checklist before merging `next-year` into `main`.
 - [x] Missing rosters and records show intentional student-facing empty states.
 - [x] Grade XI roster selection does not query the Grade X backend.
 - [x] The Grade X student directory is generated from the canonical five-class configuration.
+- [x] Student profile storage and display helpers are shared between Grade X and Grade XI.
 
 ## Teacher Track Checks
 
@@ -43,6 +44,7 @@ Use this checklist before merging `next-year` into `main`.
 - [x] Materials and assignments can be managed from teacher pages only.
 - [x] Scores, task status, strikes, submissions, attendance, activeness, and announcements are checked from the teacher route.
 - [x] Browser storage is treated as convenience only; Apps Script credential checks remain the authority for protected writes.
+- [x] Student and teacher pages reference one canonical sidebar and stylesheet source.
 
 ## Legacy Route Checks
 

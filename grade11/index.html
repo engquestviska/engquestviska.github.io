@@ -6,8 +6,8 @@
   <title>Grade 11 · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="../shared/css/system-20260611.css"/>
-  <link rel="stylesheet" href="../shared/css/app-shell-20260611.css"/>
+  <link rel="stylesheet" href="../shared/css/system.css"/>
+  <link rel="stylesheet" href="../shared/css/app-shell.css"/>
   <link rel="stylesheet" href="../shared/css/grade11-home-figma-20260612.css"/>
   <style>
     .profile-login-card {
@@ -138,8 +138,9 @@
     }
   </style>
   <script src="../shared/js/classes-20260617.js"></script>
+  <script src="../shared/js/student.js"></script>
   <script src="../shared/js/api.js"></script>
-  <script src="../shared/js/sidebar-20260611.js"></script>
+  <script src="../shared/js/sidebar.js"></script>
 </head>
 <body class="track-page grade11-page">
   <div class="shell">
@@ -290,13 +291,14 @@
     localStorage.setItem('eq_grade', '11');
 
     function classLabel(value) {
-      return value || '';
+      return EQStudent.classLabel(value);
     }
 
     function refreshSidebarClass() {
-      var cls = localStorage.getItem('eq_student_class') || '';
-      var no = localStorage.getItem('eq_student_no') || '';
-      var name = localStorage.getItem('eq_student_name') || '';
+      var profile = EQStudent.read('11');
+      var cls = profile.classId;
+      var no = profile.studentNo;
+      var name = profile.studentName;
       var sidebarClass = document.getElementById('studentSidebarClass');
       var sidebarDetail = document.getElementById('studentSidebarDetail');
       if (sidebarClass) sidebarClass.textContent = cls ? classLabel(cls) : 'Choose your class';
@@ -304,19 +306,18 @@
     }
 
     function refreshProfileDisplay() {
-      var cls = localStorage.getItem('eq_student_class') || '';
-      var no = localStorage.getItem('eq_student_no') || '';
-      var name = localStorage.getItem('eq_student_name') || '';
-      var hasProfile = !!(cls && no && name);
+      var profile = EQStudent.read('11');
+      var cls = profile.classId;
+      var no = profile.studentNo;
+      var name = profile.studentName;
+      var hasProfile = profile.hasProfile;
 
       document.getElementById('profile').classList.toggle('logged-in', hasProfile);
       document.getElementById('profileStatus').textContent = hasProfile ? 'Logged in' : 'Not logged in';
       document.getElementById('welcomeName').textContent = hasProfile ? name.split(' ')[0] : 'Student';
       document.getElementById('accountName').textContent = hasProfile ? name : 'Student';
       document.getElementById('accountClass').textContent = hasProfile ? classLabel(cls) + ' · No. ' + no : 'Grade 11 Student';
-      document.getElementById('accountAvatar').textContent = hasProfile
-        ? name.split(/\s+/).slice(0, 2).map(function(part) { return part.charAt(0); }).join('').toUpperCase()
-        : 'ST';
+      document.getElementById('accountAvatar').textContent = EQStudent.initials(name);
       refreshSidebarClass();
       document.getElementById('profileTitle').textContent = hasProfile ? name : 'Personalize your space';
       document.getElementById('profileCopy').textContent = hasProfile
@@ -379,27 +380,22 @@
         return;
       }
 
-      localStorage.setItem('eq_grade', '11');
-      localStorage.setItem('eq_student_class', cls);
-      localStorage.setItem('eq_student_no', no);
-      localStorage.setItem('eq_student_name', name);
-      localStorage.removeItem('eq_setup_skipped');
+      EQStudent.save({
+        grade: '11',
+        classId: cls,
+        studentNo: no,
+        studentName: name
+      });
       window.location.reload();
     }
 
     function changeProfile() {
-      localStorage.removeItem('eq_student_class');
-      localStorage.removeItem('eq_student_no');
-      localStorage.removeItem('eq_student_name');
+      EQStudent.clear();
       window.location.reload();
     }
 
     function logoutProfile() {
-      localStorage.removeItem('eq_grade');
-      localStorage.removeItem('eq_student_class');
-      localStorage.removeItem('eq_student_no');
-      localStorage.removeItem('eq_student_name');
-      localStorage.removeItem('eq_setup_skipped');
+      EQStudent.clear({ includeGrade: true, includeSetup: true });
       window.location.reload();
     }
 

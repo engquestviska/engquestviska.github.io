@@ -31,10 +31,10 @@
   });
 
   function ensureStyles() {
-    if (!document.querySelector('link[href*="shared/css/app-shell-20260611.css"]')) {
+    if (!document.querySelector('link[href*="shared/css/app-shell.css"]')) {
       var link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = '../shared/css/app-shell-20260611.css';
+      link.href = '../shared/css/app-shell.css';
       document.head.appendChild(link);
     }
   }
@@ -128,7 +128,7 @@
     else window.location.href = 'index.html';
   };
 
-  document.addEventListener('DOMContentLoaded', function () {
+  function initTeacherShell() {
     ensureStyles();
     document.body.classList.add('teacher-shell-enabled');
     if (!document.getElementById('dashboardSidebar')) {
@@ -137,7 +137,13 @@
     addMobileButton();
     bindMobileControls();
     ensureIcons();
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTeacherShell);
+  } else {
+    initTeacherShell();
+  }
 
   document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape') window.closeTeacherShell();
