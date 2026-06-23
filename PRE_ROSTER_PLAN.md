@@ -113,6 +113,9 @@ Done when:
 
 Run a complete desktop/mobile and functional audit before adding official names.
 
+Completed on June 23, 2026. See `LAUNCH_CHECKLIST.md` for the verification log
+and the school-data checks that must remain pending.
+
 Done when:
 
 - Local references and scripts pass.

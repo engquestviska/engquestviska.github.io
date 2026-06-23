@@ -18,14 +18,31 @@ const SCORE_SHEETS = {
 
 const TASK_SHEET_NAME = 'Task_Status';
 const TEACHER_USER    = 'teacher';
-const TEACHER_PASS    = 'engquestviska'; // plain, for legacy fallback
-const TEACHER_HASH    = '6b65c9d83a25b098f930dbe0b6ccb543923e1f95f28bb2b0b49738e6b8dac581'; // SHA-256
+const TEACHER_HASH_PROPERTY = 'TEACHER_PASSWORD_SHA256';
 
-// Accept either the hash (new) or plain password (legacy fallback)
 function authOk(username, password) {
-  return username === TEACHER_USER &&
-    (password === TEACHER_HASH || password === TEACHER_PASS);
+  const storedHash = String(
+    PropertiesService.getScriptProperties().getProperty(TEACHER_HASH_PROPERTY) || ''
+  ).trim().toLowerCase();
+  if (!storedHash || username !== TEACHER_USER) return false;
+
+  const candidate = String(password || '').trim();
+  const candidateHash = /^[a-f0-9]{64}$/i.test(candidate)
+    ? candidate.toLowerCase()
+    : sha256Hex(candidate);
+  return candidateHash === storedHash;
 }
+
+function sha256Hex(value) {
+  return Utilities.computeDigest(
+    Utilities.DigestAlgorithm.SHA_256,
+    String(value || ''),
+    Utilities.Charset.UTF_8
+  ).map(function(byte) {
+    return (byte + 256).toString(16).slice(-2);
+  }).join('');
+}
+
 
 function teacherHealthCheck(username, password) {
   if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };

@@ -6,6 +6,8 @@ Use this checklist before merging `next-year` into `main`.
 
 - Grade 10 student pages are the launch baseline: student-facing, read-only where they show class data, and separated from teacher management actions.
 - Teacher management pages live under `teacher/` and use the saved teacher session for write actions.
+- Teacher credentials are stored as a SHA-256 hash in private Apps Script Properties; no active credential is committed to the repository.
+- The June 23, 2026 credential rotation invalidated previously saved teacher sessions. Log in again with the rotated password.
 - Chapter 5 task-status sync is teacher-authenticated; students can only check received files.
 - Grade 11 pages mirror the Grade 10 structure as placeholders and preserve student profile state unless the student explicitly logs out or changes name.
 - `main` is still untouched; merge only when the user explicitly decides the new version should become live.
@@ -45,6 +47,8 @@ Use this checklist before merging `next-year` into `main`.
 - [x] Scores, task status, strikes, submissions, attendance, activeness, and announcements are checked from the teacher route.
 - [x] Browser storage is treated as convenience only; Apps Script credential checks remain the authority for protected writes.
 - [x] Student and teacher pages reference one canonical sidebar and stylesheet source.
+- [x] Teacher credentials are absent from tracked source and read from private Apps Script Properties.
+- [x] The secured teacher API accepts the rotated plaintext/hash credential and rejects the old password.
 
 ## Legacy Route Checks
 
@@ -57,6 +61,7 @@ Use this checklist before merging `next-year` into `main`.
 ## Data And Backend Checks
 
 - [x] Apps Script deployment URLs are current.
+- [x] Current-year teacher API deployment `AKfycbxK9...Huxg` is secured at version 67.
 - [x] Google Apps Script permissions allow the public student reads needed by Grade 10.
 - [x] Teacher write path still works after Apps Script deployment change.
 - [x] Chapter 5 single-student sync requires teacher credentials.
@@ -91,7 +96,18 @@ Use this checklist before merging `next-year` into `main`.
 - [x] Run local href/src audit.
 - [x] Run JavaScript syntax checks.
 - [x] Run local HTTP smoke check for root, Grade 10, Grade 11, Teacher, and shared CSS.
+- [x] Run final pre-roster permission, class configuration, duplicate-ID, responsive-source, and API authentication audits.
+- [x] Confirm all tracked application HTML/CSS/JS assets return HTTP 200 locally.
 - [x] Push the final `next-year` commit after each completed batch.
 - [x] Open the exact pushed commit preview if branch preview is stale.
 - [ ] Merge to `main` only when the user decides the new version should become live.
 - [ ] After merge, check the real GitHub Pages live URL again.
+
+## Final Pre-Roster QA Log
+
+- **Date:** June 23, 2026
+- **Branch:** `next-year`
+- **Result:** Automated pre-roster checks passed after removing the Grade XI dependency on the Grade X announcement API and rotating teacher authentication.
+- **Coverage:** 46 HTML files, 45 inline script blocks, 15 JavaScript files, 521 static local references, 67 tracked application assets, 22 authenticated backend functions, 34 core responsive pages, and all eight confirmed classes.
+- **Visual note:** The final browser surface could not reach local or external previews in this session. Responsive source checks passed, and the existing pushed visual baseline was not changed by the final Grade XI/API security fixes.
+- **Still waiting for school data:** official rosters, final class sizes, real student profile/login testing, personal-record privacy review, and one-class-first roster import.
