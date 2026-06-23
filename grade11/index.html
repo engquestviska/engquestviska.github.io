@@ -362,20 +362,9 @@
         return;
       }
 
-      document.getElementById('profileMessage').textContent = 'Loading names for ' + classLabel(cls) + '...';
-      resetStudentSelect('Loading names...');
-
-      try {
-        var data = await EQApi.get({ action: 'getStudents', className: cls });
-        studentsForClass = data.students || [];
-        populateStudents(studentsForClass);
-        document.getElementById('profileMessage').textContent = studentsForClass.length
-          ? 'Choose your name, then confirm. The page will refresh immediately.'
-          : 'No students found for this class yet.';
-      } catch(e) {
-        document.getElementById('profileMessage').textContent = 'Could not load names. Please try again.';
-        resetStudentSelect('Could not load names');
-      }
+      resetStudentSelect('Roster not published yet');
+      document.getElementById('profileMessage').textContent =
+        'The official roster for ' + classLabel(cls) + ' has not been published yet. Profile selection will open when the Grade XI roster is connected.';
     }
 
     function confirmProfile() {

@@ -601,9 +601,15 @@
     try {
       let data = studentsCache[cls];
       if (!data) { data = await cachedApiGet({ action: 'getStudents', className: cls }); studentsCache[cls] = data; }
-      if (data.error) { showToast(data.error, 'err'); return; }
+      if (data && data.error) throw new Error(data.error);
+      const students = Array.isArray(data && data.students) ? data.students : [];
+      if (!students.length) {
+        nameSelect.innerHTML = '<option value="">Roster not published yet</option>';
+        document.getElementById('studentResult').innerHTML = '<div class="empty-chapter"><div class="empty-chapter-icon">&#128101;</div><div style="font-weight:800;margin-bottom:4px;color:#0f172a">Class roster not available yet</div><div>Your name will appear here after the official roster is published.</div></div>';
+        return;
+      }
       nameSelect.innerHTML = '<option value="">— Select your name —</option>';
-      data.students.forEach(s => {
+      students.forEach(s => {
         const opt = document.createElement('option');
         opt.value = s.no;
         opt.textContent = s.name + (s.nickname ? ' (' + s.nickname + ')' : '');
@@ -611,7 +617,10 @@
       });
       nameSelect.disabled = false;
       nameSelect.onchange = () => { viewBtn.disabled = !nameSelect.value; };
-    } catch(e) { showToast('Failed to load students', 'err'); nameSelect.innerHTML = '<option>— Select class first —</option>'; }
+    } catch(e) {
+      nameSelect.innerHTML = '<option value="">Roster temporarily unavailable</option>';
+      document.getElementById('studentResult').innerHTML = '<div class="empty-chapter"><div class="empty-chapter-icon">&#8635;</div><div style="font-weight:800;margin-bottom:4px;color:#0f172a">Roster could not be loaded</div><div>Please reload the page or try again later.</div></div>';
+    }
   }
 
   // ── STUDENT — VIEW TASKS ──────────────────────────────────────
@@ -629,7 +638,7 @@
         cachedApiGet({ action: 'getTaskStatus', className: cls, studentNo: no }),
         cachedApiGet({ action: 'getSubmissions' }).catch(function() { return null; })
       ]);
-      if (data.error) { showToast(data.error, 'err'); document.getElementById('studentResult').innerHTML = ''; return; }
+      if (data && data.error) throw new Error(data.error);
 
       // Check if this student has submitted Chapter 4
       var hasSubmitted = false;
@@ -644,7 +653,9 @@
       }
 
       renderStudentTasks(data, clsLabel, hasSubmitted);
-    } catch(e) { showToast('Failed to load tasks', 'err'); document.getElementById('studentResult').innerHTML = ''; }
+    } catch(e) {
+      document.getElementById('studentResult').innerHTML = '<div class="empty-chapter"><div class="empty-chapter-icon">&#8635;</div><div style="font-weight:800;margin-bottom:4px;color:#0f172a">Task status is temporarily unavailable</div><div>Your saved task records are safe. Please try again later.</div></div>';
+    }
     finally { document.getElementById('sViewBtn').disabled = false; document.getElementById('sViewBtn').textContent = 'View My Tasks'; }
   }
 

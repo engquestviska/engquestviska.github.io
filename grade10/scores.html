@@ -559,6 +559,9 @@ function autoLoadStudentScores(cls, no, name) {
     cachedApiGet({ action: 'getChapterScores', className: cls, chapter: 5 }),
     cachedApiGet({ action: 'getFinalScores', className: cls }).then(function(r) { return r && !r.error ? r : {}; }).catch(function() { return {}; })
   ]).then(function(responses) {
+    if ((responses[0] && responses[0].error) || (responses[1] && responses[1].error)) {
+      throw new Error('Score records are unavailable');
+    }
     var ch4 = responses[0].students ? responses[0].students.find(function(s) { return String(s.no) === String(no); }) : null;
     var ch5 = responses[1].students ? responses[1].students.find(function(s) { return String(s.no) === String(no); }) : null;
     var finRes = responses[2] || {};
@@ -588,20 +591,30 @@ function autoLoadStudentScores(cls, no, name) {
       '<div id="leaderboardArea"></div>';
     renderLeaderboard(cls);
   }).catch(function(e) {
-    document.getElementById('sResult').innerHTML = '<div class="state-card"><div class="state-icon">&#9203;</div><div class="state-title">Connection problem</div><div class="state-sub">' + escapeHtml(e.message) + '</div></div>';
+    document.getElementById('sResult').innerHTML = '<div class="state-card"><div class="state-icon">&#8635;</div><div class="state-title">Scores are temporarily unavailable</div><div class="state-sub">Your records have not been changed. Please reload the page or try again later.</div></div>';
   });
 }
 function loadStudentList() {
   var sel = document.getElementById('sStudent');
   sel.innerHTML = '<option value="">Loading...</option>';
   EQApi.get({ action: 'getStudents', className: currentClass }).then(function(res) {
-    if (res.error || !res.students) { sel.innerHTML = '<option value="">Error loading</option>'; return; }
-    allStudents = res.students;
+    if (res && res.error) throw new Error(res.error);
+    allStudents = (res && res.students) || [];
+    if (!Array.isArray(allStudents) || !allStudents.length) {
+      allStudents = [];
+      sel.innerHTML = '<option value="">Roster not published yet</option>';
+      document.getElementById('sResult').innerHTML = '<div class="state-card"><div class="state-icon">&#128101;</div><div class="state-title">Class roster not available yet</div><div class="state-sub">Student score profiles will appear after the official roster is published.</div></div>';
+      return;
+    }
     sel.innerHTML = '<option value="">-- Select your name --</option>';
-    res.students.forEach(function(s) {
+    allStudents.forEach(function(s) {
       var label = s.nickname ? s.name + ' (' + s.nickname + ')' : s.name;
       sel.innerHTML += '<option value="' + escapeHtml(s.no) + '">' + escapeHtml(label) + '</option>';
     });
+  }).catch(function() {
+    allStudents = [];
+    sel.innerHTML = '<option value="">Roster temporarily unavailable</option>';
+    document.getElementById('sResult').innerHTML = '<div class="state-card"><div class="state-icon">&#8635;</div><div class="state-title">Roster could not be loaded</div><div class="state-sub">Please reload the page or try again later.</div></div>';
   });
 }
 
@@ -628,6 +641,9 @@ function viewStudentScores() {
     var ch4Data = responses[0];
     var ch5Data = responses[1];
     var finData = responses[2];
+    if ((ch4Data && ch4Data.error) || (ch5Data && ch5Data.error)) {
+      throw new Error('Score records are unavailable');
+    }
 
     var ch4Student = ch4Data.students ? ch4Data.students.find(function(s) { return String(s.no) === String(studentNo); }) : null;
     var ch5Student = ch5Data.students ? ch5Data.students.find(function(s) { return String(s.no) === String(studentNo); }) : null;
@@ -635,6 +651,8 @@ function viewStudentScores() {
     var finStudent = finData2.students ? finData2.students.find(function(s) { return String(s.no) === String(studentNo); }) : null;
 
     renderStudentScoreCard(student, ch4Student, ch5Student, finStudent, ch4Data.inputCols, ch5Data.inputCols, finData2.inputCols, finData2.calcCols);
+  }).catch(function() {
+    result.innerHTML = '<div class="state-card"><div class="state-icon">&#8635;</div><div class="state-title">Scores are temporarily unavailable</div><div class="state-sub">Your records have not been changed. Please reload the page or try again later.</div></div>';
   });
 }
 

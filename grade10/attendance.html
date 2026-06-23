@@ -651,7 +651,11 @@
         populateStudents(currentStudents);
         pickerHint.textContent = currentStudents.length
           ? currentStudents.length + ' students found. Choose your name to view your record.'
-          : 'No students found for this class yet.';
+          : 'The official roster for this class has not been published yet.';
+        if (!currentStudents.length) {
+          showEmpty('Class roster not available yet.', 'Your attendance record will become available after the official roster is published.');
+          return;
+        }
         if (openSavedStudent()) {
           pickerHint.textContent = 'Showing your saved attendance profile.';
           return;

@@ -516,101 +516,12 @@
     </div>
     <select class="filter-select" id="classFilter" onchange="filterStudents()">
       <option value="">All Classes</option>
-      <option value="XE-1">XE-1</option>
-      <option value="XE-4">XE-4</option>
-      <option value="XE-5">XE-5</option>
-      <option value="XE-6">XE-6</option>
-      <option value="XE-7">XE-7</option>
-      <option value="XE-8">XE-8</option>
-      <option value="XE-9">XE-9</option>
-      <option value="XE-10">XE-10</option>
-      <option value="XE-11">XE-11</option>
     </select>
     <div class="count-badge" id="countBadge">Loading...</div>
   </section>
 
-  <div id="noResults" class="no-results">No students found matching your search.</div>
-
-  <!-- XE-1 -->
-  <div class="class-section" data-class="XE-1">
-    <div class="class-header">
-      <span class="class-badge">XE-1</span>
-      <span class="class-count" id="count-XE-1"></span>
-    </div>
-    <div class="student-list" id="list-XE-1"></div>
-  </div>
-
-  <!-- XE-4 -->
-  <div class="class-section" data-class="XE-4">
-    <div class="class-header">
-      <span class="class-badge">XE-4</span>
-      <span class="class-count" id="count-XE-4"></span>
-    </div>
-    <div class="student-list" id="list-XE-4"></div>
-  </div>
-
-  <!-- XE-5 -->
-  <div class="class-section" data-class="XE-5">
-    <div class="class-header">
-      <span class="class-badge">XE-5</span>
-      <span class="class-count" id="count-XE-5"></span>
-    </div>
-    <div class="student-list" id="list-XE-5"></div>
-  </div>
-
-  <!-- XE-6 -->
-  <div class="class-section" data-class="XE-6">
-    <div class="class-header">
-      <span class="class-badge">XE-6</span>
-      <span class="class-count" id="count-XE-6"></span>
-    </div>
-    <div class="student-list" id="list-XE-6"></div>
-  </div>
-
-  <!-- XE-7 -->
-  <div class="class-section" data-class="XE-7">
-    <div class="class-header">
-      <span class="class-badge">XE-7</span>
-      <span class="class-count" id="count-XE-7"></span>
-    </div>
-    <div class="student-list" id="list-XE-7"></div>
-  </div>
-
-  <!-- XE-8 -->
-  <div class="class-section" data-class="XE-8">
-    <div class="class-header">
-      <span class="class-badge">XE-8</span>
-      <span class="class-count" id="count-XE-8"></span>
-    </div>
-    <div class="student-list" id="list-XE-8"></div>
-  </div>
-
-  <!-- XE-9 -->
-  <div class="class-section" data-class="XE-9">
-    <div class="class-header">
-      <span class="class-badge">XE-9</span>
-      <span class="class-count" id="count-XE-9"></span>
-    </div>
-    <div class="student-list" id="list-XE-9"></div>
-  </div>
-
-  <!-- XE-10 -->
-  <div class="class-section" data-class="XE-10">
-    <div class="class-header">
-      <span class="class-badge">XE-10</span>
-      <span class="class-count" id="count-XE-10"></span>
-    </div>
-    <div class="student-list" id="list-XE-10"></div>
-  </div>
-
-  <!-- XE-11 -->
-  <div class="class-section" data-class="XE-11">
-    <div class="class-header">
-      <span class="class-badge">XE-11</span>
-      <span class="class-count" id="count-XE-11"></span>
-    </div>
-    <div class="student-list" id="list-XE-11"></div>
-  </div>
+  <div id="noResults" class="no-results">No students match the current search.</div>
+  <div id="classDirectory"></div>
 
 </main>
 
@@ -619,10 +530,26 @@
 <script>
 const classes    = window.EQClasses ? EQClasses.idsForGrade('10').map(id => EQClasses.shortLabelFor(id).replace(/^XE/, 'XE-')) : ["XE-1","XE-2","XE-3","XE-4","XE-5"];
 const apiClsMap  = { "XE-1":"XE1", "XE-2":"XE2", "XE-3":"XE3", "XE-4":"XE4", "XE-5":"XE5" };
-let totalLoaded  = 0;
 let totalStudents = 0;
 
 // Will be called after apiGet is defined below
+
+function buildClassDirectory() {
+  const filter = document.getElementById('classFilter');
+  const directory = document.getElementById('classDirectory');
+  classes.forEach(cls => {
+    filter.options.add(new Option(cls, cls));
+  });
+  directory.innerHTML = classes.map(cls => `
+    <section class="class-section" data-class="${cls}">
+      <div class="class-header">
+        <span class="class-badge">${cls}</span>
+        <span class="class-count" id="count-${cls}">Waiting for roster</span>
+      </div>
+      <div class="student-list" id="list-${cls}"></div>
+    </section>
+  `).join('');
+}
 
 function escapeHtml(value) {
   return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
@@ -644,6 +571,9 @@ function safeNumber(value) {
 function renderStudentClass(cls, students) {
   const list = document.getElementById('list-' + cls);
   list.innerHTML = '';
+  if (!students.length) {
+    list.innerHTML = '<div style="padding:20px;color:var(--text-muted);font-size:0.9rem;">The official roster for this class has not been published yet.</div>';
+  }
   students.forEach((s, i) => {
     const name = s.name || '';
     const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase() || '?';
@@ -684,9 +614,9 @@ function autoOpenSavedStudent() {
 }
 
 function loadAllStudents() {
+  totalStudents = 0;
   classes.forEach(cls => {
-    const list = document.getElementById('list-' + cls);
-    list.innerHTML = '<div style="padding:16px;color:var(--text-muted);font-size:0.85rem;">Loading...</div>';
+    document.getElementById('list-' + cls).innerHTML = '<div style="padding:20px;color:var(--text-muted);font-size:0.9rem;">Loading class roster...</div>';
   });
   document.getElementById('countBadge').textContent = 'Loading...';
 
@@ -711,22 +641,23 @@ function loadAllStudents() {
   Promise.all(classes.map(cls => {
     var params = { action: 'getStudents', className: apiClsMap[cls] };
     return EQApi.get(params)
-      .then(res => { cacheSet(params, res); return { cls, students: res.students || [] }; })
-      .catch(() => ({ cls, students: [] }));
+      .then(res => {
+        if (res && res.error) throw new Error(res.error);
+        cacheSet(params, res);
+        return { cls, students: (res && res.students) || [], failed: false };
+      })
+      .catch(() => ({ cls, students: [], failed: true }));
   })).then(results => {
-    if (!cachedAny) {
-      results.forEach(({ cls, students }) => renderStudentClass(cls, students));
-      document.getElementById('countBadge').textContent = totalStudents + ' students';
-      updateCount();
-      autoOpenSavedStudent();
-    } else {
-      // Silent refresh — update counts only
-      results.forEach(({ cls, students }) => {
-        document.getElementById('count-' + cls).textContent = students.length + ' students';
-      });
-    }
+    totalStudents = 0;
+    results.forEach(({ cls, students }) => renderStudentClass(cls, students));
+    const failedCount = results.filter(result => result.failed).length;
+    document.getElementById('countBadge').textContent = failedCount === results.length
+      ? 'Roster unavailable'
+      : totalStudents + ' students';
+    updateCount();
+    autoOpenSavedStudent();
   }).catch(() => {
-    if (!cachedAny) document.getElementById('countBadge').textContent = 'Failed to load';
+    if (!cachedAny) document.getElementById('countBadge').textContent = 'Roster unavailable';
   });
 }
 
@@ -791,7 +722,8 @@ function cacheSet(params, data) {
 
 const activenessCache = {};
 
-// Now safe to load students (EQApi is loaded above)
+// Now safe to build and load the directory (EQApi is loaded above)
+buildClassDirectory();
 loadAllStudents();
 
 const ACTS = [
@@ -822,7 +754,7 @@ async function openActModal(name, cls) {
       classData = await EQApi.get({ action: 'getAllActiveness', className: apiCls });
       if (!classData.error) activenessCache[apiCls] = classData;
     }
-    if (classData.error) { document.getElementById('actBody').innerHTML = '<div class="act-loading">Could not load stats.</div>'; return; }
+    if (classData.error) { document.getElementById('actBody').innerHTML = '<div class="act-loading">Participation data is temporarily unavailable.</div>'; return; }
 
     // Find student by name (case-insensitive, with fuzzy fallback)
     let student = classData.students.find(s => String(s.name || '').toLowerCase() === name.toLowerCase());
@@ -835,7 +767,7 @@ async function openActModal(name, cls) {
         return sp[0] === first && sp[sp.length - 1] === last;
       });
     }
-    if (!student) { document.getElementById('actBody').innerHTML = '<div class="act-loading">Student stats not found.</div>'; return; }
+    if (!student) { document.getElementById('actBody').innerHTML = '<div class="act-loading">No participation record has been published for this student yet.</div>'; return; }
 
     // Update avatar with nickname if available
     if (student.nickname) document.getElementById('actAvatar').textContent = String(student.nickname)[0].toUpperCase();
@@ -898,7 +830,7 @@ async function openActModal(name, cls) {
       <div class="act-indicator ${indClass}" style="margin-top:14px">${escapeHtml(indicator || '—')}</div>`;
 
   } catch(e) {
-    document.getElementById('actBody').innerHTML = '<div class="act-loading">Failed to load stats.</div>';
+    document.getElementById('actBody').innerHTML = '<div class="act-loading">Participation data is temporarily unavailable.</div>';
   }
 }
 

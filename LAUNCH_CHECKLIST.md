@@ -29,6 +29,9 @@ Use this checklist before merging `next-year` into `main`.
 - [x] Grade 11 pages remain placeholders until real Grade 11 data exists.
 - [x] Grade 11 pages do not read Grade 10 spreadsheets or APIs.
 - [x] Confirmed class configuration is centralized for `XE1-XE5` and `XIF7-XIF9`.
+- [x] Missing rosters and records show intentional student-facing empty states.
+- [x] Grade XI roster selection does not query the Grade X backend.
+- [x] The Grade X student directory is generated from the canonical five-class configuration.
 
 ## Teacher Track Checks
 

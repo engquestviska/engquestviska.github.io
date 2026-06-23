@@ -559,8 +559,13 @@
     }
     try {
       const data = await EQApi.get({ action: 'getAllActiveness', className: currentClass });
-      if (data.error) { showToast(data.error, 'err'); studentSelect.innerHTML = '<option value="">Failed to load</option>'; return; }
+      if (data && data.error) throw new Error(data.error);
       studentsData = Array.isArray(data.students) ? data.students : [];
+      if (!studentsData.length) {
+        studentSelect.innerHTML = '<option value="">Roster not published yet</option>';
+        document.getElementById('activenessResult').innerHTML = '<div class="loading"><strong>Class roster not available yet.</strong><br/>Participation records will appear after the official roster is published.</div>';
+        return;
+      }
       studentSelect.innerHTML = '<option value="">— Select your name —</option>';
       studentsData.forEach(s => {
         const opt = document.createElement('option');
@@ -569,7 +574,10 @@
         studentSelect.appendChild(opt);
       });
       studentSelect.disabled = false;
-    } catch(e) { showToast('Failed to load class', 'err'); studentSelect.innerHTML = '<option value="">— Select class first —</option>'; }
+    } catch(e) {
+      studentSelect.innerHTML = '<option value="">Roster temporarily unavailable</option>';
+      document.getElementById('activenessResult').innerHTML = '<div class="loading"><strong>Activeness data could not be loaded.</strong><br/>Please reload the page or try again later.</div>';
+    }
   }
 
   function onStudentChange() {

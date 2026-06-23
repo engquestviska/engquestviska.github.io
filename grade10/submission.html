@@ -172,17 +172,22 @@
     }
 
     async function initCh4Status() {
+      var sel = document.getElementById('stClassSel');
+      var classes = window.EQClasses ? EQClasses.idsForGrade('10') : ['XE1', 'XE2', 'XE3', 'XE4', 'XE5'];
+      sel.innerHTML = '<option value="">Select your class</option>';
+      classes.forEach(function(c) {
+        sel.options.add(new Option(window.EQClasses ? EQClasses.labelFor(c) : c.replace(/^XE(\d+)$/, 'X E-$1'), c));
+      });
+      sel.disabled = false;
       try {
         var data = await EQApi.get({ action: 'getSubmissions' });
-        subData = data;
-        var classes = Object.keys(data.students || {}).filter(Boolean).sort();
-        var sel = document.getElementById('stClassSel');
-        sel.innerHTML = '<option value="">Select your class</option>';
-        classes.forEach(function(c) {
-          sel.options.add(new Option(c.replace(/^XE(\d+)$/, 'X E-$1'), c));
-        });
-        sel.disabled = false;
-      } catch(e) {}
+        if (data && data.error) throw new Error(data.error);
+        subData = data || { students: {} };
+      } catch(e) {
+        subData = { students: {} };
+        document.getElementById('statusResult').innerHTML = '<div class="notice-card">Submission records are temporarily unavailable. Please try again later.</div>';
+        document.getElementById('statusResult').classList.add('show');
+      }
     }
 
     function onStatusClassChange() {
@@ -197,6 +202,14 @@
       var students = (subData.students[cls] || []).slice().sort(function(a, b) {
         return a.name.localeCompare(b.name);
       });
+      if (!students.length) {
+        nameSel.disabled = true;
+        nameSel.innerHTML = '<option value="">Roster not published yet</option>';
+        var result = document.getElementById('statusResult');
+        result.innerHTML = '<div class="notice-card">Your submission status will appear after the official class roster is published.</div>';
+        result.classList.add('show');
+        return;
+      }
       nameSel.innerHTML = '<option value="">Select your name</option>';
       students.forEach(function(s) {
         nameSel.options.add(new Option(s.name, s.name));
@@ -244,7 +257,15 @@
       try {
         if (!ch5Students[cls]) {
           var data = await EQApi.get({ action: 'getStudents', className: cls });
+          if (data && data.error) throw new Error(data.error);
           ch5Students[cls] = data.students || [];
+        }
+        if (!ch5Students[cls].length) {
+          nameSel.innerHTML = '<option value="">Roster not published yet</option>';
+          var emptyResult = document.getElementById('ch5Result');
+          emptyResult.innerHTML = '<div class="notice-card">Your submission status will appear after the official class roster is published.</div>';
+          emptyResult.classList.add('show');
+          return;
         }
         nameSel.innerHTML = '<option value="">Select your name</option>';
         ch5Students[cls].forEach(function(s) {
@@ -252,7 +273,10 @@
         });
         nameSel.disabled = false;
       } catch(e) {
-        nameSel.innerHTML = '<option>Failed to load</option>';
+        nameSel.innerHTML = '<option value="">Roster temporarily unavailable</option>';
+        var errorResult = document.getElementById('ch5Result');
+        errorResult.innerHTML = '<div class="notice-card">Submission records could not be loaded. Please try again later.</div>';
+        errorResult.classList.add('show');
       }
     }
 
