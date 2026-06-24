@@ -46,6 +46,10 @@ every class to the same class by accident.
 - Do not assume Semester 1 is Chapter 4 and Chapter 5.
 - Do not introduce previous-year students as next-year data.
 - Use mock or empty states while official rosters are unavailable.
+- Placeholder rosters must be inactive test data only; they must not become
+  student login identities or receive personal records.
+- Class IDs and grade ownership must come from the shared class configuration,
+  not page-level hardcoded lists.
 - Residual current-year logic must be isolated to teacher tools or removed from
   student pages during cleanup.
 - Grade XI should mirror Grade X structurally, even when the real data source is
@@ -58,4 +62,3 @@ every class to the same class by accident.
 - Active sidebar state must follow the current route.
 - Typography must be readable on phones and laptops; avoid tiny dashboard text.
 - Homepage and dashboard must not duplicate the same purpose.
-

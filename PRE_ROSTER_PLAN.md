@@ -29,6 +29,10 @@ Create one shared source for the eight confirmed class IDs and labels. Remove ol
 or inconsistent class lists from student pages, teacher tools, sidebars, and API
 helpers.
 
+Implementation note: `shared/js/classes-20260617.js` is the current browser-side
+class source. It also exposes inactive placeholder roster helpers for preview and
+schema testing, but those placeholders are not production login data.
+
 Done when:
 
 - Every class selector uses only the confirmed eight classes where appropriate.

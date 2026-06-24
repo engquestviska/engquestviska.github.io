@@ -1,5 +1,7 @@
-/* English Quest canonical class configuration */
+/* English Quest canonical class and pre-roster configuration. */
 (function(global) {
+  var DEFAULT_ROSTER_SIZE = 36;
+
   var GRADE_X = [
     { id: 'XE1', label: 'X E-1', shortLabel: 'XE1', grade: '10' },
     { id: 'XE2', label: 'X E-2', shortLabel: 'XE2', grade: '10' },
@@ -39,6 +41,14 @@
     return listForGrade(grade).map(function(item) { return item.id; });
   }
 
+  function exists(id) {
+    return !!gradeById[id];
+  }
+
+  function isForGrade(id, grade) {
+    return gradeFor(id) === String(grade);
+  }
+
   function labelFor(id) {
     return labels[id] || id || '';
   }
@@ -58,7 +68,62 @@
     }).join('');
   }
 
+  function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+      return {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[ch];
+    });
+  }
+
+  function fillSelect(target, grade, selectedId, placeholderText) {
+    var select = typeof target === 'string' ? document.getElementById(target) : target;
+    if (!select) return;
+    select.innerHTML = '<option value="">' + escapeHtml(placeholderText || 'Choose class') + '</option>' + optionHtml(grade, selectedId);
+  }
+
+  function buildPlaceholderRoster(classId, count) {
+    var grade = gradeFor(classId);
+    var total = Number(count || DEFAULT_ROSTER_SIZE);
+    if (!grade || !Number.isFinite(total) || total < 1) return [];
+
+    return Array.from({ length: total }, function(_, index) {
+      var no = index + 1;
+      return {
+        grade: grade,
+        classId: classId,
+        studentNo: String(no),
+        no: no,
+        fullName: 'Student ' + no,
+        name: 'Student ' + no,
+        preferredName: '',
+        profilePhoto: '',
+        active: false,
+        placeholder: true
+      };
+    });
+  }
+
+  function placeholderRosterFor(classId) {
+    return buildPlaceholderRoster(classId, DEFAULT_ROSTER_SIZE);
+  }
+
+  function dataReadiness() {
+    return {
+      classesReady: true,
+      rostersReady: false,
+      rosterStatus: 'Official student rosters are pending school data.',
+      grade10Classes: idsForGrade('10'),
+      grade11Classes: idsForGrade('11')
+    };
+  }
+
   global.EQClasses = {
+    defaultRosterSize: DEFAULT_ROSTER_SIZE,
     grade10: cloneList(GRADE_X),
     grade11: cloneList(GRADE_XI),
     all: cloneList(ALL),
@@ -66,9 +131,14 @@
     shortLabels: Object.assign({}, shortLabels),
     listForGrade: listForGrade,
     idsForGrade: idsForGrade,
+    exists: exists,
+    isForGrade: isForGrade,
     labelFor: labelFor,
     shortLabelFor: shortLabelFor,
     gradeFor: gradeFor,
-    optionHtml: optionHtml
+    optionHtml: optionHtml,
+    fillSelect: fillSelect,
+    placeholderRosterFor: placeholderRosterFor,
+    dataReadiness: dataReadiness
   };
 })(window);

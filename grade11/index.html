@@ -137,7 +137,7 @@
       }
     }
   </style>
-  <script src="../shared/js/classes-20260617.js"></script>
+  <script src="../shared/js/classes-20260617.js?v=20260624"></script>
   <script src="../shared/js/student.js"></script>
   <script src="../shared/js/sidebar.js"></script>
 </head>
@@ -172,7 +172,7 @@
           <div>
             <span class="student-panel-kicker">Grade 11 Student Track</span>
             <h2>Your English class hub.</h2>
-            <p>Focus on your current chapter, score improvement, and task completion.</p>
+            <p>Focus on your current unit, score improvement, and task completion.</p>
           </div>
           <div class="student-welcome-actions">
             <a href="tasks.html">Continue Task</a>
@@ -184,7 +184,7 @@
           <div>
             <div class="profile-label">Student Profile</div>
             <div class="profile-title" id="profileTitle">Personalize your space</div>
-            <p class="profile-copy" id="profileCopy">Choose your class and name so this browser can show your own scores, tasks, attendance, and activeness.</p>
+            <p class="profile-copy" id="profileCopy">Choose your class and name so this browser can show your own scores, tasks, attendance, and Level / XP progress.</p>
           </div>
           <div class="profile-status" id="profileStatus">Not logged in</div>
           <div class="profile-form">
@@ -192,7 +192,6 @@
               <label for="studentClass">Class</label>
               <select id="studentClass">
                 <option value="">Choose class</option>
-                <option>XIF7</option><option>XIF8</option><option>XIF9</option>
               </select>
             </div>
             <div class="profile-field">
@@ -218,7 +217,7 @@
         <a class="student-summary-card green" href="tasks.html"><span><i data-lucide="circle-check-big"></i></span><div><small>Tasks Done</small><strong>--</strong><p>Open task status</p></div></a>
         <a class="student-summary-card amber" href="submission.html"><span><i data-lucide="send"></i></span><div><small>Submissions</small><strong>--</strong><p>Open records</p></div></a>
         <a class="student-summary-card red" href="strikes.html"><span><i data-lucide="shield-alert"></i></span><div><small>Strikes</small><strong>--</strong><p>Check eligibility</p></div></a>
-        <a class="student-summary-card purple" href="activeness.html"><span><i data-lucide="zap"></i></span><div><small>Activeness</small><strong>--</strong><p>Open progress</p></div></a>
+        <a class="student-summary-card purple" href="activeness.html"><span><i data-lucide="zap"></i></span><div><small>Level / XP</small><strong>--</strong><p>Open progress</p></div></a>
       </section>
 
       <section class="student-home-section clean-section">
@@ -234,7 +233,7 @@
             <span class="student-next-icon"><i data-lucide="clipboard-list"></i></span>
             <small>Assignments</small>
             <strong>Check current work</strong>
-            <p>Review instructions and files for your current chapter.</p>
+            <p>Review instructions and files for your current unit.</p>
             <i class="student-next-arrow" data-lucide="arrow-right"></i>
           </a>
           <a class="student-next-card purple" href="tasks.html">
@@ -293,6 +292,12 @@
       return EQStudent.classLabel(value);
     }
 
+    function initClassOptions() {
+      if (window.EQClasses) {
+        EQClasses.fillSelect('studentClass', '11', EQStudent.read('11').classId, 'Choose class');
+      }
+    }
+
     function refreshSidebarClass() {
       var profile = EQStudent.read('11');
       var cls = profile.classId;
@@ -321,7 +326,7 @@
       document.getElementById('profileTitle').textContent = hasProfile ? name : 'Personalize your space';
       document.getElementById('profileCopy').textContent = hasProfile
         ? classLabel(cls) + ' · No. ' + no + '. Your saved student profile is active on this browser.'
-        : 'Choose your class and name so this browser can show your own scores, tasks, attendance, and activeness.';
+        : 'Choose your class and name so this browser can show your own scores, tasks, attendance, and Level / XP progress.';
       document.getElementById('studentClass').value = cls || '';
       document.getElementById('logoutProfile').disabled = !hasProfile;
       document.getElementById('changeProfile').disabled = !hasProfile;
@@ -406,6 +411,7 @@
     document.getElementById('changeProfile').addEventListener('click', changeProfile);
     document.getElementById('logoutProfile').addEventListener('click', logoutProfile);
 
+    initClassOptions();
     refreshProfileDisplay();
     document.addEventListener('DOMContentLoaded', refreshSidebarClass);
     if (document.getElementById('studentClass').value) {
