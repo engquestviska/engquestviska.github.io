@@ -28,6 +28,11 @@
     return '<a' + active + ' href="' + href + '">' + icon(iconName) + '<span>' + name + '</span></a>';
   }
 
+  function currentPageFromPath() {
+    var filePage = (location.pathname.split('/').pop() || 'index.html').replace('.html', '');
+    return filePage === 'index' ? 'home' : filePage;
+  }
+
   function getStudentProfile(currentGrade) {
     if (window.EQStudent) return window.EQStudent.read(currentGrade);
     var classId = localStorage.getItem('eq_student_class') || '';
@@ -65,21 +70,21 @@
   }
 
   function shellMarkup() {
-    var filePage = (location.pathname.split('/').pop() || 'index.html').replace('.html', '');
-    var current = document.body.getAttribute('data-page') || (filePage === 'index' ? 'home' : filePage);
+    var current = document.body.getAttribute('data-page') || currentPageFromPath();
     var currentGrade = detectGrade();
     var nav = [
       navItem('home', 'index.html', 'house', 'Homepage', current),
       navItem('dashboard', 'dashboard.html', 'chart-no-axes-column-increasing', 'My Statistics', current),
-      navItem('tasks', 'tasks.html', 'list-checks', 'Tasks', current),
-      navItem('submission', 'submission.html', 'file-up', 'Submission', current),
       navItem('lessons', 'lessons.html', 'book-open', 'Materials', current),
+      navItem('assignments', 'assignments.html', 'clipboard-list', 'Assignments', current),
+      navItem('submission', 'submission.html', 'file-up', 'Submission', current),
       navItem('session', 'session.html', 'book-marked', 'Reading', current),
       navItem('attendance', 'attendance.html', 'calendar-check', 'Attendance', current),
-      navItem('scores', 'scores.html', 'trophy', 'Scores', current),
-      navItem('students', 'students.html', 'users-round', 'Classmates', current),
-      navItem('activeness', 'activeness.html', 'zap', 'Participation', current),
-      navItem('strikes', 'strikes.html', 'shield-alert', 'Strikes', current)
+      navItem('scores', 'scores.html', 'trophy', 'Student Scores', current),
+      navItem('tasks', 'tasks.html', 'list-checks', 'Task Status', current),
+      navItem('students', 'students.html', 'users-round', 'Student List', current),
+      navItem('activeness', 'activeness.html', 'zap', 'Level / XP', current),
+      navItem('strikes', 'strikes.html', 'shield-alert', 'My Strikes', current)
     ].join('');
 
     return [
@@ -129,6 +134,7 @@
 
   function initStudentShell() {
     document.body.classList.add('student-shell-enabled');
+    document.body.setAttribute('data-student-shell-page', document.body.getAttribute('data-page') || currentPageFromPath());
     if (!document.getElementById('dashboardSidebar')) {
       document.body.insertAdjacentHTML('afterbegin', shellMarkup());
     }

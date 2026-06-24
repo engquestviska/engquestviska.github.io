@@ -909,6 +909,10 @@ svg { width: 19px; height: 19px; stroke-width: 1.9; }
   margin-bottom: 22px;
 }
 
+.student-shell-enabled .topbar .nav {
+  display: none;
+}
+
 .student-shell-enabled > .subpage-header,
 .student-shell-enabled.grade10-subpage > header {
   min-height: 0;
