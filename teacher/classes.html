@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teacher Classes · English Quest</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css"/>
+  <link rel="stylesheet" href="../shared/css/app-shell.css"/>
+  <style>
+    .class-command-grid {
+      display: grid;
+      grid-template-columns: minmax(250px, 0.72fr) minmax(0, 1.28fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .class-list-panel {
+      display: grid;
+      gap: 10px;
+    }
+
+    .class-list-button {
+      min-height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--ink);
+      padding: 0 14px;
+      text-decoration: none;
+      font-weight: 800;
+    }
+
+    .class-list-button span {
+      color: var(--muted);
+      font-size: 0.74rem;
+      font-weight: 700;
+    }
+
+    .class-list-button.active {
+      border-color: #9fc4ff;
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .class-detail-card {
+      display: grid;
+      gap: 20px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    .class-detail-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    .class-detail-title {
+      margin: 5px 0 0;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1;
+    }
+
+    .class-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      border-radius: 999px;
+      background: var(--blue-soft);
+      color: var(--blue);
+      padding: 0 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+    }
+
+    .class-action-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .class-action-card {
+      min-height: 132px;
+      display: grid;
+      align-content: start;
+      gap: 9px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #f8fbff;
+      color: var(--ink);
+      padding: 16px;
+      text-decoration: none;
+    }
+
+    .class-action-card:hover {
+      border-color: #9fc4ff;
+      background: #eef5ff;
+    }
+
+    .class-action-card i {
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      background: #dbeafe;
+      color: var(--blue);
+    }
+
+    .class-action-card strong {
+      font-size: 0.94rem;
+    }
+
+    .class-action-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+
+    .class-note {
+      border: 1px dashed #bfdbfe;
+      border-radius: 12px;
+      background: #f8fbff;
+      color: var(--muted);
+      padding: 15px;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 920px) {
+      .class-command-grid,
+      .class-action-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .class-detail-head {
+        display: grid;
+      }
+    }
+  </style>
+  <script src="../shared/js/classes-20260617.js"></script>
+  <script src="../shared/js/api.js"></script>
+  <script src="../shared/js/auth.js"></script>
+  <script src="../shared/js/teacher-sidebar.js"></script>
+</head>
+<body class="teacher-tool-page" data-page="classes">
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <img src="../logo.jpg" alt="English Quest Logo"/>
+        <div>
+          <div class="brand-title">English Quest</div>
+          <div class="brand-sub">Teacher Control Room</div>
+        </div>
+      </div>
+      <nav class="nav-actions" aria-label="Teacher navigation">
+        <a href="../grade10/">Grade X Student Site</a>
+        <a href="../grade11/">Grade XI Student Site</a>
+        <button type="button" onclick="teacherLogout()">Logout</button>
+      </nav>
+    </div>
+    <section class="hero">
+      <div class="kicker">Classes</div>
+      <h1>Open the right room before editing anything.</h1>
+      <p class="hero-copy">Use this as the class switchboard for your confirmed Grade X and Grade XI teaching assignment.</p>
+    </section>
+  </header>
+
+  <main>
+    <section class="access-card" id="accessCard" hidden>
+      <h2 class="access-title">Teacher login required.</h2>
+      <p class="access-copy">Open the teacher dashboard and log in first. This page keeps class management inside the teacher track.</p>
+      <a class="btn" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none;">Open Teacher Login</a>
+    </section>
+
+    <section id="appPanel" hidden>
+      <div class="class-command-grid">
+        <aside class="panel">
+          <div class="panel-head">
+            <div>
+              <h2 class="panel-title">My Classes</h2>
+              <p class="panel-copy">Confirmed for next year.</p>
+            </div>
+          </div>
+          <div class="class-list-panel" id="classList"></div>
+        </aside>
+
+        <article class="class-detail-card" id="classDetail"></article>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2026 English Quest · Teacher Classes</footer>
+
+  <script>
+    function teacherLogout() {
+      EQAuth.logoutTeacher('index.html');
+    }
+
+    function escapeHtml(value) {
+      return String(value == null ? '' : value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function selectedClass() {
+      var queryClass = new URLSearchParams(location.search).get('class') || '';
+      var allowed = EQClasses.all.some(function(item) { return item.id === queryClass; });
+      return allowed ? queryClass : EQClasses.all[0].id;
+    }
+
+    function renderClassList(current) {
+      document.getElementById('classList').innerHTML = EQClasses.all.map(function(item) {
+        var active = item.id === current ? ' active' : '';
+        return '<a class="class-list-button' + active + '" href="classes.html?class=' + encodeURIComponent(item.id) + '">' +
+          '<strong>' + escapeHtml(item.shortLabel || item.id) + '</strong>' +
+          '<span>Grade ' + (item.grade === '11' ? 'XI' : 'X') + '</span>' +
+        '</a>';
+      }).join('');
+    }
+
+    function studentHomeFor(item) {
+      return item.grade === '11' ? '../grade11/' : '../grade10/';
+    }
+
+    function renderClassDetail(classId) {
+      var item = EQClasses.all.find(function(entry) { return entry.id === classId; }) || EQClasses.all[0];
+      var isGradeX = item.grade === '10';
+      var studentHome = studentHomeFor(item);
+      var gradeLabel = item.grade === '11' ? 'Grade XI' : 'Grade X';
+      var managerCards = isGradeX
+        ? [
+            ['scores.html?class=' + item.id, 'chart-no-axes-column-increasing', 'Scores', 'Open the Grade X score manager for this class.'],
+            ['tasks.html?class=' + item.id, 'list-checks', 'Task Status', 'Review and manage task completion records.'],
+            ['submissions.html?class=' + item.id, 'inbox', 'Submissions', 'Review submitted work and submission coverage.'],
+            ['attendance.html?class=' + item.id, 'calendar-check', 'Attendance', 'Inspect attendance records for this class.'],
+            ['activeness.html?class=' + item.id, 'zap', 'Level / XP', 'Manage the participation system until the RPG model is rebuilt.'],
+            ['strikes.html?class=' + item.id, 'shield-alert', 'Strikes', 'Manage warnings with a maximum of three strikes.']
+          ]
+        : [
+            ['../grade11/', 'monitor', 'Grade XI Student Site', 'Preview the student-side structure for this Grade XI class.'],
+            ['classes.html?class=' + item.id, 'database', 'Roster Pending', 'Official Grade XI roster and data source are not connected yet.'],
+            ['classes.html?class=' + item.id, 'clipboard-list', 'Teacher Tools Pending', 'Grade XI teacher editing tools will be enabled after the data contract is ready.']
+          ];
+
+      document.getElementById('classDetail').innerHTML =
+        '<div class="class-detail-head">' +
+          '<div><div class="eyebrow">Selected Class</div><h2 class="class-detail-title">' + escapeHtml(item.shortLabel || item.id) + '</h2></div>' +
+          '<span class="class-badge">' + escapeHtml(gradeLabel) + '</span>' +
+        '</div>' +
+        '<div class="class-note">This page is the teacher-side switchboard. Student pages stay read-only, while editing and review tools stay inside this teacher track.</div>' +
+        '<div class="class-action-grid">' +
+          '<a class="class-action-card" href="' + studentHome + '"><i data-lucide="monitor"></i><strong>Student Site</strong><p>Open what students see for this grade.</p></a>' +
+          managerCards.map(function(card) {
+            return '<a class="class-action-card" href="' + card[0] + '"><i data-lucide="' + card[1] + '"></i><strong>' + escapeHtml(card[2]) + '</strong><p>' + escapeHtml(card[3]) + '</p></a>';
+          }).join('') +
+        '</div>';
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    (function init() {
+      if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel' })) return;
+      var current = selectedClass();
+      renderClassList(current);
+      renderClassDetail(current);
+    })();
+  </script>
+</body>
+</html>
+

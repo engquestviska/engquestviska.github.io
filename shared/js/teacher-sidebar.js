@@ -2,6 +2,7 @@
 (function () {
   var NAV_ITEMS = [
     { page: 'teacher-home', href: 'index.html', icon: 'house', name: 'Homepage' },
+    { page: 'classes', href: 'classes.html', icon: 'users-round', name: 'Classes' },
     { page: 'scores', href: 'scores.html', icon: 'user-round', name: 'Students & Scores' },
     { page: 'materials', href: 'materials.html', icon: 'book-open', name: 'Materials' },
     { page: 'assignments', href: 'assignments.html', icon: 'clipboard-list', name: 'Assignments' },
@@ -26,7 +27,8 @@
     return {
       id: item.id,
       label: item.shortLabel || item.id,
-      href: item.grade === '11' ? '../grade11/' : 'scores.html?class=' + item.id
+      grade: item.grade,
+      href: 'classes.html?class=' + encodeURIComponent(item.id)
     };
   });
 
@@ -55,7 +57,7 @@
   }
 
   function navMarkup() {
-    var current = document.body.getAttribute('data-page') || '';
+    var current = document.body.getAttribute('data-page') || currentPageFromPath();
     return NAV_ITEMS.map(function (item) {
       var active = item.page === current ? ' class="active"' : '';
       return '<a' + active + ' href="' + item.href + '">' + icon(item.icon) + '<span>' + item.name + '</span></a>';
@@ -64,8 +66,36 @@
 
   function classMarkup() {
     return CLASSES.map(function (item) {
-      return '<a href="' + item.href + '">' + icon('graduation-cap') + '<span>' + item.label + '</span></a>';
+      var currentClass = selectedClassFromQuery();
+      var active = item.id === currentClass ? ' class="active"' : '';
+      return '<a' + active + ' href="' + item.href + '">' + icon('graduation-cap') + '<span>' + item.label + '</span></a>';
     }).join('');
+  }
+
+  function currentPageFromPath() {
+    var file = (location.pathname.split('/').pop() || 'index.html').replace('.html', '');
+    if (!file || file === 'index') return 'teacher-home';
+    return file;
+  }
+
+  function selectedClassFromQuery() {
+    try {
+      return new URLSearchParams(location.search).get('class') || '';
+    } catch (error) {
+      return '';
+    }
+  }
+
+  function applyClassQueryToSelect() {
+    var selected = selectedClassFromQuery();
+    var select = document.getElementById('classSelect');
+    if (!selected || !select) return;
+    var hasOption = Array.prototype.some.call(select.options, function(option) {
+      return option.value === selected;
+    });
+    if (!hasOption || select.value === selected) return;
+    select.value = selected;
+    select.dispatchEvent(new Event('change', { bubbles: true }));
   }
 
   function shellMarkup() {
@@ -75,6 +105,8 @@
       '  <nav class="primary-nav" aria-label="Teacher navigation">' + navMarkup() + '</nav>',
       '  <section class="class-nav"><div class="sidebar-label">My Classes <span>(8)</span></div>' + classMarkup() + '</section>',
       '  <div class="sidebar-footer">',
+      '    <a href="../grade10/">' + icon('monitor') + '<span>Grade X Student Site</span></a>',
+      '    <a href="../grade11/">' + icon('monitor') + '<span>Grade XI Student Site</span></a>',
       '    <a href="../index.html">' + icon('layers') + '<span>Choose Track</span></a>',
       '    <button type="button" onclick="teacherSidebarLogout()">' + icon('log-out') + '<span>Logout</span></button>',
       '  </div>',
@@ -85,7 +117,7 @@
 
   function addMobileButton() {
     var topbar = document.querySelector('.teacher-tool-page header .topbar');
-    if (!topbar || topbar.querySelector('.teacher-shell-mobile-button')) return;
+    if (!topbar || topbar.querySelector('.teacher-shell-mobile-button, .mobile-menu')) return;
     var button = document.createElement('button');
     button.type = 'button';
     button.className = 'teacher-shell-mobile-button';
@@ -136,6 +168,7 @@
     }
     addMobileButton();
     bindMobileControls();
+    applyClassQueryToSelect();
     ensureIcons();
   }
 

@@ -7,6 +7,7 @@ English Quest is being reorganized into three tracks.
 - `index.html` - landing page for Grade 10, Grade 11, and Teacher.
 - `LAUNCH_CHECKLIST.md` - launch readiness checklist before merging `next-year` into `main`.
 - `PRE_ROSTER_PLAN.md` - active development order while official student rosters are unavailable.
+- `PRODUCT_CONTRACT.md` - route, ownership, and UI contract for the next-year rebuild.
 - `ROSTER_IMPORT_CONTRACT.md` - canonical roster CSV fields, validation rules, and spreadsheet mapping.
 - `NEXT_SEMESTER_API.md` - next-semester spreadsheet/API contract and boundary notes.
 - `NEXT_SEMESTER_MIGRATION.md` - promotion checklist for moving the isolated preview into the real grade pages later.
@@ -53,6 +54,7 @@ English Quest is being reorganized into three tracks.
 ## Teacher
 
 - `teacher/index.html` - Teacher dashboard and future management hub for both grades.
+- `teacher/classes.html` - Teacher class switchboard for confirmed Grade X and Grade XI classes.
 - `teacher/materials.html` - Teacher materials manager for Grade 10 dynamic lesson files.
 - `teacher/assignments.html` - Teacher assignment manager for Grade 10 dynamic task files.
 - `teacher/submissions.html` - Teacher submission review and Chapter 5 sync manager.

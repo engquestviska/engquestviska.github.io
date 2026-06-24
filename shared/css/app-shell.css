@@ -97,17 +97,20 @@ svg { width: 19px; height: 19px; stroke-width: 1.9; }
 .student-profile-link:hover,
 .sidebar-footer a:hover,
 .sidebar-footer button:hover,
-.primary-nav a.active {
+.primary-nav a.active,
+.class-nav a.active {
   background: var(--blue-soft);
   color: var(--blue);
 }
 
-.primary-nav a.active {
+.primary-nav a.active,
+.class-nav a.active {
   position: relative;
   font-weight: 700;
 }
 
-.primary-nav a.active::before {
+.primary-nav a.active::before,
+.class-nav a.active::before {
   content: '';
   position: absolute;
   left: -14px;

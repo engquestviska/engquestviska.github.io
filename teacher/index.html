@@ -13,43 +13,7 @@
   <script src="../shared/js/auth.js"></script>
   <script src="../shared/js/teacher-sidebar.js"></script>
 </head>
-<body class="teacher-dashboard-page">
-  <aside class="dashboard-sidebar" id="dashboardSidebar">
-    <a class="sidebar-brand" href="index.html">
-      <span class="brand-mark"><i data-lucide="graduation-cap"></i></span>
-      <span>English Quest</span>
-    </a>
-
-    <nav class="primary-nav" aria-label="Teacher navigation">
-      <a class="active" href="index.html"><i data-lucide="house"></i><span>Homepage</span></a>
-      <a href="#overview"><i data-lucide="chart-no-axes-column-increasing"></i><span>Dashboard</span></a>
-      <a href="#classes"><i data-lucide="users-round"></i><span>Classes</span></a>
-      <a href="scores.html"><i data-lucide="user-round"></i><span>Students</span></a>
-      <a href="tasks.html"><i data-lucide="clipboard-list"></i><span>Tasks</span></a>
-      <a href="submissions.html"><i data-lucide="file-text"></i><span>Submissions</span></a>
-      <a href="attendance.html"><i data-lucide="chart-bar-big"></i><span>Reports</span></a>
-    </nav>
-
-    <section class="class-nav" id="classes">
-      <div class="sidebar-label">My Classes <span>(8)</span></div>
-      <a href="scores.html?class=XE1"><i data-lucide="graduation-cap"></i><span>XE1</span></a>
-      <a href="scores.html?class=XE2"><i data-lucide="graduation-cap"></i><span>XE2</span></a>
-      <a href="scores.html?class=XE3"><i data-lucide="graduation-cap"></i><span>XE3</span></a>
-      <a href="scores.html?class=XE4"><i data-lucide="graduation-cap"></i><span>XE4</span></a>
-      <a href="scores.html?class=XE5"><i data-lucide="graduation-cap"></i><span>XE5</span></a>
-      <a href="../grade11/"><i data-lucide="graduation-cap"></i><span>XIF7</span></a>
-      <a href="../grade11/"><i data-lucide="graduation-cap"></i><span>XIF8</span></a>
-      <a href="../grade11/"><i data-lucide="graduation-cap"></i><span>XIF9</span></a>
-    </section>
-
-    <div class="sidebar-footer">
-      <a href="#settings"><i data-lucide="settings"></i><span>Settings</span></a>
-      <button type="button" onclick="teacherLogout()"><i data-lucide="log-out"></i><span>Logout</span></button>
-    </div>
-  </aside>
-
-  <div class="mobile-backdrop" id="mobileBackdrop" onclick="closeTeacherShell()"></div>
-
+<body class="teacher-tool-page teacher-dashboard-page" data-page="teacher-home">
   <main class="dashboard-main">
     <header class="dashboard-topbar">
       <div class="welcome-wrap">
@@ -202,14 +166,14 @@
         </div>
       </div>
       <div class="class-grid">
-        <a href="scores.html?class=XE1"><strong>XE1</strong><span>Grade X</span></a>
-        <a href="scores.html?class=XE2"><strong>XE2</strong><span>Grade X</span></a>
-        <a href="scores.html?class=XE3"><strong>XE3</strong><span>Grade X</span></a>
-        <a href="scores.html?class=XE4"><strong>XE4</strong><span>Grade X</span></a>
-        <a href="scores.html?class=XE5"><strong>XE5</strong><span>Grade X</span></a>
-        <a href="../grade11/"><strong>XIF7</strong><span>Grade XI</span></a>
-        <a href="../grade11/"><strong>XIF8</strong><span>Grade XI</span></a>
-        <a href="../grade11/"><strong>XIF9</strong><span>Grade XI</span></a>
+        <a href="classes.html?class=XE1"><strong>XE1</strong><span>Grade X</span></a>
+        <a href="classes.html?class=XE2"><strong>XE2</strong><span>Grade X</span></a>
+        <a href="classes.html?class=XE3"><strong>XE3</strong><span>Grade X</span></a>
+        <a href="classes.html?class=XE4"><strong>XE4</strong><span>Grade X</span></a>
+        <a href="classes.html?class=XE5"><strong>XE5</strong><span>Grade X</span></a>
+        <a href="classes.html?class=XIF7"><strong>XIF7</strong><span>Grade XI</span></a>
+        <a href="classes.html?class=XIF8"><strong>XIF8</strong><span>Grade XI</span></a>
+        <a href="classes.html?class=XIF9"><strong>XIF9</strong><span>Grade XI</span></a>
       </div>
     </section>
   </main>
