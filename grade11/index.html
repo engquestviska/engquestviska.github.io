@@ -164,7 +164,7 @@
           <h1>Welcome back, <span id="welcomeName">Student</span></h1>
           <p>Your Grade 11 English class hub for materials, tasks, submissions, progress, and class updates.</p>
         </div>
-        <a class="student-header-action" href="../index.html">Grade 11 Homepage</a>
+        <a class="student-header-action" href="../index.html">Choose Grade</a>
       </header>
 
       <section class="student-home-overview">
@@ -175,7 +175,7 @@
             <p>Focus on your current unit, score improvement, and task completion.</p>
           </div>
           <div class="student-welcome-actions">
-            <a href="tasks.html">Continue Task</a>
+            <a href="tasks.html">Check Tasks</a>
             <a href="lessons.html">View Materials</a>
           </div>
         </article>
@@ -184,7 +184,7 @@
           <div>
             <div class="profile-label">Student Profile</div>
             <div class="profile-title" id="profileTitle">Personalize your space</div>
-            <p class="profile-copy" id="profileCopy">Choose your class and name so this browser can show your own scores, tasks, attendance, and Level / XP progress.</p>
+            <p class="profile-copy" id="profileCopy">Choose your class now. Name selection opens after the official Grade XI roster is published.</p>
           </div>
           <div class="profile-status" id="profileStatus">Not logged in</div>
           <div class="profile-form">
@@ -200,7 +200,7 @@
                 <option value="">Choose class first</option>
               </select>
             </div>
-            <div class="profile-message" id="profileMessage">Start by choosing your class.</div>
+            <div class="profile-message" id="profileMessage">Choose your class. Names are locked until the official roster is published.</div>
           </div>
           <div class="profile-actions profile-login-actions">
             <button class="btn primary" type="button" id="confirmProfile" disabled>Confirm Profile</button>
@@ -254,7 +254,7 @@
             <span class="student-next-icon"><i data-lucide="send"></i></span>
             <small>Submission</small>
             <strong>Check your records</strong>
-            <p>Submit work and confirm that your files were received.</p>
+            <p>Check the upload space and confirm future file records once published.</p>
             <i class="student-next-arrow" data-lucide="arrow-right"></i>
           </a>
         </div>
@@ -326,7 +326,7 @@
       document.getElementById('profileTitle').textContent = hasProfile ? name : 'Personalize your space';
       document.getElementById('profileCopy').textContent = hasProfile
         ? classLabel(cls) + ' · No. ' + no + '. Your saved student profile is active on this browser.'
-        : 'Choose your class and name so this browser can show your own scores, tasks, attendance, and Level / XP progress.';
+        : 'Choose your class now. Name selection opens after the official Grade XI roster is published.';
       document.getElementById('studentClass').value = cls || '';
       document.getElementById('logoutProfile').disabled = !hasProfile;
       document.getElementById('changeProfile').disabled = !hasProfile;
@@ -362,14 +362,14 @@
       var cls = document.getElementById('studentClass').value;
       studentsForClass = [];
       if (!cls) {
-        document.getElementById('profileMessage').textContent = 'Start by choosing your class.';
+        document.getElementById('profileMessage').textContent = 'Choose your class. Names are locked until the official roster is published.';
         resetStudentSelect('Choose class first');
         return;
       }
 
       resetStudentSelect('Roster not published yet');
       document.getElementById('profileMessage').textContent =
-        'The official roster for ' + classLabel(cls) + ' has not been published yet. Profile selection will open when the Grade XI roster is connected.';
+        'The official roster for ' + classLabel(cls) + ' has not been published yet. This page is intentionally not showing old-year or Grade X student names.';
     }
 
     function confirmProfile() {

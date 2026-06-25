@@ -181,6 +181,23 @@
   line-height: 1.65;
 }
 
+.grade11-page .placeholder-readiness {
+  margin-top: 16px;
+  border: 1px solid #bde8e1;
+  border-radius: 12px;
+  background: #f0fdfa;
+  color: #0f766e;
+  font-size: 0.74rem;
+  font-weight: 700;
+  line-height: 1.55;
+  padding: 12px 14px;
+}
+
+.grade11-page .placeholder-readiness.warning {
+  border-color: #fed7aa;
+  background: #fff7ed;
+  color: #9a3412;
+}
 .grade11-page .placeholder-actions {
   display: flex;
   flex-wrap: wrap;
