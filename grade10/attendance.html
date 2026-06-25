@@ -381,7 +381,7 @@
     <section class="subpage-hero">
       <div class="kicker">Attendance</div>
       <h1>Check your attendance record.</h1>
-      <p class="hero-copy">Choose your class and name to see your attendance percentage, totals, and meeting-by-meeting history.</p>
+      <p class="hero-copy">Choose your class and name to see attendance percentage, totals, and meeting history after official records are published.</p>
     </section>
   </header>
 
@@ -396,8 +396,6 @@
           <label for="classSelect">Class</label>
           <select id="classSelect">
             <option value="">Choose class</option>
-            <option>XE1</option><option>XE2</option><option>XE3</option>
-            <option>XE4</option><option>XE5</option>
           </select>
         </div>
         <div class="field">
@@ -483,6 +481,7 @@
     let currentClass = '';
     let currentStudents = [];
     let currentMeetings = [];
+    const ROSTERS_READY = window.EQClasses ? EQClasses.rostersReady() : false;
 
     function setLoading(on) {
       loadingState.classList.toggle('hidden', !on);
@@ -496,6 +495,19 @@
       emptyState.classList.remove('hidden');
       loadingState.classList.add('hidden');
       dashboard.classList.add('hidden');
+    }
+
+    function initClassOptions() {
+      if (window.EQClasses) {
+        EQClasses.fillSelect(classSelect, '10', '', 'Choose class');
+      }
+    }
+
+    function showPreRosterAttendance() {
+      studentSelect.disabled = true;
+      studentSelect.innerHTML = '<option value="">Roster not published yet</option>';
+      pickerHint.textContent = 'Official Grade X attendance records are not published yet.';
+      showEmpty('Official roster not published yet.', 'Attendance will appear here after the new Grade X roster and attendance records are connected. This page is intentionally not showing old-year data.');
     }
 
     function initials(name) {
@@ -636,6 +648,10 @@
     }
 
     async function loadClass(className) {
+      if (!ROSTERS_READY) {
+        showPreRosterAttendance();
+        return;
+      }
       currentClass = className;
       currentStudents = [];
       currentMeetings = [];
@@ -693,6 +709,11 @@
     });
 
     document.addEventListener('DOMContentLoaded', function() {
+      initClassOptions();
+      if (!ROSTERS_READY) {
+        showPreRosterAttendance();
+        return;
+      }
       const profile = savedProfile();
       if (!profile.className) return;
       classSelect.value = profile.className;

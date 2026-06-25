@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Chapter Scores · English Quest</title>
+  <title>Student Scores · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css"/>
@@ -422,8 +422,8 @@
 
   <section class="subpage-hero">
     <div class="kicker">Scores</div>
-    <h1>Check chapter scores without digging through sheets.</h1>
-    <p class="hero-copy">Students can open their own chapter and final score summary from a clean, read-only view.</p>
+    <h1>Check your scores without digging through sheets.</h1>
+    <p class="hero-copy">Students can open their own score summary from a clean, read-only view once official records are published.</p>
   </section>
 </header>
 <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
@@ -438,6 +438,7 @@
 <script>
 const CLASSES = window.EQClasses ? EQClasses.idsForGrade('10') : ['XE1','XE2','XE3','XE4','XE5'];
 const CLASS_LABELS = window.EQClasses ? EQClasses.labels : { XE1:'X E-1', XE2:'X E-2', XE3:'X E-3', XE4:'X E-4', XE5:'X E-5' };
+const ROSTERS_READY = window.EQClasses ? EQClasses.rostersReady() : false;
 
 var currentClass   = localStorage.getItem('eq_last_class') || 'XE1';
 if (CLASSES.indexOf(currentClass) === -1) currentClass = 'XE1';
@@ -490,8 +491,22 @@ function init() {
   renderStudentMode();
 }
 
+function renderPreRosterScores() {
+  document.getElementById('mainContent').innerHTML =
+    '<div class="mode-badge student">&#128203; Student View</div>' +
+    '<div class="state-card">' +
+      '<div class="state-icon">&#128101;</div>' +
+      '<div class="state-title">Official score records are not published yet.</div>' +
+      '<div class="state-sub">This page is intentionally not showing old-year scores. Grade X scores will appear after the new roster and score source are connected.</div>' +
+    '</div>';
+}
+
 // ── STUDENT MODE ─────────────────────────────────────────────
 function renderStudentMode() {
+  if (!ROSTERS_READY) {
+    renderPreRosterScores();
+    return;
+  }
   var main = document.getElementById('mainContent');
 
   // Check if student identity is saved
@@ -523,7 +538,7 @@ function renderStudentMode() {
         '<div class="identity-icon">&#128100;</div>' +
         '<div>' +
           '<div class="identity-title">Choose your score profile.</div>' +
-          '<div class="identity-copy">Pick your class and name to open your chapter scores.</div>' +
+          '<div class="identity-copy">Pick your class and name to open your score records.</div>' +
         '</div>' +
       '</div>' +
       '<div class="identity-controls">' +
@@ -583,7 +598,7 @@ function autoLoadStudentScores(cls, no, name) {
           '</div>' +
         '</div>' +
         '<div class="score-card-body">' +
-          '<div class="chapter-tabs"><button class="ch-tab active" id="stab4" onclick="switchStudentTab(4)">Chapter 4</button><button class="ch-tab" id="stab5" onclick="switchStudentTab(5)">Chapter 5</button><button class="ch-tab" id="stabF" onclick="switchStudentTab(&apos;F&apos;)">&#127942; Final Score</button></div>' +
+          '<div class="chapter-tabs"><button class="ch-tab active" id="stab4" onclick="switchStudentTab(4)">Current Unit</button><button class="ch-tab" id="stab5" onclick="switchStudentTab(5)">Upcoming Unit</button><button class="ch-tab" id="stabF" onclick="switchStudentTab(&apos;F&apos;)">&#127942; Final Score</button></div>' +
           '<div id="sScoreCh4">' + ch4Html + '</div>' +
           '<div id="sScoreCh5" style="display:none">' + ch5Html + '</div>' +
           '<div id="sScoreF" style="display:none">' + finHtml + '</div>' +
@@ -664,7 +679,7 @@ function renderStudentScoreCard(student, ch4, ch5, fin, cols4, cols5, colsF, cal
   var html = '<div class="student-score-card">';
   html += '<div class="score-card-header"><div class="score-card-avatar">' + escapeHtml(initial) + '</div><div class="score-card-name"><div class="name">' + escapeHtml(student ? student.name : '') + '</div><div class="meta">' + escapeHtml(CLASS_LABELS[currentClass]) + ' &middot; ' + escapeHtml(student && student.nickname ? student.nickname : '') + '</div></div></div>';
   html += '<div class="score-card-body">';
-  html += '<div class="chapter-tabs"><button class="ch-tab active" id="stab4" onclick="switchStudentTab(4)">Chapter 4</button><button class="ch-tab" id="stab5" onclick="switchStudentTab(5)">Chapter 5</button><button class="ch-tab" id="stabF" onclick="switchStudentTab(&apos;F&apos;)">&#127942; Final Score</button></div>';
+  html += '<div class="chapter-tabs"><button class="ch-tab active" id="stab4" onclick="switchStudentTab(4)">Current Unit</button><button class="ch-tab" id="stab5" onclick="switchStudentTab(5)">Upcoming Unit</button><button class="ch-tab" id="stabF" onclick="switchStudentTab(&apos;F&apos;)">&#127942; Final Score</button></div>';
   html += '<div id="sScoreCh4">' + buildStudentChapterHTML(ch4, cols4, 4) + '</div>';
   html += '<div id="sScoreCh5" style="display:none">' + buildStudentChapterHTML(ch5, cols5, 5) + '</div>';
   html += '<div id="sScoreF" style="display:none">' + buildStudentFinalHTML(fin, colsF, calcColsF) + '</div>';
@@ -675,7 +690,7 @@ function renderStudentScoreCard(student, ch4, ch5, fin, cols4, cols5, colsF, cal
 }
 
 function buildStudentChapterHTML(chData, cols, ch) {
-  if (!chData) return '<div class="state-card"><div class="state-icon">&#128203;</div><div class="state-title">No data yet</div><div class="state-sub">Chapter ' + ch + ' scores haven\'t been entered yet.</div></div>';
+  if (!chData) return '<div class="state-card"><div class="state-icon">&#128203;</div><div class="state-title">No data yet</div><div class="state-sub">This unit score has not been entered yet.</div></div>';
 
   var html = '<div class="score-grid">';
   if (cols) {
@@ -772,7 +787,7 @@ function renderLeaderboard(cls) {
   // Build filter buttons via JS (avoids string escaping issues)
   var lbFilters = document.getElementById('lbFilters');
   if (lbFilters) {
-    [['overall','Overall'],['4','Chapter 4'],['5','Chapter 5']].forEach(function(f) {
+    [['overall','Overall'],['4','Current Unit'],['5','Upcoming Unit']].forEach(function(f) {
       var btn = document.createElement('button');
       btn.className = 'lb-filter-btn' + (lbChapter === f[0] ? ' active' : '');
       btn.textContent = f[1];
@@ -786,8 +801,9 @@ function switchLbFilter(cls, chapter) {
   lbChapter = chapter;
   // Update button styles
   document.querySelectorAll('.lb-filter-btn').forEach(function(btn) {
-    var isActive = (btn.textContent.toLowerCase().replace('chapter ','') === chapter) ||
-                   (chapter === 'overall' && btn.textContent === 'Overall');
+    var isActive = (chapter === 'overall' && btn.textContent === 'Overall') ||
+                   (chapter === '4' && btn.textContent === 'Current Unit') ||
+                   (chapter === '5' && btn.textContent === 'Upcoming Unit');
     btn.classList.toggle('active', isActive);
   });
   document.getElementById('lbRankings').innerHTML = '<div class="lb-loading"><div class="spinner" style="width:24px;height:24px;margin:0 auto 8px;"></div>Loading...</div>';

@@ -122,6 +122,10 @@
     };
   }
 
+  function rostersReady() {
+    return dataReadiness().rostersReady === true;
+  }
+
   global.EQClasses = {
     defaultRosterSize: DEFAULT_ROSTER_SIZE,
     grade10: cloneList(GRADE_X),
@@ -139,6 +143,7 @@
     optionHtml: optionHtml,
     fillSelect: fillSelect,
     placeholderRosterFor: placeholderRosterFor,
-    dataReadiness: dataReadiness
+    dataReadiness: dataReadiness,
+    rostersReady: rostersReady
   };
 })(window);

@@ -502,7 +502,7 @@
   <section class="subpage-hero">
     <div class="kicker">Task Status</div>
     <h1>See which tasks are done and what still needs attention.</h1>
-    <p class="hero-copy">Students can check Chapter 4 and Chapter 5 task progress from a clean, read-only status view.</p>
+    <p class="hero-copy">Students can check published task progress from a clean, read-only status view once the official roster is ready.</p>
   </section>
 </header>
 
@@ -518,17 +518,12 @@
     <div class="card">
       <div>
         <div class="card-title">Open your task tracker.</div>
-        <p class="picker-copy">Choose your class and name to see chapter progress, missing work, and submitted tasks in one student-only view.</p>
+        <p class="picker-copy">Choose your class and name to see progress, missing work, and submitted tasks in one student-only view.</p>
       </div>
       <div class="picker-panel">
         <div class="field"><label>Your Class</label>
           <select id="sClassSelect" onchange="onSClassChange()">
             <option value="">— Select your class —</option>
-            <option value="XE1">X E-1</option>
-              <option value="XE2">X E-2</option>
-              <option value="XE3">X E-3</option>
-              <option value="XE4">X E-4</option>
-              <option value="XE5">X E-5</option>
           </select>
         </div>
         <div class="field"><label>Your Name</label>
@@ -547,6 +542,7 @@
 
 <script>
   let studentsCache = {};
+  const ROSTERS_READY = window.EQClasses ? EQClasses.rostersReady() : false;
 
   // ── CACHE LAYER ─────────────────────────────────────────────
   var CACHE_TTL = 30 * 60 * 1000;
@@ -589,6 +585,16 @@
     });
   }
 
+  function showPreRosterMessage(targetId) {
+    document.getElementById(targetId).innerHTML = '<div class="empty-chapter"><div class="empty-chapter-icon">&#128101;</div><div style="font-weight:800;margin-bottom:4px;color:#0f172a">Official roster not published yet</div><div>Task status will open after the new Grade X roster and task records are connected. This page is intentionally not showing old-year data.</div></div>';
+  }
+
+  function initClassOptions() {
+    if (window.EQClasses) {
+      EQClasses.fillSelect('sClassSelect', '10', '', '— Select your class —');
+    }
+  }
+
 
   // ── STUDENT — LOAD NAMES ──────────────────────────────────────
   async function onSClassChange() {
@@ -599,6 +605,11 @@
     nameSelect.disabled = true; viewBtn.disabled = true;
     document.getElementById('studentResult').innerHTML = '';
     if (!cls) { nameSelect.innerHTML = '<option>— Select class first —</option>'; return; }
+    if (!ROSTERS_READY) {
+      nameSelect.innerHTML = '<option value="">Roster not published yet</option>';
+      showPreRosterMessage('studentResult');
+      return;
+    }
     try {
       let data = studentsCache[cls];
       if (!data) { data = await cachedApiGet({ action: 'getStudents', className: cls }); studentsCache[cls] = data; }
@@ -626,6 +637,10 @@
 
   // ── STUDENT — VIEW TASKS ──────────────────────────────────────
   async function viewTaskStatus() {
+    if (!ROSTERS_READY) {
+      showPreRosterMessage('studentResult');
+      return;
+    }
     const cls = document.getElementById('sClassSelect').value;
     const no  = document.getElementById('sNameSelect').value;
     const clsLabel = document.getElementById('sClassSelect').options[document.getElementById('sClassSelect').selectedIndex].text;
@@ -641,7 +656,7 @@
       ]);
       if (data && data.error) throw new Error(data.error);
 
-      // Check if this student has submitted Chapter 4
+      // Check whether the current unit submission has been received.
       var hasSubmitted = false;
       if (subData && subData.students && subData.students[cls]) {
         var studentName = data.name || '';
@@ -710,15 +725,15 @@
     }).join('');
 
     const ch4Panel = ch4Keys.length
-      ? makeProgress(ch4Keys, 'Chapter 4') +
-        (hasSubmitted ? '<div class="task-status-note"><span>&#10003;</span><div>You submitted Chapter 4, so every Chapter 4 task is recorded as done.</div></div>' : '') +
+      ? makeProgress(ch4Keys, 'Current Unit') +
+        (hasSubmitted ? '<div class="task-status-note"><span>&#10003;</span><div>You submitted this unit, so every current-unit task is recorded as done.</div></div>' : '') +
         `<div class="tasks-section"><div class="tasks-grid">${makeChips(ch4Keys)}</div></div>`
-      : '<div class="empty-chapter"><div class="empty-chapter-icon">&#128203;</div><div>No Chapter 4 tasks found.</div></div>';
+      : '<div class="empty-chapter"><div class="empty-chapter-icon">&#128203;</div><div>No current-unit tasks found.</div></div>';
 
     const ch5Panel = ch5Keys.length
-      ? makeProgress(ch5Keys, 'Chapter 5') +
+      ? makeProgress(ch5Keys, 'Upcoming Unit') +
         `<div class="tasks-section"><div class="tasks-grid">${makeChips(ch5Keys)}</div></div>`
-      : '<div class="empty-chapter"><div class="empty-chapter-icon">&#8635;</div><div style="font-weight:800;margin-bottom:4px;color:#0f172a">Chapter 5 Tasks Coming Soon</div><div>Check back when Chapter 5 begins.</div></div>';
+      : '<div class="empty-chapter"><div class="empty-chapter-icon">&#8635;</div><div style="font-weight:800;margin-bottom:4px;color:#0f172a">Upcoming tasks coming soon</div><div>Check back when the next unit begins.</div></div>';
 
     document.getElementById('studentResult').innerHTML = `
       <div class="status-card">
@@ -735,8 +750,8 @@
           </div>
         </div>
         <div class="ch-tabs-inner">
-          <button class="ch-tab-inner active" id="ctab4" onclick="switchChapterTab(4)">Chapter 4</button>
-          <button class="ch-tab-inner" id="ctab5" onclick="switchChapterTab(5)">Chapter 5</button>
+          <button class="ch-tab-inner active" id="ctab4" onclick="switchChapterTab(4)">Current Unit</button>
+          <button class="ch-tab-inner" id="ctab5" onclick="switchChapterTab(5)">Upcoming Unit</button>
         </div>
         <div id="ctabPanel4">${ch4Panel}</div>
         <div id="ctabPanel5" style="display:none">${ch5Panel}</div>
@@ -760,6 +775,11 @@
 
   // Auto-select saved student — waits for page to be fully ready
   document.addEventListener('DOMContentLoaded', function() {
+    initClassOptions();
+    if (!ROSTERS_READY) {
+      showPreRosterMessage('studentResult');
+      return;
+    }
     var cls = localStorage.getItem('eq_student_class');
     var no  = localStorage.getItem('eq_student_no');
     if (!cls || !no) return;

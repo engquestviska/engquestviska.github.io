@@ -32,7 +32,7 @@
     <section class="subpage-hero">
       <div class="kicker">Task Submission</div>
       <h1>Submit your work as a clean PDF file.</h1>
-      <p class="hero-copy">Use the chapter forms for uploads, then check whether your submission has been received.</p>
+      <p class="hero-copy">Use the published upload forms for your current unit, then check whether your submission has been received.</p>
     </section>
   </header>
 
@@ -80,30 +80,24 @@
       <div class="content-section-head">
         <div class="content-title-row">
           <div class="content-badge">Forms</div>
-          <h2 class="content-title" id="formsTitle">Chapter Upload Links</h2>
+          <h2 class="content-title" id="formsTitle">Upload Links</h2>
         </div>
       </div>
       <div class="module-grid submission-grid">
-        <a href="https://s.id/Chap4TaskSubmission" target="_blank" rel="noopener" class="module submission-card">
+        <article class="module submission-card">
           <div class="module-icon">PDF</div>
-          <div class="module-title">Chapter 4</div>
-          <p class="module-copy">Submit Task 1-7 as PDF files. One PDF per task.</p>
-          <div class="module-link">Submit now →</div>
-        </a>
-        <a href="https://s.id/Chap5TaskSubmission" target="_blank" rel="noopener" class="module submission-card">
-          <div class="module-icon">PDF</div>
-          <div class="module-title">Chapter 5</div>
-          <p class="module-copy">Submit Task 1-7 as PDF files. One PDF per task.</p>
-          <div class="module-link">Submit now →</div>
-        </a>
+          <div class="module-title">Submission forms are not published yet.</div>
+          <p class="module-copy">New Grade X upload links will appear here after the official roster and task plan are connected.</p>
+          <div class="module-link">Not open yet</div>
+        </article>
       </div>
     </section>
 
-    <section class="content-section status-panel" aria-labelledby="chapter4StatusTitle">
+    <section class="content-section status-panel" aria-labelledby="submissionStatusTitle">
       <div class="content-section-head">
         <div class="content-title-row">
           <div class="content-badge">Status</div>
-          <h2 class="content-title" id="chapter4StatusTitle">Chapter 4 Submission Status</h2>
+          <h2 class="content-title" id="submissionStatusTitle">Submission Status</h2>
         </div>
       </div>
       <div class="status-picker">
@@ -123,11 +117,11 @@
       <div class="status-result" id="statusResult"></div>
     </section>
 
-    <section class="content-section status-panel" aria-labelledby="chapter5StatusTitle">
+    <section class="content-section status-panel" aria-labelledby="fileStatusTitle">
       <div class="content-section-head">
         <div class="content-title-row">
-          <div class="content-badge">Chapter 5</div>
-          <h2 class="content-title" id="chapter5StatusTitle">Chapter 5 Submission Status</h2>
+          <div class="content-badge">Files</div>
+          <h2 class="content-title" id="fileStatusTitle">File Submission Status</h2>
         </div>
       </div>
       <div class="status-picker">
@@ -135,11 +129,6 @@
           <label for="ch5ClassSel">Class</label>
           <select id="ch5ClassSel" onchange="onCh5ClassChange()">
             <option value="">Select your class</option>
-            <option value="XE1">X E-1</option>
-              <option value="XE2">X E-2</option>
-              <option value="XE3">X E-3</option>
-              <option value="XE4">X E-4</option>
-              <option value="XE5">X E-5</option>
           </select>
         </div>
         <div class="field">
@@ -149,7 +138,7 @@
           </select>
         </div>
         <button class="btn primary sync-btn" id="ch5SyncBtn" onclick="checkCh5Status()">Check Submission Status</button>
-        <div class="field-hint">Checks whether your Chapter 5 PDF submission has been received.</div>
+        <div class="field-hint">Checks whether your published PDF submission has been received.</div>
       </div>
       <div class="status-result" id="ch5Result"></div>
     </section>
@@ -159,6 +148,7 @@
 
   <script>
     var subData = null;
+    var ROSTERS_READY = window.EQClasses ? EQClasses.rostersReady() : false;
 
     function escapeHtml(value) {
       return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
@@ -172,7 +162,32 @@
       });
     }
 
+    function initClassSelects() {
+      if (window.EQClasses) {
+        EQClasses.fillSelect('stClassSel', '10', '', 'Select your class');
+        EQClasses.fillSelect('ch5ClassSel', '10', '', 'Select your class');
+      }
+    }
+
+    function showPreRosterSubmission() {
+      initClassSelects();
+      ['stClassSel', 'stNameSel', 'ch5ClassSel', 'ch5NameSel', 'ch5SyncBtn'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.disabled = true;
+      });
+      document.getElementById('stNameSel').innerHTML = '<option value="">Roster not published yet</option>';
+      document.getElementById('ch5NameSel').innerHTML = '<option value="">Roster not published yet</option>';
+      document.getElementById('statusResult').innerHTML = '<div class="notice-card">Submission status will appear after the official Grade X roster and new task forms are published. This page is intentionally not showing old-year submission records.</div>';
+      document.getElementById('statusResult').classList.add('show');
+      document.getElementById('ch5Result').innerHTML = '<div class="notice-card">File checks will open after the new submission source is connected.</div>';
+      document.getElementById('ch5Result').classList.add('show');
+    }
+
     async function initCh4Status() {
+      if (!ROSTERS_READY) {
+        showPreRosterSubmission();
+        return;
+      }
       var sel = document.getElementById('stClassSel');
       var classes = window.EQClasses ? EQClasses.idsForGrade('10') : ['XE1', 'XE2', 'XE3', 'XE4', 'XE5'];
       sel.innerHTML = '<option value="">Select your class</option>';
@@ -237,7 +252,7 @@
           (student.submitted ? 'Submitted' : 'Not Yet Submitted') +
         '</div>' +
         '<div class="status-sub-note">' +
-          (student.submitted ? 'Your Chapter 4 tasks have been received.' : 'We have not received your Chapter 4 submission yet. Please submit via the form above.') +
+          (student.submitted ? 'Your current-unit tasks have been received.' : 'We have not received your current-unit submission yet. Please submit via the published form when it opens.') +
         '</div>';
       result.classList.add('show');
     }
@@ -245,6 +260,10 @@
     var ch5Students = {};
 
     async function onCh5ClassChange() {
+      if (!ROSTERS_READY) {
+        showPreRosterSubmission();
+        return;
+      }
       var cls = document.getElementById('ch5ClassSel').value;
       var nameSel = document.getElementById('ch5NameSel');
       document.getElementById('ch5Result').className = 'status-result';
@@ -282,6 +301,10 @@
     }
 
     async function checkCh5Status() {
+      if (!ROSTERS_READY) {
+        showPreRosterSubmission();
+        return;
+      }
       var cls = document.getElementById('ch5ClassSel').value;
       var no = document.getElementById('ch5NameSel').value;
       var result = document.getElementById('ch5Result');
@@ -308,7 +331,7 @@
           result.innerHTML =
             '<div class="status-student-name">' + escapeHtml(displayName) + '</div>' +
             '<div class="status-badge-big status-missing">Not Submitted Yet</div>' +
-            '<div class="status-sub-note">We could not find a Chapter 5 submission for you. Make sure you used the submission form above and uploaded at least one PDF.</div>';
+            '<div class="status-sub-note">We could not find a published PDF submission for you. Make sure you used the current submission form and uploaded at least one PDF.</div>';
         } else {
           var chips = [1, 2, 3, 4, 5].map(function(num) {
             var key = 'C5T' + num;
@@ -318,7 +341,7 @@
           result.innerHTML =
             '<div class="status-student-name">' + escapeHtml(displayName) + '</div>' +
             '<div class="status-badge-big status-submitted">Submission Received</div>' +
-            '<div class="status-sub-note">' + fileKeys.length + ' of 5 Chapter 5 task files were found. Task status is updated from the teacher track.</div>' +
+            '<div class="status-sub-note">' + fileKeys.length + ' of 5 PDF task files were found. Task status is updated from the teacher track.</div>' +
             '<div class="task-chip-row">' + chips + '</div>';
         }
       } catch(e) {
@@ -331,6 +354,7 @@
     }
 
     localStorage.setItem('eq_grade', '10');
+    initClassSelects();
     initCh4Status();
   </script>
 </body>
