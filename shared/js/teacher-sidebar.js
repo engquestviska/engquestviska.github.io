@@ -9,9 +9,10 @@
     { page: 'tasks', href: 'tasks.html', icon: 'list-checks', name: 'Task Status' },
     { page: 'submissions', href: 'submissions.html', icon: 'inbox', name: 'Submissions' },
     { page: 'attendance', href: 'attendance.html', icon: 'calendar-check', name: 'Attendance' },
-    { page: 'activeness', href: 'activeness.html', icon: 'chart-pie', name: 'Activeness' },
+    { page: 'activeness', href: 'activeness.html', icon: 'zap', name: 'Level / XP' },
     { page: 'announcements', href: 'announcements.html', icon: 'megaphone', name: 'Announcements' },
-    { page: 'strikes', href: 'strikes.html', icon: 'shield-alert', name: 'Strikes' }
+    { page: 'strikes', href: 'strikes.html', icon: 'shield-alert', name: 'Strikes' },
+    { page: 'settings', href: 'settings.html', icon: 'settings', name: 'Settings' }
   ];
 
   var CLASSES = (window.EQClasses ? window.EQClasses.all : [

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Teacher Activeness · English Quest</title>
+  <title>Teacher Level / XP · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css"/>
@@ -167,21 +167,21 @@
       </div>
       <nav class="nav-actions" aria-label="Teacher navigation">
         <a href="index.html">Dashboard</a>
-        <a href="../grade10/activeness.html">Student View</a>
+        <a href="../grade10/activeness.html">Student Level / XP</a>
         <button type="button" onclick="teacherLogout()">Logout</button>
       </nav>
     </div>
     <section class="hero">
-      <div class="kicker">Activeness Manager</div>
+      <div class="kicker">Level / XP Manager</div>
       <h1>Update participation points from the teacher side.</h1>
-      <p class="hero-copy">Load a Grade 10 class, adjust activeness categories, and keep the student page as a read-only dashboard.</p>
+      <p class="hero-copy">Load a Grade 10 class, adjust participation categories, and keep the student page as a read-only Level / XP dashboard.</p>
     </section>
   </header>
 
   <main>
     <section class="access-card" id="accessCard" hidden>
       <h2 class="access-title">Teacher login required.</h2>
-      <p class="access-copy">Open the teacher dashboard and log in first. This page uses the saved teacher session to update activeness points.</p>
+      <p class="access-copy">Open the teacher dashboard and log in first. This page uses the saved teacher session to update participation points.</p>
       <a class="btn" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none;">Open Teacher Login</a>
     </section>
 
@@ -189,7 +189,7 @@
       <div class="panel">
         <div class="panel-head">
           <div>
-            <h2 class="panel-title">Grade 10 Activeness Sheet</h2>
+            <h2 class="panel-title">Grade 10 Level / XP Sheet</h2>
             <p class="panel-copy">Use plus and minus controls for each category. Each click saves immediately through Apps Script.</p>
           </div>
           <div class="status-pill" id="loginPill">Teacher</div>
@@ -210,7 +210,7 @@
             <label for="searchInput">Search student</label>
             <input id="searchInput" type="search" placeholder="Type name, nickname, or number"/>
           </div>
-          <button class="btn" type="button" id="loadBtn" onclick="loadActiveness()">Load Activeness</button>
+          <button class="btn" type="button" id="loadBtn" onclick="loadActiveness()">Load Level / XP</button>
         </div>
 
         <div class="summary-grid" id="summaryGrid">
@@ -225,7 +225,7 @@
     </section>
   </main>
 
-  <footer>© 2026 English Quest · Teacher Activeness Manager</footer>
+  <footer>© 2026 English Quest · Teacher Level / XP Manager</footer>
   <div class="toast" id="toast"></div>
 
   <script>
@@ -267,19 +267,19 @@
       btn.disabled = true;
       btn.textContent = 'Loading...';
       saving = {};
-      document.getElementById('activenessList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading activeness...</h2><p class="empty-copy">Fetching ' + escapeHtml(cls) + ' from the Activeness sheet.</p></div>';
+      document.getElementById('activenessList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading Level / XP...</h2><p class="empty-copy">Fetching ' + escapeHtml(cls) + ' participation records.</p></div>';
 
       EQApi.get({ action: 'getAllActiveness', className: cls }).then(function(data) {
         if (data.error) throw new Error(data.error);
         activenessData = data.students || [];
         renderActiveness();
-        showToast('Activeness loaded', 'ok');
+        showToast('Level / XP loaded', 'ok');
       }).catch(function(err) {
-        document.getElementById('activenessList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Could not load activeness.</h2><p class="empty-copy">' + escapeHtml(err.message) + '</p></div>';
+        document.getElementById('activenessList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Could not load Level / XP.</h2><p class="empty-copy">' + escapeHtml(err.message) + '</p></div>';
         showToast(err.message, 'err');
       }).finally(function() {
         btn.disabled = false;
-        btn.textContent = 'Load Activeness';
+        btn.textContent = 'Load Level / XP';
         updateSummary();
       });
     }
@@ -296,7 +296,7 @@
       var list = document.getElementById('activenessList');
       var students = visibleStudents();
       if (!activenessData.length) {
-        list.innerHTML = '<div class="empty-card"><h2 class="empty-title">No activeness data loaded yet.</h2><p class="empty-copy">Choose a class and load its Activeness sheet.</p></div>';
+        list.innerHTML = '<div class="empty-card"><h2 class="empty-title">No Level / XP data loaded yet.</h2><p class="empty-copy">Choose a class and load its participation records.</p></div>';
         updateSummary();
         return;
       }
@@ -353,7 +353,7 @@
       }).then(function(data) {
         if (data.error) throw new Error(data.error);
         activenessData = data.students || [];
-        showToast('Activeness updated', 'ok');
+        showToast('Level / XP updated', 'ok');
       }).catch(function(err) {
         showToast(err.message, 'err');
       }).finally(function() {

@@ -278,6 +278,10 @@ svg { width: 19px; height: 19px; stroke-width: 1.9; }
 .teacher-identity span { color: var(--muted); font-size: 0.7rem; }
 
 .dashboard-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
   justify-content: flex-end;
   margin: 10px 0 16px;
 }
@@ -292,6 +296,34 @@ svg { width: 19px; height: 19px; stroke-width: 1.9; }
 }
 
 .data-note svg { width: 16px; height: 16px; }
+
+.student-site-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.student-site-actions a {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--blue);
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 0 12px;
+  text-decoration: none;
+}
+
+.student-site-actions a:hover {
+  border-color: #9fc4ff;
+  background: #eef5ff;
+}
+
+.student-site-actions svg { width: 15px; height: 15px; }
 
 .semester-select {
   min-height: 42px;
@@ -506,6 +538,7 @@ svg { width: 19px; height: 19px; stroke-width: 1.9; }
 .metric-card.amber .metric-icon, .quick-icon.amber { background: #fff0c8; color: #e4a000; }
 .metric-card.cyan .metric-icon, .quick-icon.cyan { background: #dff7fa; color: #03a8b5; }
 .quick-icon.red { background: #ffe7eb; color: #ef4362; }
+.quick-icon.slate { background: #e2e8f0; color: #334155; }
 
 .dashboard-lower-grid {
   display: grid;
@@ -1090,12 +1123,13 @@ svg { width: 19px; height: 19px; stroke-width: 1.9; }
   .champion-panel { min-height: 390px; padding: 21px 16px 0; }
   .metric-grid { grid-template-columns: 1fr 1fr; }
   .metric-card:last-child { grid-column: 1 / -1; }
-  .quick-grid { grid-template-columns: 1fr 1fr; }
+  .quick-grid { grid-template-columns: 1fr; }
   .quick-grid a,
   .quick-grid a:nth-child(3n),
-  .quick-grid a:nth-last-child(-n+3) { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-  .quick-grid a:nth-child(2n) { border-right: 0; }
-  .quick-grid a:nth-last-child(-n+2) { border-bottom: 0; }
+  .quick-grid a:nth-child(2n),
+  .quick-grid a:nth-last-child(-n+3),
+  .quick-grid a:nth-last-child(-n+2) { border-right: 0; border-bottom: 1px solid var(--line); }
+  .quick-grid a:last-child { border-bottom: 0; }
   .class-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .teacher-shell-enabled > header { padding: 14px; }
   .teacher-shell-enabled > main { padding: 14px 14px 36px; }
