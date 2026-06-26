@@ -85,7 +85,7 @@
   <script src="../shared/js/classes-20260617.js?v=20260624"></script>
   <script src="../shared/js/api.js"></script>
   <script src="../shared/js/auth.js"></script>
-  <script src="../shared/js/teacher-sidebar.js"></script>
+  <script src="../shared/js/teacher-sidebar.js?v=20260626"></script>
 </head>
 <body class="teacher-tool-page" data-page="scores">
   <header>
@@ -130,13 +130,7 @@
         <div class="controls">
           <div>
             <label for="classSelect">Class</label>
-            <select id="classSelect">
-              <option value="XE1">X E-1</option>
-              <option value="XE2">X E-2</option>
-              <option value="XE3">X E-3</option>
-              <option value="XE4">X E-4</option>
-              <option value="XE5">X E-5</option>
-            </select>
+            <select id="classSelect" data-eq-class-select data-grade="10"></select>
           </div>
           <div>
             <label for="searchInput">Search student</label>
@@ -365,6 +359,7 @@
     document.getElementById('searchInput').addEventListener('input', renderScores);
 
     (function init() {
+      if (window.EQTeacherShell) EQTeacherShell.populateClassSelect('classSelect', { grade: '10' });
       if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
       loadScores();
     })();

@@ -57,6 +57,56 @@
     return '<i data-lucide="' + name + '"></i>';
   }
 
+  function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+      return {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[ch];
+    });
+  }
+
+  function classesForGrade(grade) {
+    var gradeId = String(grade || '10');
+    if (window.EQClasses && typeof window.EQClasses.listForGrade === 'function') {
+      return window.EQClasses.listForGrade(gradeId);
+    }
+    return CLASSES.filter(function(item) {
+      return String(item.grade) === gradeId;
+    });
+  }
+
+  function hasClass(classes, classId) {
+    return classes.some(function(item) {
+      return item.id === classId;
+    });
+  }
+
+  function populateClassSelect(target, options) {
+    var select = typeof target === 'string' ? document.getElementById(target) : target;
+    if (!select) return '';
+
+    var settings = options || {};
+    var grade = String(settings.grade || select.getAttribute('data-grade') || '10');
+    var classes = classesForGrade(grade);
+    var requested = settings.selectedId || selectedClassFromQuery() || select.value || select.getAttribute('data-default-class') || '';
+    var selected = hasClass(classes, requested) ? requested : (classes[0] ? classes[0].id : '');
+
+    select.setAttribute('data-eq-class-select', '');
+    select.setAttribute('data-grade', grade);
+    select.innerHTML = classes.map(function(item) {
+      var label = item.label || item.shortLabel || item.id;
+      var isSelected = item.id === selected ? ' selected' : '';
+      return '<option value="' + escapeHtml(item.id) + '"' + isSelected + '>' + escapeHtml(label) + '</option>';
+    }).join('');
+
+    if (selected) select.value = selected;
+    return select.value;
+  }
+
   function navMarkup() {
     var current = document.body.getAttribute('data-page') || currentPageFromPath();
     return NAV_ITEMS.map(function (item) {
@@ -90,7 +140,16 @@
   function applyClassQueryToSelect() {
     var selected = selectedClassFromQuery();
     var select = document.getElementById('classSelect');
-    if (!selected || !select) return;
+    if (!select) return;
+    if (select.hasAttribute('data-eq-class-select') || select.options.length === 0) {
+      var currentValue = select.value;
+      var nextValue = populateClassSelect(select, { selectedId: selected || select.value });
+      if (selected && nextValue === selected && currentValue !== selected) {
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+      return;
+    }
+    if (!selected) return;
     var hasOption = Array.prototype.some.call(select.options, function(option) {
       return option.value === selected;
     });
@@ -160,6 +219,10 @@
     if (window.EQAuth) EQAuth.logoutTeacher('index.html');
     else window.location.href = 'index.html';
   };
+
+  window.EQTeacherShell = Object.assign(window.EQTeacherShell || {}, {
+    populateClassSelect: populateClassSelect
+  });
 
   function initTeacherShell() {
     ensureStyles();
