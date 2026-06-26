@@ -490,12 +490,7 @@
       <div class="field">
         <label for="classSelect">Your Class</label>
         <select class="class-select" id="classSelect" onchange="loadClass()">
-          <option value="">— Select your class —</option>
-          <option value="XE1">X E-1</option>
-              <option value="XE2">X E-2</option>
-              <option value="XE3">X E-3</option>
-              <option value="XE4">X E-4</option>
-              <option value="XE5">X E-5</option>
+          <option value="">Loading classes...</option>
         </select>
       </div>
       <div class="field">
@@ -542,6 +537,29 @@
   function safeNumber(value) {
     const number = Number(value);
     return Number.isFinite(number) ? number : 0;
+  }
+
+  function classLabelFor(classId) {
+    if (window.EQClasses) return EQClasses.labelFor(classId);
+    if (window.EQApi && EQApi.classLabels && EQApi.classLabels[classId]) return EQApi.classLabels[classId];
+    return classId || '';
+  }
+
+  function initClassSelect() {
+    const classSelect = document.getElementById('classSelect');
+    const savedClass = localStorage.getItem('eq_student_class') || '';
+    if (window.EQClasses) {
+      EQClasses.fillSelect(classSelect, '10', savedClass, 'Select your class');
+      return;
+    }
+
+    const classes = window.EQApi && Array.isArray(EQApi.grade10Classes)
+      ? EQApi.grade10Classes
+      : ['XE1', 'XE2', 'XE3', 'XE4', 'XE5'];
+    classSelect.innerHTML = '<option value="">Select your class</option>' + classes.map(function(classId) {
+      const selected = classId === savedClass ? ' selected' : '';
+      return '<option value="' + escapeHtml(classId) + '"' + selected + '>' + escapeHtml(classLabelFor(classId)) + '</option>';
+    }).join('');
   }
 
   // ── LOAD CLASS ────────────────────────────────────────────
@@ -610,7 +628,7 @@
     localStorage.setItem('eq_student_no', no);
     localStorage.setItem('eq_student_name', student.name || '');
 
-    const classLabel = document.getElementById('classSelect').options[document.getElementById('classSelect').selectedIndex].text;
+    const classLabel = classLabelFor(currentClass);
     const total = safeNumber(student.Total);
     const indicator = String(student.Indicator || 'Not Active (+0 bonus)');
     const indClass = indicatorClass(indicator);
@@ -670,6 +688,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', function() {
+    initClassSelect();
     const cls = localStorage.getItem('eq_student_class');
     const no = localStorage.getItem('eq_student_no');
     if (!cls || !no) return;
