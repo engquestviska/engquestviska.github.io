@@ -52,18 +52,47 @@
     return window.EQClasses ? window.EQClasses.labelFor(classId) : classId;
   }
 
-  function profileMarkup(currentGrade) {
+  function escapeHtml(value) {
+    if (window.EQStudent && typeof window.EQStudent.escapeHtml === 'function') {
+      return window.EQStudent.escapeHtml(value);
+    }
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+      return {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[ch];
+    });
+  }
+
+  function sidebarProfileData(currentGrade) {
     var profile = getStudentProfile(currentGrade);
-    var classText = profile.classId ? classDisplay(profile.classId) : 'Choose your class';
-    var detailText = profile.studentName && profile.studentNo
-      ? profile.studentName + ' · No. ' + profile.studentNo
-      : 'Login on the homepage';
+    return {
+      classText: profile.classId ? classDisplay(profile.classId) : 'Choose your class',
+      detailText: profile.studentName && profile.studentNo
+        ? profile.studentName + ' · No. ' + profile.studentNo
+        : 'Login on the homepage'
+    };
+  }
+
+  function refreshProfile(currentGrade) {
+    var data = sidebarProfileData(currentGrade || detectGrade());
+    var classNode = document.getElementById('studentSidebarClass');
+    var detailNode = document.getElementById('studentSidebarDetail');
+    if (classNode) classNode.textContent = data.classText;
+    if (detailNode) detailNode.textContent = data.detailText;
+  }
+
+  function profileMarkup(currentGrade) {
+    var data = sidebarProfileData(currentGrade);
     return [
       '<section class="student-profile-nav" aria-label="Current student profile">',
       '  <div class="sidebar-label">My Class</div>',
       '  <a href="index.html#profile" class="student-profile-link">',
       '    <span class="student-profile-icon">' + icon('id-card') + '</span>',
-      '    <span><strong id="studentSidebarClass">' + classText + '</strong><small id="studentSidebarDetail">' + detailText + '</small></span>',
+      '    <span><strong id="studentSidebarClass">' + escapeHtml(data.classText) + '</strong><small id="studentSidebarDetail">' + escapeHtml(data.detailText) + '</small></span>',
       '  </a>',
       '</section>'
     ].join('');
@@ -132,6 +161,12 @@
     location.href = 'index.html';
   };
 
+  window.EQStudentShell = Object.assign(window.EQStudentShell || {}, {
+    currentGrade: detectGrade,
+    currentPage: currentPageFromPath,
+    refreshProfile: refreshProfile
+  });
+
   function initStudentShell() {
     document.body.classList.add('student-shell-enabled');
     document.body.setAttribute('data-student-shell-page', document.body.getAttribute('data-page') || currentPageFromPath());
@@ -139,6 +174,7 @@
       document.body.insertAdjacentHTML('afterbegin', shellMarkup());
     }
     addMobileButton();
+    refreshProfile();
     ensureIcons();
   }
 
