@@ -268,7 +268,7 @@
     <section class="hero">
       <div class="kicker">Strike Manager</div>
       <h1>Manage warnings without mixing student controls.</h1>
-      <p class="hero-copy">Load a Grade 10 class, review strike counts, add a clear reason, or remove the latest strike after a student completes the clearance task.</p>
+      <p class="hero-copy">Load a Grade X class, review strike counts, add a clear reason, or remove the latest strike after a student completes the clearance task.</p>
     </section>
   </header>
 
@@ -283,7 +283,7 @@
       <div class="panel">
         <div class="panel-head">
           <div>
-            <h2 class="panel-title">Grade 10 Strike Sheet</h2>
+            <h2 class="panel-title">Grade X Strike Records</h2>
             <p class="panel-copy">One strike blocks summative tests. Three strikes blocks class participation. Keep each action traceable with a reason.</p>
           </div>
           <div class="status-pill" id="loginPill">Teacher</div>
@@ -422,7 +422,7 @@
       var btn = document.getElementById('loadBtn');
       btn.disabled = true;
       btn.textContent = 'Loading...';
-      document.getElementById('strikeList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading strikes...</h2><p class="empty-copy">Fetching ' + (EQApi.classLabels[cls] || cls) + ' from the spreadsheet.</p></div>';
+      document.getElementById('strikeList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading strikes...</h2><p class="empty-copy">Fetching ' + (EQApi.classLabels[cls] || cls) + ' strike records.</p></div>';
       EQApi.get({ action: 'getAllStrikes', className: cls }).then(function(data) {
         if (data.error) throw new Error(data.error);
         strikeData = data.students || [];

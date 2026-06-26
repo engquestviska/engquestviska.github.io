@@ -201,8 +201,8 @@
     </div>
     <section class="hero">
       <div class="kicker">Announcements</div>
-      <h1>Post one clear update for Grade 10.</h1>
-      <p class="hero-copy">Publish the current class announcement from the teacher side. Students only see the latest published update on their Grade 10 home page.</p>
+      <h1>Post one clear update for Grade X.</h1>
+      <p class="hero-copy">Publish the current class announcement from the teacher side. Students only see the latest published update on their Grade X home page.</p>
     </section>
   </header>
 
@@ -227,7 +227,7 @@
           <div class="announcement-form">
             <div>
               <label for="announcementTitle">Title</label>
-              <input id="announcementTitle" type="text" maxlength="90" placeholder="e.g. Chapter 5 deadline"/>
+              <input id="announcementTitle" type="text" maxlength="90" placeholder="e.g. Unit 2 deadline"/>
             </div>
             <div>
               <label for="announcementBody">Announcement</label>
@@ -265,14 +265,14 @@
           <div class="announcement-preview-head">
             <div>
               <h2 class="panel-title">Current Student View</h2>
-              <p class="panel-copy">This is what Grade 10 students will see on the home page.</p>
+              <p class="panel-copy">This is what Grade X students will see on the home page.</p>
             </div>
             <div class="announcement-state" id="announcementState">Loading</div>
           </div>
           <div class="announcement-body" id="announcementPreview">
             <div class="empty-card">
               <h2 class="empty-title">Loading announcement...</h2>
-              <p class="empty-copy">Fetching the latest update from Apps Script.</p>
+              <p class="empty-copy">Fetching the latest published update.</p>
             </div>
           </div>
         </div>
@@ -408,7 +408,7 @@
     }
 
     function clearAnnouncement() {
-      if (!confirm('Clear the current announcement from the Grade 10 home page?')) return;
+      if (!confirm('Clear the current announcement from the Grade X home page?')) return;
       var teacher = EQAuth.getTeacher();
       var btn = document.getElementById('clearBtn');
       btn.disabled = true;

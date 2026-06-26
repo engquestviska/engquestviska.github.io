@@ -142,14 +142,14 @@
     <section class="hero">
       <div class="kicker">Submission Review</div>
       <h1>Check submitted work before it becomes task status.</h1>
-      <p class="hero-copy">Review Chapter 4 and Chapter 5 submission coverage by class, then sync Chapter 5 files into the task sheet when the class is ready.</p>
+      <p class="hero-copy">Review Unit 1 and Unit 2 submission coverage by class, then sync Unit 2 files into task records when the class is ready.</p>
     </section>
   </header>
 
   <main>
     <section class="access-card" id="accessCard" hidden>
       <h2 class="access-title">Teacher login required.</h2>
-      <p class="access-copy">Open the teacher dashboard and log in first. This page uses the saved teacher session for Chapter 5 sync actions.</p>
+      <p class="access-copy">Open the teacher dashboard and log in first. This page uses the saved teacher session for Unit 2 sync actions.</p>
       <a class="btn" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none;">Open Teacher Login</a>
     </section>
 
@@ -157,18 +157,18 @@
       <div class="panel">
         <div class="panel-head">
           <div>
-            <h2 class="panel-title">Grade 10 Submissions</h2>
-            <p class="panel-copy">Choose a chapter and class. Chapter 4 uses the submission overview. Chapter 5 can also sync found files into Task_Status.</p>
+            <h2 class="panel-title">Grade X Submissions</h2>
+            <p class="panel-copy">Choose a unit and class. Unit 1 uses the submission overview. Unit 2 can also sync found files into task records.</p>
           </div>
           <div class="status-pill" id="loginPill">Teacher</div>
         </div>
 
         <div class="controls">
           <div>
-            <label for="chapterSelect">Chapter</label>
+            <label for="chapterSelect">Unit</label>
             <select id="chapterSelect">
-              <option value="4">Chapter 4</option>
-              <option value="5">Chapter 5</option>
+              <option value="4">Unit 1</option>
+              <option value="5">Unit 2</option>
             </select>
           </div>
           <div>
@@ -193,7 +193,7 @@
 
         <div id="syncPanel" hidden>
           <div class="toolbar">
-            <button class="btn" type="button" id="syncBtn" onclick="syncCh5Class()">Sync Chapter 5 to Task Status</button>
+            <button class="btn" type="button" id="syncBtn" onclick="syncCh5Class()">Sync Unit 2 to Task Records</button>
           </div>
           <div class="sync-result" id="syncResult">Sync only after reviewing the class list below.</div>
         </div>
@@ -240,6 +240,10 @@
       }).join('') || 'EQ';
     }
 
+    function unitLabel(value) {
+      return value === '5' ? 'Unit 2' : 'Unit 1';
+    }
+
     function loadSubmissions() {
       if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
       var chapter = document.getElementById('chapterSelect').value;
@@ -248,7 +252,7 @@
       btn.disabled = true;
       btn.textContent = 'Loading...';
       document.getElementById('syncPanel').hidden = chapter !== '5';
-      list.innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading submissions...</h2><p class="empty-copy">Fetching Chapter ' + chapter + ' submission data.</p></div>';
+      list.innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading submissions...</h2><p class="empty-copy">Fetching ' + unitLabel(chapter) + ' submission data.</p></div>';
 
       if (chapter === '5') loadChapter5();
       else loadChapter4();
@@ -264,13 +268,13 @@
           for (var i = 0; i < total; i++) tasks.push(!!(student.tasksDone && student.tasksDone[i]));
           return {
             name: student.name,
-            meta: 'Chapter 4',
+            meta: 'Unit 1',
             submitted: !!student.submitted,
             tasks: tasks
           };
         });
         renderSubmissions();
-        showToast('Chapter 4 loaded', 'ok');
+        showToast('Unit 1 loaded', 'ok');
       }).catch(showLoadError).finally(resetLoadButton);
     }
 
@@ -294,20 +298,20 @@
             name: student.name,
             nickname: student.nickname,
             no: student.no,
-            meta: 'No. ' + student.no + ' · Chapter 5',
+            meta: 'No. ' + student.no + ' · Unit 2',
             submitted: submitted,
             tasks: tasks
           };
         });
         renderSubmissions();
-        showToast('Chapter 5 loaded', 'ok');
+        showToast('Unit 2 loaded', 'ok');
       }).catch(showLoadError).finally(resetLoadButton);
     }
 
     function renderSubmissions() {
       var list = document.getElementById('submissionList');
       if (!submissionRows.length) {
-        list.innerHTML = '<div class="empty-card"><h2 class="empty-title">No students found.</h2><p class="empty-copy">Try another class or check the spreadsheet connection.</p></div>';
+        list.innerHTML = '<div class="empty-card"><h2 class="empty-title">No students found.</h2><p class="empty-copy">Try another class or check the data connection.</p></div>';
         updateSummary();
         return;
       }
@@ -346,7 +350,7 @@
       var result = document.getElementById('syncResult');
       btn.disabled = true;
       btn.textContent = 'Syncing...';
-      result.textContent = 'Syncing Chapter 5 submissions into Task_Status...';
+      result.textContent = 'Syncing Unit 2 submissions into task records...';
       EQApi.get({
         action: 'syncCh5Class',
         username: teacher.username,
@@ -355,13 +359,13 @@
       }).then(function(data) {
         if (!data.success) throw new Error(data.error || 'Sync failed');
         result.textContent = 'Synced rows: ' + data.synced + '. Not found in responses: ' + data.notFound + '.';
-        showToast('Chapter 5 synced', 'ok');
+        showToast('Unit 2 synced', 'ok');
       }).catch(function(err) {
         result.textContent = err.message;
         showToast(err.message, 'err');
       }).finally(function() {
         btn.disabled = false;
-        btn.textContent = 'Sync Chapter 5 to Task Status';
+        btn.textContent = 'Sync Unit 2 to Task Records';
       });
     }
 

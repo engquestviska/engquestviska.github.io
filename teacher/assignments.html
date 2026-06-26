@@ -142,7 +142,7 @@
     <section class="hero">
       <div class="kicker">Assignment Manager</div>
       <h1>Publish task files without touching student pages.</h1>
-      <p class="hero-copy">Add Google Drive assignment files by chapter, review published tasks, and remove dynamic tasks from the Grade 10 student view.</p>
+      <p class="hero-copy">Add Google Drive assignment files by unit, review published tasks, and remove dynamic tasks from the Grade X student view.</p>
     </section>
   </header>
 
@@ -159,16 +159,16 @@
           <div class="panel-head">
             <div>
               <h2 class="panel-title">Add Assignment</h2>
-              <p class="panel-copy">Paste a Google Drive file link or file ID. Students will see the task file on the Grade 10 Assignments page.</p>
+              <p class="panel-copy">Paste a Google Drive file link or file ID. Students will see the task file on the Grade X Assignments page.</p>
             </div>
           </div>
 
           <div class="assignment-form">
             <div>
-              <label for="chapterSelect">Chapter</label>
+              <label for="chapterSelect">Unit</label>
               <select id="chapterSelect">
-                <option value="assign4">Chapter 4 · Analytical Exposition</option>
-                <option value="assign5">Chapter 5 · Narrative Text</option>
+                <option value="assign4">Unit 1 · Placeholder task set</option>
+                <option value="assign5">Unit 2 · Placeholder task set</option>
               </select>
             </div>
             <div>
@@ -188,7 +188,7 @@
           </div>
 
           <div class="starter-note">
-            <strong>Note:</strong> the original Chapter 4 starter task is still code-managed in the student page. This manager controls assignments saved through Apps Script.
+            <strong>Note:</strong> starter tasks are still code-managed in the student page. This manager controls assignments saved through the class data source.
           </div>
         </div>
 
@@ -197,16 +197,16 @@
             <div class="panel-head">
               <div>
                 <h2 class="panel-title">Published Assignments</h2>
-                <p class="panel-copy">Switch chapters to inspect or remove dynamic assignment files.</p>
+                <p class="panel-copy">Switch units to inspect or remove dynamic assignment files.</p>
               </div>
               <div class="status-pill" id="loginPill">Teacher</div>
             </div>
             <div class="controls">
               <div>
-                <label for="listChapterSelect">Chapter</label>
+                <label for="listChapterSelect">Unit</label>
                 <select id="listChapterSelect">
-                  <option value="assign4">Chapter 4</option>
-                  <option value="assign5">Chapter 5</option>
+                  <option value="assign4">Unit 1</option>
+                  <option value="assign5">Unit 2</option>
                 </select>
               </div>
               <button class="btn" type="button" id="loadBtn" onclick="loadAssignments()">Load Assignments</button>
@@ -239,7 +239,7 @@
     }
 
     function chapterLabel(key) {
-      return key === 'assign5' ? 'Chapter 5' : 'Chapter 4';
+      return key === 'assign5' ? 'Unit 2' : 'Unit 1';
     }
 
     function extractDriveId(value) {
@@ -267,7 +267,7 @@
       var btn = document.getElementById('loadBtn');
       btn.disabled = true;
       btn.textContent = 'Loading...';
-      document.getElementById('assignmentList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading assignments...</h2><p class="empty-copy">Fetching ' + chapterLabel(chapter) + ' task files from Apps Script.</p></div>';
+      document.getElementById('assignmentList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading assignments...</h2><p class="empty-copy">Fetching ' + chapterLabel(chapter) + ' task files from the class data source.</p></div>';
 
       EQApi.get({ action: 'getMaterials', chapter: chapter }).then(function(data) {
         currentAssignments = data.materials || [];

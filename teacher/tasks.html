@@ -146,7 +146,7 @@
     <section class="hero">
       <div class="kicker">Task Status Manager</div>
       <h1>Update student task progress from one room.</h1>
-      <p class="hero-copy">Choose a Grade 10 class, review Chapter 4 or Chapter 5 task status, and save changes directly to the task sheet. Students only see the read-only result.</p>
+      <p class="hero-copy">Choose a Grade X class, review Unit 1 or Unit 2 task status, and save changes directly to the task records. Students only see the read-only result.</p>
     </section>
   </header>
 
@@ -161,7 +161,7 @@
       <div class="panel">
         <div class="panel-head">
           <div>
-            <h2 class="panel-title">Grade 10 Task Sheet</h2>
+            <h2 class="panel-title">Grade X Task Records</h2>
             <p class="panel-copy">Toggle tasks for each student, then save the row. Unsaved rows turn amber so it is clear what still needs writing.</p>
           </div>
           <div class="status-pill" id="loginPill">Teacher</div>
@@ -195,9 +195,9 @@
 
       <div class="toolbar">
         <div class="tabs" id="chapterTabs">
-          <button class="tab active" type="button" onclick="setChapter('4')">Chapter 4</button>
-          <button class="tab" type="button" onclick="setChapter('5')">Chapter 5</button>
-          <button class="tab" type="button" onclick="setChapter('all')">All Tasks</button>
+          <button class="tab active" type="button" data-chapter="4" onclick="setChapter('4')">Unit 1</button>
+          <button class="tab" type="button" data-chapter="5" onclick="setChapter('5')">Unit 2</button>
+          <button class="tab" type="button" data-chapter="all" onclick="setChapter('all')">All Tasks</button>
         </div>
         <div class="bulk-actions">
           <button class="btn ghost" type="button" onclick="showOnly('missing')">Show Missing</button>
@@ -236,14 +236,15 @@
 
     function taskLabel(key) {
       var match = key.match(/^C(\d+)T(\d+)$/i);
-      return match ? 'C' + match[1] + ' Task ' + match[2] : key;
+      if (!match) return key;
+      var unit = match[1] === '5' ? 'Unit 2' : 'Unit 1';
+      return unit + ' Task ' + match[2];
     }
 
     function setChapter(chapter) {
       currentChapter = chapter;
       document.querySelectorAll('.tab').forEach(function(tab) {
-        var text = tab.textContent.toLowerCase();
-        var active = chapter === 'all' ? text.indexOf('all') > -1 : text.indexOf(chapter) > -1;
+        var active = tab.getAttribute('data-chapter') === chapter;
         tab.classList.toggle('active', active);
       });
       renderTasks();
@@ -260,7 +261,7 @@
       btn.disabled = true;
       btn.textContent = 'Loading...';
       dirtyRows = {};
-      document.getElementById('taskList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading task status...</h2><p class="empty-copy">Fetching ' + escapeHtml(EQApi.classLabels[cls] || cls) + ' from the task sheet.</p></div>';
+      document.getElementById('taskList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading task status...</h2><p class="empty-copy">Fetching ' + escapeHtml(EQApi.classLabels[cls] || cls) + ' task records.</p></div>';
 
       EQApi.get({ action: 'getAllTasks', className: cls }).then(function(data) {
         if (data.error) throw new Error(data.error);
@@ -294,7 +295,7 @@
       });
 
       if (!taskData.students.length) {
-        list.innerHTML = '<div class="empty-card"><h2 class="empty-title">Load a class to begin.</h2><p class="empty-copy">Choose a class and open its Task_Status sheet from the controls above.</p></div>';
+        list.innerHTML = '<div class="empty-card"><h2 class="empty-title">Load a class to begin.</h2><p class="empty-copy">Choose a class and open its task records from the controls above.</p></div>';
         updateSummary();
         return;
       }

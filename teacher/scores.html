@@ -105,8 +105,8 @@
     </div>
     <section class="hero">
       <div class="kicker">Scores Manager</div>
-      <h1>Edit chapter and final scores in one table.</h1>
-      <p class="hero-copy">Load a Grade 10 class, switch between Chapter 4, Chapter 5, and Final Scores, then update editable score cells directly from the teacher room.</p>
+      <h1>Edit unit and final scores in one table.</h1>
+      <p class="hero-copy">Load a Grade X class, switch between Unit 1, Unit 2, and Final Scores, then update editable score cells directly from the teacher room.</p>
     </section>
   </header>
 
@@ -121,7 +121,7 @@
       <div class="panel">
         <div class="panel-head">
           <div>
-            <h2 class="panel-title">Grade 10 Score Sheet</h2>
+            <h2 class="panel-title">Grade X Score Records</h2>
             <p class="panel-copy">Editable cells save immediately when changed. Calculated columns stay read-only and refresh when the class is loaded again.</p>
           </div>
           <div class="status-pill" id="loginPill">Teacher</div>
@@ -155,9 +155,9 @@
 
       <div class="toolbar">
         <div class="tabs" id="tabs">
-          <button class="tab active" type="button" onclick="setMode('4')">Chapter 4</button>
-          <button class="tab" type="button" onclick="setMode('5')">Chapter 5</button>
-          <button class="tab" type="button" onclick="setMode('final')">Final Scores</button>
+          <button class="tab active" type="button" data-mode="4" onclick="setMode('4')">Unit 1</button>
+          <button class="tab" type="button" data-mode="5" onclick="setMode('5')">Unit 2</button>
+          <button class="tab" type="button" data-mode="final" onclick="setMode('final')">Final Scores</button>
         </div>
       </div>
 
@@ -184,8 +184,7 @@
     function setMode(nextMode) {
       mode = nextMode;
       document.querySelectorAll('.tab').forEach(function(tab) {
-        var text = tab.textContent.toLowerCase();
-        var active = nextMode === 'final' ? text.indexOf('final') > -1 : text.indexOf(nextMode) > -1;
+        var active = tab.getAttribute('data-mode') === nextMode;
         tab.classList.toggle('active', active);
       });
       loadScores();
@@ -196,7 +195,7 @@
       var btn = document.getElementById('loadBtn');
       btn.disabled = true;
       btn.textContent = 'Loading...';
-      document.getElementById('scoreArea').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading scores...</h2><p class="empty-copy">Fetching ' + escapeHtml(EQApi.classLabels[cls] || cls) + ' from the spreadsheet.</p></div>';
+      document.getElementById('scoreArea').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading scores...</h2><p class="empty-copy">Fetching ' + escapeHtml(EQApi.classLabels[cls] || cls) + ' score records.</p></div>';
       var params = mode === 'final'
         ? { action: 'getFinalScores', className: cls }
         : { action: 'getChapterScores', className: cls, chapter: mode };

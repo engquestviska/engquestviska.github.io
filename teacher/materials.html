@@ -146,7 +146,7 @@
     <section class="hero">
       <div class="kicker">Materials Manager</div>
       <h1>Publish lesson files from the teacher side.</h1>
-      <p class="hero-copy">Add Google Drive materials by chapter, review what students can open, and remove dynamic materials without exposing controls on the student page.</p>
+      <p class="hero-copy">Add Google Drive materials by unit, review what students can open, and remove dynamic materials without exposing controls on the student page.</p>
     </section>
   </header>
 
@@ -163,16 +163,16 @@
           <div class="panel-head">
             <div>
               <h2 class="panel-title">Add Material</h2>
-              <p class="panel-copy">Paste a Google Drive file link or file ID. Students will see it on the Grade 10 Lesson Materials page.</p>
+              <p class="panel-copy">Paste a Google Drive file link or file ID. Students will see it on the Grade X Lesson Materials page.</p>
             </div>
           </div>
 
           <div class="material-form">
             <div>
-              <label for="chapterSelect">Chapter</label>
+              <label for="chapterSelect">Unit</label>
               <select id="chapterSelect">
-                <option value="4">Chapter 4 · Analytical Exposition</option>
-                <option value="5">Chapter 5 · Narrative Text</option>
+                <option value="4">Unit 1 · Placeholder topic</option>
+                <option value="5">Unit 2 · Placeholder topic</option>
               </select>
             </div>
             <div>
@@ -197,7 +197,7 @@
           </div>
 
           <div class="starter-note">
-            <strong>Note:</strong> the original Chapter 4 starter files are still code-managed in the student page. This manager controls materials saved through Apps Script.
+            <strong>Note:</strong> starter files are still code-managed in the student page. This manager controls materials saved through the class data source.
           </div>
         </div>
 
@@ -206,16 +206,16 @@
             <div class="panel-head">
               <div>
                 <h2 class="panel-title">Published Materials</h2>
-                <p class="panel-copy">Switch chapters to inspect or remove materials stored in the backend.</p>
+                <p class="panel-copy">Switch units to inspect or remove materials saved for students.</p>
               </div>
               <div class="status-pill" id="loginPill">Teacher</div>
             </div>
             <div class="controls">
               <div>
-                <label for="listChapterSelect">Chapter</label>
+                <label for="listChapterSelect">Unit</label>
                 <select id="listChapterSelect">
-                  <option value="4">Chapter 4</option>
-                  <option value="5">Chapter 5</option>
+                  <option value="4">Unit 1</option>
+                  <option value="5">Unit 2</option>
                 </select>
               </div>
               <button class="btn" type="button" id="loadBtn" onclick="loadMaterials()">Load Materials</button>
@@ -266,13 +266,17 @@
       return 'https://drive.google.com/file/d/' + encodeURIComponent(fileId) + '/preview';
     }
 
+    function unitLabel(value) {
+      return value === '5' ? 'Unit 2' : 'Unit 1';
+    }
+
     function loadMaterials() {
       if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
       var chapter = document.getElementById('listChapterSelect').value;
       var btn = document.getElementById('loadBtn');
       btn.disabled = true;
       btn.textContent = 'Loading...';
-      document.getElementById('materialList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading materials...</h2><p class="empty-copy">Fetching Chapter ' + chapter + ' materials from Apps Script.</p></div>';
+      document.getElementById('materialList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading materials...</h2><p class="empty-copy">Fetching ' + unitLabel(chapter) + ' materials from the class data source.</p></div>';
 
       EQApi.get({ action: 'getMaterials', chapter: chapter }).then(function(data) {
         currentMaterials = data.materials || [];
@@ -289,7 +293,7 @@
     function renderMaterials() {
       var chapter = document.getElementById('listChapterSelect').value;
       if (!currentMaterials.length) {
-        document.getElementById('materialList').innerHTML = '<div class="empty-card"><h2 class="empty-title">No dynamic materials yet.</h2><p class="empty-copy">Add the first Chapter ' + chapter + ' file from the form.</p></div>';
+        document.getElementById('materialList').innerHTML = '<div class="empty-card"><h2 class="empty-title">No dynamic materials yet.</h2><p class="empty-copy">Add the first ' + unitLabel(chapter) + ' file from the form.</p></div>';
         return;
       }
 
@@ -301,7 +305,7 @@
           '<div class="material-type">' + escapeHtml(fileType) + '</div>' +
           '<div>' +
             '<div class="material-title">' + escapeHtml(title) + '</div>' +
-            '<div class="material-meta">Chapter ' + chapter + ' · ' + escapeHtml(fileId) + '</div>' +
+            '<div class="material-meta">' + unitLabel(chapter) + ' · ' + escapeHtml(fileId) + '</div>' +
           '</div>' +
           '<div class="material-row-actions">' +
             '<a class="btn ghost" href="' + previewUrl(fileId) + '" target="_blank" rel="noopener">Preview</a>' +
