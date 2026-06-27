@@ -529,8 +529,27 @@
 <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
 
 <script>
-const classes    = window.EQClasses ? EQClasses.idsForGrade('10').map(id => EQClasses.shortLabelFor(id).replace(/^XE/, 'XE-')) : ["XE-1","XE-2","XE-3","XE-4","XE-5"];
-const apiClsMap  = { "XE-1":"XE1", "XE-2":"XE2", "XE-3":"XE3", "XE-4":"XE4", "XE-5":"XE5" };
+function displayClassLabel(id) {
+  var shortLabel = window.EQClasses ? EQClasses.shortLabelFor(id) : id;
+  return String(shortLabel || id || '').replace(/^XE(\d+)$/, 'XE-$1');
+}
+
+function normalizeClassId(value) {
+  var raw = String(value || '').trim();
+  if (!raw) return '';
+  if (window.EQClasses && EQClasses.exists(raw)) return raw;
+  var compact = raw.replace(/^XE-(\d+)$/i, 'XE$1').toUpperCase();
+  return compact;
+}
+
+const classItems = window.EQClasses
+  ? EQClasses.listForGrade('10').map(item => ({ id: item.id, label: displayClassLabel(item.id) }))
+  : ['XE1', 'XE2', 'XE3', 'XE4', 'XE5'].map(id => ({ id, label: displayClassLabel(id) }));
+const classes = classItems.map(item => item.id);
+const classLabels = classItems.reduce((labels, item) => {
+  labels[item.id] = item.label;
+  return labels;
+}, {});
 let totalStudents = 0;
 
 // Will be called after apiGet is defined below
@@ -538,16 +557,16 @@ let totalStudents = 0;
 function buildClassDirectory() {
   const filter = document.getElementById('classFilter');
   const directory = document.getElementById('classDirectory');
-  classes.forEach(cls => {
-    filter.options.add(new Option(cls, cls));
+  classItems.forEach(item => {
+    filter.options.add(new Option(item.label, item.id));
   });
-  directory.innerHTML = classes.map(cls => `
-    <section class="class-section" data-class="${cls}">
+  directory.innerHTML = classItems.map(item => `
+    <section class="class-section" data-class="${item.id}">
       <div class="class-header">
-        <span class="class-badge">${cls}</span>
-        <span class="class-count" id="count-${cls}">Waiting for roster</span>
+        <span class="class-badge">${item.label}</span>
+        <span class="class-count" id="count-${item.id}">Waiting for roster</span>
       </div>
-      <div class="student-list" id="list-${cls}"></div>
+      <div class="student-list" id="list-${item.id}"></div>
     </section>
   `).join('');
 }
@@ -580,7 +599,7 @@ function renderStudentClass(cls, students) {
     const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase() || '?';
     const safeName = escapeHtml(name);
     const safeInitials = escapeHtml(initials);
-    const safeClass = escapeHtml(cls);
+    const safeClass = escapeHtml(classLabels[cls] || displayClassLabel(cls));
     const safeNickname = escapeHtml(s.nickname || '');
     const item = document.createElement('div');
     item.className = 'student-item';
@@ -609,8 +628,7 @@ function autoOpenSavedStudent() {
   const savedCls  = localStorage.getItem('eq_student_class');
   const savedName = localStorage.getItem('eq_student_name');
   if (savedCls && savedName) {
-    const clsMap = { XE1:'XE-1', XE2:'XE-2', XE3:'XE-3', XE4:'XE-4', XE5:'XE-5' };
-    openActModal(savedName, clsMap[savedCls] || savedCls);
+    openActModal(savedName, normalizeClassId(savedCls));
   }
 }
 
@@ -624,7 +642,7 @@ function loadAllStudents() {
   // Check cache first — render instantly if available
   var cachedAny = false;
   classes.forEach(cls => {
-    var params = { action: 'getStudents', className: apiClsMap[cls] };
+    var params = { action: 'getStudents', className: cls };
     var cached = cacheGet(params);
     if (cached && cached.students) {
       renderStudentClass(cls, cached.students);
@@ -640,7 +658,7 @@ function loadAllStudents() {
 
   // Always fetch fresh in background (or foreground if no cache)
   Promise.all(classes.map(cls => {
-    var params = { action: 'getStudents', className: apiClsMap[cls] };
+    var params = { action: 'getStudents', className: cls };
     return EQApi.get(params)
       .then(res => {
         if (res && res.error) throw new Error(res.error);
@@ -736,13 +754,10 @@ const ACTS = [
   { key: 'Quiz',             label: 'Quiz',              color: '#14B8A6' },
 ];
 
-// Class key mapping: XE-1 → XE1 for API
-function toApiClass(cls) { return cls.replace('-', ''); }
-
 async function openActModal(name, cls) {
-  const apiCls = toApiClass(cls);
+  const apiCls = normalizeClassId(cls);
   document.getElementById('actName').textContent    = name;
-  document.getElementById('actSub').textContent     = cls + ' · Activeness Stats';
+  document.getElementById('actSub').textContent     = (classLabels[apiCls] || displayClassLabel(apiCls)) + ' · Activeness Stats';
   document.getElementById('actAvatar').textContent  = name[0].toUpperCase();
   document.getElementById('actBody').innerHTML      = '<div class="act-loading"><div class="act-spinner"></div><br/>Loading stats...</div>';
   document.getElementById('actOverlay').classList.remove('hidden');
