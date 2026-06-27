@@ -479,6 +479,9 @@ function cachedApiGet(params) {
 }
 
 function escapeHtml(value) {
+  if (window.EQStudent && typeof EQStudent.escapeHtml === 'function') {
+    return EQStudent.escapeHtml(value);
+  }
   return String(value === undefined || value === null ? '' : value)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -510,11 +513,19 @@ function renderStudentMode() {
   var main = document.getElementById('mainContent');
 
   // Check if student identity is saved
-  var savedCls  = localStorage.getItem('eq_student_class');
-  var savedNo   = localStorage.getItem('eq_student_no');
-  var savedName = localStorage.getItem('eq_student_name');
+  var profile = window.EQStudent
+    ? EQStudent.read('10')
+    : {
+        classId: localStorage.getItem('eq_student_class') || '',
+        studentNo: localStorage.getItem('eq_student_no') || '',
+        studentName: localStorage.getItem('eq_student_name') || '',
+        hasProfile: !!(localStorage.getItem('eq_student_class') && localStorage.getItem('eq_student_no') && localStorage.getItem('eq_student_name'))
+      };
+  var savedCls = profile.classId;
+  var savedNo = profile.studentNo;
+  var savedName = profile.studentName;
 
-  if (savedCls && savedNo && savedName) {
+  if (profile.hasProfile) {
     // Auto-load their scores directly
     var clsLabel = CLASS_LABELS[savedCls] || savedCls;
     main.innerHTML =
@@ -563,9 +574,13 @@ function renderStudentMode() {
 }
 
 function forgetStudent() {
-  localStorage.removeItem('eq_student_class');
-  localStorage.removeItem('eq_student_no');
-  localStorage.removeItem('eq_student_name');
+  if (window.EQStudent) {
+    EQStudent.clear();
+  } else {
+    localStorage.removeItem('eq_student_class');
+    localStorage.removeItem('eq_student_no');
+    localStorage.removeItem('eq_student_name');
+  }
   renderStudentMode();
 }
 
@@ -641,11 +656,20 @@ function viewStudentScores() {
   var result = document.getElementById('sResult');
   result.innerHTML = '<div class="state-card"><div class="spinner"></div><div class="state-title">Loading scores...</div></div>';
 
-  // Save identity so tasks.html and strikes.html can auto-load
+  // Save identity so other student pages can auto-load the same profile.
   if (student) {
-    localStorage.setItem('eq_student_class', currentClass);
-    localStorage.setItem('eq_student_no', studentNo);
-    localStorage.setItem('eq_student_name', student.name);
+    if (window.EQStudent) {
+      EQStudent.save({
+        grade: '10',
+        classId: currentClass,
+        studentNo: studentNo,
+        studentName: student.name
+      });
+    } else {
+      localStorage.setItem('eq_student_class', currentClass);
+      localStorage.setItem('eq_student_no', studentNo);
+      localStorage.setItem('eq_student_name', student.name);
+    }
   }
 
   // Load chapters + final in parallel (final gracefully degrades if GS not yet deployed)
