@@ -511,10 +511,16 @@
     }
 
     function initials(name) {
+      if (window.EQStudent && typeof EQStudent.initials === 'function') {
+        return EQStudent.initials(name, 'EQ');
+      }
       return (name || 'EQ').split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase() || 'EQ';
     }
 
     function escapeHtml(value) {
+      if (window.EQStudent && typeof EQStudent.escapeHtml === 'function') {
+        return EQStudent.escapeHtml(value);
+      }
       return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
         return {
           '&': '&amp;',
@@ -622,6 +628,14 @@
     }
 
     function savedProfile() {
+      if (window.EQStudent) {
+        const profile = EQStudent.read('10');
+        return {
+          className: profile.classId,
+          studentNo: profile.studentNo,
+          studentName: profile.studentName
+        };
+      }
       return {
         className: localStorage.getItem('eq_student_class') || '',
         studentNo: localStorage.getItem('eq_student_no') || '',
@@ -631,6 +645,15 @@
 
     function rememberStudent(student) {
       if (!student || !currentClass) return;
+      if (window.EQStudent) {
+        EQStudent.save({
+          grade: '10',
+          classId: currentClass,
+          studentNo: student.no || '',
+          studentName: student.name || ''
+        });
+        return;
+      }
       localStorage.setItem('eq_grade', '10');
       localStorage.setItem('eq_student_class', currentClass);
       localStorage.setItem('eq_student_no', student.no || '');
