@@ -523,6 +523,9 @@
   let studentsData = [];
 
   function escapeHtml(value) {
+    if (window.EQStudent && typeof EQStudent.escapeHtml === 'function') {
+      return EQStudent.escapeHtml(value);
+    }
     return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
       return {
         '&': '&amp;',
@@ -545,9 +548,35 @@
     return classId || '';
   }
 
+  function savedProfile() {
+    if (window.EQStudent) {
+      return EQStudent.read('10');
+    }
+    return {
+      classId: localStorage.getItem('eq_student_class') || '',
+      studentNo: localStorage.getItem('eq_student_no') || '',
+      studentName: localStorage.getItem('eq_student_name') || ''
+    };
+  }
+
+  function rememberStudent(studentNo, student) {
+    if (!currentClass || !student) return;
+    if (window.EQStudent && EQStudent.save({
+      grade: '10',
+      classId: currentClass,
+      studentNo: studentNo,
+      studentName: student.name || ''
+    })) {
+      return;
+    }
+    localStorage.setItem('eq_student_class', currentClass);
+    localStorage.setItem('eq_student_no', studentNo);
+    localStorage.setItem('eq_student_name', student.name || '');
+  }
+
   function initClassSelect() {
     const classSelect = document.getElementById('classSelect');
-    const savedClass = localStorage.getItem('eq_student_class') || '';
+    const savedClass = savedProfile().classId;
     if (window.EQClasses) {
       EQClasses.fillSelect(classSelect, '10', savedClass, 'Select your class');
       return;
@@ -624,9 +653,7 @@
     const student = studentsData.find(s => String(s.no) === String(no));
     if (!student) return;
 
-    localStorage.setItem('eq_student_class', currentClass);
-    localStorage.setItem('eq_student_no', no);
-    localStorage.setItem('eq_student_name', student.name || '');
+    rememberStudent(no, student);
 
     const classLabel = classLabelFor(currentClass);
     const total = safeNumber(student.Total);
@@ -689,8 +716,9 @@
 
   document.addEventListener('DOMContentLoaded', function() {
     initClassSelect();
-    const cls = localStorage.getItem('eq_student_class');
-    const no = localStorage.getItem('eq_student_no');
+    const profile = savedProfile();
+    const cls = profile.classId;
+    const no = profile.studentNo;
     if (!cls || !no) return;
     const classSelect = document.getElementById('classSelect');
     classSelect.value = cls;
