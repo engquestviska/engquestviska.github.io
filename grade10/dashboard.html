@@ -457,6 +457,9 @@
     }
 
     function escapeHtml(value) {
+      if (window.EQStudent && typeof EQStudent.escapeHtml === 'function') {
+        return EQStudent.escapeHtml(value);
+      }
       return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
         return {
           '&': '&amp;',
@@ -691,12 +694,24 @@
       renderQuickList();
     }
 
-    function init() {
-      studentProfile = {
+    function readStudentProfile() {
+      if (window.EQStudent) {
+        var profile = EQStudent.read('10');
+        return {
+          cls: profile.classId,
+          no: profile.studentNo,
+          name: profile.studentName
+        };
+      }
+      return {
         cls: localStorage.getItem('eq_student_class') || '',
         no: localStorage.getItem('eq_student_no') || '',
         name: localStorage.getItem('eq_student_name') || ''
       };
+    }
+
+    function init() {
+      studentProfile = readStudentProfile();
 
       if (!studentProfile.cls || !studentProfile.no || !studentProfile.name) {
         renderMissingProfile();
