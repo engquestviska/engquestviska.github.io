@@ -369,6 +369,9 @@
     localStorage.setItem('eq_grade', '10');
 
     function initials(name) {
+      if (window.EQStudent && EQStudent.initials) {
+        return EQStudent.initials(name, 'EQ');
+      }
       return (name || 'EQ').split(/\s+/).filter(Boolean).slice(0, 2).map(function(part) {
         return part.charAt(0);
       }).join('').toUpperCase() || 'EQ';
@@ -380,6 +383,9 @@
     }
 
     function escapeHtml(value) {
+      if (window.EQStudent && EQStudent.escapeHtml) {
+        return EQStudent.escapeHtml(value);
+      }
       return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
         return {
           '&': '&amp;',
@@ -389,6 +395,23 @@
           "'": '&#39;'
         }[ch];
       });
+    }
+
+    function readStudentProfile() {
+      if (window.EQStudent && EQStudent.read) {
+        var saved = EQStudent.read('10');
+        return {
+          cls: saved.classId || '',
+          no: saved.studentNo || '',
+          name: saved.studentName || ''
+        };
+      }
+
+      return {
+        cls: localStorage.getItem('eq_student_class') || '',
+        no: localStorage.getItem('eq_student_no') || '',
+        name: localStorage.getItem('eq_student_name') || ''
+      };
     }
 
     function safeStrikeTotal(value) {
@@ -467,11 +490,7 @@
     }
 
     function init() {
-      profile = {
-        cls: localStorage.getItem('eq_student_class') || '',
-        no: localStorage.getItem('eq_student_no') || '',
-        name: localStorage.getItem('eq_student_name') || ''
-      };
+      profile = readStudentProfile();
 
       if (!profile.cls || !profile.no || !profile.name) {
         document.getElementById('guardCard').classList.remove('hidden');
