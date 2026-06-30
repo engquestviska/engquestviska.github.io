@@ -625,10 +625,15 @@ function renderStudentClass(cls, students) {
 }
 
 function autoOpenSavedStudent() {
-  const savedCls  = localStorage.getItem('eq_student_class');
-  const savedName = localStorage.getItem('eq_student_name');
-  if (savedCls && savedName) {
-    openActModal(savedName, normalizeClassId(savedCls));
+  const saved = window.EQStudent && EQStudent.read
+    ? EQStudent.read('10')
+    : {
+        classId: localStorage.getItem('eq_student_class') || '',
+        studentName: localStorage.getItem('eq_student_name') || ''
+      };
+
+  if (saved.classId && saved.studentName) {
+    openActModal(saved.studentName, normalizeClassId(saved.classId));
   }
 }
 
