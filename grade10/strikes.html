@@ -398,19 +398,11 @@
     }
 
     function readStudentProfile() {
-      if (window.EQStudent && EQStudent.read) {
-        var saved = EQStudent.read('10');
-        return {
-          cls: saved.classId || '',
-          no: saved.studentNo || '',
-          name: saved.studentName || ''
-        };
-      }
-
+      var saved = EQStudent.read('10');
       return {
-        cls: localStorage.getItem('eq_student_class') || '',
-        no: localStorage.getItem('eq_student_no') || '',
-        name: localStorage.getItem('eq_student_name') || ''
+        cls: saved.classId || '',
+        no: saved.studentNo || '',
+        name: saved.studentName || ''
       };
     }
 

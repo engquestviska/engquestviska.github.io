@@ -628,36 +628,22 @@
     }
 
     function savedProfile() {
-      if (window.EQStudent) {
-        const profile = EQStudent.read('10');
-        return {
-          className: profile.classId,
-          studentNo: profile.studentNo,
-          studentName: profile.studentName
-        };
-      }
+      const profile = EQStudent.read('10');
       return {
-        className: localStorage.getItem('eq_student_class') || '',
-        studentNo: localStorage.getItem('eq_student_no') || '',
-        studentName: localStorage.getItem('eq_student_name') || ''
+        className: profile.classId,
+        studentNo: profile.studentNo,
+        studentName: profile.studentName
       };
     }
 
     function rememberStudent(student) {
       if (!student || !currentClass) return;
-      if (window.EQStudent) {
-        EQStudent.save({
-          grade: '10',
-          classId: currentClass,
-          studentNo: student.no || '',
-          studentName: student.name || ''
-        });
-        return;
-      }
-      localStorage.setItem('eq_grade', '10');
-      localStorage.setItem('eq_student_class', currentClass);
-      localStorage.setItem('eq_student_no', student.no || '');
-      localStorage.setItem('eq_student_name', student.name || '');
+      EQStudent.save({
+        grade: '10',
+        classId: currentClass,
+        studentNo: student.no || '',
+        studentName: student.name || ''
+      });
     }
 
     function openSavedStudent() {

@@ -549,29 +549,17 @@
   }
 
   function savedProfile() {
-    if (window.EQStudent) {
-      return EQStudent.read('10');
-    }
-    return {
-      classId: localStorage.getItem('eq_student_class') || '',
-      studentNo: localStorage.getItem('eq_student_no') || '',
-      studentName: localStorage.getItem('eq_student_name') || ''
-    };
+    return EQStudent.read('10');
   }
 
   function rememberStudent(studentNo, student) {
     if (!currentClass || !student) return;
-    if (window.EQStudent && EQStudent.save({
+    EQStudent.save({
       grade: '10',
       classId: currentClass,
       studentNo: studentNo,
       studentName: student.name || ''
-    })) {
-      return;
-    }
-    localStorage.setItem('eq_student_class', currentClass);
-    localStorage.setItem('eq_student_no', studentNo);
-    localStorage.setItem('eq_student_name', student.name || '');
+    });
   }
 
   function initClassSelect() {

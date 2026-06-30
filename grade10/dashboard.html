@@ -695,18 +695,11 @@
     }
 
     function readStudentProfile() {
-      if (window.EQStudent) {
-        var profile = EQStudent.read('10');
-        return {
-          cls: profile.classId,
-          no: profile.studentNo,
-          name: profile.studentName
-        };
-      }
+      var profile = EQStudent.read('10');
       return {
-        cls: localStorage.getItem('eq_student_class') || '',
-        no: localStorage.getItem('eq_student_no') || '',
-        name: localStorage.getItem('eq_student_name') || ''
+        cls: profile.classId,
+        no: profile.studentNo,
+        name: profile.studentName
       };
     }
 

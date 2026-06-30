@@ -777,16 +777,10 @@
   }
 
   function readSavedStudentProfile() {
-    if (window.EQStudent) {
-      var profile = EQStudent.read('10');
-      return {
-        classId: profile.classId,
-        studentNo: profile.studentNo
-      };
-    }
+    var profile = EQStudent.read('10');
     return {
-      classId: localStorage.getItem('eq_student_class') || '',
-      studentNo: localStorage.getItem('eq_student_no') || ''
+      classId: profile.classId,
+      studentNo: profile.studentNo
     };
   }
 

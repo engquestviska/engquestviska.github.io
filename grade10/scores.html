@@ -513,14 +513,7 @@ function renderStudentMode() {
   var main = document.getElementById('mainContent');
 
   // Check if student identity is saved
-  var profile = window.EQStudent
-    ? EQStudent.read('10')
-    : {
-        classId: localStorage.getItem('eq_student_class') || '',
-        studentNo: localStorage.getItem('eq_student_no') || '',
-        studentName: localStorage.getItem('eq_student_name') || '',
-        hasProfile: !!(localStorage.getItem('eq_student_class') && localStorage.getItem('eq_student_no') && localStorage.getItem('eq_student_name'))
-      };
+  var profile = EQStudent.read('10');
   var savedCls = profile.classId;
   var savedNo = profile.studentNo;
   var savedName = profile.studentName;
@@ -574,13 +567,7 @@ function renderStudentMode() {
 }
 
 function forgetStudent() {
-  if (window.EQStudent) {
-    EQStudent.clear();
-  } else {
-    localStorage.removeItem('eq_student_class');
-    localStorage.removeItem('eq_student_no');
-    localStorage.removeItem('eq_student_name');
-  }
+  EQStudent.clear();
   renderStudentMode();
 }
 
@@ -658,18 +645,12 @@ function viewStudentScores() {
 
   // Save identity so other student pages can auto-load the same profile.
   if (student) {
-    if (window.EQStudent) {
-      EQStudent.save({
-        grade: '10',
-        classId: currentClass,
-        studentNo: studentNo,
-        studentName: student.name
-      });
-    } else {
-      localStorage.setItem('eq_student_class', currentClass);
-      localStorage.setItem('eq_student_no', studentNo);
-      localStorage.setItem('eq_student_name', student.name);
-    }
+    EQStudent.save({
+      grade: '10',
+      classId: currentClass,
+      studentNo: studentNo,
+      studentName: student.name
+    });
   }
 
   // Load chapters + final in parallel (final gracefully degrades if GS not yet deployed)
