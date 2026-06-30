@@ -349,7 +349,14 @@
 
     function populateStudents(students) {
       var nameSelect = document.getElementById('studentName');
-      var savedNo = localStorage.getItem('eq_student_no') || '';
+      var currentClass = document.getElementById('studentClass').value;
+      var savedProfile = window.EQStudent && EQStudent.read
+        ? EQStudent.read('10')
+        : {
+            classId: localStorage.getItem('eq_student_class') || '',
+            studentNo: localStorage.getItem('eq_student_no') || ''
+          };
+      var savedNo = savedProfile.classId === currentClass ? savedProfile.studentNo : '';
       nameSelect.innerHTML = '<option value="">Choose your name</option>';
       students.forEach(function(student) {
         var opt = document.createElement('option');
