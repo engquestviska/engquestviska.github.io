@@ -574,6 +574,9 @@
   }
 
   function escapeHtml(value) {
+    if (window.EQStudent && typeof EQStudent.escapeHtml === 'function') {
+      return EQStudent.escapeHtml(value);
+    }
     return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
       return {
         '&': '&amp;',
@@ -773,6 +776,20 @@
     setTimeout(() => t.classList.remove('show'), 3000);
   }
 
+  function readSavedStudentProfile() {
+    if (window.EQStudent) {
+      var profile = EQStudent.read('10');
+      return {
+        classId: profile.classId,
+        studentNo: profile.studentNo
+      };
+    }
+    return {
+      classId: localStorage.getItem('eq_student_class') || '',
+      studentNo: localStorage.getItem('eq_student_no') || ''
+    };
+  }
+
   // Auto-select saved student — waits for page to be fully ready
   document.addEventListener('DOMContentLoaded', function() {
     initClassOptions();
@@ -780,8 +797,9 @@
       showPreRosterMessage('studentResult');
       return;
     }
-    var cls = localStorage.getItem('eq_student_class');
-    var no  = localStorage.getItem('eq_student_no');
+    var profile = readSavedStudentProfile();
+    var cls = profile.classId;
+    var no  = profile.studentNo;
     if (!cls || !no) return;
     var clsSel = document.getElementById('sClassSelect');
     if (!clsSel) return;
