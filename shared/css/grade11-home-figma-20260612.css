@@ -10,10 +10,10 @@
 }
 
 .grade11-page.student-shell-enabled .student-app-sidebar {
-  width: 204px;
+  width: var(--sidebar-width);
   border-right: 1px solid var(--g10-line);
   box-shadow: none;
-  padding: 18px 12px;
+  padding: 22px 14px;
 }
 
 .grade11-page.student-shell-enabled .sidebar-brand {
@@ -29,66 +29,8 @@
   border-radius: 9px;
 }
 
-.grade11-page.student-shell-enabled .student-app-sidebar > .sidebar-label {
-  display: none;
-}
-
-.grade11-page.student-shell-enabled .primary-nav {
-  gap: 3px;
-  margin-top: 18px;
-}
-
-.grade11-page.student-shell-enabled .primary-nav a {
-  min-height: 39px;
-  gap: 11px;
-  border-radius: 8px;
-  color: var(--g10-ink);
-  font-size: 0.72rem;
-  padding: 0 12px;
-}
-
-.grade11-page.student-shell-enabled .primary-nav a::before {
-  position: static;
-  width: 14px;
-  height: auto;
-  background: transparent;
-  color: inherit;
-  content: "";
-  font-size: 0.64rem;
-  font-weight: 800;
-}
-
-.grade11-page.student-shell-enabled .primary-nav a:nth-child(1)::before { content: "1"; }
-.grade11-page.student-shell-enabled .primary-nav a:nth-child(2)::before { content: "2"; }
-.grade11-page.student-shell-enabled .primary-nav a:nth-child(3)::before { content: "3"; }
-.grade11-page.student-shell-enabled .primary-nav a:nth-child(4)::before { content: "4"; }
-.grade11-page.student-shell-enabled .primary-nav a:nth-child(5)::before { content: "5"; }
-.grade11-page.student-shell-enabled .primary-nav a:nth-child(6)::before { content: "6"; }
-.grade11-page.student-shell-enabled .primary-nav a:nth-child(11)::before { content: "7"; }
-
-.grade11-page.student-shell-enabled .primary-nav a svg {
-  display: none;
-}
-
-.grade11-page.student-shell-enabled .primary-nav a.active {
-  background: #e1f5f1;
-  color: #087f73;
-}
-
-.grade11-page.student-shell-enabled .primary-nav a:nth-child(7),
-.grade11-page.student-shell-enabled .primary-nav a:nth-child(8),
-.grade11-page.student-shell-enabled .primary-nav a:nth-child(9),
-.grade11-page.student-shell-enabled .primary-nav a:nth-child(10) {
-  display: none;
-}
-
-.grade11-page.student-shell-enabled .primary-nav a:nth-child(1) { order: 1; }
-.grade11-page.student-shell-enabled .primary-nav a:nth-child(2) { order: 2; }
-.grade11-page.student-shell-enabled .primary-nav a:nth-child(3) { order: 3; }
-.grade11-page.student-shell-enabled .primary-nav a:nth-child(4) { order: 4; }
-.grade11-page.student-shell-enabled .primary-nav a:nth-child(5) { order: 5; }
-.grade11-page.student-shell-enabled .primary-nav a:nth-child(6) { order: 6; }
-.grade11-page.student-shell-enabled .primary-nav a:nth-child(11) { order: 7; }
+/* Sidebar nav uses the shared icon navigation (same as every subpage) so the
+   sidebar stays identical when navigating between the homepage and subpages. */
 
 .grade11-page.student-shell-enabled .student-profile-nav {
   margin-top: 28px;
@@ -121,9 +63,9 @@
 }
 
 .grade11-page.student-shell-enabled > .shell {
-  width: calc(100% - 204px);
+  width: calc(100% - var(--sidebar-width));
   max-width: none;
-  margin-left: 204px;
+  margin-left: var(--sidebar-width);
   padding: 0;
 }
 
