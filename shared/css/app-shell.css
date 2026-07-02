@@ -1368,7 +1368,8 @@ svg { width: 19px; height: 19px; stroke-width: 1.9; }
   padding: 28px 30px;
 }
 
-.grade10-page .student-welcome-panel h2 {
+.grade10-page .student-welcome-panel h2,
+.grade11-page .student-welcome-panel h2 {
   max-width: none;
   margin: 8px 0;
   font-size: clamp(2rem, 3.3vw, 3rem);

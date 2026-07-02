@@ -112,7 +112,7 @@
   max-width: 720px;
   margin: 14px 0 0;
   color: #fff;
-  font: 800 clamp(2rem, 4vw, 3.35rem)/1.02 "IBM Plex Sans", sans-serif;
+  font: 800 clamp(1.7rem, 3.5vw, 2.7rem)/1.1 "IBM Plex Sans", sans-serif;
   letter-spacing: 0;
 }
 
