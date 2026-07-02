@@ -168,6 +168,7 @@
   });
 
   function initStudentShell() {
+    localStorage.setItem('eq_grade', detectGrade());
     document.body.classList.add('student-shell-enabled');
     document.body.setAttribute('data-student-shell-page', document.body.getAttribute('data-page') || currentPageFromPath());
     if (!document.getElementById('dashboardSidebar')) {
