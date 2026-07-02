@@ -775,6 +775,7 @@ svg { width: 19px; height: 19px; stroke-width: 1.9; }
 }
 
 .teacher-shell-enabled header .hero {
+  display: block;
   width: 100%;
   margin: 0;
 }
