@@ -197,7 +197,7 @@
 .student-section-heading span,
 .announcement-meta {
   color: #1760ed;
-  font-size: 0.58rem;
+  font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0;
   text-transform: uppercase;
@@ -216,8 +216,8 @@
   max-width: 560px;
   margin: 12px 0 0;
   color: #e3edff;
-  font-size: 0.72rem;
-  line-height: 1.45;
+  font-size: 0.9rem;
+  line-height: 1.55;
 }
 
 .student-welcome-actions {
@@ -236,7 +236,7 @@
   border-radius: 8px;
   background: #fff;
   color: #1760ed;
-  font-size: 0.65rem;
+  font-size: 0.82rem;
   font-weight: 800;
   padding: 0 14px;
   text-decoration: none;
@@ -262,7 +262,7 @@
 
 .grade10-page .profile-label {
   color: #1760ed;
-  font-size: 0.58rem;
+  font-size: 0.72rem;
 }
 
 .grade10-page .profile-login-card .profile-title {
@@ -274,14 +274,14 @@
 .grade10-page .profile-copy {
   margin-top: 5px;
   color: var(--g10-muted);
-  font-size: 0.65rem;
-  line-height: 1.45;
+  font-size: 0.82rem;
+  line-height: 1.5;
 }
 
 .grade10-page .profile-status {
   min-height: 25px;
   border-radius: 999px;
-  font-size: 0.52rem;
+  font-size: 0.7rem;
   padding: 0 10px;
 }
 
@@ -294,20 +294,20 @@
 }
 
 .grade10-page .profile-field label {
-  font-size: 0.52rem;
+  font-size: 0.72rem;
 }
 
 .grade10-page .profile-field select {
-  min-height: 34px;
+  min-height: 38px;
   border: 1px solid var(--g10-line);
   border-radius: 7px;
-  font-size: 0.7rem;
+  font-size: 0.86rem;
 }
 
 .grade10-page .profile-message {
   min-height: 0;
-  font-size: 0.61rem;
-  line-height: 1.3;
+  font-size: 0.8rem;
+  line-height: 1.4;
 }
 
 .grade10-page .profile-login-actions {
@@ -315,9 +315,9 @@
 }
 
 .grade10-page .profile-login-actions .btn {
-  min-height: 31px;
+  min-height: 36px;
   border-radius: 8px;
-  font-size: 0.62rem;
+  font-size: 0.82rem;
 }
 
 .grade10-page .profile-login-card.logged-in .profile-form,
@@ -370,9 +370,9 @@
 .student-summary-card.red > span { background: #f9dce4; color: #da708a; }
 .student-summary-card.purple > span { background: #eee5ff; color: #9473dc; }
 .student-summary-card svg { width: 16px; }
-.student-summary-card small { display: block; font-size: 0.52rem; font-weight: 700; }
-.student-summary-card strong { display: block; margin-top: 2px; font-size: 1.08rem; line-height: 1; }
-.student-summary-card p { margin: 3px 0 0; color: #a2afc5; font-size: 0.5rem; }
+.student-summary-card small { display: block; font-size: 0.75rem; font-weight: 700; }
+.student-summary-card strong { display: block; margin-top: 2px; font-size: 1.3rem; line-height: 1; }
+.student-summary-card p { margin: 3px 0 0; color: #a2afc5; font-size: 0.8rem; }
 
 .grade10-page .clean-section {
   border: 0;
@@ -441,12 +441,12 @@
 .student-next-card.green .student-next-icon { background: #ddf4e7; color: #57b77c; }
 .student-next-card.amber .student-next-icon { background: #fff0d7; color: #e7a73a; }
 .student-next-icon svg { width: 15px; }
-.student-next-card small { color: #1760ed; font-size: 0.5rem; font-weight: 800; text-transform: uppercase; }
+.student-next-card small { color: #1760ed; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; }
 .student-next-card.purple small { color: #8754ee; }
 .student-next-card.green small { color: #22a257; }
 .student-next-card.amber small { color: #e3910b; }
-.student-next-card strong { font-size: 0.76rem; line-height: 1.15; }
-.student-next-card p { grid-column: 1 / -1; margin: 8px 0 0; color: var(--g10-muted); font-size: 0.58rem; line-height: 1.35; }
+.student-next-card strong { font-size: 0.98rem; line-height: 1.15; }
+.student-next-card p { grid-column: 1 / -1; margin: 8px 0 0; color: var(--g10-muted); font-size: 0.84rem; line-height: 1.4; }
 .student-next-card::after {
   grid-column: 1 / -1;
   align-self: end;
@@ -493,9 +493,9 @@
 }
 
 .student-resource-grid svg { display: none; }
-.student-resource-grid strong { font-size: 0.7rem; }
-.student-resource-grid p { margin: 8px 0 0; color: var(--g10-muted); font-size: 0.56rem; line-height: 1.35; }
-.student-resource-grid span { margin-top: auto; color: #1760ed; font-size: 0.55rem; font-weight: 800; }
+.student-resource-grid strong { font-size: 0.98rem; }
+.student-resource-grid p { margin: 8px 0 0; color: var(--g10-muted); font-size: 0.84rem; line-height: 1.4; }
+.student-resource-grid span { margin-top: auto; color: #1760ed; font-size: 0.78rem; font-weight: 800; }
 
 .grade10-page .announcement-panel {
   display: grid;
