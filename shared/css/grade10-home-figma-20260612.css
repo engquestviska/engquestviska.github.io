@@ -129,6 +129,7 @@
 .grade10-page .student-home-main {
   display: grid;
   gap: 20px;
+  width: auto;
   max-width: none;
   margin: 0;
   padding: 26px 28px 38px;
