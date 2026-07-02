@@ -103,9 +103,7 @@ main {
 .intro-kicker,
 .section-kicker,
 .profile-label,
-.track-label,
-.grade-label,
-.status-label {
+.grade-label {
   font-family: 'IBM Plex Mono', monospace;
   text-transform: uppercase;
   letter-spacing: 0.12em;
@@ -117,8 +115,7 @@ h1,
 h2,
 .profile-title,
 .grade-title,
-.track-title,
-.brand-title {
+.brand-title  {
   font-family: 'Playfair Display', serif;
 }
 
@@ -340,9 +337,7 @@ footer {
 
 .profile-card,
 .module,
-.track,
-.planning,
-.login-panel {
+.track {
   background: var(--card);
   border: 1.5px solid var(--line);
   border-radius: 30px;
@@ -369,11 +364,7 @@ footer {
 }
 
 .profile-copy,
-.module-copy,
-.track-copy,
-.plan-copy,
-.login-copy,
-.logged-copy {
+.module-copy {
   color: var(--muted);
   line-height: 1.6;
   font-size: 0.92rem;
@@ -385,9 +376,7 @@ footer {
   flex-wrap: wrap;
 }
 
-.btn,
-.primary-btn,
-.ghost-btn {
+.btn {
   border: none;
   border-radius: 999px;
   padding: 11px 15px;
@@ -402,8 +391,7 @@ footer {
   gap: 8px;
 }
 
-.btn.primary,
-.primary-btn {
+.btn.primary {
   background: var(--primary);
   color: #fff;
 }
@@ -414,8 +402,7 @@ footer {
 }
 
 .btn.ghost,
-.ghost-btn,
-.btn {
+.btn  {
   background: var(--primary-soft);
   color: var(--primary-dark);
 }
@@ -428,15 +415,11 @@ footer {
   margin: 32px 0 16px;
 }
 
-.module-grid,
-.track-grid,
-.planning-grid {
+.module-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
 }
-
-.track-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
 .module {
   min-height: 180px;
@@ -753,26 +736,6 @@ a.module:hover {
   line-height: 1.05;
 }
 
-.teacher-only-btn {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  border: 1.5px solid #93c5fd;
-  background: #dbeafe;
-  color: #1e3a8a;
-  border-radius: 999px;
-  padding: 9px 14px;
-  font: inherit;
-  font-size: 0.8rem;
-  font-weight: 800;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.teacher-active .teacher-only-btn {
-  display: inline-flex;
-}
-
 .material-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -935,29 +898,6 @@ a.module:hover {
   padding: 0;
 }
 
-.delete-material-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 5;
-  display: none;
-  width: 30px;
-  height: 30px;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 999px;
-  background: #ef4444;
-  color: #fff;
-  font: inherit;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.teacher-active .delete-material-btn {
-  display: flex;
-}
-
 .empty-material-card {
   grid-column: 1 / -1;
   display: flex;
@@ -1013,76 +953,6 @@ a.module:hover {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 16px;
-}
-
-.task-card {
-  position: relative;
-  overflow: hidden;
-  background: var(--card);
-  border: 1.5px solid var(--line);
-  border-radius: 24px;
-  box-shadow: 0 16px 44px rgba(15, 23, 42, 0.06);
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-}
-
-.task-card:hover {
-  transform: translateY(-4px);
-  border-color: #93c5fd;
-  box-shadow: 0 22px 48px rgba(37, 99, 235, 0.12);
-}
-
-.task-top {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 20px 20px 16px;
-}
-
-.task-number {
-  width: 42px;
-  height: 42px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-  border-radius: 14px;
-  background: var(--primary);
-  color: #fff;
-  font-family: 'Playfair Display', serif;
-  font-size: 1.1rem;
-  font-weight: 800;
-}
-
-.task-info {
-  min-width: 0;
-  flex: 1;
-}
-
-.task-name {
-  font-weight: 800;
-  font-size: 1.03rem;
-  line-height: 1.3;
-  margin-bottom: 5px;
-}
-
-.task-tag {
-  color: var(--muted);
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.74rem;
-  font-weight: 800;
-  line-height: 1.4;
-  text-transform: uppercase;
-}
-
-.task-actions {
-  display: flex;
-  gap: 8px;
-  padding: 0 18px 18px;
-}
-
-.task-actions .btn {
-  flex: 1;
-  border-radius: 12px;
 }
 
 .submission-guide {
@@ -1559,44 +1429,13 @@ a.module:hover {
   content: none;
 }
 
-.attendance-page .subpage-header .header-right {
-  position: static;
-  top: auto;
-  right: auto;
-  z-index: auto;
-}
-
-.attendance-page .login-btn,
-.attendance-page .teacher-badge {
-  min-height: 40px;
-  border: 1.5px solid rgba(255, 255, 255, 0.26);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
-  padding: 9px 14px;
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 0.82rem;
-  font-weight: 800;
-}
-
-.attendance-page .teacher-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(245, 158, 11, 0.95);
-  border-color: rgba(255, 255, 255, 0.28);
-}
-
 .attendance-page main {
   width: min(920px, 100%);
   max-width: none;
   padding-top: 36px;
 }
 
-.attendance-page .card,
-.attendance-page .list-card,
-.attendance-page .submit-card,
-.attendance-page .lb-card {
+.attendance-page .card {
   overflow: hidden;
   border: 1.5px solid var(--line);
   border-radius: 24px;
@@ -1604,32 +1443,11 @@ a.module:hover {
   box-shadow: 0 16px 44px rgba(15, 23, 42, 0.06);
 }
 
-.attendance-page .attendance-control-card {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  padding: 24px;
-}
-
-.attendance-page .attendance-control-card .card-title {
-  grid-column: 1 / -1;
-  margin-bottom: 0;
-  font-family: 'Playfair Display', serif;
-  font-size: 1.45rem;
-  font-weight: 800;
-}
-
-.attendance-page .attendance-control-card .btn-primary {
-  grid-column: 1 / -1;
-}
-
 .attendance-page .field {
   margin-bottom: 0;
 }
 
-.attendance-page .field label,
-.attendance-page .date-field label,
-.attendance-page .modal-field label {
+.attendance-page .field label {
   color: var(--muted);
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.72rem;
@@ -1638,88 +1456,16 @@ a.module:hover {
 }
 
 .attendance-page .field select,
-.attendance-page .field input[type="date"],
-.attendance-page .date-field input[type="date"],
-.attendance-page .modal-field input {
+.attendance-page .field input[type="date"] {
   border-color: var(--line);
   border-radius: 14px;
   background: #f8fafc;
   color: var(--ink);
 }
 
-.attendance-page .btn-primary,
-.attendance-page .btn-save {
+.attendance-page .btn-primary {
   border-radius: 14px;
   background: var(--primary);
-}
-
-.attendance-page .meeting-bar {
-  border: 1.5px solid #bfdbfe;
-  border-radius: 24px;
-  background: #eff6ff;
-  padding: 20px;
-}
-
-.attendance-page .meeting-bar-title,
-.attendance-page .list-header-title,
-.attendance-page .lb-head-title {
-  font-family: 'Playfair Display', serif;
-  font-weight: 800;
-}
-
-.attendance-page .view-badge {
-  border: 1.5px solid #bfdbfe;
-  border-radius: 16px;
-  background: #eff6ff;
-  color: var(--primary-dark);
-  font-weight: 800;
-}
-
-.attendance-page .quick-actions {
-  gap: 12px;
-}
-
-.attendance-page .btn-quick {
-  border-radius: 14px;
-}
-
-.attendance-page .list-header {
-  background: #f8fafc;
-  border-color: var(--line);
-}
-
-.attendance-page .s-row {
-  border-color: var(--line);
-}
-
-.attendance-page .s-top {
-  gap: 14px;
-  padding: 15px 20px 12px;
-}
-
-.attendance-page .s-no {
-  color: var(--primary);
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.75rem;
-  font-weight: 800;
-}
-
-.attendance-page .s-name {
-  color: var(--ink);
-  font-weight: 800;
-}
-
-.attendance-page .s-btns {
-  border-color: var(--line);
-}
-
-.attendance-page .s-btn {
-  background: #f8fafc;
-  border-color: var(--line);
-}
-
-.attendance-page .lb-head {
-  background: linear-gradient(135deg, #2563eb, #1e3a8a);
 }
 
 .attendance-page .overlay {
@@ -1731,8 +1477,7 @@ a.module:hover {
   box-shadow: 0 24px 70px rgba(15, 23, 42, 0.18);
 }
 
-.viewer-overlay,
-.sheet-overlay {
+.viewer-overlay {
   position: fixed;
   inset: 0;
   z-index: 300;
@@ -1741,8 +1486,7 @@ a.module:hover {
   backdrop-filter: blur(8px);
 }
 
-.viewer-overlay.hidden,
-.sheet-overlay.hidden {
+.viewer-overlay.hidden {
   display: none;
 }
 
@@ -1827,18 +1571,6 @@ a.module:hover {
   color: var(--muted);
 }
 
-.sheet-overlay {
-  align-items: flex-end;
-  justify-content: center;
-}
-
-.sheet-panel {
-  width: min(540px, 100%);
-  background: #fff;
-  border-radius: 28px 28px 0 0;
-  padding-bottom: 30px;
-}
-
 .sheet-handle {
   width: 40px;
   height: 4px;
@@ -1854,18 +1586,6 @@ a.module:hover {
   gap: 12px;
   padding: 18px 24px 14px;
   border-bottom: 1.5px solid var(--line);
-}
-
-.sheet-title {
-  font-weight: 800;
-  font-size: 1.1rem;
-}
-
-.sheet-body {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  padding: 20px 24px;
 }
 
 .field label {
@@ -1911,20 +1631,6 @@ a.module:hover {
   padding: 1px 5px;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.72rem;
-}
-
-.form-error {
-  display: none;
-  background: #fee2e2;
-  border: 1.5px solid #fca5a5;
-  border-radius: 12px;
-  color: #991b1b;
-  padding: 10px 14px;
-  font-size: 0.82rem;
-}
-
-.form-error.show {
-  display: block;
 }
 
 .spinner-sm {
@@ -2152,102 +1858,6 @@ a.module:hover {
   font-size: 0.75rem;
 }
 
-/* Teacher */
-.teacher-page {
-  --primary: #2563eb;
-  --primary-dark: #1e3a8a;
-  --primary-soft: #dbeafe;
-  --line: #dbeafe;
-  background: #f8fafc;
-}
-
-.teacher-page header {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(30, 58, 138, 0.9));
-  color: #fff;
-  padding: 22px;
-}
-
-.teacher-page .nav {
-  margin-bottom: 70px;
-}
-
-.teacher-page .brand img {
-  border: 2px solid rgba(255, 255, 255, 0.24);
-}
-
-.teacher-page .brand-sub,
-.teacher-page .hero-copy,
-.teacher-page .login-copy,
-.teacher-page .logged-copy,
-.teacher-page .nav-actions a,
-.teacher-page .nav-actions button {
-  color: rgba(255, 255, 255, 0.72);
-}
-
-.teacher-page .nav-actions a,
-.teacher-page .nav-actions button {
-  border-color: rgba(255, 255, 255, 0.22);
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-
-.teacher-page .hero {
-  padding-bottom: 54px;
-  margin-bottom: 0;
-}
-
-.teacher-page .kicker {
-  color: #93c5fd;
-}
-
-.teacher-page main {
-  padding: 42px 22px 72px;
-}
-
-.login-panel {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.22);
-  color: #fff;
-  padding: 24px;
-  backdrop-filter: blur(12px);
-}
-
-.login-title,
-.status-title,
-.logged-name,
-.track-title,
-.plan-title {
-  font-weight: 800;
-}
-
-.login-title {
-  font-size: 1.15rem;
-  margin-bottom: 6px;
-}
-
-.login-panel input {
-  width: 100%;
-  border: 1.5px solid rgba(255, 255, 255, 0.24);
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
-  border-radius: 14px;
-  padding: 12px 14px;
-  font: inherit;
-  outline: none;
-  margin-bottom: 10px;
-}
-
-.login-panel input::placeholder {
-  color: rgba(255, 255, 255, 0.48);
-}
-
-.login-row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-top: 4px;
-}
-
 .error {
   display: none;
   color: #fecaca;
@@ -2255,11 +1865,7 @@ a.module:hover {
   margin: 2px 0 10px;
 }
 
-.logged-card { display: none; }
-.logged-name { margin-bottom: 6px; }
-
-.track,
-.planning {
+.track {
   padding: 24px;
 }
 
@@ -2271,8 +1877,6 @@ a.module:hover {
 
 .track.ten { border-color: #bfdbfe; }
 .track.eleven { border-color: #99f6e4; }
-.track-label { color: var(--muted); margin-bottom: 10px; }
-.track-title { font-size: 1.7rem; margin-bottom: 8px; }
 
 .action-grid {
   display: grid;
@@ -2300,23 +1904,6 @@ a.module:hover {
   color: #94a3b8;
   background: #f8fafc;
   cursor: not-allowed;
-}
-
-.planning-grid {
-  margin-top: 18px;
-}
-
-.plan-card {
-  border: 1.5px solid var(--line);
-  border-radius: 18px;
-  padding: 18px;
-  min-height: 150px;
-  background: #f8fafc;
-}
-
-.plan-icon {
-  font-size: 1.45rem;
-  margin-bottom: 12px;
 }
 
 .teacher-control-grid {
@@ -2363,54 +1950,16 @@ a.control-card.live:hover {
   color: #64748b;
 }
 
-.control-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-}
-
-.control-code,
-.control-state {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.control-code {
-  color: var(--primary);
-}
-
-.control-state {
-  border-radius: 999px;
-  padding: 7px 10px;
-  background: var(--primary-soft);
-  color: var(--primary-dark);
-}
-
-.control-state.live {
-  background: #d1fae5;
-  color: #047857;
-}
-
 .control-card h3 {
   font-family: 'Playfair Display', serif;
   font-size: clamp(1.6rem, 3vw, 2.25rem);
   line-height: 1;
 }
 
-.control-card p,
-.grade-note {
+.control-card p {
   color: var(--muted);
   line-height: 1.6;
   font-size: 0.94rem;
-}
-
-.grade-note {
-  max-width: 760px;
-  margin: -6px 0 18px;
 }
 
 .section-head.slim {
@@ -2784,9 +2333,7 @@ a.control-card.live:hover {
   .placeholder-rule-grid,
   .teacher-control-grid,
   .teacher-control-grid.compact,
-  .track-grid,
-  .planning-grid,
-  .landing-page main {
+  .landing-page main  {
     grid-template-columns: 1fr;
   }
 
@@ -2800,10 +2347,6 @@ a.control-card.live:hover {
   .content-title-row {
     align-items: flex-start;
     flex-direction: column;
-  }
-
-  .teacher-page .nav {
-    margin-bottom: 34px;
   }
 
   .action-grid {
