@@ -1100,10 +1100,14 @@ svg { width: 19px; height: 19px; stroke-width: 1.9; }
     margin-right: auto;
   }
   .teacher-shell-enabled header .topbar {
+    flex-direction: row;
     align-items: center;
   }
   .teacher-shell-enabled header .brand {
     margin-right: auto;
+  }
+  .teacher-shell-enabled header .nav-actions {
+    flex: 0 0 auto;
   }
   .teacher-identity { display: none; }
   .podium { overflow-x: auto; grid-template-columns: repeat(5, 135px); justify-content: start; padding: 18px 0 0; }
