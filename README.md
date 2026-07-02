@@ -17,7 +17,7 @@ English Quest is a static GitHub Pages website being rebuilt into three clear tr
 Important files and folders:
 
 - `index.html` - landing page for choosing Grade 10, Grade 11, or Teacher.
-- `LAUNCH_CHECKLIST.md` - launch readiness checklist for the `next-year` switchover.
+- `docs/` - all planning, contract, and reference docs; see `docs/README.md` for the index (roadmap, product rules, launch checklist, roster/next-semester specs, folder map).
 - `grade10/index.html` - Grade 10 student home and profile setup.
 - `grade10/dashboard.html` - Grade 10 personal statistics dashboard.
 - `grade10/strikes.html` - Grade 10 student-facing strike tracker.
@@ -76,7 +76,7 @@ Some pages depend on Google Apps Script, Google Sheets, Google Drive, and YouTub
 
 ## Before Going Live
 
-- Work through `LAUNCH_CHECKLIST.md`.
+- Work through `docs/LAUNCH_CHECKLIST.md`.
 - Confirm all class names and student lists are for the correct school year.
 - Check teacher login and protected actions.
 - Test the main pages on phone and desktop.

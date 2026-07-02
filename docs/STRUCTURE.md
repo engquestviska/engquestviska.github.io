@@ -5,21 +5,28 @@ English Quest is being reorganized into three tracks.
 ## Root
 
 - `index.html` - landing page for Grade 10, Grade 11, and Teacher.
-- `LAUNCH_CHECKLIST.md` - launch readiness checklist before merging `next-year` into `main`.
-- `PRE_ROSTER_PLAN.md` - active development order while official student rosters are unavailable.
-- `PRODUCT_CONTRACT.md` - route, ownership, and UI contract for the next-year rebuild.
-- `ROSTER_IMPORT_CONTRACT.md` - canonical roster CSV fields, validation rules, and spreadsheet mapping.
-- `NEXT_SEMESTER_API.md` - next-semester spreadsheet/API contract and boundary notes.
-- `NEXT_SEMESTER_MIGRATION.md` - promotion checklist for moving the isolated preview into the real grade pages later.
-- `NEXT_SEMESTER_PROFILE_FORM.md` - next-semester student profile Google Form setup contract.
-- `ROADMAP.md` - revamp priorities.
-- `STRUCTURE.md` - current folder structure.
+- `README.md` - project intro and starting point.
+- `docs/` - all planning, contract, and reference docs (see `docs/README.md` for the index).
+- `scripts/check-site.mjs` - zero-dependency site checker (links, inline-script parse, unused-CSS report); also runs in CI.
 - `activities/` - legacy classroom activity pages, see "Activities" section below.
 - `apps-script/` - current-year Apps Script source.
 - `apps-script-next/` - separate next-semester Apps Script source for the uploaded master spreadsheet.
 - `next-semester/` - isolated preview pages for the next-semester profile login, student dashboard, and read-only teacher console. It is a bridge, not the real Grade 10 or Grade 11 data flow yet.
 - `shared/` - shared CSS and JavaScript for the new structure.
 - `samples/roster-import.sample.csv` - inactive synthetic roster rows for testing the import contract.
+
+## Docs (`docs/`)
+
+- `docs/README.md` - documentation index (active planning vs. reference).
+- `docs/STRUCTURE.md` - this file: current folder structure.
+- `docs/ROADMAP.md` - revamp priorities and work order.
+- `docs/PRE_ROSTER_PLAN.md` - active development order while official student rosters are unavailable.
+- `docs/PRODUCT_CONTRACT.md` - route, ownership, and UI contract for the next-year rebuild.
+- `docs/LAUNCH_CHECKLIST.md` - launch readiness checklist before merging `next-year` into `main`.
+- `docs/ROSTER_IMPORT_CONTRACT.md` - canonical roster CSV fields, validation rules, and spreadsheet mapping.
+- `docs/NEXT_SEMESTER_API.md` - next-semester spreadsheet/API contract and boundary notes.
+- `docs/NEXT_SEMESTER_MIGRATION.md` - promotion checklist for moving the isolated preview into the real grade pages later.
+- `docs/NEXT_SEMESTER_PROFILE_FORM.md` - next-semester student profile Google Form setup contract.
 
 ## Grade 10
 
