@@ -42,20 +42,20 @@
     '<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>',
     '<nav class="sidebar" id="sidebar" aria-label="Legacy page navigation">',
     '  <div class="sidebar-head">',
-    '    <img class="sidebar-logo" src="logo.jpg" alt="English Quest Logo"/>',
+    '    <img class="sidebar-logo" src="../logo.jpg" alt="English Quest Logo"/>',
     '    <div class="sidebar-head-text">',
     '      <div class="sidebar-head-title">English Quest</div>',
     '      <div class="sidebar-head-sub">Legacy activity pages</div>',
     '    </div>',
     '    <button class="sidebar-close" type="button" onclick="closeSidebar()" aria-label="Close menu">&#x2715;</button>',
     '  </div>',
-    '  <a href="index.html" class="sidebar-home-btn">',
+    '  <a href="../index.html" class="sidebar-home-btn">',
     '    <div>',
     '      <div class="sidebar-home-btn-text">&#127968; Landing</div>',
     '      <div class="sidebar-home-btn-sub">Choose a track</div>',
     '    </div>',
     '  </a>',
-    '  <a href="grade10/" class="sidebar-home-btn">',
+    '  <a href="../grade10/" class="sidebar-home-btn">',
     '    <div>',
     '      <div class="sidebar-home-btn-text">G10 Grade 10</div>',
     '      <div class="sidebar-home-btn-sub">Student home</div>',
@@ -105,7 +105,7 @@
           '<span style="cursor:default;color:#60A5FA;font-size:0.82rem;margin:0;">' +
             (localStorage.getItem('eq_tu') || 'Teacher') +
           '</span>' +
-          '<a href="teacher/" style="margin-left:auto;color:rgba(255,255,255,0.65);font-size:0.75rem;text-decoration:none;">Open</a>' +
+          '<a href="../teacher/" style="margin-left:auto;color:rgba(255,255,255,0.65);font-size:0.75rem;text-decoration:none;">Open</a>' +
         '</div>';
       return;
     }

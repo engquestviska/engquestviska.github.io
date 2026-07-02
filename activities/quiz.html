@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz · English Quest</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --purple:#2563EB; --purple-light:#60A5FA; --purple-soft:#DBEAFE;
+      --white:#fff; --off-white:#F8FAFC; --text-dark:#0F172A;
+      --text-muted:#475569; --border:#DBEAFE; --accent:#F59E0B;
+      --green:#10B981; --red:#DC2626;
+    }
+    body { font-family:'IBM Plex Sans',sans-serif; background:var(--off-white); color:var(--text-dark); min-height:100vh; display:flex; flex-direction:column; }
+
+    /* HEADER */
+    header { background:linear-gradient(135deg,#2563EB 0%,#1D4ED8 50%,#1E3A8A 100%); padding:36px 20px 52px; text-align:center; position:relative; overflow:hidden; }
+    header::before { content:''; position:absolute; inset:0; background-image:radial-gradient(circle,rgba(255,255,255,0.07) 1px,transparent 1px); background-size:28px 28px; pointer-events:none; }
+    .back-btn { position:absolute; top:20px; left:20px; z-index:2; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); color:#fff; font-family:'IBM Plex Sans',sans-serif; font-size:0.88rem; font-weight:600; padding:8px 18px; border-radius:999px; cursor:pointer; text-decoration:none; }
+    header h1 { font-family:'Playfair Display',serif; font-size:clamp(1.8rem,5vw,2.6rem); font-weight:800; color:#fff; position:relative; z-index:1; margin-bottom:8px; }
+    header h1 span { color:#93C5FD; font-style:italic; }
+    .header-sub { color:rgba(255,255,255,0.65); font-size:0.9rem; position:relative; z-index:1; }
+    .wave { display:block; width:100%; margin-top:-2px; }
+
+    main { flex:1; max-width:640px; margin:0 auto; padding:24px 16px 80px; width:100%; }
+
+    /* JEOPARDY BANNER */
+    .jeop-banner { display:flex; align-items:center; gap:16px; background:linear-gradient(135deg,#1E3A8A,#2563EB); border-radius:20px; padding:20px 24px; margin-bottom:20px; text-decoration:none; transition:opacity 0.2s; box-shadow:0 8px 32px rgba(37,99,235,0.25); }
+    .jeop-banner:hover { opacity:0.9; }
+    .jeop-icon { font-size:2.4rem; flex-shrink:0; }
+    .jeop-body { flex:1; }
+    .jeop-title { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:800; color:#fff; margin-bottom:4px; }
+    .jeop-sub { font-size:0.82rem; color:rgba(255,255,255,0.72); font-family:'IBM Plex Mono',monospace; }
+    .jeop-arrow { font-size:1.4rem; color:rgba(255,255,255,0.5); flex-shrink:0; }
+
+    /* COMING SOON */
+    .coming-section-label { font-size:0.72rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; font-family:'IBM Plex Mono',monospace; margin-bottom:12px; }
+    .coming-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; }
+    .coming-card { background:var(--white); border:1.5px dashed var(--border); border-radius:18px; padding:20px; position:relative; opacity:0.7; }
+    .coming-card-badge { font-size:0.68rem; font-weight:700; color:var(--purple-light); font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px; }
+    .coming-card-name { font-family:'Playfair Display',serif; font-size:1rem; font-weight:800; margin-bottom:4px; }
+    .coming-card-sub { font-size:0.78rem; color:var(--text-muted); }
+    .coming-soon-pill { position:absolute; top:14px; right:14px; background:var(--purple-soft); color:var(--purple); font-size:0.68rem; font-weight:800; padding:3px 10px; border-radius:999px; font-family:'IBM Plex Mono',monospace; border:1px solid var(--purple-mid); }
+
+    /* Btn */
+    .btn-primary { width:100%; padding:15px; background:linear-gradient(135deg,var(--purple),#1D4ED8); color:#fff; font-family:'IBM Plex Sans',sans-serif; font-weight:700; font-size:1rem; border:none; border-radius:14px; cursor:pointer; transition:opacity 0.2s; }
+    .btn-primary:hover { opacity:0.9; }
+
+    /* GENERATING STATE */
+    .gen-state { text-align:center; padding:48px 20px; }
+    .gen-icon { font-size:3rem; margin-bottom:16px; animation:genPulse 1.5s ease-in-out infinite; }
+    @keyframes genPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.12)} }
+    .gen-title { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; margin-bottom:8px; }
+    .gen-sub { font-size:0.85rem; color:var(--text-muted); }
+    .gen-dots span { animation:genDot 1.2s ease-in-out infinite; }
+    .gen-dots span:nth-child(2) { animation-delay:0.2s; }
+    .gen-dots span:nth-child(3) { animation-delay:0.4s; }
+    @keyframes genDot { 0%,80%,100%{opacity:0} 40%{opacity:1} }
+
+    /* QUIZ */
+    .quiz-progress { display:flex; align-items:center; gap:12px; margin-bottom:20px; }
+    .quiz-progress-bar-wrap { flex:1; background:var(--border); border-radius:999px; height:6px; }
+    .quiz-progress-bar { height:6px; border-radius:999px; background:linear-gradient(90deg,var(--purple),var(--purple-light)); transition:width 0.4s ease; }
+    .quiz-progress-label { font-size:0.78rem; font-weight:700; color:var(--text-muted); font-family:'IBM Plex Mono',monospace; white-space:nowrap; }
+
+    .question-card { background:var(--white); border:1.5px solid var(--border); border-radius:20px; padding:24px; margin-bottom:14px; animation:slideUp 0.3s ease; }
+    .q-num { font-size:0.7rem; font-weight:700; color:var(--purple-light); text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:10px; }
+    .q-text { font-size:0.98rem; font-weight:600; color:var(--text-dark); line-height:1.5; margin-bottom:18px; }
+    .q-options { display:flex; flex-direction:column; gap:8px; }
+    .q-option { display:flex; align-items:center; gap:12px; padding:12px 16px; border:1.5px solid var(--border); border-radius:12px; cursor:pointer; transition:all 0.15s; background:var(--off-white); }
+    .q-option:hover { border-color:var(--purple-light); background:var(--purple-soft); }
+    .q-option.selected { border-color:var(--purple); background:var(--purple-soft); }
+    .q-option.correct { border-color:var(--green); background:rgba(16,185,129,0.08); }
+    .q-option.wrong { border-color:var(--red); background:rgba(220,38,38,0.05); }
+    .q-option-letter { width:28px; height:28px; border-radius:50%; background:var(--border); display:flex; align-items:center; justify-content:center; font-size:0.78rem; font-weight:800; color:var(--text-muted); flex-shrink:0; font-family:'IBM Plex Mono',monospace; transition:all 0.15s; }
+    .q-option.selected .q-option-letter { background:var(--purple); color:#fff; }
+    .q-option.correct .q-option-letter { background:var(--green); color:#fff; }
+    .q-option.wrong   .q-option-letter { background:var(--red);   color:#fff; }
+    .q-option-text { font-size:0.88rem; color:var(--text-dark); line-height:1.4; }
+    .q-explanation { margin-top:12px; padding:10px 14px; background:rgba(37,99,235,0.06); border:1px solid var(--border); border-radius:10px; font-size:0.8rem; color:var(--text-muted); line-height:1.5; display:none; }
+    .q-explanation.show { display:block; }
+
+    /* RESULT */
+    .result-header { text-align:center; padding:28px 20px 20px; border-bottom:1.5px solid var(--border); margin-bottom:20px; }
+    .result-score-ring { width:100px; height:100px; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-family:'Playfair Display',serif; font-size:2rem; font-weight:800; border:4px solid; }
+    .result-score-ring.great  { background:rgba(16,185,129,0.1);  color:#059669; border-color:#6EE7B7; }
+    .result-score-ring.good   { background:rgba(37,99,235,0.1); color:var(--purple); border-color:var(--purple-light); }
+    .result-score-ring.okay   { background:rgba(245,158,11,0.1);  color:#D97706; border-color:#FCD34D; }
+    .result-score-ring.low    { background:rgba(220,38,38,0.08);  color:var(--red); border-color:#FCA5A5; }
+    .result-title { font-family:'Playfair Display',serif; font-size:1.3rem; font-weight:800; margin-bottom:6px; }
+    .result-sub { font-size:0.88rem; color:var(--text-muted); }
+    .result-pts-badge { display:inline-flex; align-items:center; gap:8px; background:var(--purple-soft); border:1.5px solid var(--purple-light); border-radius:12px; padding:8px 16px; margin-top:14px; font-size:0.9rem; font-weight:700; color:var(--purple); }
+
+    /* Saving state */
+    .saving-box { background:var(--off-white); border:1.5px solid var(--border); border-radius:14px; padding:14px 16px; text-align:center; font-size:0.85rem; color:var(--text-muted); margin-bottom:16px; }
+    .saving-box.saved { background:rgba(16,185,129,0.08); border-color:rgba(16,185,129,0.3); color:#059669; }
+    .saving-box.err   { background:rgba(220,38,38,0.05); border-color:#FCA5A5; color:var(--red); }
+
+    footer { background:var(--text-dark); color:rgba(255,255,255,0.5); text-align:center; padding:20px; font-size:0.85rem; }
+    footer strong { color:var(--purple-light); }
+
+    .hidden { display:none !important; }
+
+    /* Teacher results */
+    .results-table-wrap { overflow-x:auto; }
+    .results-table { width:100%; border-collapse:collapse; font-size:0.85rem; }
+    .results-table th { padding:10px 12px; background:var(--purple-soft); color:var(--purple); font-weight:700; text-align:left; font-family:'IBM Plex Mono',monospace; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap; }
+    .results-table td { padding:10px 12px; border-bottom:1px solid var(--border); color:var(--text-dark); }
+    .results-table tr:last-child td { border-bottom:none; }
+    .results-table tr:hover td { background:var(--off-white); }
+    .score-chip { display:inline-block; padding:2px 10px; border-radius:999px; font-weight:700; font-size:0.78rem; font-family:'IBM Plex Mono',monospace; }
+    .score-great { background:rgba(16,185,129,0.12); color:#059669; }
+    .score-good  { background:rgba(37,99,235,0.1); color:var(--purple); }
+    .score-okay  { background:rgba(245,158,11,0.1); color:#D97706; }
+    .score-low   { background:rgba(220,38,38,0.08); color:var(--red); }
+    .score-none  { background:var(--border); color:var(--text-muted); }
+
+    /* ── SIDEBAR (shared) ───────────────────────────────────── */
+    .hamburger { position:absolute; top:20px; right:20px; z-index:10; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); border-radius:10px; width:40px; height:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; cursor:pointer; padding:0; }
+    .hamburger span { display:block; width:18px; height:2px; background:#fff; border-radius:999px; transition:all 0.3s; }
+    .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity:0; }
+    .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+    .sidebar-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.6); backdrop-filter:blur(6px); z-index:300; opacity:0; pointer-events:none; transition:opacity 0.3s; }
+    .sidebar-overlay.open { opacity:1; pointer-events:all; }
+    .sidebar { position:fixed; top:0; right:0; height:100%; width:min(320px,85vw); background:#0F172A; z-index:301; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.34,1.1,0.64,1); display:flex; flex-direction:column; overflow-y:auto; }
+    .sidebar.open { transform:translateX(0); }
+    .sidebar-head { padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; gap:12px; }
+    .sidebar-logo { width:36px; height:36px; border-radius:10px; object-fit:cover; }
+    .sidebar-head-text { flex:1; }
+    .sidebar-head-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:800; color:#fff; }
+    .sidebar-head-sub { font-size:0.7rem; color:rgba(255,255,255,0.45); margin-top:1px; }
+    .sidebar-close { width:38px; min-width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.08); border:none; color:rgba(255,255,255,0.5); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
+    .sidebar-section { padding:14px 16px 4px; }
+    .sidebar-section-label { font-size:0.65rem; font-weight:700; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.12em; font-family:'IBM Plex Mono',monospace; padding:0 4px; margin-bottom:6px; }
+    .sidebar-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; text-decoration:none; transition:background 0.15s; margin-bottom:2px; }
+    .sidebar-item:hover, .sidebar-item:active { background:rgba(255,255,255,0.08); }
+    .sidebar-item.active { background:rgba(255,255,255,0.12); border-left:3px solid #60A5FA; padding-left:9px; }
+    .sidebar-item-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0; }
+    .sidebar-item-name { font-size:0.88rem; font-weight:600; color:#fff; flex:1; }
+    .sidebar-item-badge { font-size:0.6rem; font-weight:800; padding:2px 7px; border-radius:999px; font-family:'IBM Plex Mono',monospace; background:#F59E0B; color:#fff; }
+    .sidebar-divider { height:1px; background:rgba(255,255,255,0.07); margin:8px 16px; }
+    .sidebar-teacher { margin:12px 16px 20px; background:rgba(37,99,235,0.2); border:1px solid rgba(37,99,235,0.35); border-radius:14px; padding:12px 14px; }
+    .sidebar-teacher-label { font-size:0.68rem; font-weight:700; color:#60A5FA; text-transform:uppercase; letter-spacing:0.08em; font-family:'IBM Plex Mono',monospace; margin-bottom:8px; }
+    .sidebar-teacher-logged { font-size:0.82rem; color:#60A5FA; font-weight:600; display:flex; align-items:center; gap:8px; }
+    .sidebar-teacher-logged span { cursor:pointer; color:rgba(255,255,255,0.4); font-size:0.75rem; margin-left:auto; }
+    .sidebar-home-btn { display:flex; align-items:center; gap:10px; margin:12px 16px 4px; padding:11px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:12px; text-decoration:none; }
+    .sidebar-home-btn:hover { background:rgba(255,255,255,0.1); }
+    .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
+    .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
+
+  </style>
+  <script src="../shared/js/auth.js"></script>
+  <script src="sidebar.js"></script>
+</head>
+<body data-page="quiz">
+
+<header>
+  <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
+  <a class="back-btn" href="../grade10/">← Back</a>
+  <h1>English Quest <span>Quiz</span></h1>
+  <p class="header-sub">Chapter review games · English Quest · Mr. Laksma</p>
+</header>
+<svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
+  <path fill="#1E3A8A" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
+  <path fill="#F8FAFC" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
+</svg>
+
+<main id="mainArea">
+
+  <!-- JEOPARDY BANNER -->
+  <a href="jeopardyquiz.html" class="jeop-banner">
+    <div class="jeop-icon">&#127918;</div>
+    <div class="jeop-body">
+      <div class="jeop-title">Chapter 4 Jeopardy Quiz</div>
+      <div class="jeop-sub">Play with friends &middot; Fact/Opinion, Vocab, Structure &amp; more</div>
+    </div>
+    <div class="jeop-arrow">&#8594;</div>
+  </a>
+
+  <!-- GUESS WHO CARD (teacher only) -->
+  <div id="guessWhoCard" style="display:none">
+    <a href="chapter5_guess_who.html" class="jeop-banner" style="background:linear-gradient(135deg,#BE185D,#9D174D);box-shadow:0 8px 32px rgba(190,24,93,0.25);">
+      <div class="jeop-icon">&#129300;</div>
+      <div class="jeop-body">
+        <div class="jeop-title">Guess Who? — Chapter 5</div>
+        <div class="jeop-sub">Narrative Text warm-up &middot; Silhouette guessing game &middot; Class activity</div>
+      </div>
+      <div class="jeop-arrow">&#8594;</div>
+    </a>
+  </div>
+
+</main>
+
+<footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built with ❤️ by <strong>LaksMedia</strong></footer>
+
+
+<script>
+// Show teacher-only elements
+(function() {
+  if (EQAuth.hasTeacher()) {
+    var el = document.getElementById('guessWhoCard');
+    if (el) el.style.display = 'block';
+  }
+})();
+
+</script>
+
+</body>
+</html>

@@ -14,6 +14,7 @@ English Quest is being reorganized into three tracks.
 - `NEXT_SEMESTER_PROFILE_FORM.md` - next-semester student profile Google Form setup contract.
 - `ROADMAP.md` - revamp priorities.
 - `STRUCTURE.md` - current folder structure.
+- `activities/` - legacy classroom activity pages, see "Activities" section below.
 - `apps-script/` - current-year Apps Script source.
 - `apps-script-next/` - separate next-semester Apps Script source for the uploaded master spreadsheet.
 - `next-semester/` - isolated preview pages for the next-semester profile login, student dashboard, and read-only teacher console. It is a bridge, not the real Grade 10 or Grade 11 data flow yet.
@@ -81,13 +82,14 @@ English Quest is being reorganized into three tracks.
 - Dated shared filenames remain only as compatibility shims for cached previews.
 - `shared/css/next-semester.css` - isolated preview styles for the next-semester login and dashboard.
 
-## Legacy Root Pages
+## Activities (Legacy Classroom Pages)
 
-Some older pages still live at the root while the revamp is in progress. They should either be moved into the correct track or removed later.
-- `chapter5_guess_who.html` - legacy classroom game.
-- `gallery.html` - legacy gallery with student upload and teacher approval controls.
-- `jeopardyquiz.html` - legacy classroom quiz game.
-- `quiz.html` - legacy Grade 10 quiz/activity hub, linked from the Grade 10 home while the games are still at the root.
-- `strikes.html` redirects to `grade10/strikes.html` for old student links.
-- `submission_status.html` - legacy read-only submission status overview.
-- `summative.html` - legacy summative topic lookup with teacher reveal controls.
+Older classroom pages now live in `activities/` instead of loose at the root. Root paths still work via redirect stubs for old bookmarks/links.
+- `activities/chapter5_guess_who.html` - legacy classroom game.
+- `activities/gallery.html` - legacy gallery with student upload and teacher approval controls.
+- `activities/jeopardyquiz.html` - legacy classroom quiz game.
+- `activities/quiz.html` - legacy Grade 10 quiz/activity hub, linked from Grade 10 home (`grade10/index.html`).
+- `activities/submission_status.html` - legacy read-only submission status overview.
+- `activities/summative.html` - legacy summative topic lookup with teacher reveal controls.
+- `activities/sidebar.js` - navigation used only by the pages above; current Grade 10/11 pages use `shared/js/sidebar.js` instead.
+- Root `strikes.html`, and `chapter5_guess_who.html`/`gallery.html`/`jeopardyquiz.html`/`quiz.html`/`submission_status.html`/`summative.html` at root, are redirect stubs pointing at their real location (same pattern for all).

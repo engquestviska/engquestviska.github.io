@@ -26,7 +26,7 @@ Important files and folders:
 - `grade11/` - matching Grade 11 placeholder structure without spreadsheet connections yet.
 - `shared/css/system.css` - shared design system styles.
 - `shared/js/api.js`, `shared/js/auth.js`, `shared/js/sidebar.js`, `shared/js/teacher-sidebar.js` - shared API, auth, and navigation helpers.
-- `quiz.html`, `jeopardyquiz.html`, `chapter5_guess_who.html`, `submission_status.html`, `summative.html`, `gallery.html` - legacy root pages still used during the transition.
+- `activities/quiz.html`, `activities/jeopardyquiz.html`, `activities/chapter5_guess_who.html`, `activities/submission_status.html`, `activities/summative.html`, `activities/gallery.html` - legacy classroom pages still used during the transition; old root URLs redirect here.
 - `apps-script/` - Google Apps Script backend source for the main data API.
 - `chapter5-submission/` - Google Apps Script source for the Chapter 5 submission flow.
 - `images/` - local image assets used by activities.
