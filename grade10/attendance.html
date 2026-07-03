@@ -17,20 +17,16 @@
       color: #0f172a;
     }
     body.attendance-page .subpage-header {
-      text-align: left !important;
-      padding: 22px 22px 64px !important;
-      min-height: 210px !important;
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 52%, #1e3a8a 100%) !important;
-      overflow: hidden !important;
+      padding: 24px 28px 28px !important;
+      background: linear-gradient(125deg, #2563eb 0%, #1d4ed8 55%, #1e3a8a 100%) !important;
+      border-bottom: 0 !important;
     }
-    body.attendance-page .topbar,
+    body.attendance-page .subpage-header .topbar,
     body.attendance-page .subpage-hero {
-      position: relative !important;
-      z-index: 2 !important;
-      width: min(1180px, 100%) !important;
-      margin-inline: auto !important;
+      width: 100%;
+      max-width: 1200px;
+      margin-inline: auto;
     }
-    body.attendance-page .topbar { margin-bottom: 74px !important; }
     body.attendance-page .brand-title,
     body.attendance-page .brand-sub,
     body.attendance-page .subpage-hero,
@@ -39,32 +35,29 @@
     body.attendance-page .nav a,
     body.attendance-page .nav button {
       color: #fff !important;
-      background: rgba(255, 255, 255, 0.12) !important;
+      background: rgba(255, 255, 255, 0.14) !important;
       border-color: rgba(255, 255, 255, 0.35) !important;
     }
     body.attendance-page .subpage-hero h1 {
       max-width: 790px !important;
-      font-size: clamp(1.7rem, 3.5vw, 2.7rem) !important;
+      font-size: clamp(1.6rem, 3vw, 2.3rem) !important;
       line-height: 1.1 !important;
-      margin: 12px 0 20px !important;
+      margin: 10px 0 12px !important;
       letter-spacing: 0 !important;
     }
     body.attendance-page .kicker { color: #bfdbfe !important; }
     body.attendance-page .hero-copy {
       max-width: 650px !important;
-      font-size: 1.05rem !important;
-      line-height: 1.8 !important;
-      opacity: 0.88 !important;
+      font-size: 1rem !important;
+      line-height: 1.7 !important;
+      opacity: 0.9 !important;
     }
     body.attendance-page main {
-      width: auto !important;
-      max-width: min(1120px, calc(100% - 44px)) !important;
-      margin-top: -46px !important;
-      margin-right: auto !important;
-      margin-bottom: 0 !important;
-      padding: 0 0 88px !important;
-      position: relative !important;
-      z-index: 5 !important;
+      padding: 26px 28px 80px !important;
+    }
+    body.attendance-page .subpage-inner {
+      max-width: 1200px;
+      margin: 0 auto;
     }
     .attendance-picker,
     .profile-card,
@@ -339,12 +332,8 @@
       }
     }
     @media (max-width: 620px) {
-      body.attendance-page main {
-        width: min(100% - 28px, 1120px) !important;
-      }
-      body.attendance-page .subpage-header {
-        min-height: 380px !important;
-      }
+      body.attendance-page main { padding: 18px 14px 60px !important; }
+      body.attendance-page .subpage-header { padding: 18px 14px 22px !important; }
       .picker-form,
       .stats-grid,
       .record-row {
@@ -388,6 +377,7 @@
   </header>
 
   <main>
+    <div class="subpage-inner">
     <section class="attendance-picker" aria-labelledby="pickerTitle">
       <div>
         <h2 class="picker-title" id="pickerTitle">Find your record.</h2>
@@ -468,9 +458,10 @@
         </article>
       </div>
     </section>
+    </div>
   </main>
 
-  <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta · Built by <strong>LaksMedia</strong></footer>
+  <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta</footer>
 
   <script>
     const classSelect = document.getElementById('classSelect');
