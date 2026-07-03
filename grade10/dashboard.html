@@ -348,9 +348,9 @@
             </div>
             <p class="stat-sub" id="scoreSub">Loading your scores...</p>
             <div class="mini-grid">
-              <div class="mini-stat"><div class="mini-label">Chapter 4</div><div class="mini-value" id="scoreCh4">--</div></div>
-              <div class="mini-stat"><div class="mini-label">Chapter 5</div><div class="mini-value" id="scoreCh5">--</div></div>
-              <div class="mini-stat"><div class="mini-label">Final</div><div class="mini-value" id="scoreFinal">--</div></div>
+              <div class="mini-stat"><div class="mini-label">Chapter 1</div><div class="mini-value" id="scoreCh1">--</div></div>
+              <div class="mini-stat"><div class="mini-label">Chapter 2</div><div class="mini-value" id="scoreCh2">--</div></div>
+              <div class="mini-stat"><div class="mini-label">Chapter 3</div><div class="mini-value" id="scoreCh3">--</div></div>
             </div>
             <div class="link-row"><a class="btn ghost" href="scores.html">Open Scores</a></div>
           </article>
@@ -539,23 +539,23 @@
     async function loadScores() {
       try {
         var responses = await Promise.all([
-          mainApiGet({ action: 'getChapterScores', className: studentProfile.cls, chapter: 4 }),
-          mainApiGet({ action: 'getChapterScores', className: studentProfile.cls, chapter: 5 }),
-          mainApiGet({ action: 'getFinalScores', className: studentProfile.cls }).catch(function() { return {}; })
+          mainApiGet({ action: 'getChapterScores', className: studentProfile.cls, chapter: 1 }),
+          mainApiGet({ action: 'getChapterScores', className: studentProfile.cls, chapter: 2 }),
+          mainApiGet({ action: 'getChapterScores', className: studentProfile.cls, chapter: 3 })
         ]);
-        var ch4 = findStudent(responses[0].students);
-        var ch5 = findStudent(responses[1].students);
-        var fin = findStudent((responses[2] || {}).students);
-        var values = [ch4 && ch4.finalScore, ch5 && ch5.finalScore, fin && (fin.finalScore || fin.FinalScore || fin.average)];
+        var ch1 = findStudent(responses[0].students);
+        var ch2 = findStudent(responses[1].students);
+        var ch3 = findStudent(responses[2].students);
+        var values = [ch1 && ch1.finalScore, ch2 && ch2.finalScore, ch3 && ch3.finalScore];
         var numeric = values.map(Number).filter(Number.isFinite);
         var avg = numeric.length ? Math.round((numeric.reduce(function(a, b) { return a + b; }, 0) / numeric.length) * 10) / 10 : null;
 
         setText('scoreValue', avg === null ? '--' : String(avg));
-        setText('scoreCh4', fmtScore(ch4 && ch4.finalScore));
-        setText('scoreCh5', fmtScore(ch5 && ch5.finalScore));
-        setText('scoreFinal', fmtScore(fin && (fin.finalScore || fin.FinalScore || fin.average)));
+        setText('scoreCh1', fmtScore(ch1 && ch1.finalScore));
+        setText('scoreCh2', fmtScore(ch2 && ch2.finalScore));
+        setText('scoreCh3', fmtScore(ch3 && ch3.finalScore));
         setText('scoreSub', numeric.length
-          ? 'Showing your available chapter/final score records.'
+          ? 'Showing your available chapter score records.'
           : 'No score records have been published for your profile yet.');
         summary.scores = avg === null ? 'No data' : avg + ' avg';
       } catch(e) {

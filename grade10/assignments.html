@@ -50,45 +50,57 @@
   </header>
 
   <main>
-    <section class="content-section" aria-labelledby="chapter4Title">
+    <section class="content-section" aria-labelledby="chapter1Title">
       <div class="content-section-head">
         <div class="content-title-row">
-          <div class="content-badge">Chapter 4</div>
-          <h2 class="content-title" id="chapter4Title">Analytical Exposition</h2>
+          <div class="content-badge">Semester 1</div>
+          <h2 class="content-title" id="chapter1Title">Chapter 1</h2>
         </div>
       </div>
-
-      <div class="material-grid" id="grid-ch4">
-        <article class="material-card assignment-card" data-fileid="1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8">
-          <div class="material-info">
-            <div class="content-badge">Task 5</div>
-            <div class="material-name">Present Perfect Exercise</div>
-            <div class="material-meta">GRAMMAR · PRESENT PERFECT</div>
-            <div class="material-actions">
-              <button class="btn" onclick="openPDF('Present Perfect Exercise','https://drive.google.com/file/d/1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8/preview','https://drive.google.com/uc?export=download&id=1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8')">View</button>
-              <a class="btn primary icon-btn" href="https://drive.google.com/uc?export=download&id=1E3V1BDUAOl4DNbzi5Z24Hq4S8PlcngK8" target="_blank" rel="noopener">↓</a>
-            </div>
-          </div>
-        </article>
+      <div class="material-grid" id="grid-ch1"></div>
+      <div class="empty-material-card" id="ch1-empty">
+        <div class="empty-material-icon">📋</div>
+        <div>
+          <div class="empty-material-title">Chapter 1 Assignments</div>
+          <div class="empty-material-copy">Will be added soon. Stay tuned!</div>
+        </div>
+        <div class="empty-material-badge">Coming Soon</div>
       </div>
     </section>
 
-    <section class="content-section" aria-labelledby="chapter5Title">
+    <section class="content-section" aria-labelledby="chapter2Title">
       <div class="content-section-head">
         <div class="content-title-row">
-          <div class="content-badge">Chapter 5</div>
-          <h2 class="content-title" id="chapter5Title">Narrative Text</h2>
+          <div class="content-badge">Semester 1</div>
+          <h2 class="content-title" id="chapter2Title">Chapter 2</h2>
         </div>
       </div>
-
-      <div class="material-grid" id="grid-ch5"></div>
-      <div class="empty-material-card hidden-state" id="ch5-empty">
+      <div class="material-grid" id="grid-ch2"></div>
+      <div class="empty-material-card" id="ch2-empty">
         <div class="empty-material-icon">📋</div>
         <div>
-          <div class="empty-material-title">Chapter 5 Assignments</div>
-          <div class="empty-material-copy">No assignments yet for Chapter 5.</div>
+          <div class="empty-material-title">Chapter 2 Assignments</div>
+          <div class="empty-material-copy">Will be added soon. Stay tuned!</div>
         </div>
-        <div class="empty-material-badge">Empty</div>
+        <div class="empty-material-badge">Coming Soon</div>
+      </div>
+    </section>
+
+    <section class="content-section" aria-labelledby="chapter3Title">
+      <div class="content-section-head">
+        <div class="content-title-row">
+          <div class="content-badge">Semester 1</div>
+          <h2 class="content-title" id="chapter3Title">Chapter 3</h2>
+        </div>
+      </div>
+      <div class="material-grid" id="grid-ch3"></div>
+      <div class="empty-material-card" id="ch3-empty">
+        <div class="empty-material-icon">📋</div>
+        <div>
+          <div class="empty-material-title">Chapter 3 Assignments</div>
+          <div class="empty-material-copy">Will be added soon. Stay tuned!</div>
+        </div>
+        <div class="empty-material-badge">Coming Soon</div>
       </div>
     </section>
   </main>
@@ -165,26 +177,16 @@
     }
 
     function loadSaved() {
-      EQApi.get({ action: 'getMaterials', chapter: 'assign4' }).then(function(res) {
-        if (res.materials) {
-          res.materials.forEach(function(m) {
-            appendCard(4, m.title, m.fileId, m.fileType || '');
-          });
-        }
-      }).catch(function() {});
-
-      EQApi.get({ action: 'getMaterials', chapter: 'assign5' }).then(function(res) {
-        if (res.materials && res.materials.length) {
-          res.materials.forEach(function(m) {
-            appendCard(5, m.title, m.fileId, m.fileType || '');
-          });
-        } else {
-          document.getElementById('ch5-empty').classList.remove('hidden-state');
-        }
-      }).catch(function() {
-        var empty = document.getElementById('ch5-empty');
-        empty.classList.remove('hidden-state');
-        empty.querySelector('.empty-material-copy').textContent = 'Could not load Chapter 5 assignments.';
+      [1, 2, 3].forEach(function(ch) {
+        EQApi.get({ action: 'getMaterials', chapter: 'assign' + ch }).then(function(res) {
+          if (res.materials && res.materials.length) {
+            var empty = document.getElementById('ch' + ch + '-empty');
+            if (empty) empty.remove();
+            res.materials.forEach(function(m) {
+              appendCard(ch, m.title, m.fileId, m.fileType || '');
+            });
+          }
+        }).catch(function() {});
       });
     }
 
