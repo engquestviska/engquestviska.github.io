@@ -5,10 +5,18 @@
   var VERIFY_MAX_AGE = 1000 * 60 * 60 * 8;
   var verifyInFlight = false;
 
+  // Security: teacher credentials live in sessionStorage (cleared when the
+  // browser/tab closes) so a login no longer persists forever. Proactively
+  // remove any long-lived credentials left over in localStorage.
+  try {
+    localStorage.removeItem('eq_tu');
+    localStorage.removeItem('eq_tp');
+  } catch (e) {}
+
   function getTeacher() {
     return {
-      username: localStorage.getItem('eq_tu') || '',
-      password: localStorage.getItem('eq_tp') || ''
+      username: sessionStorage.getItem('eq_tu') || '',
+      password: sessionStorage.getItem('eq_tp') || ''
     };
   }
 
@@ -34,6 +42,8 @@
   }
 
   function logoutTeacher(redirectTo) {
+    sessionStorage.removeItem('eq_tu');
+    sessionStorage.removeItem('eq_tp');
     localStorage.removeItem('eq_tu');
     localStorage.removeItem('eq_tp');
     clearVerification();

@@ -235,8 +235,8 @@
         if (!data.ok) throw new Error('Incorrect username or password.');
         return hashPass(password);
       }).then(function(hashed) {
-        localStorage.setItem('eq_tu', username);
-        localStorage.setItem('eq_tp', hashed);
+        sessionStorage.setItem('eq_tu', username);
+        sessionStorage.setItem('eq_tp', hashed);
         EQAuth.markTeacherVerified(username);
         displayTeacher(username);
         hideLogin();
