@@ -2398,7 +2398,8 @@ a.control-card.live:hover {
   }
 
   .teacher-link {
-    display: none;
+    padding: 8px 11px;
+    font-size: 0.78rem;
   }
 
   .nav a,
