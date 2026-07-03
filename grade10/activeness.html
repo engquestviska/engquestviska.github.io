@@ -152,9 +152,8 @@
     }
     body.activeness-page .subpage-header {
       text-align: left !important;
-      padding: 22px 22px 64px !important;
-      min-height: 210px !important;
-      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e3a8a 100%) !important;
+      padding: 24px 28px 28px !important;
+      background: linear-gradient(125deg, #2563eb 0%, #1d4ed8 55%, #1e3a8a 100%) !important;
       overflow: hidden !important;
     }
     body.activeness-page .subpage-header::before {
@@ -207,14 +206,11 @@
       display: none !important;
     }
     body.activeness-page main {
-      width: auto !important;
-      max-width: min(1120px, calc(100% - 44px)) !important;
-      margin-top: -44px !important;
-      margin-right: auto !important;
-      margin-bottom: 0 !important;
-      padding: 0 0 88px !important;
-      position: relative !important;
-      z-index: 5 !important;
+      padding: 26px 28px 80px !important;
+    }
+    body.activeness-page .subpage-inner {
+      max-width: 1120px;
+      margin: 0 auto;
     }
     body.activeness-page .picker-card,
     body.activeness-page .activeness-dashboard,
@@ -421,23 +417,22 @@
       margin-top: 3px !important;
     }
     body.activeness-page footer {
-      background: #0f172a !important;
-      color: rgba(255, 255, 255, 0.55) !important;
+      background: transparent !important;
+      color: #64748b !important;
       border-top: 0 !important;
     }
     @media (max-width: 720px) {
       body.activeness-page .subpage-header {
-        min-height: 400px !important;
-        padding-bottom: 64px !important;
+        padding: 18px 14px 22px !important;
       }
       body.activeness-page .topbar {
-        margin-bottom: 54px !important;
+        margin-bottom: 8px !important;
       }
       body.activeness-page .subpage-hero h1 {
-        font-size: clamp(2.7rem, 13vw, 4.2rem) !important;
+        font-size: clamp(1.5rem, 6vw, 2rem) !important;
       }
       body.activeness-page main {
-        width: min(100% - 28px, 1120px) !important;
+        padding: 18px 14px 60px !important;
       }
       body.activeness-page .picker-card,
       body.activeness-page .dash-head {
@@ -483,6 +478,7 @@
 </svg>
 
 <main>
+  <div class="subpage-inner">
   <div class="picker-card">
     <div>
       <div class="picker-title">Open your activeness profile.</div>
@@ -506,6 +502,7 @@
   </div>
   <div id="activenessResult"></div>
 
+  </div>
 </main>
 
 <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta</footer>
@@ -593,6 +590,11 @@
     document.getElementById('activenessResult').innerHTML = '';
     if (!currentClass) {
       studentSelect.innerHTML = '<option value="">— Select class first —</option>';
+      return;
+    }
+    if (!(window.EQClasses && typeof EQClasses.rostersReady === 'function' && EQClasses.rostersReady())) {
+      studentSelect.innerHTML = '<option value="">Roster not published yet</option>';
+      document.getElementById('activenessResult').innerHTML = '<div class="loading"><strong>Official roster not published yet.</strong><br/>This page is intentionally not showing old-year names. Activeness will appear once the new roster is connected.</div>';
       return;
     }
     try {
