@@ -366,9 +366,31 @@
     body.student-directory-page .student-controls,
     body.student-directory-page .class-section,
     body.student-directory-page .no-results {
-      width: min(860px, 100%) !important;
+      width: min(1120px, 100%) !important;
       margin-left: auto !important;
       margin-right: auto !important;
+    }
+    body.student-directory-page .subpage-header {
+      padding: 24px 28px 28px !important;
+      background: linear-gradient(125deg, #2563eb 0%, #1d4ed8 55%, #1e3a8a 100%) !important;
+      border-bottom: 0 !important;
+    }
+    body.student-directory-page .subpage-header .topbar,
+    body.student-directory-page .subpage-hero {
+      width: 100% !important;
+      max-width: 1120px !important;
+      margin-inline: auto !important;
+    }
+    body.student-directory-page .brand-title,
+    body.student-directory-page .brand-sub,
+    body.student-directory-page .subpage-hero,
+    body.student-directory-page .subpage-hero h1,
+    body.student-directory-page .hero-copy { color: #fff !important; }
+    body.student-directory-page .kicker { color: #bfdbfe !important; }
+    body.student-directory-page .nav a {
+      color: #fff !important;
+      background: rgba(255, 255, 255, 0.14) !important;
+      border-color: rgba(255, 255, 255, 0.35) !important;
     }
     body.student-directory-page .class-section {
       border: 1.5px solid #dbeafe !important;
@@ -743,9 +765,28 @@ function cacheSet(params, data) {
 
 const activenessCache = {};
 
-// Now safe to build and load the directory (EQApi is loaded above)
-buildClassDirectory();
-loadAllStudents();
+// Placeholder-safe: only load the real roster once it is officially published.
+// Until then we do NOT fetch or show any (old-year) student names.
+if (window.EQClasses && typeof EQClasses.rostersReady === 'function' && EQClasses.rostersReady()) {
+  buildClassDirectory();
+  loadAllStudents();
+} else {
+  showPreRosterDirectory();
+}
+
+function showPreRosterDirectory() {
+  var controls = document.querySelector('.student-controls');
+  if (controls) controls.style.display = 'none';
+  var badge = document.getElementById('countBadge');
+  if (badge) badge.textContent = 'Roster pending';
+  var dir = document.getElementById('classDirectory');
+  if (dir) {
+    dir.innerHTML = '<section class="class-section" style="text-align:center;">' +
+      '<h2 style="font-family:\'Playfair Display\',serif;font-size:1.6rem;margin-bottom:10px;">Official roster not published yet.</h2>' +
+      '<p style="color:#64748b;line-height:1.6;max-width:560px;margin:0 auto;">The Grade 10 student list will appear here once the new class roster is added. This page is intentionally not showing old-year student names.</p>' +
+      '</section>';
+  }
+}
 
 const ACTS = [
   { key: 'VocabularyBox',    label: 'Vocabulary Box',    color: '#8B5CF6' },
