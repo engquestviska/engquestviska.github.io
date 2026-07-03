@@ -6,141 +6,102 @@
   <title>Grade 10 · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="../shared/css/system.css?v=20260702"/>
-  <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260702"/>
-  <link rel="stylesheet" href="../shared/css/grade10-home-figma-20260612.css?v=20260702"/>
+  <link rel="stylesheet" href="../shared/css/system.css?v=20260703"/>
+  <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260703"/>
   <style>
-    .profile-login-card {
-      align-content: stretch;
-      gap: 18px;
-    }
+    /* ---- Login/profile card (kept from previous homepage) ---- */
+    .profile-login-card { align-content: stretch; gap: 16px; }
     .profile-status {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: fit-content;
-      min-height: 32px;
-      border-radius: 999px;
-      background: #dbeafe;
-      color: #1d4ed8;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.68rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      padding: 0 12px;
-      text-transform: uppercase;
+      display: inline-flex; align-items: center; justify-content: center;
+      width: fit-content; min-height: 30px; border-radius: 999px;
+      background: #dbeafe; color: #1d4ed8; font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.66rem; font-weight: 800; letter-spacing: 0.08em; padding: 0 12px; text-transform: uppercase;
     }
-    .profile-form {
-      display: grid;
-      gap: 12px;
-    }
-    .profile-field {
-      display: grid;
-      gap: 7px;
-    }
+    .profile-form { display: grid; gap: 12px; }
+    .profile-field { display: grid; gap: 7px; }
     .profile-field label {
-      color: #1d4ed8;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.68rem;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
+      color: #1d4ed8; font-family: 'IBM Plex Mono', monospace; font-size: 0.66rem;
+      font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
     }
     .profile-field select {
-      width: 100%;
-      min-height: 48px;
-      border: 1.5px solid #bfdbfe;
-      border-radius: 16px;
-      background: #f8fbff;
-      color: #0f172a;
-      font: 600 0.96rem 'IBM Plex Sans', sans-serif;
-      outline: none;
-      padding: 0 14px;
+      width: 100%; min-height: 46px; border: 1.5px solid #bfdbfe; border-radius: 14px;
+      background: #f8fbff; color: #0f172a; font: 600 0.94rem 'IBM Plex Sans', sans-serif; outline: none; padding: 0 14px;
     }
-    .profile-field select:focus {
-      border-color: #2563eb;
-      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    .profile-field select:focus { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12); }
+    .profile-message { min-height: 20px; color: #64748b; font-size: 0.85rem; line-height: 1.5; }
+    .profile-login-actions { display: grid; gap: 9px; }
+    .profile-login-actions .btn { justify-content: center; width: 100%; }
+    .profile-login-actions .btn.danger { background: #fff1f2; border-color: #fecdd3; color: #be123c; }
+    .profile-login-actions .btn:disabled { cursor: not-allowed; opacity: 0.55; }
+
+    /* ---- New "Clean + Friendly" homepage (self-contained; eqh- prefix) ---- */
+    .grade10-page .eqh-main { max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; padding-top: 4px; }
+    .eqh-hero {
+      position: relative; overflow: hidden; border-radius: 26px; padding: 34px 38px; color: #fff;
+      background: linear-gradient(125deg, #2563eb 0%, #1d4ed8 55%, #1e3a8a 100%);
+      box-shadow: 0 22px 46px rgba(30, 58, 138, 0.26);
     }
-    .profile-message {
-      min-height: 22px;
-      color: #64748b;
-      font-size: 0.9rem;
-      line-height: 1.5;
+    .eqh-hero::after { content: ""; position: absolute; right: -70px; top: -80px; width: 300px; height: 300px; border-radius: 50%; background: rgba(255, 255, 255, 0.09); }
+    .eqh-hero-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; position: relative; z-index: 1; }
+    .eqh-badge, .eqh-streak {
+      display: inline-flex; align-items: center; gap: 7px; padding: 6px 13px; border-radius: 999px;
+      background: rgba(255, 255, 255, 0.16); border: 1px solid rgba(255, 255, 255, 0.28); font-weight: 700; font-size: 0.8rem;
     }
-    .profile-login-actions {
-      display: grid;
-      gap: 10px;
-    }
-    .profile-login-actions .btn {
-      justify-content: center;
-      width: 100%;
-    }
-    .profile-login-actions .btn.danger {
-      background: #fff1f2;
-      border-color: #fecdd3;
-      color: #be123c;
-    }
-    .profile-login-actions .btn:disabled {
-      cursor: not-allowed;
-      opacity: 0.55;
-    }
-    .home-announcement {
-      display: none;
-      margin-bottom: 34px;
-      border: 1.5px solid #dbeafe;
-      border-left: 8px solid #2563eb;
-      border-radius: 24px;
-      background: #fff;
-      box-shadow: 0 18px 42px rgba(37, 99, 235, 0.09);
-      padding: 22px;
-    }
-    .home-announcement.warning {
-      border-left-color: #f59e0b;
-      background: #fffbeb;
-    }
-    .home-announcement.success {
-      border-left-color: #059669;
-      background: #f0fdf4;
-    }
-    .announcement-meta {
-      color: #2563eb;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.68rem;
-      font-weight: 900;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-    .home-announcement.warning .announcement-meta {
-      color: #b45309;
-    }
-    .home-announcement.success .announcement-meta {
-      color: #047857;
-    }
-    .announcement-title {
-      margin: 8px 0 0;
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2rem, 4.8vw, 3.6rem);
-      line-height: 0.95;
-    }
-    .announcement-copy {
-      max-width: 760px;
-      margin: 14px 0 0;
-      color: #334155;
-      font-size: 1rem;
-      font-weight: 600;
-      line-height: 1.7;
-      white-space: pre-wrap;
-    }
-    @media (max-width: 720px) {
-      .profile-login-actions {
-        grid-template-columns: 1fr;
-      }
-    }
+    .eqh-badge { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .eqh-streak { color: #ffe4a3; }
+    .eqh-badge svg, .eqh-streak svg { width: 15px; height: 15px; }
+    .eqh-hero h1 { font-family: 'Playfair Display', serif; font-weight: 800; font-size: 2.6rem; line-height: 1.04; margin: 14px 0 10px; letter-spacing: -0.01em; }
+    .eqh-hero p { font-size: 1rem; opacity: 0.92; max-width: 540px; line-height: 1.55; position: relative; z-index: 1; }
+    .eqh-xp { position: relative; z-index: 1; margin-top: 18px; background: rgba(255, 255, 255, 0.13); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px; padding: 14px 16px; max-width: 540px; }
+    .eqh-xp-row { display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 0.82rem; margin-bottom: 9px; }
+    .eqh-bar { height: 11px; border-radius: 999px; background: rgba(255, 255, 255, 0.24); overflow: hidden; }
+    .eqh-bar i { display: block; height: 100%; width: 6%; border-radius: 999px; background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+    .eqh-cta { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; position: relative; z-index: 1; }
+    .eqh-btn { display: inline-flex; align-items: center; gap: 8px; border-radius: 13px; padding: 12px 22px; font: 600 0.92rem 'IBM Plex Sans', sans-serif; text-decoration: none; border: 1px solid transparent; cursor: pointer; }
+    .eqh-btn svg { width: 17px; height: 17px; }
+    .eqh-btn.solid { background: #fbbf24; color: #3b2a00; font-weight: 700; box-shadow: 0 10px 22px rgba(251, 191, 36, 0.32); }
+    .eqh-btn.glass { background: rgba(255, 255, 255, 0.16); color: #fff; border-color: rgba(255, 255, 255, 0.32); }
+
+    .eqh-cards { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+    .eqh-stat { background: #fff; border: 1px solid #e5ecf6; border-radius: 20px; padding: 18px; box-shadow: 0 16px 40px rgba(30, 58, 138, 0.08); text-decoration: none; color: inherit; display: block; }
+    .eqh-stat .ic { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: #fff; margin-bottom: 12px; }
+    .eqh-stat .ic svg { width: 21px; height: 21px; }
+    .eqh-stat .lab { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #5b6b82; }
+    .eqh-stat .val { font-size: 1.8rem; font-weight: 800; line-height: 1; margin: 5px 0 2px; color: #0f172a; }
+    .eqh-stat .sub { color: #93a1b5; font-size: 0.75rem; }
+    .eqh-c1 { background: linear-gradient(135deg, #3b82f6, #2563eb); } .eqh-c2 { background: linear-gradient(135deg, #10b981, #059669); }
+    .eqh-c3 { background: linear-gradient(135deg, #f59e0b, #f97316); } .eqh-c4 { background: linear-gradient(135deg, #f43f5e, #e11d48); }
+    .eqh-c5 { background: linear-gradient(135deg, #a855f7, #7c3aed); }
+
+    .eqh-sec-head { display: flex; justify-content: space-between; align-items: center; }
+    .eqh-sec-head h2 { font-family: 'Playfair Display', serif; font-weight: 800; font-size: 1.6rem; }
+    .eqh-sec-head a { color: #2563eb; font-weight: 600; font-size: 0.85rem; text-decoration: none; }
+    .eqh-next { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+    .eqh-ncard { position: relative; background: #fff; border: 1px solid #e5ecf6; border-radius: 20px; padding: 20px; box-shadow: 0 16px 40px rgba(30, 58, 138, 0.08); text-decoration: none; color: inherit; display: block; }
+    .eqh-ncard .ic { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; color: #fff; margin-bottom: 12px; }
+    .eqh-ncard .ic svg { width: 21px; height: 21px; }
+    .eqh-ncard small { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: #5b6b82; }
+    .eqh-ncard b { display: block; font-size: 1rem; margin: 4px 0 6px; color: #0f172a; }
+    .eqh-ncard p { color: #5b6b82; font-size: 0.82rem; line-height: 1.5; }
+    .eqh-ncard .arr { position: absolute; top: 18px; right: 16px; width: 30px; height: 30px; border-radius: 999px; background: #eef4ff; color: #2563eb; display: grid; place-items: center; }
+    .eqh-ncard .arr svg { width: 16px; height: 16px; }
+
+    .eqh-grid2 { display: grid; grid-template-columns: 1fr 340px; gap: 20px; align-items: start; }
+    .eqh-panel { background: #fff; border: 1px solid #e5ecf6; border-radius: 22px; padding: 24px; box-shadow: 0 16px 40px rgba(30, 58, 138, 0.08); }
+    .eqh-annc { border-left: 6px solid #2563eb; }
+    .eqh-annc .eqh-kick { font-family: 'IBM Plex Mono', monospace; font-size: 0.66rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #2563eb; }
+    .eqh-annc h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; margin: 6px 0 8px; }
+    .eqh-annc p { color: #5b6b82; line-height: 1.6; font-size: 0.9rem; }
+
+    @media (max-width: 1180px) { .eqh-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } .eqh-next { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 900px) { .eqh-grid2 { grid-template-columns: 1fr; } }
+    @media (max-width: 760px) { .grade10-page .student-account-chip { display: none; } }
+    @media (max-width: 620px) { .eqh-cards, .eqh-next { grid-template-columns: 1fr 1fr; } .eqh-hero { padding: 24px; } .eqh-hero h1 { font-size: 2rem; } }
   </style>
   <script src="../shared/js/classes-20260617.js?v=20260624"></script>
   <script src="../shared/js/student.js"></script>
   <script src="../shared/js/api.js"></script>
-  <script src="../shared/js/sidebar.js?v=20260626"></script>
+  <script src="../shared/js/sidebar.js?v=20260703"></script>
 </head>
 <body class="track-page grade10-page" data-page="home">
   <div class="shell">
@@ -159,49 +120,64 @@
       </a>
     </header>
 
-    <main class="student-home-main">
-      <header class="student-home-header">
-        <div>
-          <h1>Welcome back, <span id="welcomeName">Student</span></h1>
-          <p>Your Grade 10 English class hub for materials, tasks, submissions, progress, and class updates.</p>
+    <main class="eqh-main">
+      <section class="eqh-hero">
+        <div class="eqh-hero-top">
+          <span class="eqh-badge"><i data-lucide="sparkles"></i> Grade 10 · Semester 1</span>
+          <span class="eqh-streak"><i data-lucide="flame"></i> 0-day streak</span>
         </div>
-        <a class="student-header-action" href="../index.html">Grade 10 Homepage</a>
-      </header>
+        <h1>Welcome back, <span id="welcomeName">Student</span>.</h1>
+        <p>Your English class hub for materials, tasks, submissions, and progress — pick up where you left off and earn XP as you go.</p>
+        <div class="eqh-xp">
+          <div class="eqh-xp-row"><span>Level 1 · Beginner</span><span>0 / 100 XP</span></div>
+          <div class="eqh-bar"><i></i></div>
+        </div>
+        <div class="eqh-cta">
+          <a class="eqh-btn solid" href="tasks.html"><i data-lucide="play"></i> Continue Task</a>
+          <a class="eqh-btn glass" href="lessons.html"><i data-lucide="book-open"></i> View Materials</a>
+        </div>
+      </section>
 
-      <section class="student-home-overview">
-        <article class="student-welcome-panel">
-          <div>
-            <span class="student-panel-kicker">Grade 10 Student Track</span>
-            <h2>Your English class hub.</h2>
-            <p>Focus on your current unit, score improvement, and task completion.</p>
-          </div>
-          <div class="student-welcome-actions">
-            <a href="tasks.html">Continue Task</a>
-            <a href="lessons.html">View Materials</a>
-          </div>
+      <section class="eqh-cards" aria-label="Your summary">
+        <a class="eqh-stat" href="scores.html"><span class="ic eqh-c1"><i data-lucide="chart-no-axes-column-increasing"></i></span><div class="lab">Current Score</div><div class="val">--</div><div class="sub">Open scores</div></a>
+        <a class="eqh-stat" href="tasks.html"><span class="ic eqh-c2"><i data-lucide="circle-check-big"></i></span><div class="lab">Tasks Done</div><div class="val">--</div><div class="sub">Task status</div></a>
+        <a class="eqh-stat" href="submission.html"><span class="ic eqh-c3"><i data-lucide="send"></i></span><div class="lab">Submissions</div><div class="val">--</div><div class="sub">Records</div></a>
+        <a class="eqh-stat" href="strikes.html"><span class="ic eqh-c4"><i data-lucide="shield-alert"></i></span><div class="lab">Strikes</div><div class="val">--</div><div class="sub">Eligibility</div></a>
+        <a class="eqh-stat" href="activeness.html"><span class="ic eqh-c5"><i data-lucide="star"></i></span><div class="lab">Level / XP</div><div class="val">--</div><div class="sub">Progress</div></a>
+      </section>
+
+      <div class="eqh-sec-head"><h2>Class work</h2><a href="tasks.html">View task status →</a></div>
+      <section class="eqh-next" aria-label="Class work">
+        <a class="eqh-ncard" href="assignments.html"><span class="ic eqh-c1"><i data-lucide="clipboard-list"></i></span><small>Assignments</small><b>Check current work</b><p>Instructions and files for your current unit.</p><span class="arr"><i data-lucide="arrow-right"></i></span></a>
+        <a class="eqh-ncard" href="tasks.html"><span class="ic eqh-c5"><i data-lucide="list-checks"></i></span><small>Task Status</small><b>Review missing tasks</b><p>See which class tasks are done or still missing.</p><span class="arr"><i data-lucide="arrow-right"></i></span></a>
+        <a class="eqh-ncard" href="../activities/quiz.html"><span class="ic eqh-c2"><i data-lucide="gamepad-2"></i></span><small>Practice</small><b>Class activities</b><p>Continue review games and quiz activities.</p><span class="arr"><i data-lucide="arrow-right"></i></span></a>
+        <a class="eqh-ncard" href="submission.html"><span class="ic eqh-c3"><i data-lucide="send"></i></span><small>Submission</small><b>Check your records</b><p>Submit work and confirm your files were received.</p><span class="arr"><i data-lucide="arrow-right"></i></span></a>
+      </section>
+
+      <section class="eqh-grid2">
+        <article class="eqh-panel eqh-annc" id="homeAnnouncement" aria-live="polite">
+          <div class="eqh-kick" id="announcementMeta">Latest update</div>
+          <h3 id="announcementTitle">No announcement yet</h3>
+          <p id="announcementCopy">New class announcements from your teacher will appear here — assignments due, schedule changes, and reminders.</p>
         </article>
 
         <aside class="profile-card profile-login-card" id="profile">
           <div>
             <div class="profile-label">Student Profile</div>
             <div class="profile-title" id="profileTitle">Personalize your space</div>
-            <p class="profile-copy" id="profileCopy">Choose your class and name so this browser can show your own scores, tasks, attendance, and Level / XP progress.</p>
+            <p class="profile-copy" id="profileCopy">Choose your class now. Name selection opens once your official Grade 10 roster is published.</p>
           </div>
           <div class="profile-status" id="profileStatus">Not logged in</div>
           <div class="profile-form">
             <div class="profile-field">
               <label for="studentClass">Class</label>
-              <select id="studentClass">
-                <option value="">Choose class</option>
-              </select>
+              <select id="studentClass"><option value="">Choose class</option></select>
             </div>
             <div class="profile-field">
               <label for="studentName">Name</label>
-              <select id="studentName" disabled>
-                <option value="">Choose class first</option>
-              </select>
+              <select id="studentName" disabled><option value="">Choose class first</option></select>
             </div>
-            <div class="profile-message" id="profileMessage">Start by choosing your class.</div>
+            <div class="profile-message" id="profileMessage">Choose your class to get started.</div>
           </div>
           <div class="profile-actions profile-login-actions">
             <button class="btn primary" type="button" id="confirmProfile" disabled>Confirm Profile</button>
@@ -212,80 +188,16 @@
           </div>
         </aside>
       </section>
-
-      <section class="student-summary-grid" aria-label="Student summary">
-        <a class="student-summary-card blue" href="scores.html"><span><i data-lucide="chart-no-axes-column-increasing"></i></span><div><small>Current Score</small><strong>--</strong><p>Open scores</p></div></a>
-        <a class="student-summary-card green" href="tasks.html"><span><i data-lucide="circle-check-big"></i></span><div><small>Tasks Done</small><strong>--</strong><p>Open task status</p></div></a>
-        <a class="student-summary-card amber" href="submission.html"><span><i data-lucide="send"></i></span><div><small>Submissions</small><strong>--</strong><p>Open records</p></div></a>
-        <a class="student-summary-card red" href="strikes.html"><span><i data-lucide="shield-alert"></i></span><div><small>Strikes</small><strong>--</strong><p>Check eligibility</p></div></a>
-        <a class="student-summary-card purple" href="activeness.html"><span><i data-lucide="zap"></i></span><div><small>Level / XP</small><strong>--</strong><p>Open progress</p></div></a>
-      </section>
-
-      <section class="student-home-section clean-section">
-        <div class="student-section-heading">
-          <div>
-            <span>Class Work</span>
-            <h2>Your next steps</h2>
-          </div>
-          <a href="tasks.html">View task status</a>
-        </div>
-        <div class="student-next-grid">
-          <a class="student-next-card blue" href="assignments.html">
-            <span class="student-next-icon"><i data-lucide="clipboard-list"></i></span>
-            <small>Assignments</small>
-            <strong>Check current work</strong>
-            <p>Review instructions and files for your current unit.</p>
-            <i class="student-next-arrow" data-lucide="arrow-right"></i>
-          </a>
-          <a class="student-next-card purple" href="tasks.html">
-            <span class="student-next-icon"><i data-lucide="list-checks"></i></span>
-            <small>Task Status</small>
-            <strong>Review missing tasks</strong>
-            <p>See which class tasks are complete or still missing.</p>
-            <i class="student-next-arrow" data-lucide="arrow-right"></i>
-          </a>
-          <a class="student-next-card green" href="../activities/quiz.html">
-            <span class="student-next-icon"><i data-lucide="gamepad-2"></i></span>
-            <small>Practice</small>
-            <strong>Class activities</strong>
-            <p>Continue review games and classroom quiz activities.</p>
-            <i class="student-next-arrow" data-lucide="arrow-right"></i>
-          </a>
-          <a class="student-next-card amber" href="submission.html">
-            <span class="student-next-icon"><i data-lucide="send"></i></span>
-            <small>Submission</small>
-            <strong>Check your records</strong>
-            <p>Submit work and confirm that your files were received.</p>
-            <i class="student-next-arrow" data-lucide="arrow-right"></i>
-          </a>
-        </div>
-      </section>
-
-      <section class="student-home-bottom compact-bottom">
-        <article class="student-home-panel resource-panel">
-          <div class="student-section-heading compact">
-            <div><span>Learning Center</span><h2>Materials and resources</h2></div>
-            <a href="lessons.html">View all materials</a>
-          </div>
-          <div class="student-resource-grid">
-            <a href="lessons.html"><i data-lucide="book-open"></i><strong>Lesson Materials</strong><p>Slides, files, and lesson resources.</p><span>Open</span></a>
-            <a href="session.html"><i data-lucide="library"></i><strong>Reading</strong><p>Classroom texts and reading materials.</p><span>Open</span></a>
-            <a href="dashboard.html"><i data-lucide="chart-no-axes-column-increasing"></i><strong>My Statistics</strong><p>Your complete personal dashboard.</p><span>Open</span></a>
-          </div>
-        </article>
-        <article class="home-announcement student-home-panel announcement-panel" id="homeAnnouncement" aria-live="polite">
-          <div class="announcement-meta" id="announcementMeta">Latest Update</div>
-          <h2 class="announcement-title" id="announcementTitle">No announcement yet</h2>
-          <p class="announcement-copy" id="announcementCopy">New class announcements will appear here.</p>
-          <a href="dashboard.html">Open dashboard</a>
-        </article>
-      </section>
     </main>
   </div>
 
   <footer>© 2026 English Quest · Grade 10</footer>
   <script>
     var studentsForClass = [];
+
+    function rostersReady() {
+      return !!(window.EQClasses && typeof EQClasses.rostersReady === 'function' && EQClasses.rostersReady());
+    }
 
     function classLabel(value) {
       return EQStudent.classLabel(value);
@@ -298,26 +210,12 @@
     }
 
     function refreshSidebarClass() {
-      if (window.EQStudentShell) {
-        EQStudentShell.refreshProfile('10');
-        return;
-      }
-      var profile = EQStudent.read('10');
-      var cls = profile.classId;
-      var no = profile.studentNo;
-      var name = profile.studentName;
-      var sidebarClass = document.getElementById('studentSidebarClass');
-      var sidebarDetail = document.getElementById('studentSidebarDetail');
-      if (sidebarClass) sidebarClass.textContent = cls ? classLabel(cls) : 'Choose your class';
-      if (sidebarDetail) sidebarDetail.textContent = name && no ? name + ' · No. ' + no : 'Login on the homepage';
+      if (window.EQStudentShell) EQStudentShell.refreshProfile('10');
     }
 
     function refreshProfileDisplay() {
       var profile = EQStudent.read('10');
-      var cls = profile.classId;
-      var no = profile.studentNo;
-      var name = profile.studentName;
-      var hasProfile = profile.hasProfile;
+      var cls = profile.classId, no = profile.studentNo, name = profile.studentName, hasProfile = profile.hasProfile;
 
       document.getElementById('profile').classList.toggle('logged-in', hasProfile);
       document.getElementById('profileStatus').textContent = hasProfile ? 'Logged in' : 'Not logged in';
@@ -329,7 +227,7 @@
       document.getElementById('profileTitle').textContent = hasProfile ? name : 'Personalize your space';
       document.getElementById('profileCopy').textContent = hasProfile
         ? classLabel(cls) + ' · No. ' + no + '. Your saved student profile is active on this browser.'
-        : 'Choose your class and name so this browser can show your own scores, tasks, attendance, and Level / XP progress.';
+        : 'Choose your class now. Name selection opens once your official Grade 10 roster is published.';
       document.getElementById('studentClass').value = cls || '';
       document.getElementById('logoutProfile').disabled = !hasProfile;
       document.getElementById('changeProfile').disabled = !hasProfile;
@@ -367,14 +265,22 @@
       var cls = document.getElementById('studentClass').value;
       studentsForClass = [];
       if (!cls) {
-        document.getElementById('profileMessage').textContent = 'Start by choosing your class.';
+        document.getElementById('profileMessage').textContent = 'Choose your class to get started.';
         resetStudentSelect('Choose class first');
+        return;
+      }
+
+      // Placeholder-safe: no live roster is connected yet, so we do NOT fetch
+      // any names. This intentionally avoids showing old-year student data.
+      if (!rostersReady()) {
+        resetStudentSelect('Roster not published yet');
+        document.getElementById('profileMessage').textContent =
+          'The official roster for ' + classLabel(cls) + ' has not been published yet. Names will unlock here once your class list is added — no old-year names are shown.';
         return;
       }
 
       document.getElementById('profileMessage').textContent = 'Loading names for ' + classLabel(cls) + '...';
       resetStudentSelect('Loading names...');
-
       try {
         var data = await EQApi.get({ action: 'getStudents', className: cls });
         studentsForClass = data.students || [];
@@ -382,7 +288,7 @@
         document.getElementById('profileMessage').textContent = studentsForClass.length
           ? 'Choose your name, then confirm. The page will refresh immediately.'
           : 'The official roster for this class has not been published yet.';
-      } catch(e) {
+      } catch (e) {
         document.getElementById('profileMessage').textContent = 'Could not load names. Please try again.';
         resetStudentSelect('Could not load names');
       }
@@ -394,72 +300,16 @@
       var no = nameSelect.value;
       var selected = nameSelect.options[nameSelect.selectedIndex];
       var name = selected ? selected.dataset.name : '';
-
       if (!cls || !no || !name) {
         document.getElementById('profileMessage').textContent = 'Please choose both your class and name first.';
         return;
       }
-
-      EQStudent.save({
-        grade: '10',
-        classId: cls,
-        studentNo: no,
-        studentName: name
-      });
+      EQStudent.save({ grade: '10', classId: cls, studentNo: no, studentName: name });
       window.location.reload();
     }
 
-    function changeProfile() {
-      EQStudent.clear();
-      window.location.reload();
-    }
-
-    function logoutProfile() {
-      EQStudent.clear({ includeGrade: true, includeSetup: true });
-      window.location.reload();
-    }
-
-    function announcementDate(value) {
-      if (!value) return '';
-      var date = new Date(value);
-      if (isNaN(date.getTime())) return '';
-      return date.toLocaleString('en-GB', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    }
-
-    function safeAnnouncementType(value) {
-      return ['info', 'warning', 'success'].indexOf(value) >= 0 ? value : 'info';
-    }
-
-    async function loadAnnouncement() {
-      var card = document.getElementById('homeAnnouncement');
-      try {
-        var data = await EQApi.get({ action: 'getAnnouncement' });
-        var announcement = data.announcement || null;
-        if (!announcement || (!announcement.title && !announcement.body)) {
-          card.className = 'home-announcement student-home-panel announcement-panel';
-          document.getElementById('announcementMeta').textContent = 'Latest Update';
-          document.getElementById('announcementTitle').textContent = 'No announcement yet';
-          document.getElementById('announcementCopy').textContent = 'New class announcements will appear here.';
-          card.style.display = 'grid';
-          return;
-        }
-
-        var type = safeAnnouncementType(announcement.type || 'info');
-        card.className = 'home-announcement student-home-panel announcement-panel ' + type;
-        document.getElementById('announcementMeta').textContent = 'Class Announcement' + (announcement.postedAt ? ' · ' + announcementDate(announcement.postedAt) : '');
-        document.getElementById('announcementTitle').textContent = announcement.title || 'Class Announcement';
-        document.getElementById('announcementCopy').textContent = announcement.body || '';
-        card.style.display = 'grid';
-      } catch(e) {
-        card.style.display = 'grid';
-      }
-    }
+    function changeProfile() { EQStudent.clear(); window.location.reload(); }
+    function logoutProfile() { EQStudent.clear({ includeGrade: true, includeSetup: true }); window.location.reload(); }
 
     document.getElementById('studentClass').addEventListener('change', loadStudentsForClass);
     document.getElementById('studentName').addEventListener('change', function() {
@@ -472,10 +322,7 @@
     initClassOptions();
     refreshProfileDisplay();
     document.addEventListener('DOMContentLoaded', refreshSidebarClass);
-    if (document.getElementById('studentClass').value) {
-      loadStudentsForClass();
-    }
-    loadAnnouncement();
+    if (document.getElementById('studentClass').value) loadStudentsForClass();
   </script>
 </body>
 </html>
