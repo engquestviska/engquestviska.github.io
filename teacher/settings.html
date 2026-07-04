@@ -75,6 +75,34 @@
       padding: 14px;
     }
 
+    .pw-field { display: grid; gap: 6px; }
+    .pw-field label {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 0.66rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .pw-field input {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: #f8fbff;
+      padding: 0 13px;
+      font: 600 0.92rem "IBM Plex Sans", sans-serif;
+      color: var(--ink);
+      outline: none;
+    }
+    .pw-field input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+    .pw-message { min-height: 18px; font-size: 0.82rem; font-weight: 700; }
+    .pw-message.ok { color: #059669; }
+    .pw-message.err { color: #dc2626; }
+
     @media (max-width: 860px) {
       .settings-grid {
         grid-template-columns: 1fr;
@@ -153,6 +181,25 @@
         <article class="panel settings-card">
           <div class="panel-head">
             <div>
+              <h2 class="panel-title">Teacher Password</h2>
+              <p class="panel-copy">Change your login password. You'll use the new one the next time you sign in.</p>
+            </div>
+            <div class="status-pill">Security</div>
+          </div>
+          <div class="settings-list">
+            <div class="pw-field"><label for="pwCurrent">Current password</label><input type="password" id="pwCurrent" autocomplete="current-password"/></div>
+            <div class="pw-field"><label for="pwNew">New password</label><input type="password" id="pwNew" autocomplete="new-password"/></div>
+            <div class="pw-field"><label for="pwConfirm">Confirm new password</label><input type="password" id="pwConfirm" autocomplete="new-password"/></div>
+          </div>
+          <div class="pw-message" id="pwMessage"></div>
+          <div class="settings-actions">
+            <button class="btn primary" type="button" id="pwSaveBtn" onclick="changePassword()">Update Password</button>
+          </div>
+        </article>
+
+        <article class="panel settings-card">
+          <div class="panel-head">
+            <div>
               <h2 class="panel-title">Confirmed Classes</h2>
               <p class="panel-copy">These are the only classes this preview should surface.</p>
             </div>
@@ -212,6 +259,34 @@
           '<span>' + escapeHtml(grade) + '</span>' +
         '</a>';
       }).join('');
+    }
+
+    function changePassword() {
+      var cur = document.getElementById('pwCurrent').value.trim();
+      var nw = document.getElementById('pwNew').value.trim();
+      var cf = document.getElementById('pwConfirm').value.trim();
+      var msg = document.getElementById('pwMessage');
+      var btn = document.getElementById('pwSaveBtn');
+      function show(text, cls) { msg.textContent = text; msg.className = 'pw-message' + (cls ? ' ' + cls : ''); }
+      if (!cur || !nw || !cf) { show('Fill in all three fields.', 'err'); return; }
+      if (nw.length < 6) { show('New password must be at least 6 characters.', 'err'); return; }
+      if (nw !== cf) { show('New password and confirmation do not match.', 'err'); return; }
+      var teacher = EQAuth.getTeacher();
+      btn.disabled = true;
+      show('Updating...', '');
+      EQApi.get({ action: 'setTeacherPassword', username: teacher.username, password: cur, newPassword: nw })
+        .then(function(res) {
+          btn.disabled = false;
+          if (res && res.success) {
+            document.getElementById('pwCurrent').value = '';
+            document.getElementById('pwNew').value = '';
+            document.getElementById('pwConfirm').value = '';
+            show('Password updated. Use the new password the next time you log in.', 'ok');
+          } else {
+            show((res && res.error) || 'Could not update password.', 'err');
+          }
+        })
+        .catch(function() { btn.disabled = false; show('Connection error. Please try again.', 'err'); });
     }
 
     (function init() {

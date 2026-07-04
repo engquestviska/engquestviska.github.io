@@ -43,6 +43,16 @@ function sha256Hex(value) {
   }).join('');
 }
 
+// Lets a logged-in teacher change their own password. Verifies the current
+// password, then stores the SHA-256 of the new one in Script Properties.
+function setTeacherPassword(username, password, newPassword) {
+  if (!authOk(username, password)) return { success: false, error: 'Current password is incorrect.' };
+  const next = String(newPassword || '').trim();
+  if (next.length < 6) return { success: false, error: 'New password must be at least 6 characters.' };
+  PropertiesService.getScriptProperties().setProperty(TEACHER_HASH_PROPERTY, sha256Hex(next));
+  return { success: true };
+}
+
 
 function teacherHealthCheck(username, password) {
   if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
@@ -88,6 +98,7 @@ function doGet(e) {
     else if (action === 'getCh5Submissions')   result = getCh5Submissions();
     else if (action === 'getCh5StudentFiles') result = getCh5StudentFiles(e.parameter.className, e.parameter.studentNo);
     else if (action === 'checkLogin')       result = { ok: authOk(e.parameter.username, e.parameter.password) };
+    else if (action === 'setTeacherPassword') result = setTeacherPassword(e.parameter.username, e.parameter.password, e.parameter.newPassword);
     else if (action === 'getSummative')     result = getSummative();
     else if (action === 'getQuizAttempt')   result = getQuizAttempt(e.parameter.className, e.parameter.studentNo, e.parameter.chapter);
     else if (action === 'getGeminiKey')      result = getGeminiKey(e.parameter.username, e.parameter.password);
