@@ -5,6 +5,11 @@
   var VERIFY_MAX_AGE = 1000 * 60 * 60 * 8;
   var verifyInFlight = false;
 
+  // TEMPORARY (placeholder phase): the teacher password gate is disabled so the
+  // owner can reach the control room without the (currently broken) login.
+  // Set this back to false to re-enable the login before real student data goes live.
+  var GATE_DISABLED = true;
+
   // Security: teacher credentials live in sessionStorage (cleared when the
   // browser/tab closes) so a login no longer persists forever. Proactively
   // remove any long-lived credentials left over in localStorage.
@@ -115,6 +120,10 @@
   }
 
   function showTeacherGate(options) {
+    if (GATE_DISABLED) {
+      revealTeacherApp(options, { username: getTeacher().username || 'Teacher' });
+      return true;
+    }
     var teacher = getTeacher();
     if (teacher.username && teacher.password && hasFreshVerification(teacher.username)) {
       revealTeacherApp(options, teacher);
@@ -130,6 +139,7 @@
   global.EQAuth = {
     getTeacher: getTeacher,
     hasTeacher: hasTeacher,
+    gateDisabled: GATE_DISABLED,
     markTeacherVerified: markTeacherVerified,
     clearVerification: clearVerification,
     logoutTeacher: logoutTeacher,

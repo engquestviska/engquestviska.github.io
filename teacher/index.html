@@ -252,6 +252,7 @@
 
     function initDashboard() {
       if (window.lucide) lucide.createIcons();
+      if (EQAuth.gateDisabled) { displayTeacher('Teacher'); hideLogin(); return; }
       var teacher = EQAuth.getTeacher();
       if (!teacher.username || !teacher.password) {
         showLogin();
