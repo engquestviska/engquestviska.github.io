@@ -259,7 +259,7 @@
 
     <div class="upload-card">
       <h3>&#128247; Submit Your Photo</h3>
-      <p>Share a class moment! Your photo will be reviewed by Mr. Laksma before appearing in the gallery.</p>
+      <p>Share a class moment! Your photo will be reviewed by your teacher before appearing in the gallery.</p>
 
       <div class="pending-warning" id="pendingWarning">
         &#9203; You already have a photo waiting for approval. You can submit another one after your current submission is reviewed.
@@ -505,7 +505,7 @@ function teacherUpload() {
     return apiPost(API, {
       action: 'upload',
       username: savedUser, password: savedPass,
-      cls: 'Teacher', name: 'Mr. Laksma',
+      cls: 'Teacher', name: 'Teacher',
       caption: caption, fileName: file.name,
       mimeType: file.type, base64: b64,
       direct: 'true'
@@ -628,7 +628,7 @@ function studentSubmit() {
     });
   }).then(function(res) {
     if (res.success) {
-      showToast('✅ Submitted! Waiting for Mr. Laksma\'s approval.');
+      showToast('✅ Submitted! Waiting for your teacher\'s approval.');
       document.getElementById('sCaption').value = '';
       document.getElementById('sPhotoInput').value = '';
       document.getElementById('sPhotoPreview').style.display = 'none';

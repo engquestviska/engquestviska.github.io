@@ -397,7 +397,7 @@ function loadInnateData() {
 }
 
 // Find who originally owns a topic sentence (for "topic from X" label)
-// Students who did not submit — topic assigned by Mr. Laksma
+// Students who did not submit — topic assigned by the teacher
 var TEACHER_ASSIGNED = {
   'XE1': [5,7,9,10,15,16,24,33],
   'XE4': [14,18,36],
@@ -419,11 +419,11 @@ function findTopicOwner(cls, topicSentence) {
   var match = innateData.find(function(r){
     return r.cls === cls && r.topic.trim() === topicSentence.trim();
   });
-  if (!match) return 'Mr. Laksma';
+  if (!match) return 'your teacher';
   // Check if the matching student is teacher-assigned
   var classStudents = innateData.filter(function(r){ return r.cls === cls; });
   var attNum = classStudents.indexOf(match) + 1;
-  if (isTeacherAssigned(cls, attNum)) return 'Mr. Laksma';
+  if (isTeacherAssigned(cls, attNum)) return 'your teacher';
   return match.name;
 }
 
@@ -533,8 +533,8 @@ function showTopicView(student, attNum) {
   body.innerHTML =
     '<div class="topic-revealed">' +
       '<div class="topic-sentence">' + escapeHtml(displayTopic) + '</div>' +
-      (topicOwner === 'Mr. Laksma'
-        ? '<div class="topic-from">&#127979; Topic assigned by <strong>Mr. Laksma</strong></div>'
+      (topicOwner === 'your teacher'
+        ? '<div class="topic-from">&#127979; Topic assigned by <strong>your teacher</strong></div>'
         : topicOwner
           ? '<div class="topic-from">&#128100; Topic originally written by <strong>' + escapeHtml(topicOwner) + '</strong></div>'
           : '') +
