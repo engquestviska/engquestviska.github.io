@@ -170,15 +170,15 @@
         </div>
       </div>
       <nav class="nav-actions" aria-label="Teacher navigation">
-        <a href="../grade10/">Grade X Student Site</a>
-        <a href="../grade11/">Grade XI Student Site</a>
+        <a href="../grade10/">Grade 10 Student Site</a>
+        <a href="../grade11/">Grade 11 Student Site</a>
         <button type="button" onclick="teacherLogout()">Logout</button>
       </nav>
     </div>
     <section class="hero">
       <div class="kicker">Classes</div>
       <h1>Open the right room before editing anything.</h1>
-      <p class="hero-copy">Use this as the class switchboard for your confirmed Grade X and Grade XI teaching assignment.</p>
+      <p class="hero-copy">Use this as the class switchboard for your confirmed Grade 10 and Grade 11 teaching assignment.</p>
     </section>
   </header>
 
@@ -224,7 +224,7 @@
         var active = item.id === current ? ' active' : '';
         return '<a class="class-list-button' + active + '" href="classes.html?class=' + encodeURIComponent(item.id) + '">' +
           '<strong>' + escapeHtml(item.shortLabel || item.id) + '</strong>' +
-          '<span>Grade ' + (item.grade === '11' ? 'XI' : 'X') + '</span>' +
+          '<span>Grade ' + (item.grade === '11' ? '11' : '10') + '</span>' +
         '</a>';
       }).join('');
     }
@@ -237,10 +237,10 @@
       var item = EQClasses.all.find(function(entry) { return entry.id === classId; }) || EQClasses.all[0];
       var isGradeX = item.grade === '10';
       var studentHome = studentHomeFor(item);
-      var gradeLabel = item.grade === '11' ? 'Grade XI' : 'Grade X';
+      var gradeLabel = item.grade === '11' ? 'Grade 11' : 'Grade 10';
       var managerCards = isGradeX
         ? [
-            ['scores.html?class=' + item.id, 'chart-no-axes-column-increasing', 'Scores', 'Open the Grade X score manager for this class.'],
+            ['scores.html?class=' + item.id, 'chart-no-axes-column-increasing', 'Scores', 'Open the Grade 10 score manager for this class.'],
             ['tasks.html?class=' + item.id, 'list-checks', 'Task Status', 'Review and manage task completion records.'],
             ['submissions.html?class=' + item.id, 'inbox', 'Submissions', 'Review submitted work and submission coverage.'],
             ['attendance.html?class=' + item.id, 'calendar-check', 'Attendance', 'Inspect attendance records for this class.'],
@@ -248,9 +248,9 @@
             ['strikes.html?class=' + item.id, 'shield-alert', 'Strikes', 'Manage warnings with a maximum of three strikes.']
           ]
         : [
-            ['../grade11/', 'monitor', 'Grade XI Student Site', 'Preview the student-side structure for this Grade XI class.'],
-            ['classes.html?class=' + item.id, 'database', 'Roster Pending', 'Official Grade XI roster and data source are not connected yet.'],
-            ['classes.html?class=' + item.id, 'clipboard-list', 'Teacher Tools Pending', 'Grade XI teacher editing tools will be enabled after the data contract is ready.']
+            ['../grade11/', 'monitor', 'Grade 11 Student Site', 'Preview the student-side structure for this Grade 11 class.'],
+            ['classes.html?class=' + item.id, 'database', 'Roster Pending', 'Official Grade 11 roster and data source are not connected yet.'],
+            ['classes.html?class=' + item.id, 'clipboard-list', 'Teacher Tools Pending', 'Grade 11 teacher editing tools will be enabled after the data contract is ready.']
           ];
 
       document.getElementById('classDetail').innerHTML =

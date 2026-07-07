@@ -202,8 +202,8 @@
     </div>
     <section class="hero">
       <div class="kicker">Announcements</div>
-      <h1>Post one clear update for Grade X.</h1>
-      <p class="hero-copy">Publish the current class announcement from the teacher side. Students only see the latest published update on their Grade X home page.</p>
+      <h1>Post one clear update for Grade 10.</h1>
+      <p class="hero-copy">Publish the current class announcement from the teacher side. Students only see the latest published update on their Grade 10 home page.</p>
     </section>
   </header>
 
@@ -266,7 +266,7 @@
           <div class="announcement-preview-head">
             <div>
               <h2 class="panel-title">Current Student View</h2>
-              <p class="panel-copy">This is what Grade X students will see on the home page.</p>
+              <p class="panel-copy">This is what Grade 10 students will see on the home page.</p>
             </div>
             <div class="announcement-state" id="announcementState">Loading</div>
           </div>
@@ -400,7 +400,7 @@
     }
 
     function clearAnnouncement() {
-      if (!confirm('Clear the current announcement from the Grade X home page?')) return;
+      if (!confirm('Clear the current announcement from the Grade 10 home page?')) return;
       var teacher = EQAuth.getTeacher();
       var btn = document.getElementById('clearBtn');
       btn.disabled = true;

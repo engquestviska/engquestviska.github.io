@@ -119,7 +119,7 @@
     return [
       '<aside class="dashboard-sidebar student-app-sidebar" id="dashboardSidebar">',
       '  <a class="sidebar-brand" href="index.html"><span class="brand-mark">' + icon('graduation-cap') + '</span><span>English Quest</span></a>',
-      '  <div class="sidebar-label">Grade ' + (currentGrade === '11' ? 'XI' : 'X') + ' Student</div>',
+      '  <div class="sidebar-label">Grade ' + (currentGrade === '11' ? '11' : '10') + ' Student</div>',
       '  <nav class="primary-nav" aria-label="Student navigation">' + nav + '</nav>',
       '  ' + profileMarkup(currentGrade),
       '  <div class="sidebar-footer">',

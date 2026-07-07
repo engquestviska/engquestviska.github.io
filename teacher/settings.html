@@ -138,8 +138,8 @@
         </div>
       </div>
       <nav class="nav-actions" aria-label="Teacher navigation">
-        <a href="../grade10/">Grade X Student Site</a>
-        <a href="../grade11/">Grade XI Student Site</a>
+        <a href="../grade10/">Grade 10 Student Site</a>
+        <a href="../grade11/">Grade 11 Student Site</a>
         <button type="button" onclick="teacherLogout()">Logout</button>
       </nav>
     </div>
@@ -215,8 +215,8 @@
             </div>
           </div>
           <div class="settings-list">
-            <div class="settings-row"><strong>Grade X rosters</strong><span>Pending official list</span></div>
-            <div class="settings-row"><strong>Grade XI rosters</strong><span>Pending official list</span></div>
+            <div class="settings-row"><strong>Grade 10 rosters</strong><span>Pending official list</span></div>
+            <div class="settings-row"><strong>Grade 11 rosters</strong><span>Pending official list</span></div>
             <div class="settings-row"><strong>Student pages</strong><span>Read-only / guarded</span></div>
           </div>
           <div class="settings-note">Do not connect old-year student names into the next-year student pages. Teacher tools may still use temporary data routes until the new data contract is ready.</div>
@@ -235,8 +235,8 @@
             <div class="settings-row"><strong>Participation model</strong><span>Level / XP next</span></div>
           </div>
           <div class="settings-actions">
-            <a class="btn ghost" href="../grade10/">Open Grade X site</a>
-            <a class="btn ghost" href="../grade11/">Open Grade XI site</a>
+            <a class="btn ghost" href="../grade10/">Open Grade 10 site</a>
+            <a class="btn ghost" href="../grade11/">Open Grade 11 site</a>
           </div>
         </article>
       </div>
@@ -253,7 +253,7 @@
     function renderClasses() {
       var classes = window.EQClasses ? EQClasses.all : [];
       document.getElementById('classList').innerHTML = classes.map(function(item) {
-        var grade = item.grade === '11' ? 'Grade XI' : 'Grade X';
+        var grade = item.grade === '11' ? 'Grade 11' : 'Grade 10';
         return '<a class="settings-row" href="classes.html?class=' + encodeURIComponent(item.id) + '">' +
           '<strong>' + escapeHtml(item.shortLabel || item.id) + '</strong>' +
           '<span>' + escapeHtml(grade) + '</span>' +
