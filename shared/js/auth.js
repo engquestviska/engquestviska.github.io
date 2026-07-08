@@ -5,10 +5,10 @@
   var VERIFY_MAX_AGE = 1000 * 60 * 60 * 8;
   var verifyInFlight = false;
 
-  // TEMPORARY (placeholder phase): the teacher password gate is disabled so the
-  // owner can reach the control room without the (currently broken) login.
-  // Set this back to false to re-enable the login before real student data goes live.
-  var GATE_DISABLED = true;
+  // Teacher password gate is ACTIVE. Login verified working end-to-end
+  // (2026-07-07): plain + hashed-session paths both return ok:true against the
+  // live backend. Password is set via Script Property TEACHER_PASSWORD_SHA256.
+  var GATE_DISABLED = false;
 
   // Security: teacher credentials live in sessionStorage (cleared when the
   // browser/tab closes) so a login no longer persists forever. Proactively

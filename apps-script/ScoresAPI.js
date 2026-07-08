@@ -21,9 +21,13 @@ const TEACHER_USER    = 'teacher';
 const TEACHER_HASH_PROPERTY = 'TEACHER_PASSWORD_SHA256';
 
 function authOk(username, password) {
+  // The stored value must be a 64-char hex SHA-256. Strip ANY character that
+  // isn't a hex digit (stray spaces, line-breaks, or invisible characters that
+  // sneak in via copy-paste when the property is set by hand) so a paste gremlin
+  // can never silently break the login again.
   const storedHash = String(
     PropertiesService.getScriptProperties().getProperty(TEACHER_HASH_PROPERTY) || ''
-  ).trim().toLowerCase();
+  ).toLowerCase().replace(/[^a-f0-9]/g, '');
   if (!storedHash || username !== TEACHER_USER) return false;
 
   const candidate = String(password || '').trim();
