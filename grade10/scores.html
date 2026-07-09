@@ -570,42 +570,51 @@ function forgetStudent() {
   renderStudentMode();
 }
 
-function autoLoadStudentScores(cls, no, name) {
-  Promise.all([
-    cachedApiGet({ action: 'getChapterScores', className: cls, chapter: 4 }),
-    cachedApiGet({ action: 'getChapterScores', className: cls, chapter: 5 }),
-    cachedApiGet({ action: 'getFinalScores', className: cls }).then(function(r) { return r && !r.error ? r : {}; }).catch(function() { return {}; })
-  ]).then(function(responses) {
-    if ((responses[0] && responses[0].error) || (responses[1] && responses[1].error)) {
-      throw new Error('Score records are unavailable');
-    }
-    var ch4 = responses[0].students ? responses[0].students.find(function(s) { return String(s.no) === String(no); }) : null;
-    var ch5 = responses[1].students ? responses[1].students.find(function(s) { return String(s.no) === String(no); }) : null;
-    var finRes = responses[2] || {};
-    var fin = finRes.students ? finRes.students.find(function(s) { return String(s.no) === String(no); }) : null;
+var CHAPTERS = [1, 2, 3];
 
-    var ch4Html = buildStudentChapterHTML(ch4, responses[0].inputCols, 4);
-    var ch5Html = buildStudentChapterHTML(ch5, responses[1].inputCols, 5);
-    var finHtml = buildStudentFinalHTML(fin, finRes.inputCols, finRes.calcCols);
+// Fetch every chapter (1..3) + the final Scores tab for a class, in parallel.
+function fetchStudentScores(cls) {
+  var calls = CHAPTERS.map(function(ch) {
+    return cachedApiGet({ action: 'getChapterScores', className: cls, chapter: ch });
+  });
+  calls.push(cachedApiGet({ action: 'getFinalScores', className: cls }).then(function(r) { return r && !r.error ? r : {}; }).catch(function() { return {}; }));
+  return Promise.all(calls);
+}
 
-    var result = document.getElementById('sResult');
-    result.innerHTML =
-      '<div class="student-score-card">' +
-          '<div class="score-card-header">' +
-          '<div class="score-card-avatar">' + escapeHtml(name.charAt(0).toUpperCase()) + '</div>' +
-          '<div class="score-card-name">' +
-            '<div class="name">' + escapeHtml(name) + '</div>' +
-            '<div class="meta">' + escapeHtml(CLASS_LABELS[cls] || cls) + '</div>' +
-          '</div>' +
-        '</div>' +
-        '<div class="score-card-body">' +
-          '<div class="chapter-tabs"><button class="ch-tab active" id="stab4" onclick="switchStudentTab(4)">Current Unit</button><button class="ch-tab" id="stab5" onclick="switchStudentTab(5)">Upcoming Unit</button><button class="ch-tab" id="stabF" onclick="switchStudentTab(&apos;F&apos;)">&#127942; Final Score</button></div>' +
-          '<div id="sScoreCh4">' + ch4Html + '</div>' +
-          '<div id="sScoreCh5" style="display:none">' + ch5Html + '</div>' +
-          '<div id="sScoreF" style="display:none">' + finHtml + '</div>' +
+// Build the student score card (chapter tabs + final) from responses [ch1,ch2,ch3,final].
+function buildScoreCardHTML(name, cls, nickname, responses, no) {
+  var initial = name ? name.charAt(0).toUpperCase() : '?';
+  var tabsHtml = '', blocksHtml = '';
+  CHAPTERS.forEach(function(ch, i) {
+    var res = responses[i] || {};
+    var stu = res.students ? res.students.find(function(s) { return String(s.no) === String(no); }) : null;
+    tabsHtml += '<button class="ch-tab' + (i === 0 ? ' active' : '') + '" id="stab' + ch + '" onclick="switchStudentTab(' + ch + ')">Chapter ' + ch + '</button>';
+    blocksHtml += '<div id="sScoreCh' + ch + '"' + (i === 0 ? '' : ' style="display:none"') + '>' + buildStudentChapterHTML(stu, res.inputCols, ch) + '</div>';
+  });
+  tabsHtml += '<button class="ch-tab" id="stabF" onclick="switchStudentTab(&apos;F&apos;)">&#127942; Final Score</button>';
+  var finRes = responses[CHAPTERS.length] || {};
+  var finStu = finRes.students ? finRes.students.find(function(s) { return String(s.no) === String(no); }) : null;
+  var finHtml = buildStudentFinalHTML(finStu, finRes.inputCols, finRes.calcCols);
+  return '<div class="student-score-card">' +
+      '<div class="score-card-header">' +
+        '<div class="score-card-avatar">' + escapeHtml(initial) + '</div>' +
+        '<div class="score-card-name">' +
+          '<div class="name">' + escapeHtml(name || '') + '</div>' +
+          '<div class="meta">' + escapeHtml(CLASS_LABELS[cls] || cls) + (nickname ? ' &middot; ' + escapeHtml(nickname) : '') + '</div>' +
         '</div>' +
       '</div>' +
-      '<div id="leaderboardArea"></div>';
+      '<div class="score-card-body">' +
+        '<div class="chapter-tabs">' + tabsHtml + '</div>' +
+        blocksHtml +
+        '<div id="sScoreF" style="display:none">' + finHtml + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div id="leaderboardArea"></div>';
+}
+
+function autoLoadStudentScores(cls, no, name) {
+  fetchStudentScores(cls).then(function(responses) {
+    document.getElementById('sResult').innerHTML = buildScoreCardHTML(name, cls, '', responses, no);
     renderLeaderboard(cls);
   }).catch(function(e) {
     document.getElementById('sResult').innerHTML = '<div class="state-card"><div class="state-icon">&#8635;</div><div class="state-title">Scores are temporarily unavailable</div><div class="state-sub">Your records have not been changed. Please reload the page or try again later.</div></div>';
@@ -652,44 +661,17 @@ function viewStudentScores() {
     });
   }
 
-  // Load chapters + final in parallel (final gracefully degrades if GS not yet deployed)
-  Promise.all([
-    cachedApiGet({ action: 'getChapterScores', className: currentClass, chapter: 4 }),
-    cachedApiGet({ action: 'getChapterScores', className: currentClass, chapter: 5 }),
-    cachedApiGet({ action: 'getFinalScores', className: currentClass }).then(function(r) { return r && !r.error ? r : {}; }).catch(function() { return {}; })
-  ]).then(function(responses) {
-    var ch4Data = responses[0];
-    var ch5Data = responses[1];
-    var finData = responses[2];
-    if ((ch4Data && ch4Data.error) || (ch5Data && ch5Data.error)) {
-      throw new Error('Score records are unavailable');
-    }
-
-    var ch4Student = ch4Data.students ? ch4Data.students.find(function(s) { return String(s.no) === String(studentNo); }) : null;
-    var ch5Student = ch5Data.students ? ch5Data.students.find(function(s) { return String(s.no) === String(studentNo); }) : null;
-    var finData2 = finData || {};
-    var finStudent = finData2.students ? finData2.students.find(function(s) { return String(s.no) === String(studentNo); }) : null;
-
-    renderStudentScoreCard(student, ch4Student, ch5Student, finStudent, ch4Data.inputCols, ch5Data.inputCols, finData2.inputCols, finData2.calcCols);
+  // Load chapters + final in parallel
+  fetchStudentScores(currentClass).then(function(responses) {
+    renderStudentScoreCard(student, responses, studentNo);
   }).catch(function() {
     result.innerHTML = '<div class="state-card"><div class="state-icon">&#8635;</div><div class="state-title">Scores are temporarily unavailable</div><div class="state-sub">Your records have not been changed. Please reload the page or try again later.</div></div>';
   });
 }
 
-function renderStudentScoreCard(student, ch4, ch5, fin, cols4, cols5, colsF, calcColsF) {
-  var result = document.getElementById('sResult');
-  var initial = student ? student.name.charAt(0).toUpperCase() : '?';
-
-  var html = '<div class="student-score-card">';
-  html += '<div class="score-card-header"><div class="score-card-avatar">' + escapeHtml(initial) + '</div><div class="score-card-name"><div class="name">' + escapeHtml(student ? student.name : '') + '</div><div class="meta">' + escapeHtml(CLASS_LABELS[currentClass]) + ' &middot; ' + escapeHtml(student && student.nickname ? student.nickname : '') + '</div></div></div>';
-  html += '<div class="score-card-body">';
-  html += '<div class="chapter-tabs"><button class="ch-tab active" id="stab4" onclick="switchStudentTab(4)">Current Unit</button><button class="ch-tab" id="stab5" onclick="switchStudentTab(5)">Upcoming Unit</button><button class="ch-tab" id="stabF" onclick="switchStudentTab(&apos;F&apos;)">&#127942; Final Score</button></div>';
-  html += '<div id="sScoreCh4">' + buildStudentChapterHTML(ch4, cols4, 4) + '</div>';
-  html += '<div id="sScoreCh5" style="display:none">' + buildStudentChapterHTML(ch5, cols5, 5) + '</div>';
-  html += '<div id="sScoreF" style="display:none">' + buildStudentFinalHTML(fin, colsF, calcColsF) + '</div>';
-  html += '</div></div>';
-  html += '<div id="leaderboardArea"></div>';
-  result.innerHTML = html;
+function renderStudentScoreCard(student, responses, no) {
+  document.getElementById('sResult').innerHTML =
+    buildScoreCardHTML(student ? student.name : '', currentClass, student && student.nickname ? student.nickname : '', responses, no);
   renderLeaderboard(currentClass);
 }
 
@@ -756,18 +738,20 @@ function buildStudentFinalHTML(finData, inputCols, calcCols) {
 }
 
 function switchStudentTab(ch) {
-  document.getElementById('stab4').className = 'ch-tab' + (ch === 4 ? ' active' : '');
-  document.getElementById('stab5').className = 'ch-tab' + (ch === 5 ? ' active' : '');
+  CHAPTERS.forEach(function(c) {
+    var tab = document.getElementById('stab' + c);
+    var blk = document.getElementById('sScoreCh' + c);
+    if (tab) tab.className = 'ch-tab' + (ch === c ? ' active' : '');
+    if (blk) blk.style.display = (ch === c) ? '' : 'none';
+  });
   var stabF = document.getElementById('stabF');
   if (stabF) stabF.className = 'ch-tab' + (ch === 'F' ? ' active' : '');
-  document.getElementById('sScoreCh4').style.display = ch === 4 ? '' : 'none';
-  document.getElementById('sScoreCh5').style.display = ch === 5 ? '' : 'none';
   var sScoreF = document.getElementById('sScoreF');
-  if (sScoreF) sScoreF.style.display = ch === 'F' ? '' : 'none';
+  if (sScoreF) sScoreF.style.display = (ch === 'F') ? '' : 'none';
 }
 
 // ── LEADERBOARD ───────────────────────────────────────────────
-var lbChapter = 'overall'; // 'overall' | '4' | '5'
+var lbChapter = 'overall'; // 'overall' | '1' | '2' | '3'
 
 function renderLeaderboard(cls) {
   var container = document.getElementById('leaderboardArea');
@@ -791,10 +775,11 @@ function renderLeaderboard(cls) {
   // Build filter buttons via JS (avoids string escaping issues)
   var lbFilters = document.getElementById('lbFilters');
   if (lbFilters) {
-    [['overall','Overall'],['4','Current Unit'],['5','Upcoming Unit']].forEach(function(f) {
+    [['overall','Overall']].concat(CHAPTERS.map(function(ch) { return [String(ch), 'Chapter ' + ch]; })).forEach(function(f) {
       var btn = document.createElement('button');
       btn.className = 'lb-filter-btn' + (lbChapter === f[0] ? ' active' : '');
       btn.textContent = f[1];
+      btn.dataset.f = f[0];
       btn.onclick = function() { switchLbFilter(cls, f[0]); };
       lbFilters.appendChild(btn);
     });
@@ -805,36 +790,26 @@ function switchLbFilter(cls, chapter) {
   lbChapter = chapter;
   // Update button styles
   document.querySelectorAll('.lb-filter-btn').forEach(function(btn) {
-    var isActive = (chapter === 'overall' && btn.textContent === 'Overall') ||
-                   (chapter === '4' && btn.textContent === 'Current Unit') ||
-                   (chapter === '5' && btn.textContent === 'Upcoming Unit');
-    btn.classList.toggle('active', isActive);
+    btn.classList.toggle('active', btn.dataset.f === chapter);
   });
   document.getElementById('lbRankings').innerHTML = '<div class="lb-loading"><div class="spinner" style="width:24px;height:24px;margin:0 auto 8px;"></div>Loading...</div>';
   loadLbRankings(cls);
 }
 
 function loadLbRankings(cls) {
-  Promise.all([
-    cachedApiGet({ action: 'getChapterScores', className: cls, chapter: 4 }),
-    cachedApiGet({ action: 'getChapterScores', className: cls, chapter: 5 })
-  ]).then(function(responses) {
-    var ch4Students = (responses[0].students || []);
-    var ch5Students = (responses[1].students || []);
-
-    // Build map: studentNo -> { name, nickname, avgs[] }
+  Promise.all(CHAPTERS.map(function(ch) {
+    return cachedApiGet({ action: 'getChapterScores', className: cls, chapter: ch });
+  })).then(function(responses) {
+    // Build map: studentNo -> { name, nickname, avgs: {chapter: value} }
     var map = {};
-    ch4Students.forEach(function(s) {
-      if (!map[s.no]) map[s.no] = { name: s.name, nickname: s.nickname || '', ch4: null, ch5: null };
-      var v = Number(s.average);
-      if (s.average !== '' && s.average !== undefined && s.average !== null && !isNaN(v))
-        map[s.no].ch4 = v;
-    });
-    ch5Students.forEach(function(s) {
-      if (!map[s.no]) map[s.no] = { name: s.name, nickname: s.nickname || '', ch4: null, ch5: null };
-      var v = Number(s.average);
-      if (s.average !== '' && s.average !== undefined && s.average !== null && !isNaN(v))
-        map[s.no].ch5 = v;
+    CHAPTERS.forEach(function(ch, i) {
+      var students = (responses[i] && responses[i].students) || [];
+      students.forEach(function(s) {
+        if (!map[s.no]) map[s.no] = { name: s.name, nickname: s.nickname || '', avgs: {} };
+        var v = Number(s.average);
+        if (s.average !== '' && s.average !== undefined && s.average !== null && !isNaN(v))
+          map[s.no].avgs[ch] = v;
+      });
     });
 
     // Compute score based on selected filter
@@ -842,14 +817,12 @@ function loadLbRankings(cls) {
     Object.keys(map).forEach(function(no) {
       var entry = map[no];
       var score = null;
-      if (lbChapter === '4') {
-        score = entry.ch4;
-      } else if (lbChapter === '5') {
-        score = entry.ch5;
+      if (lbChapter === 'overall') {
+        var vals = CHAPTERS.map(function(ch) { return entry.avgs[ch]; }).filter(function(v) { return v !== undefined && v !== null; });
+        if (vals.length) score = vals.reduce(function(a, b) { return a + b; }, 0) / vals.length;
       } else {
-        // Overall: average of available chapters
-        var avgs = [entry.ch4, entry.ch5].filter(function(v) { return v !== null; });
-        if (avgs.length) score = avgs.reduce(function(a, b) { return a + b; }, 0) / avgs.length;
+        var sv = entry.avgs[Number(lbChapter)];
+        score = (sv === undefined) ? null : sv;
       }
       if (score === null || isNaN(score)) return;
       ranked.push({ name: entry.name, nickname: entry.nickname, avg: score });
