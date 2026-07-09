@@ -770,8 +770,49 @@ const activenessCache = {};
 if (window.EQClasses && typeof EQClasses.rostersReady === 'function' && EQClasses.rostersReady()) {
   buildClassDirectory();
   loadAllStudents();
+} else if (window.EQClasses && typeof EQClasses.numberedRosterMode === 'function' && EQClasses.numberedRosterMode()) {
+  showNumberedDirectory();
 } else {
   showPreRosterDirectory();
+}
+
+// Numbered placeholder directory: Student 1..36 per class. Renders locally from
+// the placeholder roster and never calls the backend, so no old-year data loads.
+function showNumberedDirectory() {
+  buildClassDirectory();
+  var controls = document.querySelector('.student-controls');
+  if (controls) controls.style.display = '';
+  var total = 0;
+  classItems.forEach(function(item) {
+    var roster = EQClasses.placeholderRosterFor(item.id);
+    renderPlaceholderClass(item.id, roster);
+    total += roster.length;
+  });
+  var badge = document.getElementById('countBadge');
+  if (badge) badge.textContent = total + ' students';
+}
+
+function renderPlaceholderClass(cls, students) {
+  var list = document.getElementById('list-' + cls);
+  if (!list) return;
+  list.innerHTML = '';
+  var safeClass = escapeHtml(classLabels[cls] || displayClassLabel(cls));
+  students.forEach(function(s) {
+    var item = document.createElement('div');
+    item.className = 'student-item';
+    item.dataset.name = String(s.name || '').toLowerCase();
+    item.dataset.class = cls;
+    item.innerHTML =
+      '<span class="student-avatar">' + s.no + '</span>' +
+      '<span class="student-main">' +
+        '<span class="student-name">' + escapeHtml(s.name) + '</span>' +
+        '<span class="student-meta"><span>No. ' + s.no + '</span><span>' + safeClass + '</span></span>' +
+      '</span>' +
+      '<span class="student-action" style="opacity:.5">Pending</span>';
+    list.appendChild(item);
+  });
+  var cnt = document.getElementById('count-' + cls);
+  if (cnt) cnt.textContent = students.length + ' students';
 }
 
 function showPreRosterDirectory() {
