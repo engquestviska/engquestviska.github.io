@@ -4,16 +4,18 @@
 //  Redeploy as new version after updating!
 // ============================================================
 
+// New-year (2026) class score sheets — created via SETUP_createClassSheets,
+// each with Scores / Chapter_1-3 / Task_Status / Activeness / Strike tabs and
+// 36 numbered students. Replaces last year's XE1/XE4-XE11 set.
 const SCORE_SHEETS = {
-  'XE1':  '1X3PBpMCEvglTA92HST8286dY_OWe5lw7tdJHPpNjggk',
-  'XE4':  '16CT_wxAGV0mLRhvlIFpXRzKobdnpnj2-DcAJSiz14JY',
-  'XE5':  '1-GMJ8amrcE-r_N1qJL8rsrxEItRraN-97FgyySJgOxg',
-  'XE6':  '1MxqzK2JOwMyc2yfUSwCgIW4siWCsJe2R_o_cF11mOHU',
-  'XE7':  '1D9iYhBLNPhFsgTZ15vQOHFn22RYCI6HFW10aC4HwJK4',
-  'XE8':  '1skj7KBc11zaFa07FGu0r4bEHvDrV-oHZm4qKhBLimpg',
-  'XE9':  '19Pn0JyIZRAgzhUGs_W519vjmwcnivair6hsqkIVyOnE',
-  'XE10': '1UEgm1spqzNGPbYl9a9CmLavwALVLG_6o2gEvN3R_LKM',
-  'XE11': '1yt6km9wnBYRe61bHaSjDfJWkmqz884v1cogp836Ioa0',
+  'XE1':  '1lpBQ7BYhVvKlAkqcG0GjJQfdPDEQ4wMKJvatixIxQxo',
+  'XE2':  '19aIZQbgpfrDl3WOpVJ0NrYv0JM0ajy6MVdSbHZUNoWg',
+  'XE3':  '1HtAgC_RtDf4ByQdUqPSTp93aLOyu486rq0x27mVeNHE',
+  'XE4':  '1dW-mv6ZwZVbOfdMbji4e3ddjodl4jZ3WXrHeVPBSaRg',
+  'XE5':  '1KgciwoyoDAT4h1KzhF2CAkOMfznO7ye88icEvJ-JeSQ',
+  'XIF7': '1b0VcMEbVVF9fpeSrR06Ng5pJKQ3_5A1vkdWgdnRe19g',
+  'XIF8': '1G5kzKlsKhXj0NrJ4St1nU7wj4dHPpBgoXiB3x9eoY54',
+  'XIF9': '16oayabd-pvz8x4cXTSgS-d_HT7pTZD7T2N3ELnmu6KQ',
 };
 
 const TASK_SHEET_NAME = 'Task_Status';
@@ -1031,8 +1033,8 @@ function getFinalScores(className) {
   const data    = sheet.getDataRange().getValues();
   const headers = data[0];
 
-  // Only show these specific columns — editable inputs
-  const INPUT_WHITELIST  = ['Chapter 4', 'Chapter 5', 'ASAT'];
+  // Only show these specific columns — editable inputs (Semester 1 = Ch 1-3)
+  const INPUT_WHITELIST  = ['Chapter 1', 'Chapter 2', 'Chapter 3', 'ASAT'];
   // Only show these as read-only calculated columns
   const CALC_WHITELIST   = ['Average', 'Final Score', 'Indicator'];
 
@@ -1067,8 +1069,8 @@ function getFinalScores(className) {
 
 function saveFinalScore(username, password, className, studentNo, column, value) {
   if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
-  // Only allow saving whitelisted columns
-  const ALLOWED = ['Chapter 4', 'Chapter 5', 'ASAT'];
+  // Only allow saving whitelisted columns (Semester 1 = Ch 1-3)
+  const ALLOWED = ['Chapter 1', 'Chapter 2', 'Chapter 3', 'ASAT'];
   if (!ALLOWED.includes(column)) return { success: false, error: 'Column not editable: ' + column };
   const sheetId = SCORE_SHEETS[className];
   if (!sheetId) return { success: false, error: 'Class not found' };
