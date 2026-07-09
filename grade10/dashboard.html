@@ -627,7 +627,7 @@
         setText('submissionValue', submitted ? 'Yes' : 'No');
         setText('submissionSub', submitted
           ? 'At least one submission is recorded for your name.'
-          : 'No Chapter 4 submission is recorded for your name yet.');
+          : 'No submission is recorded for your name yet.');
         summary.submission = submitted ? 'Submitted' : 'Not yet';
       } catch(e) {
         setText('submissionSub', statusError('submission'));
