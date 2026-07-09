@@ -271,8 +271,16 @@
       }
 
       // Placeholder-safe: Grade 11 has no roster connected yet, so no names are
-      // fetched or shown until the official Grade 11 roster is published.
+      // fetched. Show the numbered placeholder roster (Student 1..36) when enabled;
+      // otherwise a "not published" notice. No old-year data is fetched either way.
       if (!rostersReady()) {
+        if (window.EQClasses && EQClasses.numberedRosterMode && EQClasses.numberedRosterMode()) {
+          studentsForClass = EQClasses.placeholderRosterFor(cls);
+          populateStudents(studentsForClass);
+          document.getElementById('profileMessage').textContent =
+            'Pick your number for ' + classLabel(cls) + ', then confirm. (Numbers are placeholders until your Grade 11 class name list is added.)';
+          return;
+        }
         resetStudentSelect('Roster not published yet');
         document.getElementById('profileMessage').textContent =
           'The official roster for ' + classLabel(cls) + ' has not been published yet. Names will unlock here once your Grade 11 class list is added.';

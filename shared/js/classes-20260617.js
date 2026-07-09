@@ -2,6 +2,13 @@
 (function(global) {
   var DEFAULT_ROSTER_SIZE = 36;
 
+  // Numbered-roster mode: show a placeholder roster of "Student 1..36" per class
+  // so the site is usable before real names exist. This ONLY affects what names
+  // are DISPLAYED/pickable — it never fetches real backend data. Real per-student
+  // score/task/attendance data stays gated behind rostersReady() (still false),
+  // so numbered students correctly show empty "--" values, never old-year rows.
+  var NUMBERED_ROSTER = true;
+
   var GRADE_X = [
     { id: 'XE1', label: 'X E-1', shortLabel: 'XE1', grade: '10' },
     { id: 'XE2', label: 'X E-2', shortLabel: 'XE2', grade: '10' },
@@ -126,6 +133,12 @@
     return dataReadiness().rostersReady === true;
   }
 
+  // True when the site should display the numbered placeholder roster (Student
+  // 1..36) in place of real names. Independent of rostersReady() on purpose.
+  function numberedRosterMode() {
+    return NUMBERED_ROSTER === true;
+  }
+
   global.EQClasses = {
     defaultRosterSize: DEFAULT_ROSTER_SIZE,
     grade10: cloneList(GRADE_X),
@@ -144,6 +157,7 @@
     fillSelect: fillSelect,
     placeholderRosterFor: placeholderRosterFor,
     dataReadiness: dataReadiness,
-    rostersReady: rostersReady
+    rostersReady: rostersReady,
+    numberedRosterMode: numberedRosterMode
   };
 })(window);
