@@ -115,6 +115,7 @@ function doGet(e) {
     else if (action === 'getAllActiveness')    result = getAllActiveness(e.parameter.className);
     else if (action === 'incrementActiveness') result = incrementActiveness(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.studentNo, e.parameter.column, e.parameter.delta || 1);
     else if (action === 'setupQuizColumn')     result = setupQuizColumn(e.parameter.username, e.parameter.password);
+    else if (action === 'setupCalcFormulas')   result = setupCalcFormulas(e.parameter.username, e.parameter.password);
     else if (action === 'getStudentStrikes')  result = getStudentStrikes(e.parameter.className, e.parameter.studentNo);
     else if (action === 'debugStrikeHeaders')  result = debugStrikeHeaders(e.parameter.className);
     else if (action === 'getAllStrikes')       result = getAllStrikes(e.parameter.className);
@@ -584,6 +585,75 @@ function setupQuizColumn(username, password) {
   });
 
   return { success: true, results: results };
+}
+
+// ── SETUP CALC FORMULAS (run once to install Average / Final Score /
+//    Indicator formulas into every class sheet; replicates last-year logic) ──
+function setupCalcFormulas(username, password) {
+  if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
+  var results = {};
+  Object.keys(SCORE_SHEETS).forEach(function(cls) {
+    try {
+      var ss = SpreadsheetApp.openById(SCORE_SHEETS[cls]);
+      var report = {};
+      // Chapter tabs: I=Average(9), J=Final Score(10), K=Indicator(11);
+      // score inputs are D:H (Task 1-3, Formative, Summative). Batched writes.
+      ['Chapter_1', 'Chapter_2', 'Chapter_3'].forEach(function(tab) {
+        var sh = ss.getSheetByName(tab);
+        if (!sh) { report[tab] = 'missing'; return; }
+        var n = _countStudentRows(sh);
+        if (!n) { report[tab] = '0 rows'; return; }
+        var avg = [], fin = [], ind = [];
+        for (var i = 0; i < n; i++) {
+          var r = i + 2;
+          avg.push(['=IFERROR(ROUND(AVERAGE(D' + r + ':H' + r + '),2),"")']);
+          fin.push(['=IF(I' + r + '="","",ROUND(I' + r + ',0))']);
+          ind.push(['=IF(J' + r + '="","",IF(J' + r + '>=75,"Safe","Not Safe"))']);
+        }
+        sh.getRange(2, 9, n, 1).setFormulas(avg);
+        sh.getRange(2, 10, n, 1).setFormulas(fin);
+        sh.getRange(2, 11, n, 1).setFormulas(ind);
+        report[tab] = n + ' rows';
+      });
+      // Activeness Indicator: K=11, tiered off Total (J=10). Blank at 0. Batched.
+      var act = ss.getSheetByName('Activeness');
+      if (act) {
+        var an = _countStudentRows(act);
+        if (an) {
+          var arr = [];
+          for (var j = 0; j < an; j++) {
+            var rr = j + 2;
+            arr.push(['=IF(J' + rr + '=0,"",' +
+              'IF(J' + rr + '>=200,"Pro Maxxing Active (+35 bonus)",' +
+              'IF(J' + rr + '>=150,"Ultra Pro Active (+30 bonus)",' +
+              'IF(J' + rr + '>=100,"Plus Ultra Active (+25 bonus)",' +
+              'IF(J' + rr + '>=75,"Hyperactive (+20 bonus)",' +
+              'IF(J' + rr + '>=50,"Super Active (+15 bonus)",' +
+              'IF(J' + rr + '>=25,"Active (+10 bonus)",' +
+              'IF(J' + rr + '>=10,"Okay (+5 bonus)","Not Active (+0 bonus)"))))))))']);
+          }
+          act.getRange(2, 11, an, 1).setFormulas(arr);
+          report['Activeness'] = an + ' rows';
+        }
+      }
+      SpreadsheetApp.flush();
+      results[cls] = report;
+    } catch (e) { results[cls] = 'error: ' + e.message; }
+  });
+  return { success: true, results: results };
+}
+
+// Count contiguous student rows (col A = No) starting at row 2.
+function _countStudentRows(sh) {
+  var last = sh.getLastRow();
+  if (last < 2) return 0;
+  var col = sh.getRange(2, 1, last - 1, 1).getValues();
+  var n = 0;
+  for (var i = 0; i < col.length; i++) {
+    if (col[i][0] === '' || col[i][0] === null) break;
+    n++;
+  }
+  return n;
 }
 
 // ── INCREMENT ACTIVENESS ──────────────────────────────────────
