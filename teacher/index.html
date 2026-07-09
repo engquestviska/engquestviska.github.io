@@ -227,9 +227,13 @@
 
     function teacherLogin(event) {
       event.preventDefault();
+      var btn = event.target.querySelector('button[type="submit"]');
       var username = document.getElementById('teacherUser').value.trim();
       var password = document.getElementById('teacherPass').value.trim();
       document.getElementById('loginError').textContent = '';
+      // Immediate feedback while the login check runs (Enter or click).
+      if (btn) { if (!btn.dataset.label) btn.dataset.label = btn.textContent; btn.disabled = true; btn.textContent = 'Signing in…'; }
+      function resetBtn() { if (btn) { btn.disabled = false; btn.textContent = btn.dataset.label || 'Login'; } }
 
       EQApi.get({ action: 'checkLogin', username: username, password: password }).then(function(data) {
         if (!data.ok) throw new Error('Incorrect username or password.');
@@ -241,6 +245,7 @@
         displayTeacher(username);
         hideLogin();
       }).catch(function(error) {
+        resetBtn();
         showLogin(error.message || 'Connection error. Try again.');
       });
     }

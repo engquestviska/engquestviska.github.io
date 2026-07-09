@@ -16,7 +16,7 @@
   var GRADE10_CLASSES = classConfig ? classConfig.idsForGrade('10') : ['XE1', 'XE2', 'XE3', 'XE4', 'XE5'];
   var GRADE11_CLASSES = classConfig ? classConfig.idsForGrade('11') : ['XIF7', 'XIF8', 'XIF9'];
 
-  function apiGet(params) {
+  function attemptGet(params) {
     var url = API_URL + '?' + new URLSearchParams(params);
     return fetch(url).then(function(res) {
       if (!res.ok) throw new Error('Network error');
@@ -37,6 +37,21 @@
         script.src = API_URL + '?' + new URLSearchParams(p);
         document.body.appendChild(script);
       });
+    });
+  }
+
+  // Retry transient transport failures (e.g. a 429 "too many requests" rate-limit)
+  // with exponential backoff. A real response — including an {error:...} payload —
+  // resolves and is NOT retried; only network/rate-limit failures back off.
+  function apiGet(params, _attempt) {
+    _attempt = _attempt || 0;
+    return attemptGet(params).catch(function(err) {
+      if (_attempt < 3) {
+        var delay = 800 * Math.pow(2, _attempt); // 0.8s → 1.6s → 3.2s
+        return new Promise(function(resolve) { setTimeout(resolve, delay); })
+          .then(function() { return apiGet(params, _attempt + 1); });
+      }
+      throw err;
     });
   }
 
