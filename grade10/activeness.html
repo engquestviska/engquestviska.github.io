@@ -468,8 +468,8 @@
 
   <section class="subpage-hero">
     <div class="kicker">Activeness</div>
-    <h1>Track participation points without opening the class sheet.</h1>
-    <p class="hero-copy">Students can view their own activeness total, indicator, and activity breakdown in a read-only dashboard.</p>
+    <h1>Level up by joining in.</h1>
+    <p class="hero-copy">See your Level, XP progress, and rank — with a breakdown of the participation that earned it. Read-only.</p>
   </section>
 </header>
 <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
@@ -481,8 +481,8 @@
   <div class="subpage-inner">
   <div class="picker-card">
     <div>
-      <div class="picker-title">Open your activeness profile.</div>
-      <p class="picker-copy">Choose your class and name to see participation points, weighted total, and current activeness indicator.</p>
+      <div class="picker-title">Open your Level / XP.</div>
+      <p class="picker-copy">Choose your class and number to see your Level, XP progress, rank, and activity breakdown.</p>
     </div>
     <div class="picker-panel">
       <div class="field">
@@ -508,14 +508,47 @@
 <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta</footer>
 <div class="toast" id="toast"></div>
 
+<style>
+  .lvx-hero { background:#fff; border:1px solid #e5ecf6; border-radius:24px; box-shadow:0 20px 50px rgba(30,58,138,.09); padding:28px; display:grid; grid-template-columns:auto 1fr; gap:30px; align-items:center; }
+  .lvx-badge { text-align:center; }
+  .lvx-ring { width:140px; height:140px; border-radius:50%; display:grid; place-items:center; margin:0 auto; }
+  .lvx-ring .in { width:112px; height:112px; border-radius:50%; background:#fff; display:grid; place-items:center; }
+  .lvx-ring .lv { font-family:'IBM Plex Mono',monospace; font-size:.66rem; letter-spacing:.12em; color:#64748b; }
+  .lvx-ring .num { font-family:'Playfair Display',serif; font-size:2.9rem; line-height:1; color:#1e3a8a; }
+  .lvx-rank { margin-top:12px; display:inline-block; background:#fef3c7; color:#b45309; font-weight:700; font-size:.8rem; padding:6px 14px; border-radius:999px; }
+  .lvx-who { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .lvx-nm { font-family:'Playfair Display',serif; font-size:1.4rem; }
+  .lvx-cls { font-family:'IBM Plex Mono',monospace; font-size:.72rem; color:#64748b; background:#eff6ff; padding:3px 9px; border-radius:8px; }
+  .lvx-streak { display:inline-flex; align-items:center; gap:6px; background:#fff7ed; border:1px solid #fed7aa; color:#c2410c; font-weight:700; font-size:.8rem; padding:5px 12px; border-radius:999px; margin:10px 0 4px; }
+  .lvx-xprow { display:flex; justify-content:space-between; align-items:baseline; margin:14px 0 8px; gap:12px; }
+  .lvx-xprow .big { font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:1.05rem; }
+  .lvx-xprow .goal { font-size:.8rem; color:#64748b; }
+  .lvx-bar { height:15px; background:#eef2f9; border-radius:999px; overflow:hidden; }
+  .lvx-bar > i { display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,#f59e0b,#f97316); }
+  .lvx-mini { display:flex; gap:26px; margin-top:18px; flex-wrap:wrap; }
+  .lvx-mini div span { display:block; font-family:'IBM Plex Mono',monospace; font-size:.64rem; letter-spacing:.1em; text-transform:uppercase; color:#94a3b8; }
+  .lvx-mini div b { font-size:1.3rem; }
+  .lvx-note { margin:12px 0 0; font-size:.85rem; color:#64748b; }
+  .lvx-sec { font-family:'Playfair Display',serif; font-size:1.25rem; margin:26px 4px 14px; }
+  .lvx-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .lvx-act { background:#fff; border:1px solid #e5ecf6; border-radius:18px; padding:18px; box-shadow:0 10px 26px rgba(30,58,138,.06); }
+  .lvx-act .ic { width:44px; height:44px; border-radius:13px; display:grid; place-items:center; font-size:1.25rem; margin-bottom:12px; }
+  .lvx-act .lbl { font-weight:600; font-size:.92rem; }
+  .lvx-act .st { display:flex; justify-content:space-between; align-items:baseline; margin-top:10px; }
+  .lvx-act .xp { font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:1.05rem; }
+  .lvx-act .tm { font-size:.76rem; color:#94a3b8; }
+  .lvx-info { margin-top:22px; background:#eff6ff; border:1px solid #dbeafe; border-radius:16px; padding:16px 20px; font-size:.84rem; color:#334155; line-height:1.55; }
+  @media (max-width:640px){ .lvx-hero{ grid-template-columns:1fr; text-align:center; } .lvx-who{ justify-content:center; } .lvx-grid{ grid-template-columns:1fr 1fr; } .lvx-mini{ justify-content:center; } }
+</style>
+
 <script>
   const ACTS = [
-    { key: 'Vocabulary Box',     short: 'VB',  col: '#8B5CF6' },
-    { key: 'Answering',          short: 'ANS', col: '#3B82F6' },
-    { key: 'Presenting',         short: 'PRE', col: '#10B981' },
-    { key: 'Doing Task On Time', short: 'DTO', col: '#F59E0B' },
-    { key: 'Helping Hand',       short: 'HH',  col: '#EC4899' },
-    { key: 'Quiz',               short: 'QZ',  col: '#14B8A6' },
+    { key: 'Vocabulary Box',     em: '📚', bg: '#ede9fe', fg: '#7c3aed' },
+    { key: 'Answering',          em: '💬', bg: '#dbeafe', fg: '#2563eb' },
+    { key: 'Presenting',         em: '🎤', bg: '#d1fae5', fg: '#059669' },
+    { key: 'Doing Task On Time', em: '⏰', bg: '#fef3c7', fg: '#d97706' },
+    { key: 'Helping Hand',       em: '🤝', bg: '#fce7f3', fg: '#db2777' },
+    { key: 'Quiz',               em: '⚡', bg: '#ccfbf1', fg: '#0d9488' },
   ];
 
   let currentClass = '';
@@ -593,6 +626,22 @@
       return;
     }
     if (!(window.EQClasses && typeof EQClasses.rostersReady === 'function' && EQClasses.rostersReady())) {
+      // Numbered placeholder roster (Student 1..36): built locally, no backend
+      // fetch, so no old-year names or scores load. XP shows as 0 until real data.
+      if (window.EQClasses && typeof EQClasses.numberedRosterMode === 'function' && EQClasses.numberedRosterMode()) {
+        studentsData = EQClasses.placeholderRosterFor(currentClass).map(function(s) {
+          return { no: s.no, name: s.name, nickname: '', Total: 0, placeholder: true };
+        });
+        studentSelect.innerHTML = '<option value="">— Select your number —</option>';
+        studentsData.forEach(function(s) {
+          var opt = document.createElement('option');
+          opt.value = s.no;
+          opt.textContent = s.no + ' · ' + s.name;
+          studentSelect.appendChild(opt);
+        });
+        studentSelect.disabled = false;
+        return;
+      }
       studentSelect.innerHTML = '<option value="">Roster not published yet</option>';
       document.getElementById('activenessResult').innerHTML = '<div class="loading"><strong>Official roster not published yet.</strong><br/>This page is intentionally not showing old-year names. Activeness will appear once the new roster is connected.</div>';
       return;
@@ -648,50 +697,66 @@
     rememberStudent(no, student);
 
     const classLabel = classLabelFor(currentClass);
-    const total = safeNumber(student.Total);
-    const indicator = String(student.Indicator || 'Not Active (+0 bonus)');
-    const indClass = indicatorClass(indicator);
     const displayName = student.nickname || student.name || 'Student';
-    const fullName = student.name || displayName;
-    const initial = displayName.charAt(0).toUpperCase() || '?';
-    const safeInitial = escapeHtml(initial);
-    const safeDisplayName = escapeHtml(displayName);
-    const safeFullName = escapeHtml(fullName);
-    const safeClassLabel = escapeHtml(classLabel);
-    const safeIndicator = escapeHtml(indicator);
+    const isPlaceholder = !!student.placeholder;
+
+    // XP = weighted participation total; a new Level every LEVEL_SIZE XP.
+    const LEVEL_SIZE = 400;
+    const xp = safeNumber(student.Total);
+    const level = Math.floor(xp / LEVEL_SIZE) + 1;
+    const into = xp % LEVEL_SIZE;
+    const toNext = LEVEL_SIZE - into;
+    const pct = Math.round(into / LEVEL_SIZE * 100);
+
+    // Rank title from the activeness indicator (bonus text stripped); a friendly
+    // starter label when there is no XP yet.
+    let rank = String(student.Indicator || '').replace(/\s*\(\+?\d+\s*bonus\)/i, '').trim();
+    if (!rank || xp === 0) rank = 'Just getting started';
+
+    // Class rank only makes sense with real scores.
+    let classRank = '--';
+    if (!isPlaceholder && xp > 0) {
+      const ranked = studentsData.slice().sort((a, b) => safeNumber(b.Total) - safeNumber(a.Total));
+      const idx = ranked.findIndex(s => String(s.no) === String(no));
+      if (idx >= 0) classRank = '#' + (idx + 1);
+    }
+
+    const streak = safeNumber(student.Streak);
 
     const activityCards = ACTS.map(a => {
-      const raw = activityValue(student, a.key);
-      const weighted = raw * (ACT_PTS[a.key] || 1);
-      return `<article class="activity-card">
-        <div class="activity-top">
-          <div class="activity-icon" style="background:${a.col}">${escapeHtml(a.short)}</div>
-          <div class="activity-value">${raw}</div>
-        </div>
-        <div>
-          <div class="activity-name">${escapeHtml(a.key)}</div>
-          <div class="activity-weight">${weighted} weighted point${weighted === 1 ? '' : 's'}</div>
-        </div>
+      const times = activityValue(student, a.key);
+      const gained = times * (ACT_PTS[a.key] || 1);
+      return `<article class="lvx-act">
+        <div class="ic" style="background:${a.bg};color:${a.fg}">${a.em}</div>
+        <div class="lbl">${escapeHtml(a.key)}</div>
+        <div class="st"><span class="xp" style="color:${a.fg}">+${gained} XP</span><span class="tm">${times} times</span></div>
       </article>`;
     }).join('');
 
     document.getElementById('activenessResult').innerHTML = `
-      <section class="activeness-dashboard">
-        <div class="dash-head">
-          <div class="dash-avatar">${safeInitial}</div>
+      <section>
+        <div class="lvx-hero">
+          <div class="lvx-badge">
+            <div class="lvx-ring" style="background:conic-gradient(#f59e0b ${pct}%, #e5ecf6 0)"><div class="in"><div><div class="lv">LEVEL</div><div class="num">${level}</div></div></div></div>
+            <div class="lvx-rank">⭐ ${escapeHtml(rank)}</div>
+          </div>
           <div>
-            <div class="dash-name">${safeDisplayName}</div>
-            <div class="dash-meta">${safeFullName} · ${safeClassLabel}</div>
-          </div>
-          <div class="dash-summary">
-            <div class="summary-pill"><strong>${total}</strong><span>Total</span></div>
-            <div class="summary-pill"><strong>${ACTS.length}</strong><span>Areas</span></div>
+            <div class="lvx-who"><span class="lvx-nm">${escapeHtml(displayName)}</span><span class="lvx-cls">${escapeHtml(classLabel)}</span></div>
+            ${streak > 0 ? `<span class="lvx-streak">🔥 ${streak}-day streak</span>` : ''}
+            <div class="lvx-xprow"><span class="big">${xp} XP</span><span class="goal">${toNext} XP to Level ${level + 1}</span></div>
+            <div class="lvx-bar"><i style="width:${pct}%"></i></div>
+            <div class="lvx-mini">
+              <div><span>Total XP</span><b>${xp}</b></div>
+              <div><span>Class Rank</span><b>${classRank}</b></div>
+              <div><span>Areas</span><b>${ACTS.length}</b></div>
+            </div>
+            ${isPlaceholder ? '<p class="lvx-note">Your XP will grow as you join in — real participation records connect once class scores go live.</p>' : ''}
           </div>
         </div>
-        <div class="indicator-strip">
-          <div class="indicator-badge ${indClass}">${safeIndicator}</div>
-        </div>
-        <div class="activity-grid">${activityCards}</div>
+
+        <h2 class="lvx-sec">How you earn XP</h2>
+        <div class="lvx-grid">${activityCards}</div>
+        <div class="lvx-info">📖 <b>How XP works:</b> every participation earns points — Answering ×2, Presenting ×5, Task On Time ×2, Vocabulary / Helping Hand / Quiz ×1. Your points are your XP; every ${LEVEL_SIZE} XP you reach a new Level and a higher rank.</div>
       </section>`;
   }
 
