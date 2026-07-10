@@ -117,6 +117,10 @@ function doGet(e) {
     else if (action === 'setupQuizColumn')     result = setupQuizColumn(e.parameter.username, e.parameter.password);
     else if (action === 'setupCalcFormulas')   result = setupCalcFormulas(e.parameter.username, e.parameter.password);
     else if (action === 'setupRoster')         result = setupRoster(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.names);
+    else if (action === 'setupActivenessXP')   result = setupActivenessXP(e.parameter.username, e.parameter.password);
+    else if (action === 'getVocabulary')       result = getVocabulary(e.parameter.className, e.parameter.studentNo);
+    else if (action === 'addVocabulary')        result = addVocabulary(e.parameter.className, e.parameter.studentNo, e.parameter.words);
+    else if (action === 'clearVocabulary')      result = clearVocabulary(e.parameter.username, e.parameter.password, e.parameter.className);
     else if (action === 'getStudentStrikes')  result = getStudentStrikes(e.parameter.className, e.parameter.studentNo);
     else if (action === 'debugStrikeHeaders')  result = debugStrikeHeaders(e.parameter.className);
     else if (action === 'getAllStrikes')       result = getAllStrikes(e.parameter.className);
@@ -494,7 +498,8 @@ function getAllActiveness(className) {
       VocabularyBox:   Number(data[r][cols['Vocabulary Box']]    || 0),
       Answering:       Number(data[r][cols['Answering']]         || 0),
       Presenting:      Number(data[r][cols['Presenting']]        || 0),
-      DoingTaskOnTime: Number(data[r][cols['Doing Task On Time']]|| 0),
+      DoingTask:       Number((cols['Doing Task'] !== undefined ? data[r][cols['Doing Task']] : data[r][cols['Doing Task On Time']]) || 0),
+      DoingTaskOnTime: Number((cols['Doing Task'] !== undefined ? data[r][cols['Doing Task']] : data[r][cols['Doing Task On Time']]) || 0),
       HelpingHand:     Number(data[r][cols['Helping Hand']]      || 0),
       Quiz:            Number(data[r][cols['Quiz']]              || 0),
       Total:           Number(data[r][cols['Total']]             || 0),
@@ -670,6 +675,136 @@ function setupRoster(username, password, className, namesJson) {
   });
   SpreadsheetApp.flush();
   return { success: true, className: className, count: n, report: report };
+}
+
+// ── SETUP ACTIVENESS XP (new weights + auto Doing Task) ──
+// Activeness cols: D Vocabulary Box, E Answering, F Presenting, G Doing Task,
+// H Helping Hand, I Quiz, J Total, K Indicator. XP weights: VB×2, Ans×5,
+// Pres×20, Doing Task×20, Helping×20, Quiz×10. Doing Task auto-counts the
+// TRUE cells in each student's Task_Status row.
+function setupActivenessXP(username, password) {
+  if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
+  var results = {};
+  Object.keys(SCORE_SHEETS).forEach(function(cls) {
+    try {
+      var act = SpreadsheetApp.openById(SCORE_SHEETS[cls]).getSheetByName('Activeness');
+      if (!act) { results[cls] = 'no Activeness'; return; }
+      act.getRange(1, 7).setValue('Doing Task');
+      var n = _countStudentRows(act);
+      if (!n) { results[cls] = '0 rows'; return; }
+      var dt = [], tot = [];
+      for (var i = 0; i < n; i++) {
+        var r = i + 2;
+        dt.push(['=COUNTIF(Task_Status!D' + r + ':AZ' + r + ', TRUE)']);
+        tot.push(['=D' + r + '*2+E' + r + '*5+F' + r + '*20+G' + r + '*20+H' + r + '*20+I' + r + '*10']);
+      }
+      act.getRange(2, 7, n, 1).setFormulas(dt);
+      act.getRange(2, 10, n, 1).setFormulas(tot);
+      SpreadsheetApp.flush();
+      results[cls] = n + ' rows';
+    } catch (e) { results[cls] = 'error: ' + e.message; }
+  });
+  return { success: true, results: results };
+}
+
+// ── VOCABULARY BOX ────────────────────────────────────────────
+var VOCAB_TAB = 'Vocabulary';
+var VOCAB_WEEKLY_CAP = 30;
+
+function _vocabSheet(ss) {
+  var sh = ss.getSheetByName(VOCAB_TAB);
+  if (!sh) {
+    sh = ss.insertSheet(VOCAB_TAB);
+    sh.getRange(1, 1, 1, 5).setValues([['No', 'Name', 'English', 'Indonesian', 'Timestamp']]);
+  }
+  return sh;
+}
+
+function _studentName(ss, studentNo) {
+  var first = ss.getSheets()[0];
+  var data = first.getRange(1, 1, first.getLastRow(), 2).getValues();
+  for (var r = 1; r < data.length; r++) {
+    if (String(data[r][0]) === String(studentNo)) return String(data[r][1] || '').trim();
+  }
+  return '';
+}
+
+function getVocabulary(className, studentNo) {
+  var sheetId = SCORE_SHEETS[className];
+  if (!sheetId) return { error: 'Class not found' };
+  var sh = _vocabSheet(SpreadsheetApp.openById(sheetId));
+  var data = sh.getDataRange().getValues();
+  var words = [], weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000, weekCount = 0;
+  for (var r = 1; r < data.length; r++) {
+    if (String(data[r][0]) !== String(studentNo)) continue;
+    var ts = data[r][4] ? new Date(data[r][4]).getTime() : 0;
+    if (ts >= weekAgo) weekCount++;
+    words.push({ english: String(data[r][2] || ''), indonesian: String(data[r][3] || ''), at: data[r][4] });
+  }
+  return { words: words, total: words.length, weekCount: weekCount,
+           weeklyCap: VOCAB_WEEKLY_CAP, weeklyRemaining: Math.max(0, VOCAB_WEEKLY_CAP - weekCount) };
+}
+
+// Student self-submit (no teacher auth). Guarded by: max 10/call, no duplicate
+// English word per student, and a 30-word rolling weekly cap. Awards 2 XP/word
+// by bumping the Vocabulary Box counter in the Activeness sheet.
+function addVocabulary(className, studentNo, wordsJson) {
+  var sheetId = SCORE_SHEETS[className];
+  if (!sheetId) return { success: false, error: 'Class not found' };
+  if (!studentNo) return { success: false, error: 'No student selected' };
+  var words;
+  try { words = JSON.parse(wordsJson || '[]'); } catch (e) { return { success: false, error: 'Bad words' }; }
+  if (!words.length) return { success: false, error: 'No words submitted' };
+  if (words.length > 10) words = words.slice(0, 10);
+  var ss = SpreadsheetApp.openById(sheetId);
+  var sh = _vocabSheet(ss);
+  var data = sh.getDataRange().getValues();
+  var existing = {}, weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000, weekCount = 0;
+  for (var r = 1; r < data.length; r++) {
+    if (String(data[r][0]) !== String(studentNo)) continue;
+    existing[String(data[r][2] || '').trim().toLowerCase()] = true;
+    var ts = data[r][4] ? new Date(data[r][4]).getTime() : 0;
+    if (ts >= weekAgo) weekCount++;
+  }
+  var name = _studentName(ss, studentNo), now = new Date();
+  var accepted = [], rejected = [], seen = {}, remaining = VOCAB_WEEKLY_CAP - weekCount;
+  words.forEach(function(w) {
+    var en = String((w && w.english) || '').trim();
+    var id = String((w && w.indonesian) || '').trim();
+    var key = en.toLowerCase();
+    if (!en || !id) { rejected.push({ english: en, reason: 'empty' }); return; }
+    if (existing[key] || seen[key]) { rejected.push({ english: en, reason: 'duplicate' }); return; }
+    if (accepted.length >= remaining) { rejected.push({ english: en, reason: 'weekly-cap' }); return; }
+    seen[key] = true;
+    accepted.push([studentNo, name, en, id, now]);
+  });
+  if (accepted.length) {
+    sh.getRange(sh.getLastRow() + 1, 1, accepted.length, 5).setValues(accepted);
+    var act = ss.getSheetByName('Activeness');
+    if (act) {
+      var adata = act.getDataRange().getValues();
+      for (var ar = 1; ar < adata.length; ar++) {
+        if (String(adata[ar][0]) === String(studentNo)) {
+          act.getRange(ar + 1, 4).setValue(Number(adata[ar][3] || 0) + accepted.length);
+          break;
+        }
+      }
+    }
+    SpreadsheetApp.flush();
+  }
+  return { success: true, added: accepted.length, xp: accepted.length * 2,
+           rejected: rejected, weeklyRemaining: Math.max(0, remaining - accepted.length) };
+}
+
+// Teacher-only: wipe a class's vocabulary submissions (e.g. new semester).
+// Does NOT reset the Vocabulary Box XP counter in Activeness.
+function clearVocabulary(username, password, className) {
+  if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
+  var sheetId = SCORE_SHEETS[className];
+  if (!sheetId) return { success: false, error: 'Class not found' };
+  var sh = SpreadsheetApp.openById(sheetId).getSheetByName(VOCAB_TAB);
+  if (sh && sh.getLastRow() > 1) sh.getRange(2, 1, sh.getLastRow() - 1, sh.getLastColumn()).clearContent();
+  return { success: true };
 }
 
 // Count contiguous student rows (col A = No) starting at row 2.
