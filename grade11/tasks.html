@@ -3,69 +3,811 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Grade 11 Task Status · English Quest</title>
+  <title>Task Status · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css?v=20260702"/>
   <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260702"/>
-  <link rel="stylesheet" href="../shared/css/grade11-subpages-20260612.css?v=20260702"/>
   <script src="../shared/js/classes-20260617.js?v=20260624"></script>
   <script src="../shared/js/student.js"></script>
+  <script src="../shared/js/api.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --purple: #0f8a78; --purple-light: #46c5b3; --purple-soft: #e5f7f3;
+      --purple-mid: #8fd9cd; --white: #fff; --off-white: #F8FAFC;
+      --text-dark: #0F172A; --text-muted: #475569; --border: #e5f7f3;
+      --accent: #F59E0B; --green: #10B981; --green-soft: #D1FAE5;
+      --red: #EF4444; --red-soft: #FEE2E2;
+    }
+    body { font-family: 'IBM Plex Sans', sans-serif; background: var(--off-white); color: var(--text-dark); min-height: 100vh; }
+
+    /* HEADER */
+    header { background: linear-gradient(135deg, #0f8a78 0%, #0b6f60 50%, #07463d 100%); padding: 36px 20px 52px; text-align: center; position: relative; overflow: hidden; }
+    header::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px); background-size: 28px 28px; pointer-events: none; }
+    .back-btn { position: absolute; top: 20px; left: 20px; z-index: 2; background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.88rem; font-weight: 600; padding: 8px 18px; border-radius: 999px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+    .back-btn:hover { background: rgba(255,255,255,0.25); }
+    header h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem,5vw,2.8rem); font-weight: 800; color: #fff; position: relative; z-index: 1; }
+    header h1 span { color: var(--accent); font-style: italic; }
+    .header-sub { color: rgba(255,255,255,0.75); font-size: 0.95rem; margin-top: 8px; position: relative; z-index: 1; }
+    .wave { display: block; width: 100%; margin-top: -2px; }
+
+    main { max-width: 860px; margin: 0 auto; padding: 28px 16px 80px; }
+
+    /* SELECTOR CARD */
+    .card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; padding: 24px 20px; margin-bottom: 20px; }
+    .card-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 18px; }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+    .field select { width: 100%; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 1rem; background: var(--off-white); color: var(--text-dark); outline: none; }
+    .field select:focus { border-color: var(--purple-light); }
+    .btn-primary { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--purple), #0b6f60); color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 1rem; border: none; border-radius: 12px; cursor: pointer; margin-top: 4px; }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── STUDENT TASK STATUS CARD ── */
+    .status-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; margin-bottom: 20px; animation: slideUp 0.3s ease; }
+    @keyframes slideUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+    .profile-strip { background: linear-gradient(135deg, #0f8a78, #0b6f60); padding: 22px 24px; display: flex; align-items: center; gap: 16px; }
+    .avatar { width: 54px; height: 54px; border-radius: 50%; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; font-family: 'Playfair Display', serif; font-weight: 700; color: #fff; }
+    .profile-name { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: #fff; }
+    .profile-meta { font-size: 0.82rem; color: rgba(255,255,255,0.7); margin-top: 3px; }
+
+    /* Progress bar section */
+    .progress-section { padding: 20px 24px; border-bottom: 1.5px solid var(--border); }
+    .progress-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .progress-title { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .progress-count { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--purple); }
+    .progress-bar-wrap { background: var(--border); border-radius: 999px; height: 10px; overflow: hidden; }
+    .progress-bar-fill { height: 10px; border-radius: 999px; background: linear-gradient(90deg, #10B981, #059669); transition: width 0.6s ease; }
+    .progress-bar-fill.warn { background: linear-gradient(90deg, #F59E0B, #D97706); }
+    .progress-bar-fill.bad  { background: linear-gradient(90deg, #EF4444, #DC2626); }
+
+    /* Task grid */
+    .tasks-section { padding: 20px 24px; }
+    .tasks-chapter-label { font-size: 0.72rem; font-weight: 700; color: var(--purple-light); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'IBM Plex Mono', monospace; margin-bottom: 14px; }
+    .tasks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+    .task-chip { border-radius: 14px; padding: 14px 10px; text-align: center; border: 1.5px solid; transition: transform 0.15s; }
+    .task-chip:hover { transform: translateY(-2px); }
+    .task-chip.done    { background: var(--green-soft); border-color: #34D399; }
+    .task-chip.missing { background: var(--red-soft);   border-color: #FCA5A5; }
+    .task-chip-icon { font-size: 1.3rem; margin-bottom: 6px; }
+    .task-chip-name { font-size: 0.75rem; font-weight: 700; font-family: 'IBM Plex Mono', monospace; color: var(--text-dark); margin-bottom: 4px; }
+    .task-chip-label { font-size: 0.72rem; font-weight: 700; }
+    .task-chip.done    .task-chip-label { color: #065F46; }
+    .task-chip.missing .task-chip-label { color: #991B1B; }
+
+    /* ── CHAPTER TABS (inside student card) ── */
+    .ch-tabs-inner { display:flex; border-bottom:1.5px solid var(--border); }
+    .ch-tab-inner { flex:1; padding:12px 8px; font-family:'IBM Plex Sans',sans-serif; font-size:0.88rem; font-weight:700; border:none; background:none; cursor:pointer; color:var(--text-muted); border-bottom:3px solid transparent; margin-bottom:-2px; transition:all 0.2s; }
+    .ch-tab-inner.active { color:var(--purple); border-bottom-color:var(--purple); }
+
+    /* LOADING */
+    .loading { text-align: center; padding: 48px; color: var(--text-muted); }
+    .spinner { display: inline-block; width: 26px; height: 26px; border: 3px solid var(--border); border-top-color: var(--purple); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 10px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text-dark); color: #fff; padding: 12px 24px; border-radius: 999px; font-size: 0.9rem; font-weight: 500; transition: transform 0.3s; z-index: 999; white-space: nowrap; pointer-events: none; }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.ok  { background: #059669; }
+    .toast.err { background: #DC2626; }
+
+    .hidden { display: none !important; }
+    footer { background: var(--text-dark); color: rgba(255,255,255,0.5); text-align: center; padding: 20px; font-size: 0.85rem; }
+    footer strong { color: var(--purple-light); }
+
+    @media (max-width: 500px) {
+      .tasks-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+      .profile-strip { padding: 18px 16px; }
+      .progress-section, .tasks-section { padding: 16px; }
+    }
+
+    /* ── SIDEBAR (shared) ───────────────────────────────────── */
+    .hamburger { position:absolute; top:20px; right:20px; z-index:10; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); border-radius:10px; width:40px; height:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; cursor:pointer; padding:0; }
+    .hamburger span { display:block; width:18px; height:2px; background:#fff; border-radius:999px; transition:all 0.3s; }
+    .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity:0; }
+    .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+    .sidebar-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.6); backdrop-filter:blur(6px); z-index:300; opacity:0; pointer-events:none; transition:opacity 0.3s; }
+    .sidebar-overlay.open { opacity:1; pointer-events:all; }
+    .sidebar { position:fixed; top:0; right:0; height:100%; width:min(320px,85vw); background:#0F172A; z-index:301; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.34,1.1,0.64,1); display:flex; flex-direction:column; overflow-y:auto; }
+    .sidebar.open { transform:translateX(0); }
+    .sidebar-head { padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; gap:12px; }
+    .sidebar-logo { width:36px; height:36px; border-radius:10px; object-fit:cover; }
+    .sidebar-head-text { flex:1; }
+    .sidebar-head-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:800; color:#fff; }
+    .sidebar-head-sub { font-size:0.7rem; color:rgba(255,255,255,0.45); margin-top:1px; }
+    .sidebar-close { width:38px; min-width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.08); border:none; color:rgba(255,255,255,0.5); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
+    .sidebar-section { padding:14px 16px 4px; }
+    .sidebar-section-label { font-size:0.65rem; font-weight:700; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.12em; font-family:'IBM Plex Mono',monospace; padding:0 4px; margin-bottom:6px; }
+    .sidebar-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; text-decoration:none; transition:background 0.15s; margin-bottom:2px; }
+    .sidebar-item:hover, .sidebar-item:active { background:rgba(255,255,255,0.08); }
+    .sidebar-item.active { background:rgba(255,255,255,0.12); border-left:3px solid #46c5b3; padding-left:9px; }
+    .sidebar-item-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0; }
+    .sidebar-item-name { font-size:0.88rem; font-weight:600; color:#fff; flex:1; }
+    .sidebar-item-badge { font-size:0.6rem; font-weight:800; padding:2px 7px; border-radius:999px; font-family:'IBM Plex Mono',monospace; background:#F59E0B; color:#fff; }
+    .sidebar-divider { height:1px; background:rgba(255,255,255,0.07); margin:8px 16px; }
+    .sidebar-home-btn { display:flex; align-items:center; gap:10px; margin:12px 16px 4px; padding:11px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:12px; text-decoration:none; }
+    .sidebar-home-btn:hover { background:rgba(255,255,255,0.1); }
+    .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
+    .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
+
+    /* TASKS REVAMP */
+    body.tasks-page {
+      background:
+        radial-gradient(circle at top left, rgba(15, 138, 120, 0.12), transparent 30rem),
+        linear-gradient(180deg, #f0fbf9 0%, #f8fafc 38%, #f8fafc 100%) !important;
+      color: #0f172a !important;
+    }
+    body.tasks-page .subpage-header {
+      text-align: left !important;
+      padding: 24px 28px 28px !important;
+      background: linear-gradient(125deg, #0f8a78 0%, #0b6f60 55%, #07463d 100%) !important;
+      overflow: hidden !important;
+    }
+    body.tasks-page .subpage-header::before {
+      content: "" !important;
+      position: absolute !important;
+      inset: 0 !important;
+      background-image: none !important;
+    }
+    body.tasks-page .topbar {
+      position: relative !important;
+      z-index: 2 !important;
+      width: min(1180px, 100%) !important;
+      margin-inline: auto !important;
+      margin-bottom: 70px !important;
+    }
+    body.tasks-page .brand-title,
+    body.tasks-page .brand-sub,
+    body.tasks-page .subpage-hero,
+    body.tasks-page .subpage-hero h1,
+    body.tasks-page .hero-copy {
+      color: #fff !important;
+    }
+    body.tasks-page .nav a,
+    body.tasks-page .nav button {
+      color: #fff !important;
+      background: rgba(255, 255, 255, 0.12) !important;
+      border-color: rgba(255, 255, 255, 0.35) !important;
+    }
+    body.tasks-page .subpage-hero {
+      position: relative !important;
+      z-index: 1 !important;
+      width: min(1180px, 100%) !important;
+      margin-inline: auto !important;
+    }
+    body.tasks-page .subpage-hero h1 {
+      max-width: 760px !important;
+      font-size: clamp(1.7rem, 3.5vw, 2.7rem) !important;
+      line-height: 1.1 !important;
+      margin: 12px 0 20px !important;
+      letter-spacing: 0 !important;
+    }
+    body.tasks-page .kicker {
+      color: #c9efe8 !important;
+    }
+    body.tasks-page .hero-copy {
+      max-width: 670px !important;
+      font-size: 1.05rem !important;
+      line-height: 1.8 !important;
+      opacity: 0.86 !important;
+    }
+    body.tasks-page .wave {
+      display: none !important;
+    }
+    body.tasks-page main {
+      padding: 26px 28px 80px !important;
+    }
+    body.tasks-page .subpage-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    body.tasks-page .card,
+    body.tasks-page .status-card,
+    body.tasks-page .loading {
+      border: 1.5px solid #c9efe8 !important;
+      border-radius: 28px !important;
+      background: rgba(255, 255, 255, 0.96) !important;
+      box-shadow: 0 22px 64px rgba(15, 138, 120, 0.1) !important;
+    }
+    body.tasks-page .card {
+      padding: clamp(22px, 4vw, 34px) !important;
+      display: grid !important;
+      grid-template-columns: minmax(0, 0.85fr) minmax(320px, 1.15fr) !important;
+      gap: 24px !important;
+      align-items: center !important;
+    }
+    body.tasks-page .card-title {
+      font-size: clamp(1.55rem, 3vw, 2.15rem) !important;
+      line-height: 1 !important;
+      margin-bottom: 10px !important;
+    }
+    body.tasks-page .picker-copy {
+      color: #64748b !important;
+      line-height: 1.7 !important;
+      max-width: 360px !important;
+    }
+    body.tasks-page .picker-panel {
+      display: grid !important;
+      gap: 12px !important;
+      padding: 18px !important;
+      border: 1.5px solid #e5f7f3 !important;
+      border-radius: 24px !important;
+      background: linear-gradient(135deg, #ffffff, #f8fbff) !important;
+    }
+    body.tasks-page .field label {
+      font-family: 'IBM Plex Mono', monospace !important;
+      color: #64748b !important;
+    }
+    body.tasks-page .field select {
+      min-height: 52px !important;
+      border-radius: 16px !important;
+      background: #f8fafc !important;
+      border-color: #c9efe8 !important;
+      color: #0f172a !important;
+      font-weight: 600 !important;
+    }
+    body.tasks-page .btn-primary {
+      min-height: 54px !important;
+      border-radius: 16px !important;
+      margin-top: 12px !important;
+      box-shadow: 0 16px 34px rgba(15, 138, 120, 0.18) !important;
+    }
+    body.tasks-page .status-card {
+      overflow: hidden !important;
+    }
+    body.tasks-page .profile-strip {
+      background:
+        radial-gradient(circle at right, rgba(255, 255, 255, 0.22), transparent 15rem),
+        linear-gradient(135deg, #0f8a78, #095a4e) !important;
+      padding: 24px !important;
+      display: grid !important;
+      grid-template-columns: auto minmax(0, 1fr) auto !important;
+      align-items: center !important;
+      gap: 16px !important;
+    }
+    body.tasks-page .avatar {
+      width: 58px !important;
+      height: 58px !important;
+      border-radius: 18px !important;
+      background: rgba(255, 255, 255, 0.2) !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+    }
+    body.tasks-page .profile-name {
+      font-size: clamp(1.35rem, 2.3vw, 1.9rem) !important;
+      line-height: 1.05 !important;
+    }
+    body.tasks-page .profile-summary {
+      display: grid !important;
+      grid-template-columns: repeat(3, minmax(76px, 1fr)) !important;
+      gap: 8px !important;
+      min-width: min(310px, 38vw) !important;
+    }
+    body.tasks-page .summary-pill {
+      min-height: 62px !important;
+      border: 1px solid rgba(255, 255, 255, 0.25) !important;
+      border-radius: 18px !important;
+      background: rgba(255, 255, 255, 0.12) !important;
+      color: #fff !important;
+      display: grid !important;
+      place-items: center !important;
+      text-align: center !important;
+      padding: 8px !important;
+    }
+    body.tasks-page .summary-pill strong {
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 1.1rem !important;
+      line-height: 1 !important;
+    }
+    body.tasks-page .summary-pill span {
+      font-size: 0.66rem !important;
+      opacity: 0.78 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.08em !important;
+      font-weight: 800 !important;
+    }
+    body.tasks-page .ch-tabs-inner {
+      gap: 10px !important;
+      border-bottom: 1.5px solid #e5f7f3 !important;
+      padding: 16px 18px 0 !important;
+    }
+    body.tasks-page .ch-tab-inner {
+      min-height: 44px !important;
+      border: 1.5px solid #c9efe8 !important;
+      border-radius: 999px 999px 0 0 !important;
+      background: #fff !important;
+      margin-bottom: -1.5px !important;
+    }
+    body.tasks-page .ch-tab-inner.active {
+      background: #0f8a78 !important;
+      color: #fff !important;
+      border-color: #0f8a78 !important;
+    }
+    body.tasks-page .progress-section {
+      border-bottom: 1.5px solid #e5f7f3 !important;
+      padding: 22px 24px !important;
+      background: #f8fbff !important;
+    }
+    body.tasks-page .progress-label {
+      gap: 14px !important;
+    }
+    body.tasks-page .progress-bar-wrap {
+      background: #e5f7f3 !important;
+      height: 12px !important;
+    }
+    body.tasks-page .progress-bar-fill {
+      height: 12px !important;
+    }
+    body.tasks-page .tasks-section {
+      padding: 22px 24px 26px !important;
+    }
+    body.tasks-page .task-status-note {
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px !important;
+      margin: 18px 24px 0 !important;
+      padding: 14px 16px !important;
+      border: 1.5px solid #86efac !important;
+      border-radius: 18px !important;
+      background: linear-gradient(135deg, #ecfdf5, #d1fae5) !important;
+      color: #065f46 !important;
+      font-weight: 800 !important;
+    }
+    body.tasks-page .task-status-note span {
+      width: 34px !important;
+      height: 34px !important;
+      border-radius: 12px !important;
+      display: grid !important;
+      place-items: center !important;
+      background: #10b981 !important;
+      color: #fff !important;
+      flex: 0 0 auto !important;
+    }
+    body.tasks-page .tasks-grid {
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)) !important;
+      gap: 14px !important;
+    }
+    body.tasks-page .task-chip {
+      border-radius: 20px !important;
+      padding: 16px !important;
+      min-height: 132px !important;
+      display: grid !important;
+      align-content: space-between !important;
+      text-align: left !important;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04) !important;
+    }
+    body.tasks-page .task-chip.done {
+      background: linear-gradient(135deg, #ecfdf5, #d1fae5) !important;
+      border-color: #86efac !important;
+    }
+    body.tasks-page .task-chip.missing {
+      background: linear-gradient(135deg, #fff7ed, #fee2e2) !important;
+      border-color: #fca5a5 !important;
+    }
+    body.tasks-page .task-chip-top {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: flex-start !important;
+      gap: 12px !important;
+    }
+    body.tasks-page .task-chip-icon {
+      width: 38px !important;
+      height: 38px !important;
+      border-radius: 14px !important;
+      display: grid !important;
+      place-items: center !important;
+      margin: 0 !important;
+      color: #fff !important;
+      font-size: 1rem !important;
+    }
+    body.tasks-page .task-chip.done .task-chip-icon {
+      background: #10b981 !important;
+    }
+    body.tasks-page .task-chip.missing .task-chip-icon {
+      background: #ef4444 !important;
+    }
+    body.tasks-page .task-chip-badge {
+      border-radius: 999px !important;
+      padding: 5px 9px !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.64rem !important;
+      font-weight: 800 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.08em !important;
+      white-space: nowrap !important;
+    }
+    body.tasks-page .task-chip.done .task-chip-badge {
+      color: #065f46 !important;
+      background: rgba(16, 185, 129, 0.16) !important;
+    }
+    body.tasks-page .task-chip.missing .task-chip-badge {
+      color: #991b1b !important;
+      background: rgba(239, 68, 68, 0.14) !important;
+    }
+    body.tasks-page .task-chip-name {
+      font-size: 1.02rem !important;
+      margin: 16px 0 4px !important;
+    }
+    body.tasks-page .task-chip-label {
+      color: #64748b !important;
+      font-size: 0.78rem !important;
+    }
+    body.tasks-page .empty-chapter {
+      margin: 0 !important;
+      padding: 38px 24px !important;
+      text-align: center !important;
+      color: #64748b !important;
+    }
+    body.tasks-page .empty-chapter-icon {
+      width: 58px !important;
+      height: 58px !important;
+      display: grid !important;
+      place-items: center !important;
+      margin: 0 auto 14px !important;
+      border-radius: 20px !important;
+      background: #e5f7f3 !important;
+      color: #0b6f60 !important;
+      font-size: 1.4rem !important;
+    }
+    body.tasks-page footer {
+      background: transparent !important;
+      color: #64748b !important;
+    }
+    @media (max-width: 720px) {
+      body.tasks-page .subpage-header {
+        padding: 18px 14px 22px !important;
+      }
+      body.tasks-page .topbar {
+        margin-bottom: 8px !important;
+      }
+      body.tasks-page .subpage-hero h1 {
+        font-size: clamp(1.5rem, 6vw, 2rem) !important;
+      }
+      body.tasks-page main {
+        padding: 18px 14px 60px !important;
+      }
+      body.tasks-page .card,
+      body.tasks-page .profile-strip {
+        grid-template-columns: 1fr !important;
+      }
+      body.tasks-page .profile-summary {
+        min-width: 0 !important;
+        width: 100% !important;
+      }
+    }
+  </style>
   <script src="../shared/js/sidebar.js?v=20260626"></script>
 </head>
-<body class="track-page grade11-page" data-page="tasks">
-  <div class="placeholder-shell">
-    <header class="topbar">
-      <div class="brand">
-        <img src="../logo.jpg" alt="English Quest Logo"/>
-        <div>
-          <div class="brand-title">English Quest</div>
-          <div class="brand-sub">Grade 11 Student Track</div>
-        </div>
+<body class="grade11-subpage grade11-page tasks-page" data-page="tasks">
+
+<header class="subpage-header">
+  <div class="topbar">
+    <div class="brand">
+      <img src="../logo.jpg" alt="English Quest Logo"/>
+      <div>
+        <div class="brand-title">English Quest</div>
+        <div class="brand-sub">Grade 11 Student Track</div>
       </div>
-      <nav class="nav" aria-label="Main navigation">
-        <a href="index.html">Grade 11 Home</a>
-        <a href="dashboard.html">My Statistics</a>
-        <a href="strikes.html">My Strikes</a>
-        <a href="../index.html">Choose Grade</a>
-      </nav>
-    </header>
-
-    <main>
-      <section class="placeholder-hero">
-        <div>
-          <div class="kicker">Task Status</div>
-          <h1>Grade 11 task tracking will live here.</h1>
-          <p class="hero-copy">This page is ready for Grade 11 completion status, missing work, and task progress once the task data source is created.</p>
-        </div>
-        <aside class="placeholder-status-tile">
-          <div class="placeholder-label">Current Status</div>
-          <div class="placeholder-status-value">Task tracker is being prepared</div>
-        </aside>
-      </section>
-
-      <section class="placeholder-grid">
-        <article class="placeholder-card wide">
-          <div class="placeholder-card-label">Task Status</div>
-          <h2 class="placeholder-title">Your task progress will appear here.</h2>
-          <p class="placeholder-copy">Your completed and missing Grade 11 tasks will appear here after assignments are published.</p>
-          <div class="placeholder-readiness">Official Grade 11 data is not published yet. This page intentionally stays empty so it does not show Grade 10 or old-year records.</div>
-          <div class="placeholder-actions">
-            <a class="btn" href="submission.html">Submission</a>
-            <a class="btn ghost" href="index.html">Back to Grade 11</a>
-          </div>
-        </article>
-        <article class="placeholder-card">
-          <div class="placeholder-card-label">Coming Next</div>
-          <div class="placeholder-metric">Done tasks</div>
-          <div class="placeholder-metric">Missing tasks</div>
-          <div class="placeholder-metric">Unit status</div>
-        </article>
-      </section>
-    </main>
+    </div>
+    <nav class="nav" aria-label="Main navigation">
+      <a href="index.html">Grade 11 Home</a>
+      <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
+    </nav>
   </div>
 
-  <footer>© 2026 English Quest · Grade 11 Task Status</footer>
+  <section class="subpage-hero">
+    <div class="kicker">Task Status</div>
+    <h1>See which tasks are done and what still needs attention.</h1>
+    <p class="hero-copy">Students can check published task progress from a clean, read-only status view once the official roster is ready.</p>
+  </section>
+</header>
+
+<svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
+  <path fill="#07463d" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
+  <path fill="#F8FAFC" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
+</svg>
+
+<main>
+  <div class="subpage-inner">
+
+  <!-- ── STUDENT TAB ── -->
+  <div id="studentTab">
+    <div class="card">
+      <div>
+        <div class="card-title">Open your task tracker.</div>
+        <p class="picker-copy">Choose your class and name to see progress, missing work, and submitted tasks in one student-only view.</p>
+      </div>
+      <div class="picker-panel">
+        <div class="field"><label>Your Class</label>
+          <select id="sClassSelect" onchange="onSClassChange()">
+            <option value="">— Select your class —</option>
+          </select>
+        </div>
+        <div class="field"><label>Your Name</label>
+          <select id="sNameSelect" disabled><option>— Select class first —</option></select>
+        </div>
+        <button class="btn-primary" id="sViewBtn" onclick="viewTaskStatus()" disabled>View My Tasks</button>
+      </div>
+    </div>
+    <div id="studentResult"></div>
+  </div>
+
+  </div>
+</main>
+
+<footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+  let studentsCache = {};
+  const ROSTERS_READY = window.EQClasses ? EQClasses.rostersReady() : false;
+
+  // ── CACHE LAYER ─────────────────────────────────────────────
+  var CACHE_TTL = 30 * 60 * 1000;
+  function cacheKey(params) {
+    var sorted = Object.keys(params).sort();
+    return 'eq_cache_' + sorted.map(function(k) { return k + '=' + params[k]; }).join('_').replace(/[^a-zA-Z0-9_=]/g, '_');
+  }
+  function cacheGet(params) {
+    try {
+      var raw = localStorage.getItem(cacheKey(params));
+      if (!raw) return null;
+      var entry = JSON.parse(raw);
+      if (Date.now() - entry.ts > CACHE_TTL) { localStorage.removeItem(cacheKey(params)); return null; }
+      return entry.data;
+    } catch(e) { return null; }
+  }
+  function cacheSet(params, data) {
+    try { localStorage.setItem(cacheKey(params), JSON.stringify({ ts: Date.now(), data: data })); } catch(e) {}
+  }
+  async function cachedApiGet(params) {
+    var cached = cacheGet(params);
+    if (cached) {
+      EQApi.get(params).then(function(fresh) { cacheSet(params, fresh); }).catch(function() {});
+      return cached;
+    }
+    var data = await EQApi.get(params);
+    cacheSet(params, data);
+    return data;
+  }
+
+  function escapeHtml(value) {
+    if (window.EQStudent && typeof EQStudent.escapeHtml === 'function') {
+      return EQStudent.escapeHtml(value);
+    }
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+      return {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[ch];
+    });
+  }
+
+  function showPreRosterMessage(targetId) {
+    document.getElementById(targetId).innerHTML = '<div class="empty-chapter"><div class="empty-chapter-icon">&#128101;</div><div style="font-weight:800;margin-bottom:4px;color:#0f172a">Official roster not published yet</div><div>Task status will open after the new Grade 11 roster and task records are connected. This page is intentionally not showing old-year data.</div></div>';
+  }
+
+  function initClassOptions() {
+    if (window.EQClasses) {
+      EQClasses.fillSelect('sClassSelect', '11', '', '— Select your class —');
+    }
+  }
+
+
+  // ── STUDENT — LOAD NAMES ──────────────────────────────────────
+  async function onSClassChange() {
+    const cls = document.getElementById('sClassSelect').value;
+    const nameSelect = document.getElementById('sNameSelect');
+    const viewBtn    = document.getElementById('sViewBtn');
+    nameSelect.innerHTML = '<option>Loading...</option>';
+    nameSelect.disabled = true; viewBtn.disabled = true;
+    document.getElementById('studentResult').innerHTML = '';
+    if (!cls) { nameSelect.innerHTML = '<option>— Select class first —</option>'; return; }
+    if (!ROSTERS_READY) {
+      nameSelect.innerHTML = '<option value="">Roster not published yet</option>';
+      showPreRosterMessage('studentResult');
+      return;
+    }
+    try {
+      let data = studentsCache[cls];
+      if (!data) { data = await cachedApiGet({ action: 'getStudents', className: cls }); studentsCache[cls] = data; }
+      if (data && data.error) throw new Error(data.error);
+      const students = Array.isArray(data && data.students) ? data.students : [];
+      if (!students.length) {
+        nameSelect.innerHTML = '<option value="">Roster not published yet</option>';
+        document.getElementById('studentResult').innerHTML = '<div class="empty-chapter"><div class="empty-chapter-icon">&#128101;</div><div style="font-weight:800;margin-bottom:4px;color:#0f172a">Class roster not available yet</div><div>Your name will appear here after the official roster is published.</div></div>';
+        return;
+      }
+      nameSelect.innerHTML = '<option value="">— Select your name —</option>';
+      students.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.no;
+        opt.textContent = s.name + (s.nickname ? ' (' + s.nickname + ')' : '');
+        nameSelect.appendChild(opt);
+      });
+      nameSelect.disabled = false;
+      nameSelect.onchange = () => { viewBtn.disabled = !nameSelect.value; };
+    } catch(e) {
+      nameSelect.innerHTML = '<option value="">Roster temporarily unavailable</option>';
+      document.getElementById('studentResult').innerHTML = '<div class="empty-chapter"><div class="empty-chapter-icon">&#8635;</div><div style="font-weight:800;margin-bottom:4px;color:#0f172a">Roster could not be loaded</div><div>Please reload the page or try again later.</div></div>';
+    }
+  }
+
+  // ── STUDENT — VIEW TASKS ──────────────────────────────────────
+  async function viewTaskStatus() {
+    if (!ROSTERS_READY) {
+      showPreRosterMessage('studentResult');
+      return;
+    }
+    const cls = document.getElementById('sClassSelect').value;
+    const no  = document.getElementById('sNameSelect').value;
+    const clsLabel = document.getElementById('sClassSelect').options[document.getElementById('sClassSelect').selectedIndex].text;
+    if (!cls || !no) return;
+    document.getElementById('studentResult').innerHTML = '<div class="loading"><div class="spinner"></div><br/>Loading your tasks...</div>';
+    document.getElementById('sViewBtn').disabled = true;
+    document.getElementById('sViewBtn').textContent = '⏳ Loading...';
+    try {
+      // Load task status and submission status in parallel
+      const [data, subData] = await Promise.all([
+        cachedApiGet({ action: 'getTaskStatus', className: cls, studentNo: no }),
+        cachedApiGet({ action: 'getSubmissions' }).catch(function() { return null; })
+      ]);
+      if (data && data.error) throw new Error(data.error);
+
+      // Check whether the current unit submission has been received.
+      var hasSubmitted = false;
+      if (subData && subData.students && subData.students[cls]) {
+        var studentName = data.name || '';
+        var match = subData.students[cls].find(function(s) {
+          return s.name.toLowerCase() === studentName.toLowerCase() && s.submitted;
+        });
+        if (match) {
+          hasSubmitted = true;
+        }
+      }
+
+      renderStudentTasks(data, clsLabel, hasSubmitted);
+    } catch(e) {
+      document.getElementById('studentResult').innerHTML = '<div class="empty-chapter"><div class="empty-chapter-icon">&#8635;</div><div style="font-weight:800;margin-bottom:4px;color:#0f172a">Task status is temporarily unavailable</div><div>Your saved task records are safe. Please try again later.</div></div>';
+    }
+    finally { document.getElementById('sViewBtn').disabled = false; document.getElementById('sViewBtn').textContent = 'View My Tasks'; }
+  }
+
+  function renderStudentTasks(data, clsLabel, hasSubmitted) {
+    const tasks   = data.tasks || {};
+    const keys    = Object.keys(tasks);
+    const displayName = data.nickname || data.name || 'Student';
+    const fullName = data.name || displayName;
+    const initial = displayName ? displayName[0].toUpperCase() : '?';
+    const safeDisplayName = escapeHtml(displayName);
+    const safeFullName = escapeHtml(fullName);
+    const safeClassLabel = escapeHtml(clsLabel);
+    const safeInitial = escapeHtml(initial);
+
+    const ch4Keys = keys.filter(k => /^C4T/i.test(k));
+    const ch5Keys = keys.filter(k => /^C5T/i.test(k));
+    const allDone = keys.filter(k => tasks[k]).length;
+    const allTotal = keys.length;
+    const allMissing = Math.max(allTotal - allDone, 0);
+    const overallPct = allTotal > 0 ? Math.round((allDone / allTotal) * 100) : 0;
+
+    const makeProgress = (ckeys, label) => {
+      const done  = ckeys.filter(k => tasks[k]).length;
+      const total = ckeys.length;
+      const pct   = total > 0 ? Math.round((done / total) * 100) : 0;
+      const bar   = pct >= 80 ? '' : pct >= 50 ? 'warn' : 'bad';
+      const safeLabel = escapeHtml(label);
+      return `<div class="progress-section">
+        <div class="progress-label">
+          <div class="progress-title">${safeLabel} Progress</div>
+          <div class="progress-count">${done} / ${total} Done</div>
+        </div>
+        <div class="progress-bar-wrap"><div class="progress-bar-fill ${bar}" style="width:${pct}%"></div></div>
+      </div>`;
+    };
+
+    const makeChips = ckeys => ckeys.map(k => {
+      const isDone = tasks[k];
+      const m = k.match(/^C\d+T(\d+)$/i);
+      const taskName = m ? 'Task ' + m[1] : k;
+      return `<div class="task-chip ${isDone ? 'done' : 'missing'}">
+        <div class="task-chip-top">
+          <div class="task-chip-icon">${isDone ? '&#10003;' : '!'}</div>
+          <div class="task-chip-badge">${isDone ? 'Done' : 'Missing'}</div>
+        </div>
+        <div>
+          <div class="task-chip-name">${escapeHtml(taskName)}</div>
+          <div class="task-chip-label">${isDone ? 'Recorded as complete' : 'Needs attention'}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    const ch4Panel = ch4Keys.length
+      ? makeProgress(ch4Keys, 'Current Unit') +
+        (hasSubmitted ? '<div class="task-status-note"><span>&#10003;</span><div>You submitted this unit, so every current-unit task is recorded as done.</div></div>' : '') +
+        `<div class="tasks-section"><div class="tasks-grid">${makeChips(ch4Keys)}</div></div>`
+      : '<div class="empty-chapter"><div class="empty-chapter-icon">&#128203;</div><div>No current-unit tasks found.</div></div>';
+
+    const ch5Panel = ch5Keys.length
+      ? makeProgress(ch5Keys, 'Upcoming Unit') +
+        `<div class="tasks-section"><div class="tasks-grid">${makeChips(ch5Keys)}</div></div>`
+      : '<div class="empty-chapter"><div class="empty-chapter-icon">&#8635;</div><div style="font-weight:800;margin-bottom:4px;color:#0f172a">Upcoming tasks coming soon</div><div>Check back when the next unit begins.</div></div>';
+
+    document.getElementById('studentResult').innerHTML = `
+      <div class="status-card">
+        <div class="profile-strip">
+          <div class="avatar">${safeInitial}</div>
+          <div>
+            <div class="profile-name">${safeDisplayName}</div>
+            <div class="profile-meta">${safeFullName} · ${safeClassLabel}</div>
+          </div>
+          <div class="profile-summary">
+            <div class="summary-pill"><strong>${overallPct}%</strong><span>Overall</span></div>
+            <div class="summary-pill"><strong>${allDone}</strong><span>Done</span></div>
+            <div class="summary-pill"><strong>${allMissing}</strong><span>Missing</span></div>
+          </div>
+        </div>
+        <div class="ch-tabs-inner">
+          <button class="ch-tab-inner active" id="ctab4" onclick="switchChapterTab(4)">Current Unit</button>
+          <button class="ch-tab-inner" id="ctab5" onclick="switchChapterTab(5)">Upcoming Unit</button>
+        </div>
+        <div id="ctabPanel4">${ch4Panel}</div>
+        <div id="ctabPanel5" style="display:none">${ch5Panel}</div>
+      </div>`;
+  }
+
+  function switchChapterTab(ch) {
+    document.getElementById('ctab4').className = 'ch-tab-inner' + (ch === 4 ? ' active' : '');
+    document.getElementById('ctab5').className = 'ch-tab-inner' + (ch === 5 ? ' active' : '');
+    document.getElementById('ctabPanel4').style.display = ch === 4 ? '' : 'none';
+    document.getElementById('ctabPanel5').style.display = ch === 5 ? '' : 'none';
+  }
+
+  // ── TOAST ─────────────────────────────────────────────────────
+  function showToast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = 'toast ' + (type || '');
+    setTimeout(() => t.classList.add('show'), 10);
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function readSavedStudentProfile() {
+    var profile = EQStudent.read('11');
+    return {
+      classId: profile.classId,
+      studentNo: profile.studentNo
+    };
+  }
+
+  // Auto-select saved student — waits for page to be fully ready
+  document.addEventListener('DOMContentLoaded', function() {
+    initClassOptions();
+    if (!ROSTERS_READY) {
+      showPreRosterMessage('studentResult');
+      return;
+    }
+    var profile = readSavedStudentProfile();
+    var cls = profile.classId;
+    var no  = profile.studentNo;
+    if (!cls || !no) return;
+    var clsSel = document.getElementById('sClassSelect');
+    if (!clsSel) return;
+    clsSel.value = cls;
+    onSClassChange().then(function() {
+      var nameSel = document.getElementById('sNameSelect');
+      if (!nameSel) return;
+      nameSel.value = no;
+      var viewBtn = document.getElementById('sViewBtn');
+      if (viewBtn) { viewBtn.disabled = false; viewBtn.click(); }
+    }).catch(function(){});
+  });
+
+</script>
 
 </body>
 </html>

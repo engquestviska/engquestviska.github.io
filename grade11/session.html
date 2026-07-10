@@ -3,19 +3,45 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Grade 11 Reading · English Quest</title>
+  <title>Reading · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css?v=20260702"/>
   <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260702"/>
-  <link rel="stylesheet" href="../shared/css/grade11-subpages-20260612.css?v=20260702"/>
   <script src="../shared/js/classes-20260617.js?v=20260624"></script>
   <script src="../shared/js/student.js"></script>
+  <script src="../shared/js/api.js"></script>
   <script src="../shared/js/sidebar.js?v=20260626"></script>
 </head>
-<body class="track-page grade11-page" data-page="session">
-  <div class="placeholder-shell">
-    <header class="topbar">
+<body class="grade11-subpage grade11-page" data-page="session">
+  <div class="viewer-overlay hidden" id="pdfModal">
+    <div class="viewer-top">
+      <div class="viewer-title" id="pdfModalTitle">Reading Material</div>
+      <div class="viewer-actions">
+        <a class="btn primary" id="pdfModalDl" href="#" target="_blank" rel="noopener">Download</a>
+        <button class="round-close" onclick="closePdfModal()" aria-label="Close reading viewer">x</button>
+      </div>
+    </div>
+    <div class="viewer-frame">
+      <iframe id="pdfModalIframe" src="" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <div class="viewer-overlay hidden video-viewer" id="videoModal">
+    <div class="viewer-top">
+      <div class="viewer-title" id="videoModalTitle">Video Lesson</div>
+      <div class="viewer-actions">
+        <a class="btn danger" id="videoModalYt" href="#" target="_blank" rel="noopener">YouTube</a>
+        <button class="round-close" onclick="closeVideoModal()" aria-label="Close video player">x</button>
+      </div>
+    </div>
+    <div class="video-frame">
+      <iframe id="videoModalIframe" src="" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <header class="subpage-header">
+    <div class="topbar">
       <div class="brand">
         <img src="../logo.jpg" alt="English Quest Logo"/>
         <div>
@@ -25,47 +51,271 @@
       </div>
       <nav class="nav" aria-label="Main navigation">
         <a href="index.html">Grade 11 Home</a>
-        <a href="dashboard.html">My Statistics</a>
-        <a href="strikes.html">My Strikes</a>
-        <a href="../index.html">Choose Grade</a>
+        <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
       </nav>
-    </header>
+    </div>
 
-    <main>
-      <section class="placeholder-hero">
-        <div>
-          <div class="kicker">Reading</div>
-          <h1>Grade 11 reading texts will live here.</h1>
-          <p class="hero-copy">This page is prepared for reading passages, class texts, and session activities for the Grade 11 track.</p>
+    <section class="subpage-hero">
+      <div class="kicker">Reading</div>
+      <h1>Open class texts and video explanations in one place.</h1>
+      <p class="hero-copy">Reading materials and lesson videos stay organized for Grade 11 students.</p>
+    </section>
+  </header>
+
+  <main>
+    <section class="content-section" aria-labelledby="readingTitle">
+      <div class="content-section-head">
+        <div class="content-title-row">
+          <div class="content-badge">Reading</div>
+          <h2 class="content-title" id="readingTitle">Reading Material</h2>
         </div>
-        <aside class="placeholder-status-tile">
-          <div class="placeholder-label">Current Status</div>
-          <div class="placeholder-status-value">Reading space is being prepared</div>
-        </aside>
-      </section>
+      </div>
 
-      <section class="placeholder-grid">
-        <article class="placeholder-card wide">
-          <div class="placeholder-card-label">Reading</div>
-          <h2 class="placeholder-title">Your reading space is ready.</h2>
-          <p class="placeholder-copy">Your Grade 11 classroom texts, reading notes, and practice activities will appear here when published.</p>
-          <div class="placeholder-readiness">Official Grade 11 data is not published yet. This page intentionally stays empty so it does not show Grade 10 or old-year records.</div>
-          <div class="placeholder-actions">
-            <a class="btn" href="lessons.html">Lesson Materials</a>
-            <a class="btn ghost" href="index.html">Back to Grade 11</a>
+      <div class="material-grid" id="readingGrid">
+        <div class="empty-material-card" id="readingEmpty">
+          <div class="empty-material-icon">PDF</div>
+          <div>
+            <div class="empty-material-title">No Reading Yet</div>
+            <div class="empty-material-copy">Reading material will appear here soon.</div>
           </div>
-        </article>
-        <article class="placeholder-card">
-          <div class="placeholder-card-label">Coming Next</div>
-          <div class="placeholder-metric">Reading texts</div>
-          <div class="placeholder-metric">Session notes</div>
-          <div class="placeholder-metric">Class activities</div>
-        </article>
-      </section>
-    </main>
-  </div>
+          <div class="empty-material-badge">Empty</div>
+        </div>
+      </div>
+    </section>
 
-  <footer>© 2026 English Quest · Grade 11 Reading</footer>
+    <section class="content-section" aria-labelledby="videoTitle">
+      <div class="content-section-head">
+        <div class="content-title-row">
+          <div class="content-badge video-badge">Video</div>
+          <h2 class="content-title" id="videoTitle">Video Lesson</h2>
+        </div>
+      </div>
 
+      <div class="material-grid" id="videoGrid">
+        <div class="empty-material-card" id="videoEmpty">
+          <div class="empty-material-icon">YT</div>
+          <div>
+            <div class="empty-material-title">No Video Yet</div>
+            <div class="empty-material-copy">Lesson videos will appear here soon.</div>
+          </div>
+          <div class="empty-material-badge">Empty</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta</footer>
+
+  <script>
+    function safeDriveId(value) {
+      var id = String(value || '').trim();
+      return /^[A-Za-z0-9_-]+$/.test(id) ? id : '';
+    }
+
+    function safeYouTubeId(value) {
+      var id = String(value || '').trim();
+      return /^[A-Za-z0-9_-]{6,}$/.test(id) ? id : '';
+    }
+
+    function openPdf(title, fileId) {
+      fileId = safeDriveId(fileId);
+      if (!fileId) return;
+      document.getElementById('pdfModalTitle').textContent = title;
+      document.getElementById('pdfModalIframe').src = 'https://drive.google.com/file/d/' + fileId + '/preview';
+      document.getElementById('pdfModalDl').href = 'https://drive.google.com/uc?export=download&id=' + fileId;
+      document.getElementById('pdfModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePdfModal() {
+      document.getElementById('pdfModal').classList.add('hidden');
+      document.getElementById('pdfModalIframe').src = '';
+      document.body.style.overflow = '';
+    }
+
+    function openVideo(title, videoId) {
+      videoId = safeYouTubeId(videoId);
+      if (!videoId) return;
+      document.getElementById('videoModalTitle').textContent = title;
+      document.getElementById('videoModalIframe').src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0';
+      document.getElementById('videoModalYt').href = 'https://www.youtube.com/watch?v=' + videoId;
+      document.getElementById('videoModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeVideoModal() {
+      document.getElementById('videoModal').classList.add('hidden');
+      document.getElementById('videoModalIframe').src = '';
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('pdfModal').addEventListener('click', function(e) {
+      if (e.target === this) closePdfModal();
+    });
+
+    document.getElementById('videoModal').addEventListener('click', function(e) {
+      if (e.target === this) closeVideoModal();
+    });
+
+    function loadAll() {
+      EQApi.get({ action: 'getMaterials', chapter: 'reading' }).then(function(res) {
+        if (res.materials && res.materials.length > 0) {
+          res.materials.forEach(function(m) {
+            appendReadingCard(m.title, m.fileId);
+          });
+        }
+      }).catch(function() {});
+
+      EQApi.get({ action: 'getMaterials', chapter: 'video' }).then(function(res) {
+        if (res.materials && res.materials.length > 0) {
+          res.materials.forEach(function(m) {
+            appendVideoCard(m.title, m.fileId);
+          });
+        }
+      }).catch(function() {});
+    }
+
+    function appendReadingCard(title, fileId) {
+      fileId = safeDriveId(fileId);
+      if (!fileId) return;
+      if (document.querySelector('[data-reading-id="' + fileId + '"]')) return;
+      var empty = document.getElementById('readingEmpty');
+      if (empty) empty.remove();
+
+      var previewUrl = 'https://drive.google.com/file/d/' + fileId + '/preview';
+      var downloadUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
+      var card = document.createElement('article');
+      card.className = 'material-card';
+      card.setAttribute('data-reading-id', fileId);
+
+      var preview = document.createElement('div');
+      preview.className = 'material-preview';
+      var icon = document.createElement('span');
+      icon.className = 'material-icon';
+      icon.textContent = 'PDF';
+      var frame = document.createElement('iframe');
+      frame.src = previewUrl;
+      frame.title = title || 'Reading material';
+      var overlay = document.createElement('div');
+      overlay.className = 'material-overlay';
+      var overlayText = document.createElement('span');
+      overlayText.textContent = 'Read';
+      overlay.appendChild(overlayText);
+      preview.appendChild(icon);
+      preview.appendChild(frame);
+      preview.appendChild(overlay);
+      preview.onclick = function() { openPdf(title, fileId); };
+
+      var info = document.createElement('div');
+      info.className = 'material-info';
+      info.innerHTML =
+        '<div class="material-name"></div>' +
+        '<div class="material-meta">PDF · Reading Material</div>' +
+        '<div class="material-actions"></div>';
+      info.querySelector('.material-name').textContent = title;
+
+      var actions = info.querySelector('.material-actions');
+      var btnView = document.createElement('button');
+      btnView.className = 'btn';
+      btnView.textContent = 'Read';
+      btnView.onclick = function() { openPdf(title, fileId); };
+      var btnDownload = document.createElement('a');
+      btnDownload.className = 'btn primary icon-btn';
+      btnDownload.href = downloadUrl;
+      btnDownload.target = '_blank';
+      btnDownload.rel = 'noopener';
+      btnDownload.textContent = '↓';
+      actions.appendChild(btnView);
+      actions.appendChild(btnDownload);
+
+      card.appendChild(preview);
+      card.appendChild(info);
+      document.getElementById('readingGrid').appendChild(card);
+    }
+
+    function showReadingEmptyIfNeeded() {
+      var grid = document.getElementById('readingGrid');
+      if (!grid || grid.children.length > 0) return;
+      var empty = document.createElement('div');
+      empty.className = 'empty-material-card';
+      empty.id = 'readingEmpty';
+      empty.innerHTML = '<div class="empty-material-icon">PDF</div><div><div class="empty-material-title">No Reading Yet</div><div class="empty-material-copy">Reading material will appear here soon.</div></div><div class="empty-material-badge">Empty</div>';
+      grid.appendChild(empty);
+    }
+
+    function appendVideoCard(title, videoId) {
+      videoId = safeYouTubeId(videoId);
+      if (!videoId) return;
+      if (document.querySelector('[data-video-id="' + videoId + '"]')) return;
+      var empty = document.getElementById('videoEmpty');
+      if (empty) empty.remove();
+
+      var thumbUrl = 'https://img.youtube.com/vi/' + videoId + '/hqdefault.jpg';
+      var ytUrl = 'https://www.youtube.com/watch?v=' + videoId;
+      var card = document.createElement('article');
+      card.className = 'material-card video-card';
+      card.setAttribute('data-video-id', videoId);
+
+      var preview = document.createElement('div');
+      preview.className = 'video-preview';
+      var thumb = document.createElement('img');
+      thumb.src = thumbUrl;
+      thumb.alt = title || 'Video lesson';
+      thumb.onerror = function() { this.style.display = 'none'; };
+      var play = document.createElement('div');
+      play.className = 'video-play';
+      var playText = document.createElement('span');
+      playText.textContent = 'Play';
+      play.appendChild(playText);
+      preview.appendChild(thumb);
+      preview.appendChild(play);
+      preview.onclick = function() { openVideo(title, videoId); };
+
+      var info = document.createElement('div');
+      info.className = 'material-info';
+      info.innerHTML =
+        '<div class="material-name"></div>' +
+        '<div class="material-meta">YouTube · Video Lesson</div>' +
+        '<div class="material-actions"></div>';
+      info.querySelector('.material-name').textContent = title;
+
+      var actions = info.querySelector('.material-actions');
+      var btnWatch = document.createElement('button');
+      btnWatch.className = 'btn';
+      btnWatch.textContent = 'Watch';
+      btnWatch.onclick = function() { openVideo(title, videoId); };
+      var btnYt = document.createElement('a');
+      btnYt.className = 'btn danger icon-btn';
+      btnYt.href = ytUrl;
+      btnYt.target = '_blank';
+      btnYt.rel = 'noopener';
+      btnYt.textContent = '↗';
+      actions.appendChild(btnWatch);
+      actions.appendChild(btnYt);
+
+      card.appendChild(preview);
+      card.appendChild(info);
+      document.getElementById('videoGrid').appendChild(card);
+    }
+
+    function showVideoEmptyIfNeeded() {
+      var grid = document.getElementById('videoGrid');
+      if (!grid || grid.children.length > 0) return;
+      var empty = document.createElement('div');
+      empty.className = 'empty-material-card';
+      empty.id = 'videoEmpty';
+      empty.innerHTML = '<div class="empty-material-icon">YT</div><div><div class="empty-material-title">No Video Yet</div><div class="empty-material-copy">Lesson videos will appear here soon.</div></div><div class="empty-material-badge">Empty</div>';
+      grid.appendChild(empty);
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closePdfModal();
+        closeVideoModal();
+      }
+    });
+
+    loadAll();
+  </script>
 </body>
 </html>

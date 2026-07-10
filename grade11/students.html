@@ -3,69 +3,966 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Grade 11 Students · English Quest</title>
+  <title>Student List · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple: #0f8a78;
+      --purple-light: #46c5b3;
+      --purple-soft: #e5f7f3;
+      --purple-mid: #8fd9cd;
+      --white: #FFFFFF;
+      --off-white: #F8FAFC;
+      --text-dark: #0F172A;
+      --text-muted: #475569;
+      --border: #e5f7f3;
+      --accent: #F59E0B;
+    }
+
+    body {
+      font-family: 'IBM Plex Sans', sans-serif;
+      background: var(--off-white);
+      color: var(--text-dark);
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, #0f8a78 0%, #0b6f60 50%, #07463d 100%);
+      padding: 36px 24px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.10) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 20px; left: 20px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      padding: 7px 16px;
+      border-radius: 999px;
+      text-decoration: none;
+      transition: background 0.2s;
+      z-index: 2;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.25); }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 800;
+      color: #fff;
+      position: relative;
+      z-index: 1;
+    }
+
+    header h1 span { color: var(--accent); }
+
+    .header-sub {
+      color: rgba(255,255,255,0.7);
+      font-size: 0.9rem;
+      margin-top: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── WAVE ── */
+    .wave { display: block; width: 100%; margin-top: -2px; }
+
+    /* ── SEARCH + FILTER ── */
+    .controls {
+      max-width: 900px;
+      margin: 32px auto 0;
+      padding: 0 24px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .search-wrap {
+      flex: 1;
+      min-width: 220px;
+      position: relative;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      padding: 11px 16px 11px 40px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.9rem;
+      background: var(--white);
+      color: var(--text-dark);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-wrap input:focus {
+      border-color: var(--purple-light);
+      box-shadow: 0 0 0 3px rgba(15, 138, 120,0.1);
+    }
+
+    .search-wrap::before {
+      content: '🔍';
+      position: absolute;
+      left: 13px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    .filter-select {
+      padding: 11px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.88rem;
+      background: var(--white);
+      color: var(--text-dark);
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .filter-select:focus { border-color: var(--purple-light); }
+
+    .count-badge {
+      background: var(--purple-soft);
+      color: var(--purple);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 900px;
+      margin: 28px auto 80px;
+      padding: 0 24px;
+    }
+
+    /* ── CLASS SECTION ── */
+    .class-section { margin-bottom: 40px; }
+
+    .class-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .class-badge {
+      background: linear-gradient(135deg, var(--purple), var(--purple-light));
+      color: #fff;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 5px 16px;
+      border-radius: 999px;
+    }
+
+    .class-count {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* ── LIST ── */
+    .student-list {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .student-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 20px;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+
+    .student-item:last-child { border-bottom: none; }
+    .student-item:hover { background: var(--purple-soft); }
+
+    .student-item.hidden { display: none; }
+
+    .student-num {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--purple-light);
+      width: 24px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .student-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--purple-mid);
+      flex-shrink: 0;
+    }
+
+    .student-name {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-dark);
+      letter-spacing: 0.01em;
+    }
+
+    /* ── NO RESULTS ── */
+    .no-results {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--text-dark);
+      color: rgba(255,255,255,0.5);
+      text-align: center;
+      padding: 24px;
+      font-size: 0.82rem;
+    }
+    footer strong { color: var(--purple-light); }
+
+    @media (max-width: 600px) {
+      .controls { flex-direction: column; }
+      .filter-select, .search-wrap { width: 100%; }
+    }
+
+    /* ── ACTIVENESS MODAL ── */
+    .act-overlay { position: fixed; inset: 0; background: rgba(15,10,40,0.75); backdrop-filter: blur(8px); z-index: 100; display: flex; align-items: flex-end; justify-content: center; padding: 0; }
+    .act-overlay.hidden { display: none; }
+    .act-sheet {
+      background: #1A1230; border-radius: 28px 28px 0 0; width: 100%; max-width: 500px;
+      padding: 0 0 32px; animation: slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      border: 1px solid #2E2250; border-bottom: none;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .act-sheet-handle { width: 40px; height: 4px; background: #3D2E6B; border-radius: 999px; margin: 12px auto 0; }
+    .act-sheet-head { padding: 20px 24px 16px; border-bottom: 1px solid #2E2250; display: flex; align-items: center; gap: 14px; }
+    .act-avatar { width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg, #0f8a78, #0b6f60); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 800; color: #fff; flex-shrink: 0; font-family: 'Playfair Display', serif; }
+    .act-sheet-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: #F1EEFF; line-height: 1.2; }
+    .act-sheet-sub { font-size: 0.78rem; color: #7C6FA0; margin-top: 2px; }
+    .act-close { margin-left: auto; width: 32px; height: 32px; border-radius: 50%; background: #241A3A; border: 1px solid #2E2250; color: #7C6FA0; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .act-close:hover { color: #F1EEFF; }
+
+    /* Progress bar */
+    .act-progress { padding: 16px 24px; border-bottom: 1px solid #2E2250; }
+    .act-prog-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .act-prog-label { font-size: 0.78rem; color: #7C6FA0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+    .act-prog-count { font-size: 0.88rem; font-weight: 700; color: #46c5b3; }
+    .act-bar-wrap { background: #241A3A; border-radius: 999px; height: 8px; overflow: hidden; }
+    .act-bar-fill { height: 8px; border-radius: 999px; background: linear-gradient(90deg, #8B5CF6, #46c5b3); transition: width 0.7s ease; }
+
+    /* Stat items */
+    .act-stats { padding: 14px 20px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .act-stat-card { background: #241A3A; border: 1px solid #2E2250; border-radius: 14px; padding: 12px 14px; }
+    .act-stat-top { display: flex; align-items: center; gap: 7px; margin-bottom: 8px; }
+    .act-stat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .act-stat-label { font-size: 0.72rem; color: #7C6FA0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; line-height: 1.2; }
+    .act-stat-nums { display: flex; justify-content: space-between; align-items: flex-end; }
+    .act-stat-times { font-size: 1.2rem; font-weight: 800; color: #F1EEFF; font-family: 'Playfair Display', serif; line-height: 1; }
+    .act-stat-times span { font-size: 0.65rem; color: #7C6FA0; font-weight: 500; font-family: 'IBM Plex Sans', sans-serif; display: block; margin-top: 2px; }
+    .act-stat-pts { text-align: right; }
+    .act-stat-pts-val { font-size: 0.88rem; font-weight: 700; font-family: 'IBM Plex Mono', monospace; }
+    .act-stat-pts-label { font-size: 0.6rem; color: #7C6FA0; margin-top: 1px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+    /* Info box */
+    .act-info-box { margin: 14px 20px 0; background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.2); border-radius: 12px; padding: 10px 14px; }
+    .act-info-title { font-size: 0.7rem; font-weight: 700; color: #46c5b3; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+    .act-info-rows { display: flex; flex-direction: column; gap: 3px; }
+    .act-info-row { display: flex; justify-content: space-between; font-size: 0.72rem; color: #7C6FA0; }
+    .act-info-row span:last-child { color: #A79FC0; font-family: 'IBM Plex Mono', monospace; font-weight: 600; }
+
+    /* Indicator badge */
+    .act-indicator { margin: 16px 24px 0; padding: 10px 16px; border-radius: 12px; font-size: 0.82rem; font-weight: 700; text-align: center; }
+    .ind-promax  { background: linear-gradient(135deg,rgba(139,92,246,0.3),rgba(239,68,68,0.2)); color: #fff; border: 1px solid rgba(139,92,246,0.6); font-weight:800; }
+    .ind-ultrapro { background: linear-gradient(135deg,rgba(239,68,68,0.2),rgba(251,191,36,0.2)); color: #FCA5A5; border: 1px solid rgba(239,68,68,0.5); }
+    .ind-ultra  { background: linear-gradient(135deg,rgba(239,68,68,0.15),rgba(251,191,36,0.15)); color: #F97316; border: 1px solid rgba(249,115,22,0.5); }
+    .ind-hyper  { background: rgba(251,191,36,0.15); color: #FBBF24; border: 1px solid rgba(251,191,36,0.4); }
+    .ind-super  { background: rgba(16,185,129,0.15);  color: #10B981; border: 1px solid rgba(16,185,129,0.3); }
+    .ind-active { background: rgba(139,92,246,0.15);  color: #46c5b3; border: 1px solid rgba(139,92,246,0.3); }
+    .ind-okay   { background: rgba(245,158,11,0.15);  color: #F59E0B; border: 1px solid rgba(245,158,11,0.3); }
+    .ind-not    { background: rgba(239,68,68,0.1);    color: #EF4444; border: 1px solid rgba(239,68,68,0.2); }
+
+    .act-loading { text-align: center; padding: 40px; color: #7C6FA0; font-size: 0.9rem; }
+    .act-spinner { display: inline-block; width: 22px; height: 22px; border: 2px solid #2E2250; border-top-color: #8B5CF6; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 10px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .student-item { cursor: pointer; }
+    .student-item .student-name::after { content: ' ›'; font-size: 0.75rem; color: var(--purple-light); opacity: 0; transition: opacity 0.15s; }
+    .student-item:hover .student-name::after { opacity: 1; }
+
+
+    /* ── SIDEBAR (shared) ───────────────────────────────────── */
+    .hamburger { position:absolute; top:20px; right:20px; z-index:10; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); border-radius:10px; width:40px; height:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; cursor:pointer; padding:0; }
+    .hamburger span { display:block; width:18px; height:2px; background:#fff; border-radius:999px; transition:all 0.3s; }
+    .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity:0; }
+    .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+    .sidebar-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.6); backdrop-filter:blur(6px); z-index:300; opacity:0; pointer-events:none; transition:opacity 0.3s; }
+    .sidebar-overlay.open { opacity:1; pointer-events:all; }
+    .sidebar { position:fixed; top:0; right:0; height:100%; width:min(320px,85vw); background:#0F172A; z-index:301; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.34,1.1,0.64,1); display:flex; flex-direction:column; overflow-y:auto; }
+    .sidebar.open { transform:translateX(0); }
+    .sidebar-head { padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; gap:12px; }
+    .sidebar-logo { width:36px; height:36px; border-radius:10px; object-fit:cover; }
+    .sidebar-head-text { flex:1; }
+    .sidebar-head-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:800; color:#fff; }
+    .sidebar-head-sub { font-size:0.7rem; color:rgba(255,255,255,0.45); margin-top:1px; }
+    .sidebar-close { width:38px; min-width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.08); border:none; color:rgba(255,255,255,0.5); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
+    .sidebar-section { padding:14px 16px 4px; }
+    .sidebar-section-label { font-size:0.65rem; font-weight:700; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.12em; font-family:'IBM Plex Mono',monospace; padding:0 4px; margin-bottom:6px; }
+    .sidebar-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; text-decoration:none; transition:background 0.15s; margin-bottom:2px; }
+    .sidebar-item:hover, .sidebar-item:active { background:rgba(255,255,255,0.08); }
+    .sidebar-item.active { background:rgba(255,255,255,0.12); border-left:3px solid #46c5b3; padding-left:9px; }
+    .sidebar-item-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0; }
+    .sidebar-item-name { font-size:0.88rem; font-weight:600; color:#fff; flex:1; }
+    .sidebar-item-badge { font-size:0.6rem; font-weight:800; padding:2px 7px; border-radius:999px; font-family:'IBM Plex Mono',monospace; background:#F59E0B; color:#fff; }
+    .sidebar-divider { height:1px; background:rgba(255,255,255,0.07); margin:8px 16px; }
+    .sidebar-home-btn { display:flex; align-items:center; gap:10px; margin:12px 16px 4px; padding:11px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:12px; text-decoration:none; }
+    .sidebar-home-btn:hover { background:rgba(255,255,255,0.1); }
+    .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
+    .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
+
+  </style>
   <link rel="stylesheet" href="../shared/css/system.css?v=20260702"/>
   <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260702"/>
-  <link rel="stylesheet" href="../shared/css/grade11-subpages-20260612.css?v=20260702"/>
+  <style>
+    /* Keep the redesigned directory stable even if preview CSS is cached. */
+    body.student-directory-page main {
+      width: auto !important;
+      max-width: none !important;
+      margin-top: 0 !important;
+      margin-right: 0 !important;
+      margin-bottom: 0 !important;
+      padding: 40px 22px 84px !important;
+    }
+    body.student-directory-page .student-controls,
+    body.student-directory-page .class-section,
+    body.student-directory-page .no-results {
+      width: min(1120px, 100%) !important;
+      margin-left: auto !important;
+      margin-right: auto !important;
+    }
+    body.student-directory-page .subpage-header {
+      padding: 24px 28px 28px !important;
+      background: linear-gradient(125deg, #0f8a78 0%, #0b6f60 55%, #07463d 100%) !important;
+      border-bottom: 0 !important;
+    }
+    body.student-directory-page .subpage-header .topbar,
+    body.student-directory-page .subpage-hero {
+      width: 100% !important;
+      max-width: 1120px !important;
+      margin-inline: auto !important;
+    }
+    body.student-directory-page .brand-title,
+    body.student-directory-page .brand-sub,
+    body.student-directory-page .subpage-hero,
+    body.student-directory-page .subpage-hero h1,
+    body.student-directory-page .hero-copy { color: #fff !important; }
+    body.student-directory-page .kicker { color: #c9efe8 !important; }
+    body.student-directory-page .nav a {
+      color: #fff !important;
+      background: rgba(255, 255, 255, 0.14) !important;
+      border-color: rgba(255, 255, 255, 0.35) !important;
+    }
+    body.student-directory-page .class-section {
+      border: 1.5px solid #e5f7f3 !important;
+      border-radius: 26px !important;
+      background: rgba(255, 255, 255, 0.92) !important;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.06) !important;
+      padding: 18px !important;
+    }
+    body.student-directory-page .class-header {
+      justify-content: space-between !important;
+      margin-bottom: 16px !important;
+    }
+    body.student-directory-page .student-controls {
+      display: grid !important;
+      grid-template-columns: minmax(0, 1fr) minmax(150px, 0.35fr) auto !important;
+      align-items: center !important;
+      gap: 12px !important;
+    }
+    body.student-directory-page .student-controls .search-wrap,
+    body.student-directory-page .student-controls .filter-select,
+    body.student-directory-page .student-controls .count-badge {
+      min-width: 0 !important;
+    }
+    body.student-directory-page .student-controls .filter-select {
+      width: 100% !important;
+    }
+    body.student-directory-page .student-list {
+      display: grid !important;
+      gap: 10px !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+    body.student-directory-page .student-item {
+      display: grid !important;
+      grid-template-columns: 48px minmax(0, 1fr) auto !important;
+      align-items: center !important;
+      gap: 14px !important;
+      border: 1.5px solid #e5f7f3 !important;
+      border-radius: 18px !important;
+      background: linear-gradient(135deg, rgba(239, 246, 255, 0.72), rgba(255, 255, 255, 0.98)) !important;
+      padding: 13px 14px !important;
+    }
+    body.student-directory-page .student-avatar {
+      width: 48px !important;
+      height: 48px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border-radius: 16px !important;
+      background: #0f8a78 !important;
+      color: #fff !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.78rem !important;
+      font-weight: 800 !important;
+    }
+    body.student-directory-page .student-main {
+      display: grid !important;
+      gap: 5px !important;
+      min-width: 0 !important;
+    }
+    body.student-directory-page .student-name {
+      display: block !important;
+      color: #0f172a !important;
+      font-size: 0.98rem !important;
+      font-weight: 800 !important;
+      line-height: 1.35 !important;
+      overflow-wrap: anywhere !important;
+    }
+    body.student-directory-page .student-name::after {
+      content: none !important;
+    }
+    body.student-directory-page .student-meta {
+      display: flex !important;
+      flex-wrap: wrap !important;
+      gap: 6px !important;
+    }
+    body.student-directory-page .student-meta span {
+      display: inline-flex !important;
+      align-items: center !important;
+      border-radius: 999px !important;
+      background: #eef6ff !important;
+      color: #475569 !important;
+      padding: 4px 8px !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.66rem !important;
+      font-weight: 800 !important;
+    }
+    body.student-directory-page .student-action {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      min-width: 66px !important;
+      border-radius: 999px !important;
+      background: #e5f7f3 !important;
+      color: #07463d !important;
+      padding: 8px 12px !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.68rem !important;
+      font-weight: 800 !important;
+      text-transform: uppercase !important;
+      white-space: nowrap !important;
+    }
+    @media (max-width: 640px) {
+      body.student-directory-page .student-controls {
+        grid-template-columns: 1fr !important;
+      }
+      body.student-directory-page .student-controls .count-badge {
+        justify-self: stretch !important;
+        text-align: center !important;
+      }
+    }
+  </style>
   <script src="../shared/js/classes-20260617.js?v=20260624"></script>
   <script src="../shared/js/student.js"></script>
+  <script src="../shared/js/api.js"></script>
   <script src="../shared/js/sidebar.js?v=20260626"></script>
 </head>
-<body class="track-page grade11-page" data-page="students">
-  <div class="placeholder-shell">
-    <header class="topbar">
-      <div class="brand">
-        <img src="../logo.jpg" alt="English Quest Logo"/>
-        <div>
-          <div class="brand-title">English Quest</div>
-          <div class="brand-sub">Grade 11 Student Track</div>
-        </div>
+<body class="grade11-subpage grade11-page student-directory-page" data-page="students">
+
+<header class="subpage-header">
+  <div class="topbar">
+    <div class="brand">
+      <img src="../logo.jpg" alt="English Quest Logo"/>
+      <div>
+        <div class="brand-title">English Quest</div>
+        <div class="brand-sub">Grade 11 Student Track</div>
       </div>
-      <nav class="nav" aria-label="Main navigation">
-        <a href="index.html">Grade 11 Home</a>
-        <a href="dashboard.html">My Statistics</a>
-        <a href="strikes.html">My Strikes</a>
-        <a href="../index.html">Choose Grade</a>
-      </nav>
-    </header>
-
-    <main>
-      <section class="placeholder-hero">
-        <div>
-          <div class="kicker">Student List</div>
-          <h1>Grade 11 roster data will appear here.</h1>
-          <p class="hero-copy">Find your Grade 11 classmates here after the official class roster is published.</p>
-        </div>
-        <aside class="placeholder-status-tile">
-          <div class="placeholder-label">Current Status</div>
-          <div class="placeholder-status-value">Class roster is being prepared</div>
-        </aside>
-      </section>
-
-      <section class="placeholder-grid">
-        <article class="placeholder-card wide">
-          <div class="placeholder-card-label">Roster</div>
-          <h2 class="placeholder-title">Your class roster will appear here.</h2>
-          <p class="placeholder-copy">Your Grade 11 classmates will appear here after the official class roster is available.</p>
-          <div class="placeholder-readiness">Official Grade 11 data is not published yet. This page intentionally stays empty so it does not show Grade 10 or old-year records.</div>
-          <div class="placeholder-actions">
-            <a class="btn" href="attendance.html">Attendance</a>
-            <a class="btn ghost" href="index.html">Back to Grade 11</a>
-          </div>
-        </article>
-        <article class="placeholder-card">
-          <div class="placeholder-card-label">Coming Next</div>
-          <div class="placeholder-metric">XI F-7 roster</div>
-          <div class="placeholder-metric">XI F-8 roster</div>
-          <div class="placeholder-metric">XI F-9 roster</div>
-        </article>
-      </section>
-    </main>
+    </div>
+    <nav class="nav" aria-label="Main navigation">
+      <a href="index.html">Grade 11 Home</a>
+      <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
+    </nav>
   </div>
 
-  <footer>© 2026 English Quest · Grade 11 Students</footer>
+  <section class="subpage-hero">
+    <div class="kicker">Student List</div>
+    <h1>Find every Grade 11 student by class.</h1>
+    <p class="hero-copy">Search the student directory, filter by class, and open activeness stats from each student row.</p>
+  </section>
+</header>
+
+<main id="mainContent">
+  <section class="content-section student-controls" aria-label="Student filters">
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="Search student name..." oninput="filterStudents()"/>
+    </div>
+    <select class="filter-select" id="classFilter" onchange="filterStudents()">
+      <option value="">All Classes</option>
+    </select>
+    <div class="count-badge" id="countBadge">Loading...</div>
+  </section>
+
+  <div id="noResults" class="no-results">No students match the current search.</div>
+  <div id="classDirectory"></div>
+
+</main>
+
+<footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta</footer>
+
+<script>
+function displayClassLabel(id) {
+  var shortLabel = window.EQClasses ? EQClasses.shortLabelFor(id) : id;
+  return String(shortLabel || id || '').replace(/^XE(\d+)$/, 'XE-$1');
+}
+
+function normalizeClassId(value) {
+  var raw = String(value || '').trim();
+  if (!raw) return '';
+  if (window.EQClasses && EQClasses.exists(raw)) return raw;
+  var compact = raw.replace(/^XE-(\d+)$/i, 'XE$1').toUpperCase();
+  return compact;
+}
+
+const classItems = window.EQClasses
+  ? EQClasses.listForGrade('11').map(item => ({ id: item.id, label: displayClassLabel(item.id) }))
+  : ['XIF7', 'XIF8', 'XIF9'].map(id => ({ id, label: displayClassLabel(id) }));
+const classes = classItems.map(item => item.id);
+const classLabels = classItems.reduce((labels, item) => {
+  labels[item.id] = item.label;
+  return labels;
+}, {});
+let totalStudents = 0;
+
+// Will be called after apiGet is defined below
+
+function buildClassDirectory() {
+  const filter = document.getElementById('classFilter');
+  const directory = document.getElementById('classDirectory');
+  classItems.forEach(item => {
+    filter.options.add(new Option(item.label, item.id));
+  });
+  directory.innerHTML = classItems.map(item => `
+    <section class="class-section" data-class="${item.id}">
+      <div class="class-header">
+        <span class="class-badge">${item.label}</span>
+        <span class="class-count" id="count-${item.id}">Waiting for roster</span>
+      </div>
+      <div class="student-list" id="list-${item.id}"></div>
+    </section>
+  `).join('');
+}
+
+function escapeHtml(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+    return {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    }[ch];
+  });
+}
+
+function safeNumber(value) {
+  var n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function renderStudentClass(cls, students) {
+  const list = document.getElementById('list-' + cls);
+  list.innerHTML = '';
+  if (!students.length) {
+    list.innerHTML = '<div style="padding:20px;color:var(--text-muted);font-size:0.9rem;">The official roster for this class has not been published yet.</div>';
+  }
+  students.forEach((s, i) => {
+    const name = s.name || '';
+    const initials = name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase() || '?';
+    const safeName = escapeHtml(name);
+    const safeInitials = escapeHtml(initials);
+    const safeClass = escapeHtml(classLabels[cls] || displayClassLabel(cls));
+    const safeNickname = escapeHtml(s.nickname || '');
+    const item = document.createElement('div');
+    item.className = 'student-item';
+    item.dataset.name  = name.toLowerCase();
+    item.dataset.class = cls;
+    item.innerHTML = `
+      <span class="student-avatar">${safeInitials}</span>
+      <span class="student-main">
+        <span class="student-name">${safeName}</span>
+        <span class="student-meta">
+          <span>No. ${i + 1}</span>
+          <span>${safeClass}</span>
+          ${s.nickname ? '<span>' + safeNickname + '</span>' : ''}
+        </span>
+      </span>
+      <span class="student-action">Stats</span>
+    `;
+    item.addEventListener('click', () => openActModal(name, cls));
+    list.appendChild(item);
+  });
+  document.getElementById('count-' + cls).textContent = students.length + ' students';
+  totalStudents += students.length;
+}
+
+function autoOpenSavedStudent() {
+  const saved = EQStudent.read('11');
+
+  if (saved.classId && saved.studentName) {
+    openActModal(saved.studentName, normalizeClassId(saved.classId));
+  }
+}
+
+function loadAllStudents() {
+  totalStudents = 0;
+  classes.forEach(cls => {
+    document.getElementById('list-' + cls).innerHTML = '<div style="padding:20px;color:var(--text-muted);font-size:0.9rem;">Loading class roster...</div>';
+  });
+  document.getElementById('countBadge').textContent = 'Loading...';
+
+  // Check cache first — render instantly if available
+  var cachedAny = false;
+  classes.forEach(cls => {
+    var params = { action: 'getStudents', className: cls };
+    var cached = cacheGet(params);
+    if (cached && cached.students) {
+      renderStudentClass(cls, cached.students);
+      cachedAny = true;
+    }
+  });
+
+  if (cachedAny) {
+    document.getElementById('countBadge').textContent = totalStudents + ' students';
+    updateCount();
+    autoOpenSavedStudent();
+  }
+
+  // Always fetch fresh in background (or foreground if no cache)
+  Promise.all(classes.map(cls => {
+    var params = { action: 'getStudents', className: cls };
+    return EQApi.get(params)
+      .then(res => {
+        if (res && res.error) throw new Error(res.error);
+        cacheSet(params, res);
+        return { cls, students: (res && res.students) || [], failed: false };
+      })
+      .catch(() => ({ cls, students: [], failed: true }));
+  })).then(results => {
+    totalStudents = 0;
+    results.forEach(({ cls, students }) => renderStudentClass(cls, students));
+    const failedCount = results.filter(result => result.failed).length;
+    document.getElementById('countBadge').textContent = failedCount === results.length
+      ? 'Roster unavailable'
+      : totalStudents + ' students';
+    updateCount();
+    autoOpenSavedStudent();
+  }).catch(() => {
+    if (!cachedAny) document.getElementById('countBadge').textContent = 'Roster unavailable';
+  });
+}
+
+function filterStudents() {
+  const query = document.getElementById('searchInput').value.toLowerCase().trim();
+  const cls   = document.getElementById('classFilter').value;
+  let visible = 0;
+
+  classes.forEach(c => {
+    const section = document.querySelector(`.class-section[data-class="${c}"]`);
+    const items   = section.querySelectorAll('.student-item');
+    let sectionVisible = 0;
+
+    items.forEach(item => {
+      const nameMatch  = !query || item.dataset.name.includes(query);
+      const classMatch = !cls   || item.dataset.class === cls;
+      if (nameMatch && classMatch) {
+        item.classList.remove('hidden');
+        sectionVisible++;
+        visible++;
+      } else {
+        item.classList.add('hidden');
+      }
+    });
+    section.style.display = (cls && cls !== c) ? 'none' : (sectionVisible === 0 && query ? 'none' : '');
+  });
+
+  document.getElementById('noResults').style.display = visible === 0 ? 'block' : 'none';
+  updateCount(visible);
+}
+
+function updateCount(n) {
+  if (n !== undefined) {
+    document.getElementById('countBadge').textContent = n + ' students';
+  }
+}
+
+// ── ACTIVENESS STATS ──────────────────────────────────────────
+
+// ── CACHE LAYER ───────────────────────────────────────────────
+var CACHE_TTL = 30 * 60 * 1000; // 30 minutes
+
+function cacheKey(params) {
+  var sorted = Object.keys(params).sort();
+  var parts = sorted.map(function(k) { return k + '=' + params[k]; });
+  return 'eq_cache_' + parts.join('_').replace(/[^a-zA-Z0-9_=]/g, '_');
+}
+
+function cacheGet(params) {
+  try {
+    var raw = localStorage.getItem(cacheKey(params));
+    if (!raw) return null;
+    var entry = JSON.parse(raw);
+    if (Date.now() - entry.ts > CACHE_TTL) { localStorage.removeItem(cacheKey(params)); return null; }
+    return entry.data;
+  } catch(e) { return null; }
+}
+
+function cacheSet(params, data) {
+  try { localStorage.setItem(cacheKey(params), JSON.stringify({ ts: Date.now(), data: data })); } catch(e) {}
+}
+
+const activenessCache = {};
+
+// Placeholder-safe: only load the real roster once it is officially published.
+// Until then we do NOT fetch or show any (old-year) student names.
+if (window.EQClasses && typeof EQClasses.rostersReady === 'function' && EQClasses.rostersReady()) {
+  buildClassDirectory();
+  loadAllStudents();
+} else if (window.EQClasses && typeof EQClasses.numberedRosterMode === 'function' && EQClasses.numberedRosterMode()) {
+  showNumberedDirectory();
+} else {
+  showPreRosterDirectory();
+}
+
+// Numbered placeholder directory: Student 1..36 per class. Renders locally from
+// the placeholder roster and never calls the backend, so no old-year data loads.
+function showNumberedDirectory() {
+  buildClassDirectory();
+  var controls = document.querySelector('.student-controls');
+  if (controls) controls.style.display = '';
+  var total = 0;
+  classItems.forEach(function(item) {
+    var roster = EQClasses.placeholderRosterFor(item.id);
+    renderPlaceholderClass(item.id, roster);
+    total += roster.length;
+  });
+  var badge = document.getElementById('countBadge');
+  if (badge) badge.textContent = total + ' students';
+}
+
+function renderPlaceholderClass(cls, students) {
+  var list = document.getElementById('list-' + cls);
+  if (!list) return;
+  list.innerHTML = '';
+  var safeClass = escapeHtml(classLabels[cls] || displayClassLabel(cls));
+  students.forEach(function(s) {
+    var item = document.createElement('div');
+    item.className = 'student-item';
+    item.dataset.name = String(s.name || '').toLowerCase();
+    item.dataset.class = cls;
+    item.innerHTML =
+      '<span class="student-avatar">' + s.no + '</span>' +
+      '<span class="student-main">' +
+        '<span class="student-name">' + escapeHtml(s.name) + '</span>' +
+        '<span class="student-meta"><span>No. ' + s.no + '</span><span>' + safeClass + '</span></span>' +
+      '</span>' +
+      '<span class="student-action" style="opacity:.5">Pending</span>';
+    list.appendChild(item);
+  });
+  var cnt = document.getElementById('count-' + cls);
+  if (cnt) cnt.textContent = students.length + ' students';
+}
+
+function showPreRosterDirectory() {
+  var controls = document.querySelector('.student-controls');
+  if (controls) controls.style.display = 'none';
+  var badge = document.getElementById('countBadge');
+  if (badge) badge.textContent = 'Roster pending';
+  var dir = document.getElementById('classDirectory');
+  if (dir) {
+    dir.innerHTML = '<section class="class-section" style="text-align:center;">' +
+      '<h2 style="font-family:\'Playfair Display\',serif;font-size:1.6rem;margin-bottom:10px;">Official roster not published yet.</h2>' +
+      '<p style="color:#64748b;line-height:1.6;max-width:560px;margin:0 auto;">The Grade 11 student list will appear here once the new class roster is added. This page is intentionally not showing old-year student names.</p>' +
+      '</section>';
+  }
+}
+
+const ACTS = [
+  { key: 'VocabularyBox',    label: 'Vocabulary Box',    color: '#8B5CF6' },
+  { key: 'Answering',        label: 'Answering',         color: '#3B82F6' },
+  { key: 'Presenting',       label: 'Presenting',        color: '#10B981' },
+  { key: 'DoingTaskOnTime',  label: 'Doing Task On Time',color: '#F59E0B' },
+  { key: 'HelpingHand',      label: 'Helping Hand',      color: '#EC4899' },
+  { key: 'Quiz',             label: 'Quiz',              color: '#14B8A6' },
+];
+
+async function openActModal(name, cls) {
+  const apiCls = normalizeClassId(cls);
+  document.getElementById('actName').textContent    = name;
+  document.getElementById('actSub').textContent     = (classLabels[apiCls] || displayClassLabel(apiCls)) + ' · Activeness Stats';
+  document.getElementById('actAvatar').textContent  = name[0].toUpperCase();
+  document.getElementById('actBody').innerHTML      = '<div class="act-loading"><div class="act-spinner"></div><br/>Loading stats...</div>';
+  document.getElementById('actOverlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+
+  try {
+    // Use cache per class
+    let classData = activenessCache[apiCls];
+    if (!classData) {
+      classData = await EQApi.get({ action: 'getAllActiveness', className: apiCls });
+      if (!classData.error) activenessCache[apiCls] = classData;
+    }
+    if (classData.error) { document.getElementById('actBody').innerHTML = '<div class="act-loading">Participation data is temporarily unavailable.</div>'; return; }
+
+    // Find student by name (case-insensitive, with fuzzy fallback)
+    let student = classData.students.find(s => String(s.name || '').toLowerCase() === name.toLowerCase());
+    if (!student) {
+      // Fuzzy fallback: match by first word + last word to handle minor spelling differences
+      const nameParts = name.toLowerCase().split(' ');
+      const first = nameParts[0], last = nameParts[nameParts.length - 1];
+      student = classData.students.find(s => {
+        const sp = String(s.name || '').toLowerCase().split(' ');
+        return sp[0] === first && sp[sp.length - 1] === last;
+      });
+    }
+    if (!student) { document.getElementById('actBody').innerHTML = '<div class="act-loading">No participation record has been published for this student yet.</div>'; return; }
+
+    // Update avatar with nickname if available
+    if (student.nickname) document.getElementById('actAvatar').textContent = String(student.nickname)[0].toUpperCase();
+
+    const total   = safeNumber(student.Total);
+    const indicator = String(student.Indicator || '');
+    const indClass = indicator.includes('Pro Maxxing') ? 'ind-promax' :
+      indicator.includes('Ultra Pro') ? 'ind-ultrapro' :
+      indicator.includes('Plus Ultra') ? 'ind-ultra' :
+      indicator.includes('Hyperactive') ? 'ind-hyper' :
+      indicator.includes('Super') ? 'ind-super' :
+      indicator.includes('Active') && !indicator.includes('Not') ? 'ind-active' :
+      indicator.includes('Okay') ? 'ind-okay' : 'ind-not';
+    const barPct  = Math.min(100, Math.round((total / 200) * 100)); // 200 = Pro Maxxing threshold
+
+    // Point rules per activity
+    const pointRules = {
+      VocabularyBox:    { pts: 1, unit: 'pt each',  info: 'Each vocab box submission' },
+      Answering:        { pts: 2, unit: 'pts each', info: 'Each question answered' },
+      Presenting:       { pts: 5, unit: 'pts each', info: 'Each presentation done' },
+      DoingTaskOnTime:  { pts: 2, unit: 'pts each', info: 'Tasks submitted on time' },
+      HelpingHand:      { pts: 1, unit: 'pt each',  info: 'Helping classmates' },
+      Quiz:             { pts: 1, unit: 'pt each',  info: 'Quiz activeness score' },
+    };
+
+    const statsHtml = ACTS.map(a => {
+      const times = safeNumber(student[a.key]);
+      const rule  = pointRules[a.key];
+      const pts   = times * rule.pts;
+      return `<div class="act-stat-card">
+        <div class="act-stat-top">
+          <div class="act-stat-dot" style="background:${a.color}"></div>
+          <div class="act-stat-label">${escapeHtml(a.label)}</div>
+        </div>
+        <div class="act-stat-nums">
+          <div class="act-stat-times">${times}<span>times</span></div>
+          <div class="act-stat-pts">
+            <div class="act-stat-pts-val" style="color:${a.color}">+${pts}</div>
+            <div class="act-stat-pts-label">points</div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+
+    document.getElementById('actBody').innerHTML = `
+      <div class="act-progress">
+        <div class="act-prog-row">
+          <div class="act-prog-label">Total Points</div>
+          <div class="act-prog-count">${total} pts</div>
+        </div>
+        <div class="act-bar-wrap"><div class="act-bar-fill" style="width:${barPct}%"></div></div>
+      </div>
+      <div class="act-stats">${statsHtml}</div>
+      <div class="act-info-box">
+        <div class="act-info-title">📖 How points work</div>
+        <div class="act-info-rows">
+          ${ACTS.map(a => `<div class="act-info-row"><span>${escapeHtml(a.label)}</span><span>×${pointRules[a.key].pts} ${escapeHtml(pointRules[a.key].unit)}</span></div>`).join('')}
+        </div>
+      </div>
+      <div class="act-indicator ${indClass}" style="margin-top:14px">${escapeHtml(indicator || '—')}</div>`;
+
+  } catch(e) {
+    document.getElementById('actBody').innerHTML = '<div class="act-loading">Participation data is temporarily unavailable.</div>';
+  }
+}
+
+function closeActModal(e) {
+  if (e && e.target !== document.getElementById('actOverlay')) return;
+  document.getElementById('actOverlay').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { document.getElementById('actOverlay').classList.add('hidden'); document.body.style.overflow = ''; } });
+
+</script>
+
+
+<!-- ACTIVENESS STATS MODAL -->
+<div class="act-overlay hidden" id="actOverlay" onclick="closeActModal(event)">
+  <div class="act-sheet" id="actSheet">
+    <div class="act-sheet-handle"></div>
+    <div class="act-sheet-head">
+      <div class="act-avatar" id="actAvatar">?</div>
+      <div>
+        <div class="act-sheet-name" id="actName">—</div>
+        <div class="act-sheet-sub" id="actSub">—</div>
+      </div>
+      <button class="act-close" onclick="closeActModal()">✕</button>
+    </div>
+    <div id="actBody">
+      <div class="act-loading"><div class="act-spinner"></div><br/>Loading stats...</div>
+    </div>
+  </div>
+</div>
+
 
 </body>
 </html>

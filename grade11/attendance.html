@@ -3,19 +3,359 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Grade 11 Attendance · English Quest</title>
+  <title>Attendance · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css?v=20260702"/>
   <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260702"/>
-  <link rel="stylesheet" href="../shared/css/grade11-subpages-20260612.css?v=20260702"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body.attendance-page {
+      background:
+        radial-gradient(circle at top left, rgba(15, 138, 120, 0.12), transparent 30rem),
+        linear-gradient(180deg, #f0fbf9 0%, #f8fafc 42%, #f8fafc 100%) !important;
+      color: #0f172a;
+    }
+    body.attendance-page .subpage-header {
+      padding: 24px 28px 28px !important;
+      background: linear-gradient(125deg, #0f8a78 0%, #0b6f60 55%, #07463d 100%) !important;
+      border-bottom: 0 !important;
+    }
+    body.attendance-page .subpage-header .topbar,
+    body.attendance-page .subpage-hero {
+      width: 100%;
+      max-width: 1200px;
+      margin-inline: auto;
+    }
+    body.attendance-page .brand-title,
+    body.attendance-page .brand-sub,
+    body.attendance-page .subpage-hero,
+    body.attendance-page .subpage-hero h1,
+    body.attendance-page .hero-copy { color: #fff !important; }
+    body.attendance-page .nav a,
+    body.attendance-page .nav button {
+      color: #fff !important;
+      background: rgba(255, 255, 255, 0.14) !important;
+      border-color: rgba(255, 255, 255, 0.35) !important;
+    }
+    body.attendance-page .subpage-hero h1 {
+      max-width: 790px !important;
+      font-size: clamp(1.6rem, 3vw, 2.3rem) !important;
+      line-height: 1.1 !important;
+      margin: 10px 0 12px !important;
+      letter-spacing: 0 !important;
+    }
+    body.attendance-page .kicker { color: #c9efe8 !important; }
+    body.attendance-page .hero-copy {
+      max-width: 650px !important;
+      font-size: 1rem !important;
+      line-height: 1.7 !important;
+      opacity: 0.9 !important;
+    }
+    body.attendance-page main {
+      padding: 26px 28px 80px !important;
+    }
+    body.attendance-page .subpage-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .attendance-picker,
+    .profile-card,
+    .stat-card,
+    .record-card,
+    .empty-card {
+      border: 1.5px solid #c9efe8;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 22px 64px rgba(15, 138, 120, 0.10);
+    }
+    .attendance-picker {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
+      gap: 24px;
+      align-items: center;
+      padding: clamp(22px, 4vw, 34px);
+      margin-bottom: 22px;
+    }
+    .picker-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+    .picker-copy {
+      color: #475569;
+      line-height: 1.7;
+      max-width: 440px;
+    }
+    .picker-form {
+      display: grid;
+      grid-template-columns: 0.72fr 1.28fr;
+      gap: 12px;
+    }
+    .field {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+    .field label {
+      color: #0b6f60;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .field select {
+      width: 100%;
+      min-height: 52px;
+      border: 1.5px solid #c9efe8;
+      border-radius: 16px;
+      background: #f8fbff;
+      color: #0f172a;
+      font: 600 0.98rem 'IBM Plex Sans', sans-serif;
+      padding: 0 14px;
+      outline: none;
+    }
+    .field select:focus { border-color: #0f8a78; }
+    .hint {
+      grid-column: 1 / -1;
+      color: #64748b;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    .dashboard {
+      display: grid;
+      grid-template-columns: minmax(270px, 0.82fr) minmax(0, 1.18fr);
+      gap: 22px;
+      align-items: start;
+    }
+    .profile-card {
+      padding: 24px;
+      position: sticky;
+      top: 18px;
+    }
+    .avatar {
+      width: 76px;
+      height: 76px;
+      border-radius: 24px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #0f8a78, #095a4e);
+      color: #fff;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 1.25rem;
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
+    .student-name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3.1rem);
+      line-height: 0.98;
+      margin-bottom: 12px;
+      overflow-wrap: anywhere;
+    }
+    .student-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      border-radius: 999px;
+      background: #f0fbf9;
+      color: #0b6f60;
+      padding: 0 11px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+    .rate-box {
+      border-radius: 24px;
+      background: linear-gradient(135deg, #f0fbf9, #ffffff);
+      border: 1.5px solid #e5f7f3;
+      padding: 20px;
+    }
+    .rate-label {
+      color: #64748b;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .rate-value {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 7vw, 4.6rem);
+      line-height: 1;
+      margin: 8px 0 10px;
+    }
+    .rate-note {
+      color: #475569;
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+    .stat-card {
+      min-height: 118px;
+      padding: 18px;
+      box-shadow: 0 14px 34px rgba(15, 138, 120, 0.07);
+    }
+    .stat-number {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.45rem;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+    .stat-label {
+      color: #475569;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+    .record-card {
+      overflow: hidden;
+      box-shadow: 0 18px 48px rgba(15, 138, 120, 0.08);
+    }
+    .record-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 22px 24px;
+      border-bottom: 1.5px solid #e5f7f3;
+    }
+    .record-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.7rem;
+      line-height: 1;
+    }
+    .record-sub {
+      color: #64748b;
+      font-size: 0.88rem;
+      margin-top: 6px;
+    }
+    .record-list {
+      display: grid;
+      gap: 0;
+    }
+    .record-row {
+      display: grid;
+      grid-template-columns: 120px minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+      padding: 16px 24px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .record-row:last-child { border-bottom: 0; }
+    .meeting-no {
+      color: #0b6f60;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .meeting-date {
+      color: #475569;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+    .status-chip {
+      justify-self: end;
+      min-width: 110px;
+      border-radius: 999px;
+      padding: 8px 12px;
+      text-align: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+    .status-Present { background: #dcfce7; color: #166534; }
+    .status-Absent { background: #fee2e2; color: #991b1b; }
+    .status-Sick { background: #fef3c7; color: #92400e; }
+    .status-Permission,
+    .status-Dispen { background: #e5f7f3; color: #07463d; }
+    .empty-card {
+      padding: 42px 28px;
+      text-align: center;
+      color: #475569;
+    }
+    .empty-title {
+      color: #0f172a;
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+    .loading {
+      padding: 42px;
+      text-align: center;
+      color: #64748b;
+    }
+    .spinner {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 3px solid #e5f7f3;
+      border-top-color: #0f8a78;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hidden { display: none !important; }
+    footer {
+      text-align: center;
+      padding: 26px;
+      color: #64748b;
+      font-size: 0.84rem;
+    }
+    @media (max-width: 900px) {
+      .attendance-picker,
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+      .profile-card {
+        position: static;
+      }
+      .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 620px) {
+      body.attendance-page main { padding: 18px 14px 60px !important; }
+      body.attendance-page .subpage-header { padding: 18px 14px 22px !important; }
+      .picker-form,
+      .stats-grid,
+      .record-row {
+        grid-template-columns: 1fr;
+      }
+      .record-head {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .status-chip {
+        justify-self: start;
+      }
+    }
+  </style>
   <script src="../shared/js/classes-20260617.js?v=20260624"></script>
   <script src="../shared/js/student.js"></script>
+  <script src="../shared/js/attendance.js"></script>
   <script src="../shared/js/sidebar.js?v=20260626"></script>
 </head>
-<body class="track-page grade11-page" data-page="attendance">
-  <div class="placeholder-shell">
-    <header class="topbar">
+<body class="grade11-subpage grade11-page attendance-page" data-page="attendance">
+  <header class="subpage-header">
+    <div class="topbar">
       <div class="brand">
         <img src="../logo.jpg" alt="English Quest Logo"/>
         <div>
@@ -25,47 +365,362 @@
       </div>
       <nav class="nav" aria-label="Main navigation">
         <a href="index.html">Grade 11 Home</a>
-        <a href="dashboard.html">My Statistics</a>
-        <a href="strikes.html">My Strikes</a>
-        <a href="../index.html">Choose Grade</a>
+        <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
       </nav>
-    </header>
+    </div>
 
-    <main>
-      <section class="placeholder-hero">
-        <div>
-          <div class="kicker">Attendance</div>
-          <h1>Grade 11 attendance will be tracked here.</h1>
-          <p class="hero-copy">This page is reserved for Grade 11 attendance records after the new class roster and attendance source are ready.</p>
+    <section class="subpage-hero">
+      <div class="kicker">Attendance</div>
+      <h1>Check your attendance record.</h1>
+      <p class="hero-copy">Choose your class and name to see attendance percentage, totals, and meeting history after official records are published.</p>
+    </section>
+  </header>
+
+  <main>
+    <div class="subpage-inner">
+    <section class="attendance-picker" aria-labelledby="pickerTitle">
+      <div>
+        <h2 class="picker-title" id="pickerTitle">Find your record.</h2>
+        <p class="picker-copy">The page is read-only and focuses on your personal attendance data.</p>
+      </div>
+      <div class="picker-form">
+        <div class="field">
+          <label for="classSelect">Class</label>
+          <select id="classSelect">
+            <option value="">Choose class</option>
+          </select>
         </div>
-        <aside class="placeholder-status-tile">
-          <div class="placeholder-label">Current Status</div>
-          <div class="placeholder-status-value">Attendance view is being prepared</div>
-        </aside>
-      </section>
+        <div class="field">
+          <label for="studentSelect">Student</label>
+          <select id="studentSelect" disabled>
+            <option value="">Choose class first</option>
+          </select>
+        </div>
+        <p class="hint" id="pickerHint">Start by choosing your class.</p>
+      </div>
+    </section>
 
-      <section class="placeholder-grid">
-        <article class="placeholder-card wide">
-          <div class="placeholder-card-label">Attendance</div>
-          <h2 class="placeholder-title">Your attendance history will appear here.</h2>
-          <p class="placeholder-copy">Your meeting history, attendance rate, and attendance status will appear here after classes begin.</p>
-          <div class="placeholder-readiness">Official Grade 11 data is not published yet. This page intentionally stays empty so it does not show Grade 10 or old-year records.</div>
-          <div class="placeholder-actions">
-            <a class="btn" href="students.html">Student List</a>
-            <a class="btn ghost" href="index.html">Back to Grade 11</a>
+    <section class="empty-card" id="emptyState">
+      <div class="empty-title">No student selected yet.</div>
+      <p>Your personal attendance dashboard will appear here after you choose your name.</p>
+    </section>
+
+    <section class="loading hidden" id="loadingState">
+      <div class="spinner"></div>
+      <p>Loading attendance data...</p>
+    </section>
+
+    <section class="dashboard hidden" id="dashboard" aria-live="polite">
+      <aside class="profile-card">
+        <div class="avatar" id="studentAvatar">EQ</div>
+        <h2 class="student-name" id="studentName">Student Name</h2>
+        <div class="student-meta">
+          <span class="pill" id="studentClass">Class</span>
+          <span class="pill" id="studentNo">No.</span>
+          <span class="pill" id="studentMeetings">0 meetings</span>
+        </div>
+        <div class="rate-box">
+          <div class="rate-label">Attendance Rate</div>
+          <div class="rate-value" id="attendanceRate">0%</div>
+          <p class="rate-note" id="attendanceNote">Choose a student to see the latest record.</p>
+        </div>
+      </aside>
+
+      <div>
+        <div class="stats-grid">
+          <article class="stat-card">
+            <div class="stat-number" id="presentCount">0</div>
+            <div class="stat-label">Present</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-number" id="absentCount">0</div>
+            <div class="stat-label">Absent</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-number" id="otherCount">0</div>
+            <div class="stat-label">Sick / Permission</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-number" id="totalCount">0</div>
+            <div class="stat-label">Recorded</div>
+          </article>
+        </div>
+
+        <article class="record-card">
+          <div class="record-head">
+            <div>
+              <h3 class="record-title">Meeting History</h3>
+              <p class="record-sub" id="recordSub">Latest recorded attendance first.</p>
+            </div>
+            <span class="pill" id="lastStatus">Latest: -</span>
           </div>
+          <div class="record-list" id="recordList"></div>
         </article>
-        <article class="placeholder-card">
-          <div class="placeholder-card-label">Coming Next</div>
-          <div class="placeholder-metric">Meeting history</div>
-          <div class="placeholder-metric">Student status</div>
-          <div class="placeholder-metric">Attendance rate</div>
-        </article>
-      </section>
-    </main>
-  </div>
+      </div>
+    </section>
+    </div>
+  </main>
 
-  <footer>© 2026 English Quest · Grade 11 Attendance</footer>
+  <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta</footer>
 
+  <script>
+    const classSelect = document.getElementById('classSelect');
+    const studentSelect = document.getElementById('studentSelect');
+    const pickerHint = document.getElementById('pickerHint');
+    const emptyState = document.getElementById('emptyState');
+    const loadingState = document.getElementById('loadingState');
+    const dashboard = document.getElementById('dashboard');
+
+    let currentClass = '';
+    let currentStudents = [];
+    let currentMeetings = [];
+    const ROSTERS_READY = window.EQClasses ? EQClasses.rostersReady() : false;
+
+    function setLoading(on) {
+      loadingState.classList.toggle('hidden', !on);
+      emptyState.classList.add('hidden');
+      dashboard.classList.add('hidden');
+    }
+
+    function showEmpty(title, copy) {
+      emptyState.querySelector('.empty-title').textContent = title;
+      emptyState.querySelector('p').textContent = copy;
+      emptyState.classList.remove('hidden');
+      loadingState.classList.add('hidden');
+      dashboard.classList.add('hidden');
+    }
+
+    function initClassOptions() {
+      if (window.EQClasses) {
+        EQClasses.fillSelect(classSelect, '11', '', 'Choose class');
+      }
+    }
+
+    function showPreRosterAttendance() {
+      studentSelect.disabled = true;
+      studentSelect.innerHTML = '<option value="">Roster not published yet</option>';
+      pickerHint.textContent = 'Official Grade 11 attendance records are not published yet.';
+      showEmpty('Official roster not published yet.', 'Attendance will appear here after the new Grade 11 roster and attendance records are connected. This page is intentionally not showing old-year data.');
+    }
+
+    function initials(name) {
+      if (window.EQStudent && typeof EQStudent.initials === 'function') {
+        return EQStudent.initials(name, 'EQ');
+      }
+      return (name || 'EQ').split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]).join('').toUpperCase() || 'EQ';
+    }
+
+    function escapeHtml(value) {
+      if (window.EQStudent && typeof EQStudent.escapeHtml === 'function') {
+        return EQStudent.escapeHtml(value);
+      }
+      return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[ch];
+      });
+    }
+
+    function normalizeStatus(value) {
+      const status = String(value || 'Present');
+      if (status === 'Present') return 'Present';
+      if (status === 'Absent') return 'Absent';
+      if (status === 'Sick') return 'Sick';
+      if (status === 'Permission') return 'Permission';
+      if (status === 'Dispen') return 'Dispen';
+      return 'Present';
+    }
+
+    function usableMeetings() {
+      return currentMeetings.filter(meeting => {
+        const hasDate = !!meeting.date;
+        const hasNumber = meeting.number !== undefined && meeting.number !== null && meeting.number !== '';
+        return hasNumber && hasDate;
+      });
+    }
+
+    function statusLabel(status) {
+      if (status === 'Dispen') return 'Dispensation';
+      return status;
+    }
+
+    function formatDate(date) {
+      return date || 'No date';
+    }
+
+    function attendanceRecords(student) {
+      return usableMeetings().map(meeting => {
+        const key = 'm' + meeting.number;
+        const status = normalizeStatus(student.attendance && student.attendance[key]);
+        return {
+          number: meeting.number,
+          date: meeting.date,
+          status
+        };
+      });
+    }
+
+    function renderStudent(student) {
+      const records = attendanceRecords(student);
+      const present = records.filter(item => item.status === 'Present').length;
+      const absent = records.filter(item => item.status === 'Absent').length;
+      const other = records.filter(item => item.status !== 'Present' && item.status !== 'Absent').length;
+      const total = records.length;
+      const rate = total ? Math.round((present / total) * 100) : 0;
+      const latest = records[records.length - 1];
+
+      document.getElementById('studentAvatar').textContent = initials(student.name);
+      document.getElementById('studentName').textContent = student.name || 'Student';
+      document.getElementById('studentClass').textContent = currentClass;
+      document.getElementById('studentNo').textContent = 'No. ' + (student.no || '-');
+      document.getElementById('studentMeetings').textContent = total + ' meetings';
+      document.getElementById('attendanceRate').textContent = rate + '%';
+      document.getElementById('attendanceNote').textContent = total
+        ? present + ' present out of ' + total + ' recorded meetings.'
+        : 'No dated attendance records have been published yet.';
+      document.getElementById('presentCount').textContent = present;
+      document.getElementById('absentCount').textContent = absent;
+      document.getElementById('otherCount').textContent = other;
+      document.getElementById('totalCount').textContent = total;
+      document.getElementById('lastStatus').textContent = latest ? 'Latest: ' + statusLabel(latest.status) : 'Latest: -';
+      document.getElementById('recordSub').textContent = total
+        ? 'Showing ' + total + ' dated meetings for ' + currentClass + '.'
+        : 'No dated meetings are available yet.';
+
+      const list = document.getElementById('recordList');
+      if (!records.length) {
+        list.innerHTML = '<div class="empty-card"><div class="empty-title">No records yet.</div><p>Attendance will appear here after meetings are published.</p></div>';
+      } else {
+        list.innerHTML = records.slice().reverse().map(item => (
+          '<div class="record-row">' +
+            '<div class="meeting-no">Meeting ' + escapeHtml(item.number) + '</div>' +
+            '<div class="meeting-date">' + escapeHtml(formatDate(item.date)) + '</div>' +
+            '<div class="status-chip status-' + item.status + '">' + escapeHtml(statusLabel(item.status)) + '</div>' +
+          '</div>'
+        )).join('');
+      }
+
+      loadingState.classList.add('hidden');
+      emptyState.classList.add('hidden');
+      dashboard.classList.remove('hidden');
+    }
+
+    function populateStudents(students) {
+      studentSelect.innerHTML = '<option value="">Choose your name</option>';
+      students.forEach((student, index) => {
+        const option = document.createElement('option');
+        option.value = String(index);
+        option.textContent = (student.no ? student.no + ' · ' : '') + student.name;
+        studentSelect.appendChild(option);
+      });
+      studentSelect.disabled = students.length === 0;
+    }
+
+    function savedProfile() {
+      const profile = EQStudent.read('11');
+      return {
+        className: profile.classId,
+        studentNo: profile.studentNo,
+        studentName: profile.studentName
+      };
+    }
+
+    function rememberStudent(student) {
+      if (!student || !currentClass) return;
+      EQStudent.save({
+        grade: '11',
+        classId: currentClass,
+        studentNo: student.no || '',
+        studentName: student.name || ''
+      });
+    }
+
+    function openSavedStudent() {
+      const profile = savedProfile();
+      if (!profile.studentNo || profile.className !== currentClass) return false;
+      const index = currentStudents.findIndex(student => String(student.no) === String(profile.studentNo));
+      if (index < 0) return false;
+      studentSelect.value = String(index);
+      renderStudent(currentStudents[index]);
+      return true;
+    }
+
+    async function loadClass(className) {
+      if (!ROSTERS_READY) {
+        showPreRosterAttendance();
+        return;
+      }
+      currentClass = className;
+      currentStudents = [];
+      currentMeetings = [];
+      studentSelect.disabled = true;
+      studentSelect.innerHTML = '<option value="">Loading students...</option>';
+      pickerHint.textContent = 'Loading attendance data for ' + className + '...';
+      setLoading(true);
+
+      try {
+        const data = await EQAttendance.get({ action: 'getClassData', className });
+        if (data.error) throw new Error(data.error);
+        currentStudents = data.students || [];
+        currentMeetings = data.meetings || [];
+        populateStudents(currentStudents);
+        pickerHint.textContent = currentStudents.length
+          ? currentStudents.length + ' students found. Choose your name to view your record.'
+          : 'The official roster for this class has not been published yet.';
+        if (!currentStudents.length) {
+          showEmpty('Class roster not available yet.', 'Your attendance record will become available after the official roster is published.');
+          return;
+        }
+        if (openSavedStudent()) {
+          pickerHint.textContent = 'Showing your saved attendance profile.';
+          return;
+        }
+        showEmpty('Choose your name.', 'Your attendance dashboard will appear after you select a student.');
+      } catch (error) {
+        studentSelect.innerHTML = '<option value="">Could not load students</option>';
+        pickerHint.textContent = 'Could not load attendance data. Please try again later.';
+        showEmpty('Could not load data.', 'Please check your connection and reload this page.');
+      }
+    }
+
+    classSelect.addEventListener('change', function() {
+      const className = classSelect.value;
+      if (!className) {
+        studentSelect.disabled = true;
+        studentSelect.innerHTML = '<option value="">Choose class first</option>';
+        pickerHint.textContent = 'Start by choosing your class.';
+        showEmpty('No student selected yet.', 'Your personal attendance dashboard will appear here after you choose your name.');
+        return;
+      }
+      loadClass(className);
+    });
+
+    studentSelect.addEventListener('change', function() {
+      const index = Number(studentSelect.value);
+      const student = currentStudents[index];
+      if (!student) {
+        showEmpty('Choose your name.', 'Your attendance dashboard will appear after you select a student.');
+        return;
+      }
+      rememberStudent(student);
+      renderStudent(student);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      initClassOptions();
+      if (!ROSTERS_READY) {
+        showPreRosterAttendance();
+        return;
+      }
+      const profile = savedProfile();
+      if (!profile.className) return;
+      classSelect.value = profile.className;
+      loadClass(profile.className);
+    });
+  </script>
 </body>
 </html>

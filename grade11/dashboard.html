@@ -3,18 +3,303 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Grade 11 Statistics · English Quest</title>
+  <title>My Statistics · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css?v=20260702"/>
   <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260702"/>
-  <link rel="stylesheet" href="../shared/css/grade11-subpages-20260612.css?v=20260702"/>
   <script src="../shared/js/classes-20260617.js?v=20260624"></script>
   <script src="../shared/js/student.js"></script>
+  <script src="../shared/js/api.js"></script>
+  <script src="../shared/js/attendance.js"></script>
   <script src="../shared/js/sidebar.js?v=20260626"></script>
+  <style>
+    .student-dashboard-page {
+      --primary: #0f8a78;
+      --primary-dark: #07463d;
+      --primary-soft: #e5f7f3;
+      --line: #e5f7f3;
+      background:
+        radial-gradient(circle at top left, rgba(15, 138, 120, 0.14), transparent 32rem),
+        linear-gradient(180deg, #f8fafc 0%, #eef6ff 100%);
+      color: #0f172a;
+    }
+    .dashboard-shell {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      padding: 22px;
+    }
+    .student-shell-enabled #app { width: auto; max-width: none; }
+    .dashboard-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+      align-items: end;
+      border-radius: 34px;
+      background: linear-gradient(135deg, #0f8a78 0%, #0b6f60 52%, #07463d 100%);
+      color: #fff;
+      padding: clamp(28px, 5vw, 54px);
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+    .dashboard-hero h1 {
+      max-width: 720px;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: clamp(1.7rem, 3.5vw, 2.7rem);
+      line-height: 1.1;
+    }
+    .dashboard-hero .hero-copy {
+      max-width: 680px;
+    }
+    .student-chip {
+      min-width: 220px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.12);
+      padding: 18px;
+    }
+    .student-chip-label,
+    .card-label,
+    .mini-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .student-chip-label {
+      color: #c9efe8;
+    }
+    .student-chip-name {
+      font: 800 1.35rem 'IBM Plex Sans', sans-serif;
+      margin-top: 8px;
+      overflow-wrap: anywhere;
+    }
+    .student-chip-meta {
+      color: rgba(255, 255, 255, 0.76);
+      line-height: 1.5;
+      margin-top: 6px;
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 18px;
+      align-items: start;
+    }
+    .stat-card {
+      grid-column: span 4;
+      min-height: 220px;
+      border: 1.5px solid #c9efe8;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 22px 60px rgba(15, 138, 120, 0.09);
+      padding: 22px;
+      display: grid;
+      gap: 16px;
+    }
+    .stat-card.wide {
+      grid-column: span 8;
+    }
+    .stat-card.full {
+      grid-column: 1 / -1;
+    }
+    .stat-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .card-label {
+      color: #0f8a78;
+      margin-bottom: 8px;
+    }
+    .stat-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.7rem, 3vw, 2.35rem);
+      line-height: 1;
+    }
+    .stat-value {
+      font: 800 clamp(2.5rem, 5vw, 4.2rem) 'IBM Plex Sans', sans-serif;
+      color: #0f172a;
+      line-height: 0.9;
+    }
+    .stat-sub {
+      color: #64748b;
+      line-height: 1.6;
+    }
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .mini-stat {
+      border-radius: 18px;
+      background: #f8fbff;
+      border: 1px solid #e5f7f3;
+      padding: 14px;
+    }
+    .mini-label {
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+    .mini-value {
+      font: 800 1.35rem 'IBM Plex Sans', sans-serif;
+    }
+    .progress-track {
+      height: 12px;
+      border-radius: 999px;
+      background: #e5f7f3;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #0f8a78, #10b981);
+      transition: width 0.3s ease;
+    }
+    .link-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-self: end;
+    }
+    .state-note {
+      border: 1.5px dashed #c9efe8;
+      border-radius: 20px;
+      background: #f8fbff;
+      color: #475569;
+      line-height: 1.6;
+      padding: 18px;
+    }
+    .loading-text {
+      color: #64748b;
+      font-weight: 700;
+    }
+    .quick-list {
+      display: grid;
+      gap: 10px;
+    }
+    .quick-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+      border: 1px solid #e5f7f3;
+      border-radius: 18px;
+      background: #f8fbff;
+      padding: 14px;
+    }
+    .quick-title {
+      font-weight: 800;
+    }
+    .quick-meta {
+      color: #64748b;
+      font-size: 0.92rem;
+      margin-top: 3px;
+    }
+    .quick-status {
+      border-radius: 999px;
+      background: #e5f7f3;
+      color: #0b6f60;
+      font: 800 0.78rem 'IBM Plex Sans', sans-serif;
+      padding: 8px 12px;
+      white-space: nowrap;
+    }
+    .strike-dots {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .strike-dot {
+      width: 46px;
+      height: 46px;
+      border: 2px solid #c9efe8;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8fbff;
+      color: #93a4b8;
+      font: 800 1rem 'IBM Plex Sans', sans-serif;
+    }
+    .strike-dot.active {
+      background: #fee2e2;
+      border-color: #fca5a5;
+      color: #dc2626;
+    }
+    .eligibility-note {
+      border-radius: 18px;
+      border: 1.5px solid #bbf7d0;
+      background: #f0fdf4;
+      color: #166534;
+      font-weight: 800;
+      line-height: 1.45;
+      padding: 14px 16px;
+    }
+    .eligibility-note.warning {
+      border-color: #fcd34d;
+      background: #fffbeb;
+      color: #92400e;
+    }
+    .eligibility-note.danger {
+      border-color: #fca5a5;
+      background: #fef2f2;
+      color: #991b1b;
+    }
+    .guard-card {
+      max-width: 760px;
+      margin: 42px auto;
+      border: 1.5px solid #c9efe8;
+      border-radius: 28px;
+      background: #fff;
+      box-shadow: var(--shadow);
+      padding: 30px;
+      text-align: center;
+    }
+    .guard-card h1 {
+      color: #0f172a;
+      font-size: clamp(1.7rem, 4vw, 2.5rem);
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
+    .guard-card p {
+      color: #64748b;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+    @media (max-width: 920px) {
+      .dashboard-hero,
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      .stat-card,
+      .stat-card.wide,
+      .stat-card.full {
+        grid-column: auto;
+      }
+    }
+    @media (max-width: 560px) {
+      .dashboard-shell {
+        padding: 18px;
+      }
+      .dashboard-hero,
+      .stat-card,
+      .guard-card {
+        border-radius: 24px;
+        padding: 22px;
+      }
+      .mini-grid {
+        grid-template-columns: 1fr;
+      }
+      .quick-item {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
-<body class="track-page grade11-page" data-page="dashboard">
-  <div class="placeholder-shell">
+<body class="student-dashboard-page" data-page="dashboard">
+  <div class="dashboard-shell">
     <header class="topbar">
       <div class="brand">
         <img src="../logo.jpg" alt="English Quest Logo"/>
@@ -25,59 +310,421 @@
       </div>
       <nav class="nav" aria-label="Main navigation">
         <a href="index.html">Grade 11 Home</a>
-        <a href="strikes.html">My Strikes</a>
         <a href="../index.html">Choose Grade</a>
+        <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
       </nav>
     </header>
 
-    <main>
-      <section class="placeholder-hero">
-        <div>
-          <div class="kicker">My Statistics</div>
-          <h1>Your Grade 11 progress at a glance.</h1>
-          <p class="hero-copy">Your personal Grade 11 progress will appear here as scores, attendance, tasks, submissions, and participation records become available.</p>
-        </div>
-        <aside class="placeholder-status-tile">
-          <div class="placeholder-label">Current Status</div>
-          <div class="placeholder-status-value">Personal statistics are being prepared</div>
-        </aside>
+    <main id="app">
+      <section class="guard-card" id="guardCard">
+        <div class="section-kicker">My Statistics</div>
+        <h1>Choose your profile first.</h1>
+        <p>This dashboard is personal. Go back to Grade 11 Home, choose your class and name, then open My Statistics again.</p>
+        <a class="btn primary" href="index.html">Set Student Profile</a>
       </section>
 
-      <section class="placeholder-grid">
-        <article class="placeholder-card wide">
-          <div class="placeholder-card-label">Student Dashboard</div>
-          <h2 class="placeholder-title">Your first statistics will appear here.</h2>
-          <p class="placeholder-copy">This dashboard will bring your scores, attendance, tasks, submissions, participation, and strike status together in one personal view.</p>
-          <div class="placeholder-readiness">Official Grade 11 data is not published yet. This page intentionally stays empty so it does not show Grade 10 or old-year records.</div>
-          <div class="placeholder-actions">
-            <a class="btn" href="index.html">Back to Grade 11</a>
-            <a class="btn ghost" href="scores.html">View scores</a>
+      <div id="dashboardView" hidden>
+        <section class="dashboard-hero">
+          <div>
+            <div class="kicker">My Statistics</div>
+            <h1>Your personal English Quest dashboard.</h1>
+            <p class="hero-copy">A student-only view of your scores, attendance, task progress, submissions, and class activeness.</p>
           </div>
-        </article>
+          <aside class="student-chip">
+            <div class="student-chip-label">Logged in as</div>
+            <div class="student-chip-name" id="studentName">Student</div>
+            <div class="student-chip-meta" id="studentMeta">Grade 11</div>
+          </aside>
+        </section>
 
-        <article class="placeholder-card">
-          <div class="placeholder-card-label">Coming Next</div>
-          <div class="placeholder-metric">Scores</div>
-          <div class="placeholder-metric">Attendance</div>
-          <div class="placeholder-metric">Tasks</div>
-        </article>
+        <section class="dashboard-grid" aria-label="Student statistics">
+          <article class="stat-card" id="scoresCard">
+            <div class="stat-head">
+              <div>
+                <div class="card-label">Scores</div>
+                <div class="stat-title">Chapter progress</div>
+              </div>
+              <div class="stat-value" id="scoreValue">--</div>
+            </div>
+            <p class="stat-sub" id="scoreSub">Loading your scores...</p>
+            <div class="mini-grid">
+              <div class="mini-stat"><div class="mini-label">Chapter 1</div><div class="mini-value" id="scoreCh1">--</div></div>
+              <div class="mini-stat"><div class="mini-label">Chapter 2</div><div class="mini-value" id="scoreCh2">--</div></div>
+              <div class="mini-stat"><div class="mini-label">Chapter 3</div><div class="mini-value" id="scoreCh3">--</div></div>
+            </div>
+            <div class="link-row"><a class="btn ghost" href="scores.html">Open Scores</a></div>
+          </article>
 
-        <article class="placeholder-card">
-          <div class="placeholder-card-label">Your Records</div>
-          <h2 class="placeholder-title">Your Grade 11 records stay separate.</h2>
-          <p class="placeholder-copy">Only your Grade 11 class records will appear in this dashboard.</p>
-        </article>
+          <article class="stat-card" id="attendanceCard">
+            <div>
+              <div class="card-label">Attendance</div>
+              <div class="stat-title">Presence record</div>
+            </div>
+            <div class="stat-value" id="attendanceValue">--</div>
+            <div class="progress-track"><div class="progress-fill" id="attendanceBar"></div></div>
+            <p class="stat-sub" id="attendanceSub">Loading your attendance...</p>
+            <div class="link-row"><a class="btn ghost" href="attendance.html">Open Attendance</a></div>
+          </article>
 
-        <article class="placeholder-card">
-          <div class="placeholder-card-label">What Happens Next</div>
-          <h2 class="placeholder-title">Ready for the first class records.</h2>
-          <p class="placeholder-copy">The dashboard will begin filling automatically as Grade 11 class activity starts.</p>
-        </article>
-      </section>
+          <article class="stat-card" id="activenessCard">
+            <div>
+              <div class="card-label">Activeness</div>
+              <div class="stat-title">Participation</div>
+            </div>
+            <div class="stat-value" id="activeValue">--</div>
+            <p class="stat-sub" id="activeSub">Loading your activeness...</p>
+            <div class="link-row"><a class="btn ghost" href="activeness.html">Open Activeness</a></div>
+          </article>
+
+          <article class="stat-card" id="strikesCard">
+            <div>
+              <div class="card-label">Strikes</div>
+              <div class="stat-title">Eligibility warning</div>
+            </div>
+            <div class="stat-value" id="strikeValue">--</div>
+            <div class="strike-dots" id="strikeDots">
+              <div class="strike-dot">1</div><div class="strike-dot">2</div><div class="strike-dot">3</div>
+            </div>
+            <div class="eligibility-note" id="eligibilityNote">Loading your strike record...</div>
+            <p class="stat-sub" id="strikeSub">Checking your current warning status.</p>
+            <div class="link-row"><a class="btn ghost" href="strikes.html">Open Strikes</a></div>
+          </article>
+
+          <article class="stat-card wide" id="tasksCard">
+            <div class="stat-head">
+              <div>
+                <div class="card-label">Tasks</div>
+                <div class="stat-title">Completion status</div>
+              </div>
+              <div class="stat-value" id="taskValue">--</div>
+            </div>
+            <div class="progress-track"><div class="progress-fill" id="taskBar"></div></div>
+            <p class="stat-sub" id="taskSub">Loading your task status...</p>
+            <div class="mini-grid">
+              <div class="mini-stat"><div class="mini-label">Done</div><div class="mini-value" id="taskDone">--</div></div>
+              <div class="mini-stat"><div class="mini-label">Missing</div><div class="mini-value" id="taskMissing">--</div></div>
+              <div class="mini-stat"><div class="mini-label">Total</div><div class="mini-value" id="taskTotal">--</div></div>
+            </div>
+            <div class="link-row"><a class="btn ghost" href="tasks.html">Open Task Status</a></div>
+          </article>
+
+          <article class="stat-card" id="submissionCard">
+            <div>
+              <div class="card-label">Submission</div>
+              <div class="stat-title">Upload check</div>
+            </div>
+            <div class="stat-value" id="submissionValue">--</div>
+            <p class="stat-sub" id="submissionSub">Loading submission status...</p>
+            <div class="link-row"><a class="btn ghost" href="submission.html">Open Submission</a></div>
+          </article>
+
+          <article class="stat-card full">
+            <div class="stat-head">
+              <div>
+                <div class="card-label">Quick View</div>
+                <div class="stat-title">Where to go next</div>
+              </div>
+            </div>
+            <div class="quick-list" id="quickList">
+              <div class="state-note">Loading quick summary...</div>
+            </div>
+          </article>
+        </section>
+      </div>
     </main>
   </div>
 
-  <footer>© 2026 English Quest · Grade 11 Statistics</footer>
+  <footer>© 2026 English Quest · My Statistics</footer>
 
+  <script>
+    var studentProfile = {};
+    var summary = {
+      scores: 'Loading',
+      attendance: 'Loading',
+      tasks: 'Loading',
+      submission: 'Loading',
+      activeness: 'Loading',
+      strikes: 'Loading'
+    };
+
+    function mainApiGet(params) {
+      return EQApi.get(params);
+    }
+
+    function attendanceApiGet(params) {
+      return EQAttendance.get(params);
+    }
+
+    function setText(id, value) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = value;
+    }
+
+    function escapeHtml(value) {
+      if (window.EQStudent && typeof EQStudent.escapeHtml === 'function') {
+        return EQStudent.escapeHtml(value);
+      }
+      return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[ch];
+      });
+    }
+
+    function safeNumber(value) {
+      var number = Number(value);
+      return Number.isFinite(number) ? number : 0;
+    }
+
+    function safeStrikeTotal(value) {
+      return Math.max(0, Math.floor(safeNumber(value)));
+    }
+
+    function pct(done, total) {
+      return total ? Math.round((done / total) * 100) : 0;
+    }
+
+    function fmtScore(value) {
+      if (value === undefined || value === null || value === '') return '--';
+      var num = Number(value);
+      return Number.isFinite(num) ? String(Math.round(num * 10) / 10) : String(value);
+    }
+
+    function findStudent(list) {
+      return (list || []).find(function(student) {
+        return String(student.no) === String(studentProfile.no);
+      }) || null;
+    }
+
+    function statusError(section, message) {
+      summary[section] = 'Not available';
+      renderQuickList();
+      return message || 'Could not load this data yet.';
+    }
+
+    function renderQuickList() {
+      var items = [
+        { title: 'Scores', meta: 'Chapter and final score overview', status: summary.scores, href: 'scores.html' },
+        { title: 'Attendance', meta: 'Meeting presence summary', status: summary.attendance, href: 'attendance.html' },
+        { title: 'Tasks', meta: 'Done and missing task count', status: summary.tasks, href: 'tasks.html' },
+        { title: 'Submissions', meta: 'Chapter upload status', status: summary.submission, href: 'submission.html' },
+        { title: 'Activeness', meta: 'Participation point summary', status: summary.activeness, href: 'activeness.html' },
+        { title: 'Strikes', meta: 'Summative and class eligibility', status: summary.strikes, href: 'strikes.html' }
+      ];
+      document.getElementById('quickList').innerHTML = items.map(function(item) {
+        return '<a class="quick-item" href="' + item.href + '">' +
+          '<div><div class="quick-title">' + escapeHtml(item.title) + '</div><div class="quick-meta">' + escapeHtml(item.meta) + '</div></div>' +
+          '<div class="quick-status">' + escapeHtml(item.status) + '</div>' +
+        '</a>';
+      }).join('');
+    }
+
+    function renderMissingProfile() {
+      document.getElementById('guardCard').hidden = false;
+      document.getElementById('dashboardView').hidden = true;
+    }
+
+    function renderProfile() {
+      document.getElementById('guardCard').hidden = true;
+      document.getElementById('dashboardView').hidden = false;
+      setText('studentName', studentProfile.name);
+      setText('studentMeta', studentProfile.cls.replace(/^XE/, 'XE-') + ' · No. ' + studentProfile.no);
+      renderQuickList();
+    }
+
+    async function loadScores() {
+      try {
+        var responses = await Promise.all([
+          mainApiGet({ action: 'getChapterScores', className: studentProfile.cls, chapter: 1 }),
+          mainApiGet({ action: 'getChapterScores', className: studentProfile.cls, chapter: 2 }),
+          mainApiGet({ action: 'getChapterScores', className: studentProfile.cls, chapter: 3 })
+        ]);
+        var ch1 = findStudent(responses[0].students);
+        var ch2 = findStudent(responses[1].students);
+        var ch3 = findStudent(responses[2].students);
+        var values = [ch1 && ch1.finalScore, ch2 && ch2.finalScore, ch3 && ch3.finalScore];
+        var numeric = values.map(Number).filter(Number.isFinite);
+        var avg = numeric.length ? Math.round((numeric.reduce(function(a, b) { return a + b; }, 0) / numeric.length) * 10) / 10 : null;
+
+        setText('scoreValue', avg === null ? '--' : String(avg));
+        setText('scoreCh1', fmtScore(ch1 && ch1.finalScore));
+        setText('scoreCh2', fmtScore(ch2 && ch2.finalScore));
+        setText('scoreCh3', fmtScore(ch3 && ch3.finalScore));
+        setText('scoreSub', numeric.length
+          ? 'Showing your available chapter score records.'
+          : 'No score records have been published for your profile yet.');
+        summary.scores = avg === null ? 'No data' : avg + ' avg';
+      } catch(e) {
+        setText('scoreSub', statusError('scores'));
+      }
+      renderQuickList();
+    }
+
+    async function loadAttendance() {
+      try {
+        var data = await attendanceApiGet({ action: 'getClassData', className: studentProfile.cls });
+        var student = findStudent(data.students);
+        var meetings = (data.meetings || []).filter(function(meeting) {
+          return meeting.date && meeting.number !== undefined && meeting.number !== null && meeting.number !== '';
+        });
+        if (!student || !meetings.length) {
+          setText('attendanceValue', '--');
+          setText('attendanceSub', 'No dated attendance records have been published yet.');
+          summary.attendance = 'No data';
+          renderQuickList();
+          return;
+        }
+        var records = meetings.map(function(meeting) {
+          var status = (student.attendance && student.attendance['m' + meeting.number]) || 'Present';
+          return status;
+        });
+        var present = records.filter(function(status) { return status === 'Present'; }).length;
+        var rate = pct(present, records.length);
+        setText('attendanceValue', rate + '%');
+        document.getElementById('attendanceBar').style.width = rate + '%';
+        setText('attendanceSub', present + ' present out of ' + records.length + ' recorded meetings.');
+        summary.attendance = rate + '%';
+      } catch(e) {
+        setText('attendanceSub', statusError('attendance'));
+      }
+      renderQuickList();
+    }
+
+    async function loadTasks() {
+      try {
+        var data = await mainApiGet({ action: 'getTaskStatus', className: studentProfile.cls, studentNo: studentProfile.no });
+        var tasks = data.tasks || {};
+        var keys = Object.keys(tasks);
+        var done = keys.filter(function(key) { return !!tasks[key]; }).length;
+        var total = keys.length;
+        var missing = Math.max(total - done, 0);
+        var rate = pct(done, total);
+        setText('taskValue', total ? rate + '%' : '--');
+        setText('taskDone', String(done));
+        setText('taskMissing', String(missing));
+        setText('taskTotal', String(total));
+        document.getElementById('taskBar').style.width = rate + '%';
+        setText('taskSub', total ? done + ' of ' + total + ' tasks are recorded as done.' : 'No task tracker data has been published yet.');
+        summary.tasks = total ? done + '/' + total : 'No data';
+      } catch(e) {
+        setText('taskSub', statusError('tasks'));
+      }
+      renderQuickList();
+    }
+
+    async function loadSubmission() {
+      try {
+        var data = await mainApiGet({ action: 'getSubmissions' });
+        var classRows = data.students && data.students[studentProfile.cls] ? data.students[studentProfile.cls] : [];
+        var match = classRows.find(function(row) {
+          return String(row.name || '').toLowerCase() === String(studentProfile.name || '').toLowerCase();
+        });
+        var submitted = !!(match && match.submitted);
+        setText('submissionValue', submitted ? 'Yes' : 'No');
+        setText('submissionSub', submitted
+          ? 'At least one submission is recorded for your name.'
+          : 'No submission is recorded for your name yet.');
+        summary.submission = submitted ? 'Submitted' : 'Not yet';
+      } catch(e) {
+        setText('submissionSub', statusError('submission'));
+      }
+      renderQuickList();
+    }
+
+    async function loadActiveness() {
+      try {
+        var data = await mainApiGet({ action: 'getAllActiveness', className: studentProfile.cls });
+        var student = findStudent(data.students);
+        var total = student ? Number(student.Total || 0) : null;
+        var indicator = student ? (student.Indicator || 'No indicator yet') : 'No activeness data found for your profile.';
+        setText('activeValue', total === null ? '--' : String(total));
+        setText('activeSub', indicator);
+        summary.activeness = total === null ? 'No data' : total + ' pts';
+      } catch(e) {
+        setText('activeSub', statusError('activeness'));
+      }
+      renderQuickList();
+    }
+
+    function strikeStatus(total) {
+      if (total >= 3) {
+        return {
+          label: 'Class blocked',
+          cls: 'danger',
+          copy: 'You have 3 strikes. You cannot join class until this is cleared with your teacher.'
+        };
+      }
+      if (total >= 1) {
+        return {
+          label: 'Summative blocked',
+          cls: 'warning',
+          copy: 'You have ' + total + ' strike' + (total === 1 ? '' : 's') + '. You cannot join the summative test.'
+        };
+      }
+      return {
+        label: 'Clear',
+        cls: '',
+        copy: 'You have no strikes. You are clear for class and summative test.'
+      };
+    }
+
+    async function loadStrikes() {
+      try {
+        var data = await mainApiGet({ action: 'getStudentStrikes', className: studentProfile.cls, studentNo: studentProfile.no });
+        if (data.error) throw new Error(data.error);
+        var total = safeStrikeTotal(data.total);
+        var status = strikeStatus(total);
+        var dots = [1, 2, 3].map(function(num) {
+          return '<div class="strike-dot' + (num <= total ? ' active' : '') + '">' + num + '</div>';
+        }).join('');
+
+        setText('strikeValue', String(total));
+        document.getElementById('strikeDots').innerHTML = dots;
+        document.getElementById('eligibilityNote').className = 'eligibility-note' + (status.cls ? ' ' + status.cls : '');
+        setText('eligibilityNote', status.copy);
+        setText('strikeSub', data.reason
+          ? 'Latest reason: ' + data.reason + (data.date ? ' · ' + data.date : '')
+          : 'Strike rule: 1 strike blocks summative test, 3 strikes block class.');
+        summary.strikes = status.label;
+      } catch(e) {
+        setText('strikeSub', statusError('strikes'));
+        document.getElementById('eligibilityNote').className = 'eligibility-note warning';
+        setText('eligibilityNote', 'Could not load strike eligibility yet.');
+      }
+      renderQuickList();
+    }
+
+    function readStudentProfile() {
+      var profile = EQStudent.read('11');
+      return {
+        cls: profile.classId,
+        no: profile.studentNo,
+        name: profile.studentName
+      };
+    }
+
+    function init() {
+      studentProfile = readStudentProfile();
+
+      if (!studentProfile.cls || !studentProfile.no || !studentProfile.name) {
+        renderMissingProfile();
+        return;
+      }
+
+      renderProfile();
+      loadScores();
+      loadAttendance();
+      loadTasks();
+      loadSubmission();
+      loadActiveness();
+      loadStrikes();
+    }
+
+    init();
+  </script>
 </body>
 </html>

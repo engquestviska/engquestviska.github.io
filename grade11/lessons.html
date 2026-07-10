@@ -3,19 +3,32 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Grade 11 Lessons · English Quest</title>
+  <title>Lesson Materials · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css?v=20260702"/>
   <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260702"/>
-  <link rel="stylesheet" href="../shared/css/grade11-subpages-20260612.css?v=20260702"/>
   <script src="../shared/js/classes-20260617.js?v=20260624"></script>
   <script src="../shared/js/student.js"></script>
+  <script src="../shared/js/api.js"></script>
   <script src="../shared/js/sidebar.js?v=20260626"></script>
 </head>
-<body class="track-page grade11-page" data-page="lessons">
-  <div class="placeholder-shell">
-    <header class="topbar">
+<body class="grade11-subpage grade11-page" data-page="lessons">
+  <div class="viewer-overlay hidden" id="pdfModal">
+    <div class="viewer-top">
+      <div class="viewer-title" id="modalTitle">Document</div>
+      <div class="viewer-actions">
+        <a class="btn primary" id="modalDownload" href="#" target="_blank" rel="noopener">Download</a>
+        <button class="round-close" onclick="closeModal()" aria-label="Close viewer">x</button>
+      </div>
+    </div>
+    <div class="viewer-frame">
+      <iframe id="modalIframe" src="" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <header class="subpage-header">
+    <div class="topbar">
       <div class="brand">
         <img src="../logo.jpg" alt="English Quest Logo"/>
         <div>
@@ -25,47 +38,192 @@
       </div>
       <nav class="nav" aria-label="Main navigation">
         <a href="index.html">Grade 11 Home</a>
-        <a href="dashboard.html">My Statistics</a>
-        <a href="strikes.html">My Strikes</a>
-        <a href="../index.html">Choose Grade</a>
+        <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
       </nav>
-    </header>
+    </div>
 
-    <main>
-      <section class="placeholder-hero">
-        <div>
-          <div class="kicker">Lesson Materials</div>
-          <h1>Grade 11 materials will live here.</h1>
-          <p class="hero-copy">This page is ready for Grade 11 slides, files, and lesson links once the new-year materials are prepared.</p>
+    <section class="subpage-hero">
+      <div class="kicker">Lesson Materials</div>
+      <h1>Open the class materials for each chapter.</h1>
+      <p class="hero-copy">Grade 11 lesson files stay here for students to view, preview, or download by chapter.</p>
+    </section>
+  </header>
+
+  <main>
+    <section class="content-section" aria-labelledby="chapter1Title">
+      <div class="content-section-head">
+        <div class="content-title-row">
+          <div class="content-badge">Semester 1</div>
+          <h2 class="content-title" id="chapter1Title">Chapter 1</h2>
         </div>
-        <aside class="placeholder-status-tile">
-          <div class="placeholder-label">Current Status</div>
-          <div class="placeholder-status-value">Materials are being prepared</div>
-        </aside>
-      </section>
-
-      <section class="placeholder-grid">
-        <article class="placeholder-card wide">
-          <div class="placeholder-card-label">Materials</div>
-          <h2 class="placeholder-title">Your Grade 11 learning library.</h2>
-          <p class="placeholder-copy">Your Grade 11 lesson slides, files, and reference links will appear here as they are published.</p>
-          <div class="placeholder-readiness">Official Grade 11 data is not published yet. This page intentionally stays empty so it does not show Grade 10 or old-year records.</div>
-          <div class="placeholder-actions">
-            <a class="btn" href="assignments.html">Assignments</a>
-            <a class="btn ghost" href="index.html">Back to Grade 11</a>
+      </div>
+      <div class="material-grid" id="grid-ch1">
+        <div class="empty-material-card" id="ch1-empty">
+          <div class="empty-material-icon">📘</div>
+          <div>
+            <div class="empty-material-title">Chapter 1 Materials</div>
+            <div class="empty-material-copy">Will be uploaded soon. Stay tuned!</div>
           </div>
-        </article>
-        <article class="placeholder-card">
-          <div class="placeholder-card-label">Planned Content</div>
-          <div class="placeholder-metric">Slides</div>
-          <div class="placeholder-metric">Reading files</div>
-          <div class="placeholder-metric">Reference links</div>
-        </article>
-      </section>
-    </main>
-  </div>
+          <div class="empty-material-badge">Coming Soon</div>
+        </div>
+      </div>
+    </section>
 
-  <footer>© 2026 English Quest · Grade 11 Lessons</footer>
+    <section class="content-section" aria-labelledby="chapter2Title">
+      <div class="content-section-head">
+        <div class="content-title-row">
+          <div class="content-badge">Semester 1</div>
+          <h2 class="content-title" id="chapter2Title">Chapter 2</h2>
+        </div>
+      </div>
+      <div class="material-grid" id="grid-ch2">
+        <div class="empty-material-card" id="ch2-empty">
+          <div class="empty-material-icon">📘</div>
+          <div>
+            <div class="empty-material-title">Chapter 2 Materials</div>
+            <div class="empty-material-copy">Will be uploaded soon. Stay tuned!</div>
+          </div>
+          <div class="empty-material-badge">Coming Soon</div>
+        </div>
+      </div>
+    </section>
 
+    <section class="content-section" aria-labelledby="chapter3Title">
+      <div class="content-section-head">
+        <div class="content-title-row">
+          <div class="content-badge">Semester 1</div>
+          <h2 class="content-title" id="chapter3Title">Chapter 3</h2>
+        </div>
+      </div>
+      <div class="material-grid" id="grid-ch3">
+        <div class="empty-material-card" id="ch3-empty">
+          <div class="empty-material-icon">📘</div>
+          <div>
+            <div class="empty-material-title">Chapter 3 Materials</div>
+            <div class="empty-material-copy">Will be uploaded soon. Stay tuned!</div>
+          </div>
+          <div class="empty-material-badge">Coming Soon</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta</footer>
+
+  <script>
+    function safeDriveId(value) {
+      var id = String(value || '').trim();
+      return /^[A-Za-z0-9_-]+$/.test(id) ? id : '';
+    }
+
+    function openPDF(title, previewUrl, downloadUrl) {
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalIframe').src = previewUrl;
+      document.getElementById('modalDownload').href = downloadUrl;
+      document.getElementById('pdfModal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      document.getElementById('pdfModal').classList.add('hidden');
+      document.getElementById('modalIframe').src = '';
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('pdfModal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    function loadSavedMaterials() {
+      [1, 2, 3].forEach(function(ch) {
+        EQApi.get({ action: 'getMaterials', chapter: ch }).then(function(res) {
+          if (res.materials && res.materials.length > 0) {
+            res.materials.forEach(function(m) {
+              appendCard(ch, m.title, m.fileId, m.fileType);
+            });
+          }
+        }).catch(function() {});
+      });
+    }
+
+    function appendCard(ch, name, fileId, fileType) {
+      fileId = safeDriveId(fileId);
+      if (!fileId) return;
+      var previewUrl = 'https://drive.google.com/file/d/' + fileId + '/preview';
+      var downloadUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
+      var existing = document.querySelector('[data-fileid="' + fileId + '"]');
+      if (existing) return;
+
+      var empty = document.getElementById('ch' + ch + '-empty');
+      if (empty) empty.remove();
+
+      var card = document.createElement('article');
+      card.className = 'material-card';
+      card.setAttribute('data-fileid', fileId);
+
+      var preview = document.createElement('div');
+      preview.className = 'material-preview';
+      var icon = document.createElement('span');
+      icon.className = 'material-icon';
+      icon.textContent = 'PDF';
+      var frame = document.createElement('iframe');
+      frame.src = previewUrl;
+      frame.title = name || 'Material preview';
+      var overlay = document.createElement('div');
+      overlay.className = 'material-overlay';
+      var overlayText = document.createElement('span');
+      overlayText.textContent = 'View';
+      overlay.appendChild(overlayText);
+      preview.appendChild(icon);
+      preview.appendChild(frame);
+      preview.appendChild(overlay);
+      preview.onclick = function() { openPDF(name, previewUrl, downloadUrl); };
+
+      var info = document.createElement('div');
+      info.className = 'material-info';
+      info.innerHTML =
+        '<div class="material-name"></div>' +
+        '<div class="material-meta"></div>' +
+        '<div class="material-actions"></div>';
+      info.querySelector('.material-name').textContent = name;
+      info.querySelector('.material-meta').textContent = (fileType || 'PDF') + ' · Chapter ' + ch;
+
+      var actions = info.querySelector('.material-actions');
+      var btnView = document.createElement('button');
+      btnView.className = 'btn';
+      btnView.textContent = 'View';
+      btnView.onclick = function() { openPDF(name, previewUrl, downloadUrl); };
+      var btnDownload = document.createElement('a');
+      btnDownload.className = 'btn primary icon-btn';
+      btnDownload.href = downloadUrl;
+      btnDownload.target = '_blank';
+      btnDownload.rel = 'noopener';
+      btnDownload.textContent = '↓';
+      actions.appendChild(btnView);
+      actions.appendChild(btnDownload);
+
+      card.appendChild(preview);
+      card.appendChild(info);
+      document.getElementById('grid-ch' + ch).appendChild(card);
+    }
+
+    function showEmptyStateIfNeeded(ch) {
+      var grid = document.getElementById('grid-ch' + ch);
+      if (!grid || grid.children.length > 0) return;
+      var empty = document.createElement('div');
+      empty.className = 'empty-material-card';
+      empty.id = 'ch' + ch + '-empty';
+      empty.innerHTML = '<div class="empty-material-icon">📘</div><div><div class="empty-material-title">Chapter ' + ch + ' Materials</div><div class="empty-material-copy">No materials yet.</div></div><div class="empty-material-badge">Empty</div>';
+      grid.appendChild(empty);
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeModal();
+      }
+    });
+
+    loadSavedMaterials();
+  </script>
 </body>
 </html>

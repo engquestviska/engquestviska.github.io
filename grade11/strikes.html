@@ -3,18 +3,275 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Grade 11 Strikes · English Quest</title>
+  <title>My Strikes · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css?v=20260702"/>
   <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260702"/>
-  <link rel="stylesheet" href="../shared/css/grade11-subpages-20260612.css?v=20260702"/>
   <script src="../shared/js/classes-20260617.js?v=20260624"></script>
   <script src="../shared/js/student.js"></script>
+  <script src="../shared/js/api.js"></script>
   <script src="../shared/js/sidebar.js?v=20260626"></script>
+  <style>
+    .student-strikes-page {
+      --primary: #0f8a78;
+      --primary-dark: #07463d;
+      --primary-soft: #e5f7f3;
+      --line: #e5f7f3;
+      background:
+        radial-gradient(circle at top left, rgba(15, 138, 120, 0.14), transparent 34rem),
+        linear-gradient(180deg, #f8fafc 0%, #eef6ff 100%);
+      color: #0f172a;
+    }
+    .strike-shell {
+      width: min(980px, 100%);
+      margin: 0 auto;
+      padding: 22px;
+    }
+    .strike-hero {
+      border-radius: 34px;
+      background: linear-gradient(135deg, #0f8a78 0%, #0b6f60 52%, #07463d 100%);
+      color: #fff;
+      padding: clamp(30px, 6vw, 58px);
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+    .strike-hero h1 {
+      max-width: 720px;
+    }
+    .strike-hero .hero-copy {
+      max-width: 680px;
+    }
+    .strike-panel,
+    .guard-card {
+      border: 1.5px solid #c9efe8;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.94);
+      box-shadow: 0 22px 60px rgba(15, 138, 120, 0.09);
+      padding: clamp(22px, 4vw, 32px);
+    }
+    .student-strip {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .student-avatar {
+      width: 62px;
+      height: 62px;
+      border-radius: 20px;
+      background: #0f8a78;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font: 800 1.3rem 'IBM Plex Sans', sans-serif;
+      flex: 0 0 auto;
+    }
+    .student-name {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      line-height: 1;
+    }
+    .student-meta,
+    .strike-copy {
+      color: #64748b;
+      line-height: 1.6;
+      margin-top: 6px;
+    }
+    .strike-grid {
+      display: grid;
+      grid-template-columns: 0.75fr 1.25fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+    .strike-count {
+      border-radius: 24px;
+      background: #0f172a;
+      color: #fff;
+      padding: 24px;
+      display: grid;
+      align-content: space-between;
+      min-height: 260px;
+    }
+    .count-label,
+    .section-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .count-label {
+      color: #8fd9cd;
+    }
+    .count-value {
+      font: 800 clamp(4.4rem, 12vw, 7rem) 'IBM Plex Sans', sans-serif;
+      line-height: 0.9;
+      margin: 18px 0;
+    }
+    .count-copy {
+      color: rgba(255, 255, 255, 0.72);
+      line-height: 1.55;
+    }
+    .strike-detail {
+      border-radius: 24px;
+      border: 1.5px solid #e5f7f3;
+      background: #f8fbff;
+      padding: 22px;
+    }
+    .strike-dots {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 14px 0 18px;
+    }
+    .strike-dot {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      border: 2px solid #c9efe8;
+      background: #fff;
+      color: #94a3b8;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font: 800 1.1rem 'IBM Plex Sans', sans-serif;
+    }
+    .strike-dot.active {
+      border-color: #fca5a5;
+      background: #fee2e2;
+      color: #dc2626;
+    }
+    .eligibility {
+      border-radius: 20px;
+      border: 1.5px solid #bbf7d0;
+      background: #f0fdf4;
+      color: #166534;
+      font-weight: 800;
+      line-height: 1.5;
+      padding: 16px 18px;
+      margin-bottom: 14px;
+    }
+    .eligibility.warning {
+      border-color: #fcd34d;
+      background: #fffbeb;
+      color: #92400e;
+    }
+    .eligibility.danger {
+      border-color: #fca5a5;
+      background: #fef2f2;
+      color: #991b1b;
+    }
+    .detail-row {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      gap: 12px;
+      border-top: 1px solid #e5f7f3;
+      padding-top: 12px;
+      margin-top: 12px;
+    }
+    .detail-label {
+      color: #64748b;
+      font: 800 0.72rem 'IBM Plex Mono', monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .detail-value {
+      color: #0f172a;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+    .rule-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .rule-card {
+      border: 1px solid #e5f7f3;
+      border-radius: 18px;
+      background: #fff;
+      padding: 16px;
+    }
+    .rule-number {
+      color: #0f8a78;
+      font: 800 1.6rem 'IBM Plex Sans', sans-serif;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .rule-title {
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .rule-copy {
+      color: #64748b;
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+    .clearance-guide {
+      margin-top: 20px;
+      border: 1.5px solid #c9efe8;
+      border-radius: 24px;
+      background: #fff;
+      padding: 22px;
+    }
+    .clearance-guide h2,
+    .guard-card h1 {
+      color: #0f172a;
+      margin-bottom: 10px;
+    }
+    .guard-card h1 {
+      font-size: clamp(1.7rem, 4vw, 2.5rem);
+      line-height: 1.1;
+    }
+    .clearance-guide ul {
+      color: #475569;
+      line-height: 1.7;
+      padding-left: 20px;
+      margin: 12px 0 0;
+    }
+    .hidden {
+      display: none !important;
+    }
+    .guard-card {
+      max-width: 720px;
+      margin: 40px auto;
+      text-align: center;
+    }
+    .guard-card p {
+      color: #64748b;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+    @media (max-width: 820px) {
+      .strike-grid,
+      .rule-grid {
+        grid-template-columns: 1fr;
+      }
+      .student-strip {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+    @media (max-width: 560px) {
+      .strike-shell {
+        padding: 18px;
+      }
+      .strike-hero,
+      .strike-panel,
+      .guard-card {
+        border-radius: 24px;
+        padding: 22px;
+      }
+      .detail-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
-<body class="track-page grade11-page" data-page="strikes">
-  <div class="placeholder-shell narrow">
+<body class="student-strikes-page grade11-subpage grade11-page" data-page="strikes">
+  <div class="shell strike-shell">
     <header class="topbar">
       <div class="brand">
         <img src="../logo.jpg" alt="English Quest Logo"/>
@@ -24,50 +281,226 @@
         </div>
       </div>
       <nav class="nav" aria-label="Main navigation">
-        <a href="index.html">Grade 11 Home</a>
         <a href="dashboard.html">My Statistics</a>
-        <a href="../index.html">Choose Grade</a>
+        <a href="index.html">Grade 11 Home</a>
+        <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
       </nav>
     </header>
 
     <main>
-      <section class="placeholder-hero simple">
-        <div class="kicker">My Strikes</div>
-        <h1>Your Grade 11 strike status.</h1>
-        <p class="hero-copy">Review your warning status and eligibility here. Your personal record will appear when Grade 11 classes begin.</p>
+      <section class="guard-card" id="guardCard">
+        <div class="section-kicker">My Strikes</div>
+        <h1>Choose your profile first.</h1>
+        <p>This strike tracker is personal. Go back to Grade 11 Home, choose your class and name, then open My Strikes again.</p>
+        <a class="btn primary" href="index.html">Set Student Profile</a>
       </section>
 
-      <section class="placeholder-panel">
-        <div class="placeholder-rule-grid">
-          <article class="placeholder-count-preview">
+      <div id="trackerView" class="hidden">
+        <section class="strike-hero">
+          <div class="kicker">My Strikes</div>
+          <h1>Check your warning status.</h1>
+          <p class="hero-copy">This page shows your strike count and what it means for summative test and class eligibility.</p>
+        </section>
+
+        <section class="strike-panel">
+          <div class="student-strip">
+            <div class="student-avatar" id="studentAvatar">EQ</div>
             <div>
-              <div class="placeholder-count-label">Current Status</div>
-              <div class="placeholder-count-value">--</div>
+              <div class="student-name" id="studentName">Student</div>
+              <div class="student-meta" id="studentMeta">Grade 11</div>
             </div>
-            <p class="placeholder-copy">Your personal strike count will appear here after classes begin.</p>
-            <div class="placeholder-readiness warning">Official Grade 11 strike records are not published yet. This page intentionally stays empty so it does not show old-year records.</div>
-          </article>
+          </div>
 
-          <article class="placeholder-rule-card">
-            <div class="placeholder-card-label">Strike Rules</div>
-            <h2>Know what each strike means.</h2>
-            <p class="placeholder-copy">This page shows only your personal warning status. Strike changes remain managed by your teacher.</p>
-            <div class="placeholder-rule-list">
-              <div class="placeholder-rule-item">1 strike: cannot join summative test.</div>
-              <div class="placeholder-rule-item">3 strikes: cannot join class.</div>
-              <div class="placeholder-rule-item">Your teacher manages all strike changes.</div>
-            </div>
-            <div class="placeholder-actions">
-              <a class="btn" href="dashboard.html">My Statistics</a>
-              <a class="btn ghost" href="index.html">Back to Grade 11</a>
-            </div>
-          </article>
-        </div>
-      </section>
+          <div class="strike-grid">
+            <article class="strike-count">
+              <div>
+                <div class="count-label">Total Strikes</div>
+                <div class="count-value" id="strikeTotal">--</div>
+              </div>
+              <div class="count-copy" id="countCopy">Loading your strike record...</div>
+            </article>
+
+            <article class="strike-detail">
+              <div class="section-label">Eligibility</div>
+              <div class="strike-dots" id="strikeDots">
+                <div class="strike-dot">1</div>
+                <div class="strike-dot">2</div>
+                <div class="strike-dot">3</div>
+              </div>
+              <div class="eligibility" id="eligibilityText">Loading...</div>
+              <div id="detailRows"></div>
+            </article>
+          </div>
+
+          <div class="rule-grid" aria-label="Strike rules">
+            <article class="rule-card">
+              <div class="rule-number">0</div>
+              <div class="rule-title">Clear</div>
+              <div class="rule-copy">You can join class and summative test.</div>
+            </article>
+            <article class="rule-card">
+              <div class="rule-number">1+</div>
+              <div class="rule-title">Summative Blocked</div>
+              <div class="rule-copy">Any strike means you cannot join the summative test.</div>
+            </article>
+            <article class="rule-card">
+              <div class="rule-number">3</div>
+              <div class="rule-title">Class Blocked</div>
+              <div class="rule-copy">Three strikes means you cannot join class.</div>
+            </article>
+          </div>
+
+          <section class="clearance-guide hidden" id="clearanceGuide">
+            <div class="section-kicker">Clearance</div>
+            <h2>How to clear a strike</h2>
+            <p class="strike-copy">Complete the writing task requested by your teacher. Your teacher will review it and remove the strike when it meets the requirements.</p>
+            <ul>
+              <li>Write an analytical exposition text for the active chapter.</li>
+              <li>Use the full text structure: thesis, arguments, and reiteration.</li>
+              <li>Submit it directly to your teacher for review.</li>
+            </ul>
+          </section>
+        </section>
+      </div>
     </main>
   </div>
 
-  <footer>© 2026 English Quest · Grade 11 Strikes</footer>
+  <footer>© 2026 English Quest · My Strikes</footer>
 
+  <script>
+    var profile = {};
+
+    function initials(name) {
+      if (window.EQStudent && EQStudent.initials) {
+        return EQStudent.initials(name, 'EQ');
+      }
+      return (name || 'EQ').split(/\s+/).filter(Boolean).slice(0, 2).map(function(part) {
+        return part.charAt(0);
+      }).join('').toUpperCase() || 'EQ';
+    }
+
+    function setText(id, value) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = value;
+    }
+
+    function escapeHtml(value) {
+      if (window.EQStudent && EQStudent.escapeHtml) {
+        return EQStudent.escapeHtml(value);
+      }
+      return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        }[ch];
+      });
+    }
+
+    function readStudentProfile() {
+      var saved = EQStudent.read('11');
+      return {
+        cls: saved.classId || '',
+        no: saved.studentNo || '',
+        name: saved.studentName || ''
+      };
+    }
+
+    function safeStrikeTotal(value) {
+      var total = Number(value);
+      if (!Number.isFinite(total)) return 0;
+      return Math.max(0, Math.floor(total));
+    }
+
+    function statusFor(total) {
+      if (total >= 3) {
+        return {
+          cls: 'danger',
+          title: 'Class blocked',
+          copy: 'You have 3 strikes. You cannot join class until this is cleared with your teacher.'
+        };
+      }
+      if (total >= 1) {
+        return {
+          cls: 'warning',
+          title: 'Summative test blocked',
+          copy: 'You have ' + total + ' strike' + (total === 1 ? '' : 's') + '. You cannot join the summative test.'
+        };
+      }
+      return {
+        cls: '',
+        title: 'Clear',
+        copy: 'You have no strikes. You can join class and the summative test.'
+      };
+    }
+
+    function renderDetails(data) {
+      var rows = '';
+      if (data.date) {
+        rows += '<div class="detail-row"><div class="detail-label">Date</div><div class="detail-value">' + escapeHtml(data.date) + '</div></div>';
+      }
+      if (data.reason) {
+        rows += '<div class="detail-row"><div class="detail-label">Reason</div><div class="detail-value">' + escapeHtml(data.reason) + '</div></div>';
+      }
+      document.getElementById('detailRows').innerHTML = rows || '<p class="strike-copy">No strike detail has been recorded.</p>';
+    }
+
+    function renderStrikes(data) {
+      var total = safeStrikeTotal(data.total);
+      var status = statusFor(total);
+      var dots = [1, 2, 3].map(function(num) {
+        return '<div class="strike-dot' + (num <= total ? ' active' : '') + '">' + num + '</div>';
+      }).join('');
+
+      setText('studentAvatar', initials(data.nickname || data.name || profile.name));
+      setText('studentName', data.nickname || data.name || profile.name);
+      setText('studentMeta', (data.name || profile.name) + ' · ' + profile.cls.replace(/^XE/, 'XE-') + ' · No. ' + profile.no);
+      setText('strikeTotal', String(total));
+      setText('countCopy', total ? 'You have an active warning record.' : 'Your warning record is clear.');
+      document.getElementById('strikeDots').innerHTML = dots;
+      document.getElementById('eligibilityText').className = 'eligibility' + (status.cls ? ' ' + status.cls : '');
+      setText('eligibilityText', status.title + '. ' + status.copy);
+      renderDetails(data);
+      document.getElementById('clearanceGuide').classList.toggle('hidden', total <= 0);
+    }
+
+    function showError(message) {
+      setText('strikeTotal', '--');
+      setText('countCopy', 'Could not load your strike record.');
+      document.getElementById('eligibilityText').className = 'eligibility warning';
+      setText('eligibilityText', message || 'Please try again later.');
+    }
+
+    async function loadStrikes() {
+      try {
+        var data = await EQApi.get({ action: 'getStudentStrikes', className: profile.cls, studentNo: profile.no });
+        if (data.error) throw new Error(data.error);
+        renderStrikes(data);
+      } catch(e) {
+        showError('Strike data is not available right now.');
+      }
+    }
+
+    function init() {
+      profile = readStudentProfile();
+
+      if (!profile.cls || !profile.no || !profile.name) {
+        document.getElementById('guardCard').classList.remove('hidden');
+        document.getElementById('trackerView').classList.add('hidden');
+        return;
+      }
+
+      document.getElementById('guardCard').classList.add('hidden');
+      document.getElementById('trackerView').classList.remove('hidden');
+      setText('studentAvatar', initials(profile.name));
+      setText('studentName', profile.name);
+      setText('studentMeta', profile.cls.replace(/^XE/, 'XE-') + ' · No. ' + profile.no);
+      loadStrikes();
+    }
+
+    init();
+  </script>
 </body>
 </html>
