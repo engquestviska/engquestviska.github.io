@@ -4,10 +4,10 @@
 
   // Numbered-roster mode: show a placeholder roster of "Student 1..36" per class
   // so the site is usable before real names exist. This ONLY affects what names
-  // are DISPLAYED/pickable — it never fetches real backend data. Real per-student
-  // score/task/attendance data stays gated behind rostersReady() (still false),
-  // so numbered students correctly show empty "--" values, never old-year rows.
-  var NUMBERED_ROSTER = true;
+  // are DISPLAYED/pickable — it never fetches real backend data.
+  // Went LIVE 2026-07-10: real rosters loaded into all 8 class sheets, so this is
+  // now false (students pick their real name) and rostersReady() is true.
+  var NUMBERED_ROSTER = false;
 
   var GRADE_X = [
     { id: 'XE1', label: 'X E-1', shortLabel: 'XE1', grade: '10' },
@@ -122,8 +122,8 @@
   function dataReadiness() {
     return {
       classesReady: true,
-      rostersReady: false,
-      rosterStatus: 'Official student rosters are pending school data.',
+      rostersReady: true,
+      rosterStatus: 'Official student rosters are loaded.',
       grade10Classes: idsForGrade('10'),
       grade11Classes: idsForGrade('11')
     };

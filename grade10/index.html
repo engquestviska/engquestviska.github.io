@@ -165,7 +165,7 @@
           <div>
             <div class="profile-label">Student Profile</div>
             <div class="profile-title" id="profileTitle">Personalize your space</div>
-            <p class="profile-copy" id="profileCopy">Choose your class now. Name selection opens once your official Grade 10 roster is published.</p>
+            <p class="profile-copy" id="profileCopy">Choose your class, then select your name to log in.</p>
           </div>
           <div class="profile-status" id="profileStatus">Not logged in</div>
           <div class="profile-form">
@@ -227,7 +227,7 @@
       document.getElementById('profileTitle').textContent = hasProfile ? name : 'Personalize your space';
       document.getElementById('profileCopy').textContent = hasProfile
         ? classLabel(cls) + ' · No. ' + no + '. Your saved student profile is active on this browser.'
-        : 'Choose your class now. Name selection opens once your official Grade 10 roster is published.';
+        : 'Choose your class, then select your name to log in.';
       document.getElementById('studentClass').value = cls || '';
       document.getElementById('logoutProfile').disabled = !hasProfile;
       document.getElementById('changeProfile').disabled = !hasProfile;
