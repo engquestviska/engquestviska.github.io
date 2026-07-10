@@ -498,9 +498,9 @@
 
     function showPreRosterAttendance() {
       studentSelect.disabled = true;
-      studentSelect.innerHTML = '<option value="">Roster not published yet</option>';
-      pickerHint.textContent = 'Official Grade 10 attendance records are not published yet.';
-      showEmpty('Official roster not published yet.', 'Attendance will appear here after the new Grade 10 roster and attendance records are connected. This page is intentionally not showing old-year data.');
+      studentSelect.innerHTML = '<option value="">No students found</option>';
+      pickerHint.textContent = 'Select your class and name to view your attendance.';
+      showEmpty('No roster loaded for this class.', 'Please reload the page to load this class.');
     }
 
     function initials(name) {
@@ -670,9 +670,9 @@
         populateStudents(currentStudents);
         pickerHint.textContent = currentStudents.length
           ? currentStudents.length + ' students found. Choose your name to view your record.'
-          : 'The official roster for this class has not been published yet.';
+          : 'The class roster could not be loaded. Please reload the page.';
         if (!currentStudents.length) {
-          showEmpty('Class roster not available yet.', 'Your attendance record will become available after the official roster is published.');
+          showEmpty('No students in this class.', 'Please reload the page.');
           return;
         }
         if (openSavedStudent()) {

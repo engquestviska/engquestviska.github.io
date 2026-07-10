@@ -86,8 +86,8 @@
       <div class="module-grid submission-grid">
         <article class="module submission-card">
           <div class="module-icon">PDF</div>
-          <div class="module-title">Submission forms are not published yet.</div>
-          <p class="module-copy">New Grade 11 upload links will appear here after the official roster and task plan are connected.</p>
+          <div class="module-title">Submissions are not open yet.</div>
+          <p class="module-copy">Upload links will appear here once your teacher opens submissions.</p>
           <div class="module-link">Not open yet</div>
         </article>
       </div>
@@ -175,9 +175,9 @@
         var el = document.getElementById(id);
         if (el) el.disabled = true;
       });
-      document.getElementById('stNameSel').innerHTML = '<option value="">Roster not published yet</option>';
-      document.getElementById('ch5NameSel').innerHTML = '<option value="">Roster not published yet</option>';
-      document.getElementById('statusResult').innerHTML = '<div class="notice-card">Submission status will appear after the official Grade 11 roster and new task forms are published. This page is intentionally not showing old-year submission records.</div>';
+      document.getElementById('stNameSel').innerHTML = '<option value="">No students found</option>';
+      document.getElementById('ch5NameSel').innerHTML = '<option value="">No students found</option>';
+      document.getElementById('statusResult').innerHTML = '<div class="notice-card">Please reload the page to check submission status.</div>';
       document.getElementById('statusResult').classList.add('show');
       document.getElementById('ch5Result').innerHTML = '<div class="notice-card">File checks will open after the new submission source is connected.</div>';
       document.getElementById('ch5Result').classList.add('show');
@@ -220,9 +220,9 @@
       });
       if (!students.length) {
         nameSel.disabled = true;
-        nameSel.innerHTML = '<option value="">Roster not published yet</option>';
+        nameSel.innerHTML = '<option value="">No students found</option>';
         var result = document.getElementById('statusResult');
-        result.innerHTML = '<div class="notice-card">Your submission status will appear after the official class roster is published.</div>';
+        result.innerHTML = '<div class="notice-card">Please reload the page.</div>';
         result.classList.add('show');
         return;
       }
@@ -281,9 +281,9 @@
           ch5Students[cls] = data.students || [];
         }
         if (!ch5Students[cls].length) {
-          nameSel.innerHTML = '<option value="">Roster not published yet</option>';
+          nameSel.innerHTML = '<option value="">No students found</option>';
           var emptyResult = document.getElementById('ch5Result');
-          emptyResult.innerHTML = '<div class="notice-card">Your submission status will appear after the official class roster is published.</div>';
+          emptyResult.innerHTML = '<div class="notice-card">Please reload the page.</div>';
           emptyResult.classList.add('show');
           return;
         }

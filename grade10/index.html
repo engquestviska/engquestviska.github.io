@@ -281,9 +281,9 @@
             'Pick your number for ' + classLabel(cls) + ', then confirm. (Numbers are placeholders until your class name list is added.)';
           return;
         }
-        resetStudentSelect('Roster not published yet');
+        resetStudentSelect('No students found');
         document.getElementById('profileMessage').textContent =
-          'The official roster for ' + classLabel(cls) + ' has not been published yet. Names will unlock here once your class list is added — no old-year names are shown.';
+          'The official roster for ' + classLabel(cls) + ' could not be loaded. Please reload the page.';
         return;
       }
 
@@ -295,7 +295,7 @@
         populateStudents(studentsForClass);
         document.getElementById('profileMessage').textContent = studentsForClass.length
           ? 'Choose your name, then confirm. The page will refresh immediately.'
-          : 'The official roster for this class has not been published yet.';
+          : 'The class roster could not be loaded. Please reload the page.';
       } catch (e) {
         document.getElementById('profileMessage').textContent = 'Could not load names. Please try again.';
         resetStudentSelect('Could not load names');

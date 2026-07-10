@@ -500,7 +500,7 @@
   <section class="subpage-hero">
     <div class="kicker">Task Status</div>
     <h1>See which tasks are done and what still needs attention.</h1>
-    <p class="hero-copy">Students can check published task progress from a clean, read-only status view once the official roster is ready.</p>
+    <p class="hero-copy">Check your task progress from a clean, read-only status view.</p>
   </section>
 </header>
 
@@ -589,7 +589,7 @@
   }
 
   function showPreRosterMessage(targetId) {
-    document.getElementById(targetId).innerHTML = '<div class="empty-chapter"><div class="empty-chapter-icon">&#128101;</div><div style="font-weight:800;margin-bottom:4px;color:#0f172a">Official roster not published yet</div><div>Task status will open after the new Grade 10 roster and task records are connected. This page is intentionally not showing old-year data.</div></div>';
+    document.getElementById(targetId).innerHTML = '<div class="empty-chapter"><div class="empty-chapter-icon">&#128101;</div><div style="font-weight:800;margin-bottom:4px;color:#0f172a">No roster loaded for this class</div><div>Please reload the page to load this class.</div></div>';
   }
 
   function initClassOptions() {
@@ -609,7 +609,7 @@
     document.getElementById('studentResult').innerHTML = '';
     if (!cls) { nameSelect.innerHTML = '<option>— Select class first —</option>'; return; }
     if (!ROSTERS_READY) {
-      nameSelect.innerHTML = '<option value="">Roster not published yet</option>';
+      nameSelect.innerHTML = '<option value="">No students found</option>';
       showPreRosterMessage('studentResult');
       return;
     }
@@ -619,8 +619,8 @@
       if (data && data.error) throw new Error(data.error);
       const students = Array.isArray(data && data.students) ? data.students : [];
       if (!students.length) {
-        nameSelect.innerHTML = '<option value="">Roster not published yet</option>';
-        document.getElementById('studentResult').innerHTML = '<div class="empty-chapter"><div class="empty-chapter-icon">&#128101;</div><div style="font-weight:800;margin-bottom:4px;color:#0f172a">Class roster not available yet</div><div>Your name will appear here after the official roster is published.</div></div>';
+        nameSelect.innerHTML = '<option value="">No students found</option>';
+        document.getElementById('studentResult').innerHTML = '<div class="empty-chapter"><div class="empty-chapter-icon">&#128101;</div><div style="font-weight:800;margin-bottom:4px;color:#0f172a">No students in this class</div><div>Please reload the page, or pick a different class.</div></div>';
         return;
       }
       nameSelect.innerHTML = '<option value="">— Select your name —</option>';

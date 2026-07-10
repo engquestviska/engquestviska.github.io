@@ -642,8 +642,8 @@
         studentSelect.disabled = false;
         return;
       }
-      studentSelect.innerHTML = '<option value="">Roster not published yet</option>';
-      document.getElementById('activenessResult').innerHTML = '<div class="loading"><strong>Official roster not published yet.</strong><br/>This page is intentionally not showing old-year names. Activeness will appear once the new roster is connected.</div>';
+      studentSelect.innerHTML = '<option value="">No students found</option>';
+      document.getElementById('activenessResult').innerHTML = '<div class="loading"><strong>No roster loaded for this class.</strong><br/>Please reload the page, or pick a different class.</div>';
       return;
     }
     try {
@@ -651,8 +651,8 @@
       if (data && data.error) throw new Error(data.error);
       studentsData = Array.isArray(data.students) ? data.students : [];
       if (!studentsData.length) {
-        studentSelect.innerHTML = '<option value="">Roster not published yet</option>';
-        document.getElementById('activenessResult').innerHTML = '<div class="loading"><strong>Class roster not available yet.</strong><br/>Participation records will appear after the official roster is published.</div>';
+        studentSelect.innerHTML = '<option value="">No students found</option>';
+        document.getElementById('activenessResult').innerHTML = '<div class="loading"><strong>No students in this class.</strong><br/>Please reload the page, or pick a different class.</div>';
         return;
       }
       studentSelect.innerHTML = '<option value="">— Select your name —</option>';

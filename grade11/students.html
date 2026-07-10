@@ -616,7 +616,7 @@ function renderStudentClass(cls, students) {
   const list = document.getElementById('list-' + cls);
   list.innerHTML = '';
   if (!students.length) {
-    list.innerHTML = '<div style="padding:20px;color:var(--text-muted);font-size:0.9rem;">The official roster for this class has not been published yet.</div>';
+    list.innerHTML = '<div style="padding:20px;color:var(--text-muted);font-size:0.9rem;">The class roster could not be loaded. Please reload the page.</div>';
   }
   students.forEach((s, i) => {
     const name = s.name || '';
@@ -823,8 +823,8 @@ function showPreRosterDirectory() {
   var dir = document.getElementById('classDirectory');
   if (dir) {
     dir.innerHTML = '<section class="class-section" style="text-align:center;">' +
-      '<h2 style="font-family:\'Playfair Display\',serif;font-size:1.6rem;margin-bottom:10px;">Official roster not published yet.</h2>' +
-      '<p style="color:#64748b;line-height:1.6;max-width:560px;margin:0 auto;">The Grade 11 student list will appear here once the new class roster is added. This page is intentionally not showing old-year student names.</p>' +
+      '<h2 style="font-family:\'Playfair Display\',serif;font-size:1.6rem;margin-bottom:10px;">No roster loaded for this class.</h2>' +
+      '<p style="color:#64748b;line-height:1.6;max-width:560px;margin:0 auto;">The student list could not be loaded. Please reload the page.</p>' +
       '</section>';
   }
 }

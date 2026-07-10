@@ -422,7 +422,7 @@
   <section class="subpage-hero">
     <div class="kicker">Scores</div>
     <h1>Check your scores without digging through sheets.</h1>
-    <p class="hero-copy">Students can open their own score summary from a clean, read-only view once official records are published.</p>
+    <p class="hero-copy">Open your own score summary from a clean, read-only view.</p>
   </section>
 </header>
 <svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
@@ -498,8 +498,8 @@ function renderPreRosterScores() {
     '<div class="mode-badge student">&#128203; Student View</div>' +
     '<div class="state-card">' +
       '<div class="state-icon">&#128101;</div>' +
-      '<div class="state-title">Official score records are not published yet.</div>' +
-      '<div class="state-sub">This page is intentionally not showing old-year scores. Grade 10 scores will appear after the new roster and score source are connected.</div>' +
+      '<div class="state-title">Scores are not available right now.</div>' +
+      '<div class="state-sub">Please reload the page or try again later.</div>' +
     '</div>';
 }
 
@@ -628,8 +628,8 @@ function loadStudentList() {
     allStudents = (res && res.students) || [];
     if (!Array.isArray(allStudents) || !allStudents.length) {
       allStudents = [];
-      sel.innerHTML = '<option value="">Roster not published yet</option>';
-      document.getElementById('sResult').innerHTML = '<div class="state-card"><div class="state-icon">&#128101;</div><div class="state-title">Class roster not available yet</div><div class="state-sub">Student score profiles will appear after the official roster is published.</div></div>';
+      sel.innerHTML = '<option value="">No students found</option>';
+      document.getElementById('sResult').innerHTML = '<div class="state-card"><div class="state-icon">&#128101;</div><div class="state-title">No students in this class</div><div class="state-sub">Please reload the page, or pick a different class.</div></div>';
       return;
     }
     sel.innerHTML = '<option value="">-- Select your name --</option>';
