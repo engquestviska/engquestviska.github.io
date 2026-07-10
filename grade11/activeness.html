@@ -539,6 +539,24 @@
   .lvx-act .tm { font-size:.76rem; color:#94a3b8; }
   .lvx-info { margin-top:22px; background:#f0fbf9; border:1px solid #e5f7f3; border-radius:16px; padding:16px 20px; font-size:.84rem; color:#334155; line-height:1.55; }
   @media (max-width:640px){ .lvx-hero{ grid-template-columns:1fr; text-align:center; } .lvx-who{ justify-content:center; } .lvx-grid{ grid-template-columns:1fr 1fr; } .lvx-mini{ justify-content:center; } }
+  /* Vocabulary Box */
+  .vocab-wrap { margin-top:26px; background:#fff; border:1px solid #e5ecf6; border-radius:20px; padding:22px 24px; box-shadow:0 16px 40px rgba(15,23,42,.05); }
+  .vocab-head { display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .vocab-head h2 { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:800; }
+  .vocab-head .rem { font-size:.78rem; font-weight:700; color:#b45309; background:#fef3c7; padding:4px 12px; border-radius:999px; font-family:'IBM Plex Mono',monospace; }
+  .vocab-intro { color:#64748b; font-size:.86rem; margin:6px 0 16px; line-height:1.5; }
+  .vocab-rows { display:flex; flex-direction:column; gap:8px; }
+  .vocab-row { display:grid; grid-template-columns:26px 1fr 1fr; gap:8px; align-items:center; }
+  .vocab-row .n { font-family:'IBM Plex Mono',monospace; font-size:.8rem; color:#94a3b8; text-align:center; }
+  .vocab-row input { min-height:42px; border:1.5px solid #e2e8f0; border-radius:10px; padding:0 12px; font:500 .9rem 'IBM Plex Sans',sans-serif; outline:none; width:100%; }
+  .vocab-row input:focus { border-color:#f59e0b; }
+  .vocab-submit { margin-top:14px; display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; border:none; border-radius:12px; padding:12px 24px; font:700 .92rem 'IBM Plex Sans',sans-serif; cursor:pointer; }
+  .vocab-submit:disabled { opacity:.55; cursor:not-allowed; }
+  .vocab-msg { margin-top:12px; font-size:.86rem; font-weight:600; min-height:1em; }
+  .vocab-msg.ok { color:#059669; } .vocab-msg.warn { color:#b45309; } .vocab-msg.err { color:#e11d48; }
+  .vocab-list { margin-top:16px; display:flex; flex-wrap:wrap; gap:8px; }
+  .vocab-chip { background:#f8fafc; border:1px solid #e2e8f0; border-radius:999px; padding:5px 12px; font-size:.8rem; }
+  .vocab-chip b { color:#0f172a; } .vocab-chip span { color:#94a3b8; }
 </style>
 
 <script>
@@ -546,10 +564,18 @@
     { key: 'Vocabulary Box',     em: '📚', bg: '#ede9fe', fg: '#7c3aed' },
     { key: 'Answering',          em: '💬', bg: '#e5f7f3', fg: '#0f8a78' },
     { key: 'Presenting',         em: '🎤', bg: '#d1fae5', fg: '#059669' },
-    { key: 'Doing Task On Time', em: '⏰', bg: '#fef3c7', fg: '#d97706' },
+    { key: 'Doing Task',         em: '⏰', bg: '#fef3c7', fg: '#d97706' },
     { key: 'Helping Hand',       em: '🤝', bg: '#fce7f3', fg: '#db2777' },
     { key: 'Quiz',               em: '⚡', bg: '#ccfbf1', fg: '#0d9488' },
   ];
+
+  // Faster level curve: level N->N+1 needs (5 + 5*N) XP. L1->2:10, L2->3:15, L3->4:20 ...
+  function levelFromXP(xp) {
+    xp = Math.max(0, Number(xp) || 0);
+    var level = 1, need = 10, floor = 0;
+    while (xp >= floor + need) { floor += need; level++; need += 5; }
+    return { level: level, into: xp - floor, needForNext: need, toNext: floor + need - xp };
+  }
 
   let currentClass = '';
   let studentsData = [];
@@ -700,18 +726,13 @@
     const displayName = student.nickname || student.name || 'Student';
     const isPlaceholder = !!student.placeholder;
 
-    // XP = weighted participation total; a new Level every LEVEL_SIZE XP.
-    const LEVEL_SIZE = 400;
+    // XP = weighted participation total; faster curve (see levelFromXP).
     const xp = safeNumber(student.Total);
-    const level = Math.floor(xp / LEVEL_SIZE) + 1;
-    const into = xp % LEVEL_SIZE;
-    const toNext = LEVEL_SIZE - into;
-    const pct = Math.round(into / LEVEL_SIZE * 100);
-
-    // Rank title from the activeness indicator (bonus text stripped); a friendly
-    // starter label when there is no XP yet.
-    let rank = String(student.Indicator || '').replace(/\s*\(\+?\d+\s*bonus\)/i, '').trim();
-    if (!rank || xp === 0) rank = 'Just getting started';
+    const lv = levelFromXP(xp);
+    const level = lv.level;
+    const into = lv.into;
+    const toNext = lv.toNext;
+    const pct = lv.needForNext ? Math.round(into / lv.needForNext * 100) : 0;
 
     // Class rank only makes sense with real scores.
     let classRank = '--';
@@ -738,7 +759,6 @@
         <div class="lvx-hero">
           <div class="lvx-badge">
             <div class="lvx-ring" style="background:conic-gradient(#f59e0b ${pct}%, #e5ecf6 0)"><div class="in"><div><div class="lv">LEVEL</div><div class="num">${level}</div></div></div></div>
-            <div class="lvx-rank">⭐ ${escapeHtml(rank)}</div>
           </div>
           <div>
             <div class="lvx-who"><span class="lvx-nm">${escapeHtml(displayName)}</span><span class="lvx-cls">${escapeHtml(classLabel)}</span></div>
@@ -756,12 +776,88 @@
 
         <h2 class="lvx-sec">How you earn XP</h2>
         <div class="lvx-grid">${activityCards}</div>
-        <div class="lvx-info">📖 <b>How XP works:</b> every participation earns points — Answering ×2, Presenting ×5, Task On Time ×2, Vocabulary / Helping Hand / Quiz ×1. Your points are your XP; every ${LEVEL_SIZE} XP you reach a new Level and a higher rank.</div>
+        <div class="lvx-info">📖 <b>How XP works:</b> Vocabulary +2 each, Answering +5, Doing Task / Presenting / Helping Hand +20, Quiz +10 per answer. Your points are your XP — the more you join in, the faster you level up.</div>
+        <div id="vocabWrap"></div>
       </section>`;
+    initVocab(currentClass, no);
   }
 
-  // Weights match spreadsheet: VB×1, ANS×2, PRE×5, DTO×2, HH×1, Quiz×1
-  const ACT_PTS = { 'Vocabulary Box': 1, 'Answering': 2, 'Presenting': 5, 'Doing Task On Time': 2, 'Helping Hand': 1, 'Quiz': 1 };
+  // Weights match spreadsheet XP: VB×2, ANS×5, PRE×20, Doing Task×20, HH×20, Quiz×10
+  const ACT_PTS = { 'Vocabulary Box': 2, 'Answering': 5, 'Presenting': 20, 'Doing Task': 20, 'Helping Hand': 20, 'Quiz': 10 };
+
+  // ── VOCABULARY BOX ──
+  var VOCAB_MAX = 10;
+  function initVocab(cls, no) {
+    var wrap = document.getElementById('vocabWrap');
+    if (!wrap || !cls || !no) return;
+    var rows = '';
+    for (var i = 1; i <= VOCAB_MAX; i++) {
+      rows += '<div class="vocab-row"><span class="n">' + i + '</span>' +
+        '<input class="v-en" placeholder="English word" autocomplete="off" />' +
+        '<input class="v-id" placeholder="Arti (Bahasa Indonesia)" autocomplete="off" /></div>';
+    }
+    wrap.innerHTML =
+      '<div class="vocab-wrap">' +
+        '<div class="vocab-head"><h2>📚 Vocabulary Box</h2><span class="rem" id="vocabRem">…</span></div>' +
+        '<p class="vocab-intro">Read something in English (a book, article, or movie), then add new words with their Indonesian meaning. Each new word = <b>+2 XP</b>. No repeats, up to 30 words per week.</p>' +
+        '<div class="vocab-rows">' + rows + '</div>' +
+        '<button class="vocab-submit" id="vocabBtn">✨ Submit &amp; Earn XP</button>' +
+        '<div class="vocab-msg" id="vocabMsg"></div>' +
+        '<div class="vocab-list" id="vocabList"></div>' +
+      '</div>';
+    var btn = document.getElementById('vocabBtn');
+    if (btn) btn.onclick = function() { submitVocab(cls, no); };
+    loadVocab(cls, no);
+  }
+  function loadVocab(cls, no) {
+    if (!window.EQApi) return;
+    EQApi.get({ action: 'getVocabulary', className: cls, studentNo: no }).then(function(res) {
+      var rem = document.getElementById('vocabRem');
+      if (rem) rem.textContent = (res && res.weeklyRemaining != null ? res.weeklyRemaining : '?') + ' words left this week';
+      var list = document.getElementById('vocabList');
+      if (list) {
+        var words = (res && res.words) || [];
+        list.innerHTML = words.length
+          ? words.slice(-40).reverse().map(function(w) {
+              return '<span class="vocab-chip"><b>' + escapeHtml(w.english) + '</b> <span>· ' + escapeHtml(w.indonesian) + '</span></span>';
+            }).join('')
+          : '<span class="vocab-chip"><span>No words yet — add your first!</span></span>';
+      }
+    }).catch(function(){});
+  }
+  function submitVocab(cls, no) {
+    var btn = document.getElementById('vocabBtn'), msg = document.getElementById('vocabMsg');
+    var ens = document.querySelectorAll('#vocabWrap .v-en'), ids = document.querySelectorAll('#vocabWrap .v-id');
+    var words = [];
+    for (var i = 0; i < ens.length; i++) {
+      var en = ens[i].value.trim(), id = ids[i].value.trim();
+      if (en || id) words.push({ english: en, indonesian: id });
+    }
+    if (!words.length) { msg.className = 'vocab-msg warn'; msg.textContent = 'Type at least one word pair first.'; return; }
+    btn.disabled = true; msg.className = 'vocab-msg'; msg.textContent = 'Saving…';
+    EQApi.get({ action: 'addVocabulary', className: cls, studentNo: no, words: JSON.stringify(words) }).then(function(res) {
+      btn.disabled = false;
+      if (!res || !res.success) { msg.className = 'vocab-msg err'; msg.textContent = (res && res.error) || 'Could not save. Please try again.'; return; }
+      var parts = [];
+      if (res.added) parts.push('✅ +' + res.xp + ' XP for ' + res.added + ' word' + (res.added > 1 ? 's' : '') + '!');
+      var dupes = (res.rejected || []).filter(function(r){ return r.reason === 'duplicate'; }).length;
+      var capped = (res.rejected || []).filter(function(r){ return r.reason === 'weekly-cap'; }).length;
+      if (dupes) parts.push(dupes + ' already added before');
+      if (capped) parts.push(capped + ' over the weekly limit');
+      var summary = parts.join(' · ') || 'No new words added.';
+      if (typeof showToast === 'function') showToast(summary, res.added ? 'ok' : '');
+      msg.className = 'vocab-msg ' + (res.added ? 'ok' : 'warn');
+      msg.textContent = summary;
+      for (var j = 0; j < ens.length; j++) { ens[j].value = ''; ids[j].value = ''; }
+      if (res.added) {
+        var stu = studentsData.find(function(s){ return String(s.no) === String(no); });
+        if (stu) { stu.VocabularyBox = (Number(stu.VocabularyBox) || 0) + res.added; stu.Total = (Number(stu.Total) || 0) + res.xp; }
+        viewActiveness();
+      } else {
+        loadVocab(cls, no);
+      }
+    }).catch(function() { btn.disabled = false; msg.className = 'vocab-msg err'; msg.textContent = 'Network error. Please try again.'; });
+  }
 
   // ── TOAST ─────────────────────────────────────────────────
   function showToast(msg, type) {
