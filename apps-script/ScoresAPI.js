@@ -116,6 +116,7 @@ function doGet(e) {
     else if (action === 'incrementActiveness') result = incrementActiveness(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.studentNo, e.parameter.column, e.parameter.delta || 1);
     else if (action === 'setupQuizColumn')     result = setupQuizColumn(e.parameter.username, e.parameter.password);
     else if (action === 'setupCalcFormulas')   result = setupCalcFormulas(e.parameter.username, e.parameter.password);
+    else if (action === 'setupRoster')         result = setupRoster(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.names);
     else if (action === 'getStudentStrikes')  result = getStudentStrikes(e.parameter.className, e.parameter.studentNo);
     else if (action === 'debugStrikeHeaders')  result = debugStrikeHeaders(e.parameter.className);
     else if (action === 'getAllStrikes')       result = getAllStrikes(e.parameter.className);
@@ -641,6 +642,34 @@ function setupCalcFormulas(username, password) {
     } catch (e) { results[cls] = 'error: ' + e.message; }
   });
   return { success: true, results: results };
+}
+
+// ── SETUP ROSTER (write real student names into every roster tab) ──
+// names = JSON array of student names in No order (index 0 -> student #1).
+// Writes names as VALUES to column B of each tab the app reads, so it is
+// re-runnable to update rosters later.
+function setupRoster(username, password, className, namesJson) {
+  if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
+  var sheetId = SCORE_SHEETS[className];
+  if (!sheetId) return { success: false, error: 'Class not found: ' + className };
+  var names;
+  try { names = JSON.parse(namesJson || '[]'); } catch (e) { return { success: false, error: 'Bad names JSON' }; }
+  if (!names.length) return { success: false, error: 'No names provided' };
+  var ss = SpreadsheetApp.openById(sheetId);
+  var vals = names.map(function(x) { return [String(x == null ? '' : x).trim()]; });
+  var n = vals.length;
+  var report = { allTabs: ss.getSheets().map(function(s) { return s.getName(); }) };
+  var targets = ['Scores', 'Chapter_1', 'Chapter_2', 'Chapter_3', 'Activeness', 'Task_Status', 'Strike'];
+  var firstName = ss.getSheets()[0].getName();
+  if (targets.indexOf(firstName) === -1) targets.unshift(firstName);
+  targets.forEach(function(tab) {
+    var sh = ss.getSheetByName(tab);
+    if (!sh) { report[tab] = 'missing'; return; }
+    sh.getRange(2, 2, n, 1).setValues(vals);
+    report[tab] = n + ' names';
+  });
+  SpreadsheetApp.flush();
+  return { success: true, className: className, count: n, report: report };
 }
 
 // Count contiguous student rows (col A = No) starting at row 2.
