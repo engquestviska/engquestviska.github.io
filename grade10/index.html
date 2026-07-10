@@ -129,8 +129,8 @@
         <h1>Welcome back, <span id="welcomeName">Student</span>.</h1>
         <p>Your English class hub for materials, tasks, submissions, and progress — pick up where you left off and earn XP as you go.</p>
         <div class="eqh-xp">
-          <div class="eqh-xp-row"><span>Level 1 · Beginner</span><span>0 / 100 XP</span></div>
-          <div class="eqh-bar"><i></i></div>
+          <div class="eqh-xp-row"><span id="xpLevelLabel">Level 1 · Beginner</span><span id="xpAmount">0 / 10 XP</span></div>
+          <div class="eqh-bar"><i id="xpBar" style="width:0%"></i></div>
         </div>
         <div class="eqh-cta">
           <a class="eqh-btn solid" href="tasks.html"><i data-lucide="play"></i> Continue Task</a>
@@ -143,7 +143,7 @@
         <a class="eqh-stat" href="tasks.html"><span class="ic eqh-c2"><i data-lucide="circle-check-big"></i></span><div class="lab">Tasks Done</div><div class="val">--</div><div class="sub">Task status</div></a>
         <a class="eqh-stat" href="submission.html"><span class="ic eqh-c3"><i data-lucide="send"></i></span><div class="lab">Submissions</div><div class="val">--</div><div class="sub">Records</div></a>
         <a class="eqh-stat" href="strikes.html"><span class="ic eqh-c4"><i data-lucide="shield-alert"></i></span><div class="lab">Strikes</div><div class="val">--</div><div class="sub">Eligibility</div></a>
-        <a class="eqh-stat" href="activeness.html"><span class="ic eqh-c5"><i data-lucide="star"></i></span><div class="lab">Level / XP</div><div class="val">--</div><div class="sub">Progress</div></a>
+        <a class="eqh-stat" href="activeness.html"><span class="ic eqh-c5"><i data-lucide="star"></i></span><div class="lab">Level / XP</div><div class="val" id="statLevel">--</div><div class="sub">Progress</div></a>
       </section>
 
       <div class="eqh-sec-head"><h2>Class work</h2><a href="tasks.html">View task status →</a></div>
@@ -233,7 +233,34 @@
       document.getElementById('changeProfile').disabled = !hasProfile;
       document.getElementById('dashboardProfileLink').style.display = hasProfile ? 'inline-flex' : 'none';
       document.getElementById('strikesProfileLink').style.display = hasProfile ? 'inline-flex' : 'none';
+      updateHeroXP(cls, no, hasProfile);
       if (window.lucide) window.lucide.createIcons();
+    }
+
+    // Faster level curve (matches the activeness page): level N->N+1 needs 5+5N XP.
+    function levelFromXP(xp) {
+      xp = Math.max(0, Number(xp) || 0);
+      var level = 1, need = 10, floor = 0;
+      while (xp >= floor + need) { floor += need; level++; need += 5; }
+      return { level: level, into: xp - floor, needForNext: need };
+    }
+    var LEVEL_TITLES = ['Beginner', 'Explorer', 'Achiever', 'Rising Star', 'Champion', 'Legend'];
+    function levelTitle(level) { return LEVEL_TITLES[Math.min(level - 1, LEVEL_TITLES.length - 1)]; }
+    function updateHeroXP(cls, no, hasProfile) {
+      var lbl = document.getElementById('xpLevelLabel'), amt = document.getElementById('xpAmount'),
+          bar = document.getElementById('xpBar'), stat = document.getElementById('statLevel');
+      function paint(level, into, need) {
+        if (lbl) lbl.textContent = 'Level ' + level + ' · ' + levelTitle(level);
+        if (amt) amt.textContent = into + ' / ' + need + ' XP';
+        if (bar) bar.style.width = (need ? Math.round(into / need * 100) : 0) + '%';
+        if (stat) stat.textContent = 'Lv ' + level;
+      }
+      if (!hasProfile || !window.EQApi) { paint(1, 0, 10); if (stat) stat.textContent = '--'; return; }
+      EQApi.get({ action: 'getAllActiveness', className: cls }).then(function(res) {
+        var stu = ((res && res.students) || []).filter(function(s){ return String(s.no) === String(no); })[0];
+        var lv = levelFromXP(stu ? stu.Total : 0);
+        paint(lv.level, lv.into, lv.needForNext);
+      }).catch(function(){});
     }
 
     function resetStudentSelect(message) {
