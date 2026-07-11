@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Vocabulary · English Quest</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css?v=20260702"/>
+  <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260702"/>
+  <style>
+    main { max-width: 900px; margin: 0 auto; padding: 26px 20px 80px; }
+    .vocab-need-login { text-align:center; padding:56px 20px; color:#64748b; background:#fff; border:1px solid #e5ecf6; border-radius:20px; }
+    .vocab-need-login a { color:var(--blue); font-weight:700; }
+    /* Vocabulary Box */
+    .vocab-wrap { background:#fff; border:1px solid #e5ecf6; border-radius:20px; padding:22px 24px; box-shadow:0 16px 40px rgba(15,23,42,.05); }
+    .vocab-head { display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+    .vocab-head h2 { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:800; }
+    .vocab-head .rem { font-size:.78rem; font-weight:700; color:#b45309; background:#fef3c7; padding:4px 12px; border-radius:999px; font-family:'IBM Plex Mono',monospace; }
+    .vocab-intro { color:#64748b; font-size:.86rem; margin:6px 0 16px; line-height:1.5; }
+    .vocab-rows { display:flex; flex-direction:column; gap:8px; }
+    .vocab-row { display:grid; grid-template-columns:26px 1fr 1fr; gap:8px; align-items:center; }
+    .vocab-row .n { font-family:'IBM Plex Mono',monospace; font-size:.8rem; color:#94a3b8; text-align:center; }
+    .vocab-row input { min-height:42px; border:1.5px solid #e2e8f0; border-radius:10px; padding:0 12px; font:500 .9rem 'IBM Plex Sans',sans-serif; outline:none; width:100%; }
+    .vocab-row input:focus { border-color:#f59e0b; }
+    .vocab-submit { margin-top:14px; display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg,#f59e0b,#d97706); color:#fff; border:none; border-radius:12px; padding:12px 24px; font:700 .92rem 'IBM Plex Sans',sans-serif; cursor:pointer; }
+    .vocab-submit:disabled { opacity:.55; cursor:not-allowed; }
+    .vocab-msg { margin-top:12px; font-size:.86rem; font-weight:600; min-height:1em; }
+    .vocab-msg.ok { color:#059669; } .vocab-msg.warn { color:#b45309; } .vocab-msg.err { color:#e11d48; }
+    .vocab-list { margin-top:16px; display:flex; flex-wrap:wrap; gap:8px; }
+    .vocab-chip { background:#f8fafc; border:1px solid #e2e8f0; border-radius:999px; padding:5px 12px; font-size:.8rem; }
+    .vocab-chip b { color:#0f172a; } .vocab-chip span { color:#94a3b8; }
+  </style>
+  <script src="../shared/js/classes-20260617.js?v=20260624"></script>
+  <script src="../shared/js/student.js"></script>
+  <script src="../shared/js/api.js"></script>
+  <script src="../shared/js/sidebar.js?v=20260711"></script>
+</head>
+<body class="grade10-subpage" data-page="vocabulary">
+  <header class="subpage-header">
+    <div class="topbar">
+      <div class="brand">
+        <img src="../logo.jpg" alt="English Quest Logo"/>
+        <div>
+          <div class="brand-title">English Quest</div>
+          <div class="brand-sub">Grade 10 Student Track</div>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="index.html">Grade 10 Home</a>
+        <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
+      </nav>
+    </div>
+
+    <section class="subpage-hero">
+      <div class="kicker">My Vocabulary</div>
+      <h1>Build your Vocabulary Box and earn XP.</h1>
+      <p class="hero-copy">Add new English words with their Indonesian meaning. Each new word gives you +2 XP — and your teacher can test you on them with flashcards.</p>
+    </section>
+  </header>
+
+  <main>
+    <div id="vocabWrap"></div>
+    <div class="vocab-need-login" id="needLogin" style="display:none">Log in on the <a href="index.html">homepage</a> first to open your Vocabulary Box.</div>
+  </main>
+
+  <script>
+    function escapeHtml(v) { return (window.EQStudent && EQStudent.escapeHtml) ? EQStudent.escapeHtml(v) : String(v == null ? '' : v); }
+    var VOCAB_MAX = 10;
+
+    function initVocab(cls, no) {
+      var wrap = document.getElementById('vocabWrap');
+      if (!wrap || !cls || !no) return;
+      var rows = '';
+      for (var i = 1; i <= VOCAB_MAX; i++) {
+        rows += '<div class="vocab-row"><span class="n">' + i + '</span>' +
+          '<input class="v-en" placeholder="English word" autocomplete="off" />' +
+          '<input class="v-id" placeholder="Arti (Bahasa Indonesia)" autocomplete="off" /></div>';
+      }
+      wrap.innerHTML =
+        '<div class="vocab-wrap">' +
+          '<div class="vocab-head"><h2>📚 Vocabulary Box</h2><span class="rem" id="vocabRem">…</span></div>' +
+          '<p class="vocab-intro">Read something in English (a book, article, or movie), then add new words with their Indonesian meaning. Each new word = <b>+2 XP</b>. No repeats, up to 30 words per week.</p>' +
+          '<div class="vocab-rows">' + rows + '</div>' +
+          '<button class="vocab-submit" id="vocabBtn">✨ Submit &amp; Earn XP</button>' +
+          '<div class="vocab-msg" id="vocabMsg"></div>' +
+          '<div class="vocab-list" id="vocabList"></div>' +
+        '</div>';
+      var btn = document.getElementById('vocabBtn');
+      if (btn) btn.onclick = function() { submitVocab(cls, no); };
+      loadVocab(cls, no);
+    }
+    function loadVocab(cls, no) {
+      if (!window.EQApi) return;
+      EQApi.get({ action: 'getVocabulary', className: cls, studentNo: no }).then(function(res) {
+        var rem = document.getElementById('vocabRem');
+        if (rem) rem.textContent = (res && res.weeklyRemaining != null ? res.weeklyRemaining : '?') + ' words left this week';
+        var list = document.getElementById('vocabList');
+        if (list) {
+          var words = (res && res.words) || [];
+          list.innerHTML = words.length
+            ? words.slice(-60).reverse().map(function(w) {
+                return '<span class="vocab-chip"><b>' + escapeHtml(w.english) + '</b> <span>· ' + escapeHtml(w.indonesian) + '</span></span>';
+              }).join('')
+            : '<span class="vocab-chip"><span>No words yet — add your first!</span></span>';
+        }
+      }).catch(function(){});
+    }
+    function submitVocab(cls, no) {
+      var btn = document.getElementById('vocabBtn'), msg = document.getElementById('vocabMsg');
+      var ens = document.querySelectorAll('#vocabWrap .v-en'), ids = document.querySelectorAll('#vocabWrap .v-id');
+      var words = [];
+      for (var i = 0; i < ens.length; i++) {
+        var en = ens[i].value.trim(), id = ids[i].value.trim();
+        if (en || id) words.push({ english: en, indonesian: id });
+      }
+      if (!words.length) { msg.className = 'vocab-msg warn'; msg.textContent = 'Type at least one word pair first.'; return; }
+      btn.disabled = true; msg.className = 'vocab-msg'; msg.textContent = 'Saving…';
+      EQApi.get({ action: 'addVocabulary', className: cls, studentNo: no, words: JSON.stringify(words) }).then(function(res) {
+        btn.disabled = false;
+        if (!res || !res.success) { msg.className = 'vocab-msg err'; msg.textContent = (res && res.error) || 'Could not save. Please try again.'; return; }
+        var parts = [];
+        if (res.added) parts.push('✅ +' + res.xp + ' XP for ' + res.added + ' word' + (res.added > 1 ? 's' : '') + '!');
+        var dupes = (res.rejected || []).filter(function(r){ return r.reason === 'duplicate'; }).length;
+        var capped = (res.rejected || []).filter(function(r){ return r.reason === 'weekly-cap'; }).length;
+        if (dupes) parts.push(dupes + ' already added before');
+        if (capped) parts.push(capped + ' over the weekly limit');
+        msg.className = 'vocab-msg ' + (res.added ? 'ok' : 'warn');
+        msg.textContent = parts.join(' · ') || 'No new words added.';
+        for (var j = 0; j < ens.length; j++) { ens[j].value = ''; ids[j].value = ''; }
+        loadVocab(cls, no);
+      }).catch(function() { btn.disabled = false; msg.className = 'vocab-msg err'; msg.textContent = 'Network error. Please try again.'; });
+    }
+
+    (function init() {
+      var p = EQStudent.read('10');
+      if (p.hasProfile) { initVocab(p.classId, p.studentNo); }
+      else { document.getElementById('needLogin').style.display = ''; }
+    })();
+  </script>
+</body>
+</html>

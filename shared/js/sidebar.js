@@ -113,6 +113,7 @@
       navItem('tasks', 'tasks.html', 'list-checks', 'Task Status', current),
       navItem('students', 'students.html', 'users-round', 'Student List', current),
       navItem('activeness', 'activeness.html', 'zap', 'Level / XP', current),
+      navItem('vocabulary', 'vocabulary.html', 'book-a', 'My Vocabulary', current),
       navItem('strikes', 'strikes.html', 'shield-alert', 'My Strikes', current)
     ].join('');
 
