@@ -121,6 +121,8 @@ function doGet(e) {
     else if (action === 'getVocabulary')       result = getVocabulary(e.parameter.className, e.parameter.studentNo);
     else if (action === 'addVocabulary')        result = addVocabulary(e.parameter.className, e.parameter.studentNo, e.parameter.words);
     else if (action === 'clearVocabulary')      result = clearVocabulary(e.parameter.username, e.parameter.password, e.parameter.className);
+    else if (action === 'setupAttendanceSheet') result = setupAttendanceSheet(e.parameter.username, e.parameter.password);
+    else if (action === 'getClassData')         result = getClassData(e.parameter.className);
     else if (action === 'getStudentStrikes')  result = getStudentStrikes(e.parameter.className, e.parameter.studentNo);
     else if (action === 'debugStrikeHeaders')  result = debugStrikeHeaders(e.parameter.className);
     else if (action === 'getAllStrikes')       result = getAllStrikes(e.parameter.className);
@@ -805,6 +807,70 @@ function clearVocabulary(username, password, className) {
   var sh = SpreadsheetApp.openById(sheetId).getSheetByName(VOCAB_TAB);
   if (sh && sh.getLastRow() > 1) sh.getRange(2, 1, sh.getLastRow() - 1, sh.getLastColumn()).clearContent();
   return { success: true };
+}
+
+// ── ATTENDANCE (new-period sheet) ─────────────────────────────
+// Creates ONE new spreadsheet "EQ Attendance 2026-2027" with a tab per class
+// (Grade 10 XE1-5 + Grade 11 XIF7-9), each filled with that class's roster.
+// Meeting/date columns get added later (col D onward) as attendance is taken.
+// Stores the new spreadsheet id in Script Property ATTENDANCE_SHEET_ID.
+function setupAttendanceSheet(username, password) {
+  if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
+  var props = PropertiesService.getScriptProperties();
+  var ss = null;
+  var existing = props.getProperty('ATTENDANCE_SHEET_ID');
+  if (existing) { try { ss = SpreadsheetApp.openById(existing); } catch (e) { ss = null; } }
+  if (!ss) {
+    ss = SpreadsheetApp.create('EQ Attendance 2026-2027');
+    props.setProperty('ATTENDANCE_SHEET_ID', ss.getId());
+  }
+  var report = {};
+  Object.keys(SCORE_SHEETS).forEach(function(cls) {
+    var tab = ss.getSheetByName(cls) || ss.insertSheet(cls);
+    tab.clear();
+    var src = SpreadsheetApp.openById(SCORE_SHEETS[cls]).getSheets()[0].getDataRange().getValues();
+    var rows = [['No', 'Name', 'Nickname']];
+    for (var r = 1; r < src.length; r++) {
+      var no = src[r][0], name = src[r][1];
+      if (!no || !name || String(name).trim() === '') break;
+      rows.push([no, String(name).trim(), String(src[r][2] || '').trim()]);
+    }
+    tab.getRange(1, 1, rows.length, 3).setValues(rows);
+    tab.setFrozenRows(1);
+    report[cls] = (rows.length - 1) + ' students';
+  });
+  var def = ss.getSheetByName('Sheet1');
+  if (def && !SCORE_SHEETS['Sheet1'] && ss.getSheets().length > 1) ss.deleteSheet(def);
+  SpreadsheetApp.flush();
+  return { success: true, spreadsheetId: ss.getId(), url: ss.getUrl(), report: report };
+}
+
+// Attendance read for the student pages. Returns { students, meetings } in the
+// shape the frontend expects: meetings = [{number, date}], each student has an
+// attendance map { m1:'Present', ... }. Empty (but valid) until meetings exist.
+function getClassData(className) {
+  var id = PropertiesService.getScriptProperties().getProperty('ATTENDANCE_SHEET_ID');
+  if (!id) return { students: [], meetings: [] };
+  var ss;
+  try { ss = SpreadsheetApp.openById(id); } catch (e) { return { students: [], meetings: [] }; }
+  var tab = ss.getSheetByName(className);
+  if (!tab) return { students: [], meetings: [] };
+  var data = tab.getDataRange().getValues();
+  if (!data.length) return { students: [], meetings: [] };
+  var headers = data[0];
+  var meetings = [];
+  for (var c = 3; c < headers.length; c++) {
+    if (headers[c] !== '' && headers[c] !== null) meetings.push({ number: c - 2, date: String(headers[c]) });
+  }
+  var students = [];
+  for (var r = 1; r < data.length; r++) {
+    var no = data[r][0], name = data[r][1];
+    if (!no || !name || String(name).trim() === '') break;
+    var att = {};
+    meetings.forEach(function(m) { var v = data[r][m.number + 1]; if (v) att['m' + m.number] = String(v); });
+    students.push({ no: no, name: String(name).trim(), nickname: String(data[r][2] || '').trim(), attendance: att });
+  }
+  return { students: students, meetings: meetings };
 }
 
 // Count contiguous student rows (col A = No) starting at row 2.
