@@ -123,6 +123,7 @@
     return {
       classesReady: true,
       rostersReady: true,
+      attendanceReady: false,
       rosterStatus: 'Official student rosters are loaded.',
       grade10Classes: idsForGrade('10'),
       grade11Classes: idsForGrade('11')
@@ -131,6 +132,13 @@
 
   function rostersReady() {
     return dataReadiness().rostersReady === true;
+  }
+
+  // Attendance runs on a SEPARATE backend that still holds last-year data.
+  // Keep this false so attendance pages stay placeholder-safe (no old-year
+  // records) until a new-period attendance sheet is wired. Flip to true then.
+  function attendanceReady() {
+    return dataReadiness().attendanceReady === true;
   }
 
   // True when the site should display the numbered placeholder roster (Student
@@ -158,6 +166,7 @@
     placeholderRosterFor: placeholderRosterFor,
     dataReadiness: dataReadiness,
     rostersReady: rostersReady,
+    attendanceReady: attendanceReady,
     numberedRosterMode: numberedRosterMode
   };
 })(window);

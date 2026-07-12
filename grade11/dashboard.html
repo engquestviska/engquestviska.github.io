@@ -564,6 +564,13 @@
     }
 
     async function loadAttendance() {
+      if (!window.EQClasses || !EQClasses.attendanceReady || !EQClasses.attendanceReady()) {
+        setText('attendanceValue', '--');
+        setText('attendanceSub', 'Attendance opens once the new-period sheet is connected.');
+        summary.attendance = 'Not ready';
+        renderQuickList();
+        return;
+      }
       try {
         var data = await attendanceApiGet({ action: 'getClassData', className: studentProfile.cls });
         var student = findStudent(data.students);

@@ -474,7 +474,7 @@
     let currentClass = '';
     let currentStudents = [];
     let currentMeetings = [];
-    const ROSTERS_READY = window.EQClasses ? EQClasses.rostersReady() : false;
+    const ROSTERS_READY = (window.EQClasses && EQClasses.attendanceReady) ? EQClasses.attendanceReady() : false;
 
     function setLoading(on) {
       loadingState.classList.toggle('hidden', !on);
@@ -498,9 +498,9 @@
 
     function showPreRosterAttendance() {
       studentSelect.disabled = true;
-      studentSelect.innerHTML = '<option value="">No students found</option>';
-      pickerHint.textContent = 'Select your class and name to view your attendance.';
-      showEmpty('No roster loaded for this class.', 'Please reload the page to load this class.');
+      studentSelect.innerHTML = '<option value="">Attendance not open yet</option>';
+      pickerHint.textContent = 'Attendance for the new school period will open here soon.';
+      showEmpty('Attendance isn\'t open yet.', 'Your attendance for the new period will appear here once it is set up. No old-year records are shown.');
     }
 
     function initials(name) {
