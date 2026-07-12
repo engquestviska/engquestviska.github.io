@@ -9,135 +9,33 @@
   <link rel="stylesheet" href="../shared/css/system.css?v=20260702"/>
   <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260702"/>
   <style>
-    .attendance-list {
-      display: grid;
-      gap: 12px;
-    }
+    .controls { display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; margin-bottom:16px; }
+    .controls > div { display:flex; flex-direction:column; gap:6px; }
+    .controls label { font-size:.72rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#64748b; font-family:'IBM Plex Mono',monospace; }
+    .controls select, .controls input { min-height:46px; border:1.5px solid #dbeafe; border-radius:12px; background:#fff; padding:0 14px; font:600 .92rem 'IBM Plex Sans',sans-serif; color:#0f172a; }
+    .controls select { min-width:190px; }
 
-    .attendance-row {
-      display: grid;
-      grid-template-columns: 54px minmax(180px, 1fr) auto;
-      gap: 14px;
-      align-items: center;
-      border: 1.5px solid #dbeafe;
-      border-radius: 20px;
-      background: #fff;
-      padding: 16px;
-      box-shadow: 0 12px 26px rgba(37, 99, 235, 0.06);
-    }
+    .att-actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:6px 0 16px; }
+    .att-actions .grow { flex:1; }
+    .att-summary { color:#64748b; font-size:.86rem; font-weight:600; }
+    .btn.danger { background:#fff1f2; border-color:#fecdd3; color:#be123c; }
 
-    .attendance-row.issue {
-      border-color: #fecaca;
-      background: linear-gradient(135deg, #fff, #fff5f5);
-    }
-
-    .attendance-avatar {
-      width: 48px;
-      height: 48px;
-      display: grid;
-      place-items: center;
-      border-radius: 16px;
-      background: #2563eb;
-      color: #fff;
-      font-family: 'IBM Plex Mono', monospace;
-      font-weight: 900;
-    }
-
-    .attendance-name {
-      font-weight: 800;
-      line-height: 1.25;
-    }
-
-    .attendance-meta {
-      margin-top: 5px;
-      color: var(--muted);
-      font-size: 0.84rem;
-      font-weight: 600;
-    }
-
-    .attendance-state {
-      justify-self: end;
-      border-radius: 999px;
-      padding: 9px 12px;
-      background: #d1fae5;
-      color: #047857;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.74rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      white-space: nowrap;
-    }
-
-    .attendance-state.Absent {
-      background: #fee2e2;
-      color: #b91c1c;
-    }
-
-    .attendance-state.Sick {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .attendance-state.Permission,
-    .attendance-state.Dispen {
-      background: #dbeafe;
-      color: #1d4ed8;
-    }
-
-    .meeting-strip {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 18px;
-    }
-
-    .meeting-chip {
-      min-height: 38px;
-      border: 1.5px solid #dbeafe;
-      border-radius: 999px;
-      background: #fff;
-      color: var(--muted);
-      padding: 0 13px;
-      font: inherit;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.76rem;
-      font-weight: 900;
-      cursor: pointer;
-    }
-
-    .meeting-chip.active {
-      border-color: #2563eb;
-      background: #2563eb;
-      color: #fff;
-    }
-
-    .teacher-note {
-      margin-top: 18px;
-      border: 1.5px dashed #bfdbfe;
-      border-radius: 18px;
-      background: #f8fbff;
-      padding: 15px;
-      color: var(--muted);
-      line-height: 1.55;
-    }
-
-    @media (max-width: 760px) {
-      .attendance-row {
-        grid-template-columns: 48px 1fr;
-      }
-
-      .attendance-state {
-        grid-column: 1 / -1;
-        justify-self: start;
-      }
-    }
+    .attendance-list { display:grid; gap:10px; }
+    .attendance-row { display:grid; grid-template-columns:48px minmax(160px,1fr) 170px; gap:14px; align-items:center; border:1.5px solid #dbeafe; border-radius:16px; background:#fff; padding:12px 16px; }
+    .attendance-avatar { width:44px; height:44px; display:grid; place-items:center; border-radius:14px; background:#2563eb; color:#fff; font-family:'IBM Plex Mono',monospace; font-weight:900; }
+    .attendance-name { font-weight:800; line-height:1.2; }
+    .attendance-meta { margin-top:3px; color:var(--muted); font-size:.8rem; font-weight:600; }
+    .att-sel { justify-self:end; width:100%; min-height:44px; border:1.5px solid #dbeafe; border-radius:12px; background:#f8fbff; padding:0 12px; font:700 .9rem 'IBM Plex Sans',sans-serif; color:#0f172a; }
+    .att-sel[data-v="Present"] { border-color:#6ee7b7; background:#ecfdf5; color:#047857; }
+    .att-sel[data-v="Absent"]  { border-color:#fca5a5; background:#fef2f2; color:#b91c1c; }
+    .att-sel[data-v="Sick"]    { border-color:#fcd34d; background:#fffbeb; color:#92400e; }
+    .att-sel[data-v="Permit"]  { border-color:#93c5fd; background:#eff6ff; color:#1d4ed8; }
+    @media (max-width:640px){ .attendance-row { grid-template-columns:44px 1fr; } .att-sel { grid-column:1/-1; } }
   </style>
   <script src="../shared/js/classes-20260617.js?v=20260712"></script>
   <script src="../shared/js/api.js"></script>
   <script src="../shared/js/dom-utils.js"></script>
   <script src="../shared/js/auth.js"></script>
-  <script src="../shared/js/attendance.js?v=20260712"></script>
   <script src="../shared/js/teacher-sidebar.js?v=20260711"></script>
 </head>
 <body class="teacher-tool-page" data-page="attendance">
@@ -152,21 +50,20 @@
       </div>
       <nav class="nav-actions" aria-label="Teacher navigation">
         <a href="index.html">Dashboard</a>
-        <a href="../grade10/attendance.html">Student View</a>
         <button type="button" onclick="teacherLogout()">Logout</button>
       </nav>
     </div>
     <section class="hero">
-      <div class="kicker">Attendance Review</div>
-      <h1>Inspect attendance records without touching student pages.</h1>
-      <p class="hero-copy">Load a Grade 10 class, review meeting totals, and inspect each meeting from the teacher room.</p>
+      <div class="kicker">Attendance</div>
+      <h1>Take class attendance.</h1>
+      <p class="hero-copy">Pick any class (Grade 10 or 11) and a date, mark each student, and save. Change a mark anytime, or remove a whole meeting.</p>
     </section>
   </header>
 
   <main>
     <section class="access-card" id="accessCard" hidden>
       <h2 class="access-title">Teacher login required.</h2>
-      <p class="access-copy">Open the teacher dashboard and log in first. Attendance review uses the saved teacher session.</p>
+      <p class="access-copy">Open the teacher dashboard and log in first. Marking attendance uses your saved teacher session.</p>
       <a class="btn" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none;">Open Teacher Login</a>
     </section>
 
@@ -174,8 +71,8 @@
       <div class="panel">
         <div class="panel-head">
           <div>
-            <h2 class="panel-title">Grade 10 Attendance</h2>
-            <p class="panel-copy">This page reads the deployed attendance source. Editing will be added after the attendance writing flow is connected.</p>
+            <h2 class="panel-title">Mark Attendance</h2>
+            <p class="panel-copy">Choose a class and date, set each student, then Save.</p>
           </div>
           <div class="status-pill" id="loginPill">Teacher</div>
         </div>
@@ -183,186 +80,165 @@
         <div class="controls">
           <div>
             <label for="classSelect">Class</label>
-            <select id="classSelect" data-eq-class-select data-grade="10"></select>
+            <select id="classSelect"><option value="">Choose class</option></select>
           </div>
           <div>
-            <label for="searchInput">Search student</label>
-            <input id="searchInput" type="search" placeholder="Type name, nickname, or number"/>
+            <label for="dateInput">Date</label>
+            <input id="dateInput" type="date"/>
           </div>
-          <button class="btn" type="button" id="loadBtn" onclick="loadAttendance()">Load Attendance</button>
+          <button class="btn" type="button" id="loadBtn" onclick="loadAttendance()" disabled>Load</button>
         </div>
 
-        <div class="summary-grid" id="summaryGrid">
-          <div class="summary-card"><strong>0</strong><span>Students</span></div>
-          <div class="summary-card"><strong>0</strong><span>Dated Meetings</span></div>
-          <div class="summary-card"><strong>0%</strong><span>Average Present</span></div>
-          <div class="summary-card"><strong>0</strong><span>Issues</span></div>
+        <div class="att-actions" id="attActions" style="display:none">
+          <span class="att-summary grow" id="attSummary"></span>
+          <button class="btn ghost" type="button" onclick="markAll('Present')">Mark all Present</button>
+          <button class="btn danger" type="button" id="removeBtn" onclick="removeMeeting()" style="display:none">Remove this meeting</button>
+          <button class="btn" type="button" id="saveBtn" onclick="saveAttendance()">Save Attendance</button>
         </div>
 
-        <div class="meeting-strip" id="meetingStrip"></div>
-        <div class="teacher-note">Current mode: review only. This avoids unsafe writes until attendance editing is confirmed.</div>
+        <div id="attendanceList" class="attendance-list"></div>
       </div>
-
-      <div id="attendanceList" class="attendance-list"></div>
     </section>
   </main>
 
-  <footer>© 2026 English Quest · Teacher Attendance Review</footer>
+  <footer>© 2026 English Quest · Teacher Attendance</footer>
   <div class="toast" id="toast"></div>
 
   <script>
-    var attendanceData = { students: [], meetings: [] };
-    var selectedMeeting = 'summary';
+    var STATUSES = ['Present', 'Absent', 'Sick', 'Permit'];
+    var students = [];
+    var meetings = [];
 
-    function teacherLogout() {
-      EQAuth.logoutTeacher('index.html');
+    function esc(v) { return (window.EQStudent && EQStudent.escapeHtml) ? EQStudent.escapeHtml(v) : String(v == null ? '' : v); }
+    function teacherLogout() { EQAuth.logoutTeacher('index.html'); }
+    function showToast(message, type) {
+      var t = document.getElementById('toast');
+      t.textContent = message; t.className = 'toast ' + (type || '');
+      setTimeout(function(){ t.classList.add('show'); }, 10);
+      setTimeout(function(){ t.classList.remove('show'); }, 2600);
+    }
+    function initials(s) {
+      var src = s.nickname || s.name || 'EQ';
+      return src.split(/\s+/).filter(Boolean).slice(0, 2).map(function(p){ return p.charAt(0).toUpperCase(); }).join('') || 'EQ';
     }
 
-    function initials(student) {
-      var source = student.nickname || student.name || 'EQ';
-      return source.split(/\s+/).filter(Boolean).slice(0, 2).map(function(part) {
-        return part.charAt(0).toUpperCase();
-      }).join('') || 'EQ';
+    function populateClasses() {
+      var sel = document.getElementById('classSelect');
+      var all = (window.EQClasses && EQClasses.all) || [];
+      sel.innerHTML = '<option value="">Choose class</option>' +
+        all.map(function(c){ return '<option value="' + c.id + '">' + esc(c.label) + '</option>'; }).join('');
     }
 
-    function datedMeetings() {
-      return attendanceData.meetings.filter(function(meeting) {
-        return meeting.date && meeting.number !== undefined && meeting.number !== null && meeting.number !== '';
-      });
-    }
-
-    function statusFor(student, meeting) {
-      return (student.attendance && student.attendance['m' + meeting.number]) || 'Present';
+    function meetingForDate(date) {
+      for (var i = 0; i < meetings.length; i++) { if (String(meetings[i].date) === String(date)) return meetings[i]; }
+      return null;
     }
 
     function loadAttendance() {
       if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
       var cls = document.getElementById('classSelect').value;
+      var date = document.getElementById('dateInput').value;
+      if (!cls || !date) { showToast('Pick a class and a date first.', 'err'); return; }
       var btn = document.getElementById('loadBtn');
-      btn.disabled = true;
-      btn.textContent = 'Loading...';
-      document.getElementById('attendanceList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading attendance...</h2><p class="empty-copy">Fetching ' + escapeHtml(cls) + ' from the attendance source.</p></div>';
-
-      EQAttendance.get({ action: 'getClassData', className: cls }).then(function(data) {
+      btn.disabled = true; btn.textContent = 'Loading…';
+      document.getElementById('attActions').style.display = 'none';
+      document.getElementById('attendanceList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading…</h2></div>';
+      EQApi.get({ action: 'getClassData', className: cls }).then(function(data) {
         if (data.error) throw new Error(data.error);
-        attendanceData = {
-          students: data.students || [],
-          meetings: data.meetings || []
-        };
-        selectedMeeting = 'summary';
-        renderMeetings();
-        renderAttendance();
-        showToast('Attendance loaded', 'ok');
+        students = data.students || [];
+        meetings = data.meetings || [];
+        renderMarking(date);
+        showToast('Loaded ' + cls, 'ok');
       }).catch(function(err) {
-        document.getElementById('attendanceList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Could not load attendance.</h2><p class="empty-copy">' + escapeHtml(err.message) + '</p></div>';
+        document.getElementById('attendanceList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Could not load.</h2><p class="empty-copy">' + esc(err.message) + '</p></div>';
         showToast(err.message, 'err');
       }).finally(function() {
-        btn.disabled = false;
-        btn.textContent = 'Load Attendance';
-        updateSummary();
+        btn.disabled = false; btn.textContent = 'Load';
       });
     }
 
-    function renderMeetings() {
-      var meetings = datedMeetings();
-      var html = '<button class="meeting-chip ' + (selectedMeeting === 'summary' ? 'active' : '') + '" type="button" onclick="setMeeting(&quot;summary&quot;)">Summary</button>';
-      html += meetings.map(function(meeting) {
-        return '<button class="meeting-chip ' + (String(selectedMeeting) === String(meeting.number) ? 'active' : '') + '" type="button" onclick="setMeeting(&quot;' + escapeHtml(meeting.number) + '&quot;)">M' + escapeHtml(meeting.number) + '</button>';
-      }).join('');
-      document.getElementById('meetingStrip').innerHTML = html;
-    }
-
-    function setMeeting(meetingNumber) {
-      selectedMeeting = meetingNumber;
-      renderMeetings();
-      renderAttendance();
-    }
-
-    function visibleStudents() {
-      var query = document.getElementById('searchInput').value.trim().toLowerCase();
-      return attendanceData.students.filter(function(student) {
-        var searchable = [student.no, student.name, student.nickname].join(' ').toLowerCase();
-        return !query || searchable.indexOf(query) > -1;
-      });
-    }
-
-    function renderAttendance() {
+    function renderMarking(date) {
+      var meeting = meetingForDate(date);
       var list = document.getElementById('attendanceList');
-      var meetings = datedMeetings();
-      var students = visibleStudents();
-      if (!attendanceData.students.length) {
-        list.innerHTML = '<div class="empty-card"><h2 class="empty-title">No attendance data loaded yet.</h2><p class="empty-copy">Choose a class and load its attendance records.</p></div>';
-        updateSummary();
-        return;
-      }
       if (!students.length) {
-        list.innerHTML = '<div class="empty-card"><h2 class="empty-title">No matching students.</h2><p class="empty-copy">Try another search.</p></div>';
-        updateSummary();
+        list.innerHTML = '<div class="empty-card"><h2 class="empty-title">No students in this class.</h2></div>';
         return;
       }
-
-      list.innerHTML = students.map(function(student) {
-        var state;
-        var meta;
-        if (selectedMeeting === 'summary') {
-          var statuses = meetings.map(function(meeting) { return statusFor(student, meeting); });
-          var present = statuses.filter(function(status) { return status === 'Present'; }).length;
-          var issue = statuses.filter(function(status) { return status !== 'Present'; }).length;
-          var rate = statuses.length ? Math.round(present / statuses.length * 100) : 0;
-          state = rate + '%';
-          meta = present + ' present · ' + issue + ' non-present · ' + statuses.length + ' dated meetings';
-        } else {
-          var meeting = meetings.find(function(item) { return String(item.number) === String(selectedMeeting); });
-          state = meeting ? statusFor(student, meeting) : 'Present';
-          meta = meeting ? 'Meeting ' + meeting.number + ' · ' + meeting.date : 'Meeting not found';
-        }
-        var issueClass = selectedMeeting === 'summary' ? (state !== '100%' ? 'issue' : '') : (state !== 'Present' ? 'issue' : '');
-        var stateClass = selectedMeeting === 'summary' ? '' : state;
-        return '<article class="attendance-row ' + issueClass + '">' +
-          '<div class="attendance-avatar">' + escapeHtml(initials(student)) + '</div>' +
-          '<div><div class="attendance-name">' + escapeHtml(student.nickname || student.name) + '</div><div class="attendance-meta">No. ' + escapeHtml(student.no) + ' · ' + escapeHtml(meta) + (student.nickname ? ' · ' + escapeHtml(student.name) : '') + '</div></div>' +
-          '<div class="attendance-state ' + escapeHtml(stateClass) + '">' + escapeHtml(state) + '</div>' +
+      list.innerHTML = students.map(function(s) {
+        var current = meeting ? (s.attendance['m' + meeting.number] || 'Present') : 'Present';
+        var opts = STATUSES.map(function(st){ return '<option value="' + st + '"' + (st === current ? ' selected' : '') + '>' + st + '</option>'; }).join('') +
+          '<option value=""' + (current === '' ? ' selected' : '') + '>— Not set</option>';
+        return '<article class="attendance-row">' +
+          '<div class="attendance-avatar">' + esc(initials(s)) + '</div>' +
+          '<div><div class="attendance-name">' + esc(s.nickname || s.name) + '</div><div class="attendance-meta">No. ' + esc(s.no) + (s.nickname ? ' · ' + esc(s.name) : '') + '</div></div>' +
+          '<select class="att-sel" data-no="' + esc(s.no) + '" data-v="' + esc(current) + '" onchange="this.setAttribute(&quot;data-v&quot;, this.value); updateSummary();">' + opts + '</select>' +
         '</article>';
       }).join('');
+      document.getElementById('attActions').style.display = 'flex';
+      document.getElementById('removeBtn').style.display = meeting ? 'inline-flex' : 'none';
       updateSummary();
     }
 
     function updateSummary() {
-      var meetings = datedMeetings();
-      var students = attendanceData.students;
-      var totalSlots = students.length * meetings.length;
-      var presentSlots = 0;
-      var issues = 0;
-      students.forEach(function(student) {
-        meetings.forEach(function(meeting) {
-          var status = statusFor(student, meeting);
-          if (status === 'Present') presentSlots++;
-          else issues++;
-        });
+      var sels = document.querySelectorAll('.att-sel');
+      var present = 0, marked = 0;
+      sels.forEach(function(s){ if (s.value) marked++; if (s.value === 'Present') present++; });
+      document.getElementById('attSummary').textContent = sels.length + ' students · ' + present + ' present · ' + (marked - present) + ' not present';
+    }
+
+    function markAll(status) {
+      document.querySelectorAll('.att-sel').forEach(function(s){ s.value = status; s.setAttribute('data-v', status); });
+      updateSummary();
+    }
+
+    function saveAttendance() {
+      var cls = document.getElementById('classSelect').value;
+      var date = document.getElementById('dateInput').value;
+      if (!cls || !date) return;
+      var records = [];
+      document.querySelectorAll('.att-sel').forEach(function(s){ records.push({ no: s.getAttribute('data-no'), status: s.value }); });
+      var teacher = EQAuth.getTeacher();
+      var btn = document.getElementById('saveBtn');
+      btn.disabled = true; btn.textContent = 'Saving…';
+      EQApi.get({ action: 'saveAttendance', username: teacher.username, password: teacher.password, className: cls, date: date, records: JSON.stringify(records) }).then(function(res) {
+        if (!res || !res.success) throw new Error((res && res.error) || 'Save failed');
+        showToast('Attendance saved for ' + date, 'ok');
+        return EQApi.get({ action: 'getClassData', className: cls });
+      }).then(function(data) {
+        if (data && !data.error) { students = data.students || []; meetings = data.meetings || []; renderMarking(date); }
+      }).catch(function(err) {
+        showToast(err.message, 'err');
+      }).finally(function() {
+        btn.disabled = false; btn.textContent = 'Save Attendance';
       });
-      var average = totalSlots ? Math.round(presentSlots / totalSlots * 100) : 0;
-      document.getElementById('summaryGrid').innerHTML =
-        '<div class="summary-card"><strong>' + students.length + '</strong><span>Students</span></div>' +
-        '<div class="summary-card"><strong>' + meetings.length + '</strong><span>Dated Meetings</span></div>' +
-        '<div class="summary-card"><strong>' + average + '%</strong><span>Average Present</span></div>' +
-        '<div class="summary-card"><strong>' + issues + '</strong><span>Issues</span></div>';
     }
 
-    function showToast(message, type) {
-      var toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.className = 'toast ' + (type || '');
-      setTimeout(function() { toast.classList.add('show'); }, 10);
-      setTimeout(function() { toast.classList.remove('show'); }, 2600);
+    function removeMeeting() {
+      var cls = document.getElementById('classSelect').value;
+      var date = document.getElementById('dateInput').value;
+      if (!cls || !date) return;
+      if (!window.confirm('Remove the whole meeting for ' + date + '? This deletes everyone’s marks for that date.')) return;
+      var teacher = EQAuth.getTeacher();
+      EQApi.get({ action: 'removeAttendanceMeeting', username: teacher.username, password: teacher.password, className: cls, date: date }).then(function(res) {
+        if (!res || !res.success) throw new Error((res && res.error) || 'Remove failed');
+        showToast('Meeting removed', 'ok');
+        return EQApi.get({ action: 'getClassData', className: cls });
+      }).then(function(data) {
+        if (data && !data.error) { students = data.students || []; meetings = data.meetings || []; renderMarking(date); }
+      }).catch(function(err) { showToast(err.message, 'err'); });
     }
 
-    document.getElementById('classSelect').addEventListener('change', loadAttendance);
-    document.getElementById('searchInput').addEventListener('input', renderAttendance);
+    function refreshLoadEnabled() {
+      document.getElementById('loadBtn').disabled = !(document.getElementById('classSelect').value && document.getElementById('dateInput').value);
+    }
+    document.getElementById('classSelect').addEventListener('change', refreshLoadEnabled);
+    document.getElementById('dateInput').addEventListener('change', refreshLoadEnabled);
 
     (function init() {
-      if (window.EQTeacherShell) EQTeacherShell.populateClassSelect('classSelect', { grade: '10' });
-      if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
-      loadAttendance();
+      populateClasses();
+      document.getElementById('dateInput').value = new Date().toISOString().slice(0, 10);
+      refreshLoadEnabled();
+      EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' });
     })();
   </script>
 </body>
