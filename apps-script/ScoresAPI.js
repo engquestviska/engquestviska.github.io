@@ -123,6 +123,8 @@ function doGet(e) {
     else if (action === 'clearVocabulary')      result = clearVocabulary(e.parameter.username, e.parameter.password, e.parameter.className);
     else if (action === 'setupAttendanceSheet') result = setupAttendanceSheet(e.parameter.username, e.parameter.password);
     else if (action === 'getClassData')         result = getClassData(e.parameter.className);
+    else if (action === 'saveAttendance')       result = saveAttendance(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.date, e.parameter.records);
+    else if (action === 'removeAttendanceMeeting') result = removeAttendanceMeeting(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.date);
     else if (action === 'getStudentStrikes')  result = getStudentStrikes(e.parameter.className, e.parameter.studentNo);
     else if (action === 'debugStrikeHeaders')  result = debugStrikeHeaders(e.parameter.className);
     else if (action === 'getAllStrikes')       result = getAllStrikes(e.parameter.className);
@@ -860,17 +862,71 @@ function getClassData(className) {
   var headers = data[0];
   var meetings = [];
   for (var c = 3; c < headers.length; c++) {
-    if (headers[c] !== '' && headers[c] !== null) meetings.push({ number: c - 2, date: String(headers[c]) });
+    if (headers[c] !== '' && headers[c] !== null) meetings.push({ number: c - 2, date: _fmtDate(headers[c]) });
   }
   var students = [];
   for (var r = 1; r < data.length; r++) {
     var no = data[r][0], name = data[r][1];
     if (!no || !name || String(name).trim() === '') break;
     var att = {};
-    meetings.forEach(function(m) { var v = data[r][m.number + 1]; if (v) att['m' + m.number] = String(v); });
+    meetings.forEach(function(m) { var v = data[r][m.number + 2]; if (v !== '' && v !== null) att['m' + m.number] = String(v); });
     students.push({ no: no, name: String(name).trim(), nickname: String(data[r][2] || '').trim(), attendance: att });
   }
   return { students: students, meetings: meetings };
+}
+
+// Format a sheet cell that may be a Date or string into a plain yyyy-MM-dd.
+function _fmtDate(v) {
+  if (v instanceof Date) return Utilities.formatDate(v, Session.getScriptTimeZone(), 'yyyy-MM-dd');
+  return String(v == null ? '' : v);
+}
+
+// Teacher writes attendance for one class on one date. records = JSON array of
+// {no, status}. Finds the column whose header === date (or appends a new one),
+// then writes each student's status. Blank status clears (removes) that mark.
+function saveAttendance(username, password, className, date, recordsJson) {
+  if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
+  if (!date) return { success: false, error: 'No date provided' };
+  var id = PropertiesService.getScriptProperties().getProperty('ATTENDANCE_SHEET_ID');
+  if (!id) return { success: false, error: 'Attendance sheet not set up' };
+  var tab = SpreadsheetApp.openById(id).getSheetByName(className);
+  if (!tab) return { success: false, error: 'Class not found: ' + className };
+  var records;
+  try { records = JSON.parse(recordsJson || '[]'); } catch (e) { return { success: false, error: 'Bad records' }; }
+  var data = tab.getDataRange().getValues();
+  var headers = data[0];
+  var col = -1;
+  for (var c = 3; c < headers.length; c++) { if (_fmtDate(headers[c]) === String(date)) { col = c; break; } }
+  if (col === -1) { col = Math.max(headers.length, 3); tab.getRange(1, col + 1).setValue(date); }
+  var n = 0;
+  for (var r = 1; r < data.length; r++) { if (data[r][0] === '' || data[r][0] === null) break; n++; }
+  if (!n) return { success: false, error: 'No students' };
+  var existing = (col < headers.length) ? tab.getRange(2, col + 1, n, 1).getValues() : null;
+  var out = [], noToIdx = {};
+  for (var i = 0; i < n; i++) { out.push([existing ? existing[i][0] : '']); noToIdx[String(data[i + 1][0])] = i; }
+  var written = 0;
+  records.forEach(function(rec) {
+    var idx = noToIdx[String(rec && rec.no)];
+    if (idx !== undefined) { out[idx] = [String(rec.status == null ? '' : rec.status)]; written++; }
+  });
+  tab.getRange(2, col + 1, n, 1).setValues(out);
+  SpreadsheetApp.flush();
+  return { success: true, meetingNumber: col - 2, date: date, written: written };
+}
+
+// Teacher deletes a whole meeting (date column) from a class.
+function removeAttendanceMeeting(username, password, className, date) {
+  if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
+  var id = PropertiesService.getScriptProperties().getProperty('ATTENDANCE_SHEET_ID');
+  if (!id) return { success: false, error: 'Attendance sheet not set up' };
+  var tab = SpreadsheetApp.openById(id).getSheetByName(className);
+  if (!tab) return { success: false, error: 'Class not found: ' + className };
+  var lastCol = tab.getLastColumn();
+  var headers = tab.getRange(1, 1, 1, lastCol).getValues()[0];
+  for (var c = 3; c < headers.length; c++) {
+    if (_fmtDate(headers[c]) === String(date)) { tab.deleteColumn(c + 1); SpreadsheetApp.flush(); return { success: true }; }
+  }
+  return { success: false, error: 'Meeting not found' };
 }
 
 // Count contiguous student rows (col A = No) starting at row 2.
