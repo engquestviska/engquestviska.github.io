@@ -123,7 +123,7 @@
     return {
       classesReady: true,
       rostersReady: true,
-      attendanceReady: false,
+      attendanceReady: true,
       rosterStatus: 'Official student rosters are loaded.',
       grade10Classes: idsForGrade('10'),
       grade11Classes: idsForGrade('11')

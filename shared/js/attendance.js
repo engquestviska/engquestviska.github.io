@@ -1,6 +1,9 @@
 /* English Quest shared attendance API helper */
 (function(global) {
-  var API_URL = 'https://script.google.com/macros/s/AKfycbxHaOK1WSG5hVVrzOUwGI3QxY3eSbjaAseRVxVaMXU-b8k9Stn4exUUbvB56dYbKLfr/exec';
+  // Repointed 2026-07-10 from the old presensi backend (old-year data) to the
+  // main Scores API, which now serves attendance via getClassData reading the
+  // new "EQ Attendance 2026-2027" sheet. All attendance pages are read-only.
+  var API_URL = 'https://script.google.com/macros/s/AKfycbxK9MSUe75KC7xMhZhy-9a4omw9rVf1RugYR72OaGlzuNiKJvS5XRoZRp9hcTzjibHuxg/exec';
 
   function get(params) {
     return new Promise(function(resolve, reject) {
