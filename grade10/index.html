@@ -36,6 +36,9 @@
 
     /* ---- New "Clean + Friendly" homepage (self-contained; eqh- prefix) ---- */
     .grade10-page .eqh-main { max-width: 1280px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; padding-top: 4px; }
+    /* Match Grade 11: the homepage shell had full-bleed padding:0 from old CSS — give it normal side gutters. */
+    .grade10-page.student-shell-enabled > .shell { max-width: none; padding: 20px 28px 42px; }
+    @media (max-width: 760px) { .grade10-page.student-shell-enabled > .shell { padding: 14px 14px 36px; } }
     .eqh-hero {
       position: relative; overflow: hidden; border-radius: 26px; padding: 34px 38px; color: #fff;
       background: linear-gradient(125deg, #2563eb 0%, #1d4ed8 55%, #1e3a8a 100%);
