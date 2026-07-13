@@ -183,6 +183,7 @@
             <button class="btn primary" type="button" id="confirmProfile" disabled>Confirm Profile</button>
             <a class="btn ghost" href="dashboard.html" id="dashboardProfileLink">My Statistics</a>
             <a class="btn ghost" href="strikes.html" id="strikesProfileLink">My Strikes</a>
+            <a class="btn" id="waGroupLink" target="_blank" rel="noopener" style="display:none;background:#25d366;border-color:#25d366;color:#fff;">Join Class WhatsApp Group</a>
             <button class="btn ghost" type="button" id="changeProfile">Change Name</button>
             <button class="btn danger" type="button" id="logoutProfile">Logout</button>
           </div>
@@ -213,6 +214,12 @@
       if (window.EQStudentShell) EQStudentShell.refreshProfile('11');
     }
 
+    var WA_GROUPS = {
+      XIF7: 'https://chat.whatsapp.com/HcMUXxFggeL4cKE5yyXoPQ?s=cl&p=a&ilr=1&amv=1',
+      XIF8: 'https://chat.whatsapp.com/JqQIDurQooKLO1SIDDQI9P?s=cl&p=a&ilr=1&amv=1',
+      XIF9: 'https://chat.whatsapp.com/Jb9eNXQnsBiDwQMLJqUaHG?s=cl&p=a&ilr=1&amv=1'
+    };
+
     function refreshProfileDisplay() {
       var profile = EQStudent.read('11');
       var cls = profile.classId, no = profile.studentNo, name = profile.studentName, hasProfile = profile.hasProfile;
@@ -233,6 +240,12 @@
       document.getElementById('changeProfile').disabled = !hasProfile;
       document.getElementById('dashboardProfileLink').style.display = hasProfile ? 'inline-flex' : 'none';
       document.getElementById('strikesProfileLink').style.display = hasProfile ? 'inline-flex' : 'none';
+      var waLink = document.getElementById('waGroupLink');
+      if (waLink) {
+        var wa = WA_GROUPS[cls];
+        if (hasProfile && wa) { waLink.href = wa; waLink.style.display = 'inline-flex'; }
+        else { waLink.style.display = 'none'; }
+      }
       updateHeroXP(cls, no, hasProfile);
       if (window.lucide) window.lucide.createIcons();
     }
