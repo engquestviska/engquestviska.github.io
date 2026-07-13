@@ -248,6 +248,18 @@
         if (hasProfile && wa) { waLink.href = wa; waLink.style.display = 'inline-flex'; }
         else { waLink.style.display = 'none'; }
       }
+      // First open (not logged in): surface the class/name picker at the top.
+      // Once logged in: tuck the profile back into the side panel (bottom).
+      var profileCard = document.getElementById('profile');
+      var eqhMain = document.querySelector('.eqh-main');
+      var grid2 = document.querySelector('.eqh-grid2');
+      if (profileCard && eqhMain) {
+        if (!hasProfile) {
+          if (eqhMain.firstElementChild !== profileCard) eqhMain.insertBefore(profileCard, eqhMain.firstElementChild);
+        } else if (grid2 && profileCard.parentElement !== grid2) {
+          grid2.appendChild(profileCard);
+        }
+      }
       updateHeroXP(cls, no, hasProfile);
       if (window.lucide) window.lucide.createIcons();
     }
