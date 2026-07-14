@@ -677,6 +677,17 @@ function setupRoster(username, password, className, namesJson) {
     sh.getRange(2, 2, n, 1).setValues(vals);
     report[tab] = n + ' names';
   });
+  // Keep the separate attendance sheet's roster (Name column) in sync so the
+  // attendance pages show the same students in the same order. Names only —
+  // No / Nickname / meeting columns are left untouched.
+  try {
+    var attId = PropertiesService.getScriptProperties().getProperty('ATTENDANCE_SHEET_ID');
+    if (attId) {
+      var attTab = SpreadsheetApp.openById(attId).getSheetByName(className);
+      if (attTab) { attTab.getRange(2, 2, n, 1).setValues(vals); report.attendance = n + ' names'; }
+      else report.attendance = 'tab missing';
+    } else report.attendance = 'no attendance sheet';
+  } catch (e) { report.attendance = 'error: ' + e.message; }
   SpreadsheetApp.flush();
   return { success: true, className: className, count: n, report: report };
 }
