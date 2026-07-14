@@ -39,6 +39,12 @@
       </div>
     </header>
 
+    <a class="submission-alert" id="submissionAlert" href="submissions.html" hidden style="display:flex;align-items:center;gap:12px;margin:0 0 18px;padding:14px 18px;border-radius:16px;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1.5px solid #fde68a;color:#92400e;text-decoration:none;font-weight:700;">
+      <i data-lucide="inbox"></i>
+      <span id="submissionAlertText">You have task submissions to check.</span>
+      <span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;color:#b45309;white-space:nowrap;">Review now <i data-lucide="arrow-right"></i></span>
+    </a>
+
     <div class="dashboard-toolbar">
       <span class="data-note"><i data-lucide="database"></i> Live totals appear when class data is connected.</span>
       <div class="student-site-actions" aria-label="Student site previews">
@@ -255,6 +261,26 @@
       showLogin();
     }
 
+    function loadPendingSubmissions() {
+      var teacher = EQAuth.getTeacher();
+      if (!teacher.username || !teacher.password) return;
+      EQApi.get({ action: 'getTaskSubmissions', username: teacher.username, password: teacher.password }).then(function(res) {
+        if (!res || !res.success) return;
+        var n = res.pending || 0;
+        var dot = document.querySelector('.notification-dot');
+        if (dot) dot.textContent = n;
+        var alertEl = document.getElementById('submissionAlert');
+        if (alertEl) {
+          if (n > 0) {
+            document.getElementById('submissionAlertText').textContent =
+              n + (n === 1 ? ' task submission is' : ' task submissions are') + ' waiting to be checked.';
+            alertEl.hidden = false;
+          } else { alertEl.hidden = true; }
+        }
+        if (window.lucide) lucide.createIcons();
+      }).catch(function() {});
+    }
+
     function initDashboard() {
       if (window.lucide) lucide.createIcons();
       if (EQAuth.gateDisabled) { displayTeacher('Teacher'); hideLogin(); return; }
@@ -268,6 +294,7 @@
         if (data && data.ok) {
           EQAuth.markTeacherVerified(teacher.username);
           hideLogin();
+          loadPendingSubmissions();
         } else {
           EQAuth.logoutTeacher();
           showLogin('Your teacher session expired. Please log in again.');

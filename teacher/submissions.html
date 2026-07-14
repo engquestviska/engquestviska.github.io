@@ -3,120 +3,47 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Teacher Submissions · English Quest</title>
+  <title>Task Submissions · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css?v=20260702"/>
   <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260702"/>
   <style>
-    .submission-list {
-      display: grid;
-      gap: 12px;
-    }
+    .sub-toolbar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
+    .sub-count { font-weight:800; font-size:1.05rem; }
+    .sub-count .n { color:#b45309; }
+    .seg { display:inline-flex; border:1.5px solid #dbeafe; border-radius:12px; overflow:hidden; }
+    .seg button { border:none; background:#fff; padding:8px 16px; font:700 .84rem 'IBM Plex Sans',sans-serif; color:#475569; cursor:pointer; }
+    .seg button.on { background:#2563eb; color:#fff; }
+    .refresh-btn { margin-left:auto; border:1.5px solid #dbeafe; background:#fff; border-radius:12px; padding:8px 16px; font:700 .84rem 'IBM Plex Sans',sans-serif; color:#2563eb; cursor:pointer; }
 
-    .submission-row {
-      display: grid;
-      grid-template-columns: 54px minmax(180px, 1fr) auto;
-      gap: 14px;
-      align-items: center;
-      border: 1.5px solid #dbeafe;
-      border-radius: 20px;
-      background: #fff;
-      padding: 16px;
-      box-shadow: 0 12px 26px rgba(37, 99, 235, 0.06);
-    }
+    .sub-list { display:grid; gap:12px; }
+    .sub-row { display:grid; grid-template-columns:52px minmax(160px,1fr) auto; gap:14px; align-items:center; border:1.5px solid #dbeafe; border-radius:18px; background:#fff; padding:14px 16px; box-shadow:0 12px 26px rgba(37,99,235,.06); }
+    .sub-row.reviewed { border-color:#bbf7d0; background:linear-gradient(135deg,#fff,#f3fdf6); }
+    .sub-row.rejected { border-color:#fecaca; background:linear-gradient(135deg,#fff,#fff5f5); }
+    .sub-task { width:48px; height:48px; display:grid; place-items:center; border-radius:14px; background:#2563eb; color:#fff; font-family:'IBM Plex Mono',monospace; font-weight:800; font-size:.82rem; }
+    .sub-name { font-weight:800; line-height:1.25; }
+    .sub-meta { margin-top:4px; color:var(--muted); font-size:.82rem; font-weight:600; }
+    .sub-pill { display:inline-flex; align-items:center; gap:5px; font-size:.72rem; font-weight:800; padding:3px 10px; border-radius:999px; font-family:'IBM Plex Mono',monospace; }
+    .sub-pill.pending { background:#fef3c7; color:#b45309; } .sub-pill.reviewed { background:#dcfce7; color:#15803d; } .sub-pill.rejected { background:#fee2e2; color:#b91c1c; }
+    .view-btn { border:none; background:#2563eb; color:#fff; border-radius:11px; padding:10px 18px; font:700 .85rem 'IBM Plex Sans',sans-serif; cursor:pointer; white-space:nowrap; }
+    .sub-empty { text-align:center; padding:50px 20px; color:#64748b; }
 
-    .submission-row.missing {
-      border-color: #fecaca;
-      background: linear-gradient(135deg, #fff, #fff5f5);
-    }
-
-    .submission-avatar {
-      width: 48px;
-      height: 48px;
-      display: grid;
-      place-items: center;
-      border-radius: 16px;
-      background: #2563eb;
-      color: #fff;
-      font-family: 'IBM Plex Mono', monospace;
-      font-weight: 900;
-    }
-
-    .submission-name {
-      font-weight: 800;
-      line-height: 1.25;
-    }
-
-    .submission-meta {
-      margin-top: 5px;
-      color: var(--muted);
-      font-size: 0.84rem;
-      font-weight: 600;
-    }
-
-    .submission-state {
-      justify-self: end;
-      border-radius: 999px;
-      padding: 9px 12px;
-      background: #d1fae5;
-      color: #047857;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.74rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      white-space: nowrap;
-    }
-
-    .submission-state.missing {
-      background: #fee2e2;
-      color: #b91c1c;
-    }
-
-    .task-chip-row {
-      grid-column: 2 / -1;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-    }
-
-    .task-chip {
-      border-radius: 999px;
-      padding: 7px 10px;
-      background: #fee2e2;
-      color: #b91c1c;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.72rem;
-      font-weight: 900;
-    }
-
-    .task-chip.done {
-      background: #d1fae5;
-      color: #047857;
-    }
-
-    .sync-result {
-      margin-top: 14px;
-      border: 1.5px solid #dbeafe;
-      border-radius: 18px;
-      background: #f8fbff;
-      padding: 14px;
-      color: var(--muted);
-      line-height: 1.55;
-    }
-
-    @media (max-width: 760px) {
-      .submission-row {
-        grid-template-columns: 48px 1fr;
-      }
-
-      .submission-state,
-      .task-chip-row {
-        grid-column: 1 / -1;
-        justify-self: start;
-      }
-    }
+    .modal-back { position:fixed; inset:0; background:rgba(15,23,42,.7); display:none; align-items:center; justify-content:center; padding:18px; z-index:70; }
+    .modal-back.on { display:flex; }
+    .modal { background:#fff; border-radius:22px; padding:20px; max-width:560px; width:100%; max-height:92vh; overflow:auto; box-shadow:0 30px 80px rgba(15,23,42,.35); }
+    .modal h3 { font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:800; }
+    .modal .msub { color:#64748b; font-size:.85rem; margin:2px 0 14px; }
+    .photo-wrap { min-height:200px; display:grid; place-items:center; background:#f8fafc; border:1px solid #e5ecf6; border-radius:14px; overflow:hidden; }
+    .photo-wrap img { width:100%; object-fit:contain; max-height:60vh; display:block; }
+    .modal-actions { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
+    .modal-actions button { flex:1; min-width:130px; border-radius:12px; padding:13px; font:800 .92rem 'IBM Plex Sans',sans-serif; cursor:pointer; border:none; }
+    .btn-reviewed { background:linear-gradient(135deg,#10b981,#059669); color:#fff; }
+    .btn-reject { background:#fff1f2; color:#be123c; border:1.5px solid #fecdd3; }
+    .btn-close { background:#f1f5f9; color:#475569; flex:0 0 auto; min-width:90px; }
+    .modal-actions button:disabled { opacity:.5; cursor:not-allowed; }
+    .modal-msg { margin-top:8px; font-size:.84rem; font-weight:700; text-align:center; min-height:1em; }
+    .modal-msg.err { color:#dc2626; } .modal-msg.ok { color:#059669; }
   </style>
   <script src="../shared/js/classes-20260617.js?v=20260712"></script>
   <script src="../shared/js/api.js"></script>
@@ -136,21 +63,21 @@
       </div>
       <nav class="nav-actions" aria-label="Teacher navigation">
         <a href="index.html">Dashboard</a>
-        <a href="../grade10/submission.html">Student View</a>
+        <a href="scores.html">Students &amp; Scores</a>
         <button type="button" onclick="teacherLogout()">Logout</button>
       </nav>
     </div>
     <section class="hero">
-      <div class="kicker">Submission Review</div>
-      <h1>Check submitted work before it becomes task status.</h1>
-      <p class="hero-copy">Review Unit 1 and Unit 2 submission coverage by class, then sync Unit 2 files into task records when the class is ready.</p>
+      <div class="kicker">Task Submissions</div>
+      <h1>Check the photos students turned in.</h1>
+      <p class="hero-copy">Students submit a photo of each finished task. Review it right here — no downloads — then mark it done. You enter the score in Students &amp; Scores.</p>
     </section>
   </header>
 
   <main>
     <section class="access-card" id="accessCard" hidden>
       <h2 class="access-title">Teacher login required.</h2>
-      <p class="access-copy">Open the teacher dashboard and log in first. This page uses the saved teacher session for Unit 2 sync actions.</p>
+      <p class="access-copy">Open the teacher dashboard and log in first. This page uses your saved teacher session.</p>
       <a class="btn" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none;">Open Teacher Login</a>
     </section>
 
@@ -158,229 +85,148 @@
       <div class="panel">
         <div class="panel-head">
           <div>
-            <h2 class="panel-title">Grade 10 Submissions</h2>
-            <p class="panel-copy">Choose a unit and class. Unit 1 uses the submission overview. Unit 2 can also sync found files into task records.</p>
+            <h2 class="panel-title">Submission Inbox</h2>
+            <p class="panel-copy">Newest first. Tap a submission to see the photo and check it.</p>
           </div>
           <div class="status-pill" id="loginPill">Teacher</div>
         </div>
 
-        <div class="controls">
-          <div>
-            <label for="chapterSelect">Unit</label>
-            <select id="chapterSelect">
-              <option value="4">Unit 1</option>
-              <option value="5">Unit 2</option>
-            </select>
+        <div class="sub-toolbar">
+          <div class="sub-count"><span class="n" id="pendCount">0</span> waiting to check</div>
+          <div class="seg">
+            <button id="segPending" class="on" onclick="setFilter('pending')">Pending</button>
+            <button id="segAll" onclick="setFilter('all')">All</button>
           </div>
-          <div>
-            <label for="classSelect">Class</label>
-            <select id="classSelect" data-eq-class-select data-grade="10"></select>
-          </div>
-          <button class="btn" type="button" id="loadBtn" onclick="loadSubmissions()">Load</button>
+          <button class="refresh-btn" onclick="loadSubs()">↻ Refresh</button>
         </div>
 
-        <div class="summary-grid" id="summaryGrid">
-          <div class="summary-card"><strong>0</strong><span>Students</span></div>
-          <div class="summary-card"><strong>0</strong><span>Submitted</span></div>
-          <div class="summary-card"><strong>0</strong><span>Missing</span></div>
-          <div class="summary-card"><strong>0%</strong><span>Complete</span></div>
-        </div>
-
-        <div id="syncPanel" hidden>
-          <div class="toolbar">
-            <button class="btn" type="button" id="syncBtn" onclick="syncCh5Class()">Sync Unit 2 to Task Records</button>
-          </div>
-          <div class="sync-result" id="syncResult">Sync only after reviewing the class list below.</div>
-        </div>
+        <div class="sub-list" id="subList"></div>
       </div>
-
-      <div id="submissionList" class="submission-list"></div>
     </section>
   </main>
 
-  <footer>© 2026 English Quest · Teacher Submission Review</footer>
+  <div class="modal-back" id="modalBack">
+    <div class="modal">
+      <h3 id="mTitle">Submission</h3>
+      <div class="msub" id="mSub"></div>
+      <div class="photo-wrap"><img id="mImg" alt="Submitted work"/></div>
+      <div class="modal-msg" id="mMsg"></div>
+      <div class="modal-actions">
+        <button class="btn-reviewed" id="btnReviewed" type="button">✓ Mark reviewed</button>
+        <button class="btn-reject" id="btnReject" type="button">Reject (resubmit)</button>
+        <button class="btn-close" id="btnClose" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
   <script>
-    var submissionRows = [];
+    var ALL = [];
+    var filter = 'pending';
+    var current = null; // current submission being viewed
 
-    function teacherLogout() {
-      EQAuth.logoutTeacher('index.html');
+    function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+    function teacherLogout() { EQAuth.logoutTeacher('index.html'); }
+    function classLabel(id) { return (window.EQApi && EQApi.classLabels && EQApi.classLabels[id]) || id; }
+
+    function showToast(msg, type) {
+      var t = document.getElementById('toast');
+      t.textContent = msg; t.className = 'toast ' + (type || '');
+      setTimeout(function(){ t.classList.add('show'); }, 10);
+      setTimeout(function(){ t.classList.remove('show'); }, 2600);
     }
 
-    function normName(value) {
-      return String(value || '').toLowerCase()
-        .replace(/[-]/g, ' ')
-        .replace(/[^a-z0-9\s]/g, '')
-        .replace(/\s+/g, ' ')
-        .trim();
+    function setFilter(f) {
+      filter = f;
+      document.getElementById('segPending').classList.toggle('on', f === 'pending');
+      document.getElementById('segAll').classList.toggle('on', f === 'all');
+      renderList();
     }
 
-    function normClass(value) {
-      return String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-    }
-
-    function initials(name) {
-      return String(name || 'EQ').split(/\s+/).filter(Boolean).slice(0, 2).map(function(part) {
-        return part.charAt(0).toUpperCase();
-      }).join('') || 'EQ';
-    }
-
-    function unitLabel(value) {
-      return value === '5' ? 'Unit 2' : 'Unit 1';
-    }
-
-    function loadSubmissions() {
-      if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
-      var chapter = document.getElementById('chapterSelect').value;
-      var list = document.getElementById('submissionList');
-      var btn = document.getElementById('loadBtn');
-      btn.disabled = true;
-      btn.textContent = 'Loading...';
-      document.getElementById('syncPanel').hidden = chapter !== '5';
-      list.innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading submissions...</h2><p class="empty-copy">Fetching ' + unitLabel(chapter) + ' submission data.</p></div>';
-
-      if (chapter === '5') loadChapter5();
-      else loadChapter4();
-    }
-
-    function loadChapter4() {
-      var cls = document.getElementById('classSelect').value;
-      EQApi.get({ action: 'getSubmissions' }).then(function(data) {
-        if (data.error) throw new Error(data.error);
-        submissionRows = (data.students && data.students[cls] ? data.students[cls] : []).map(function(student) {
-          var tasks = [];
-          var total = Number(data.totalTasks || 0);
-          for (var i = 0; i < total; i++) tasks.push(!!(student.tasksDone && student.tasksDone[i]));
-          return {
-            name: student.name,
-            meta: 'Unit 1',
-            submitted: !!student.submitted,
-            tasks: tasks
-          };
-        });
-        renderSubmissions();
-        showToast('Unit 1 loaded', 'ok');
-      }).catch(showLoadError).finally(resetLoadButton);
-    }
-
-    function loadChapter5() {
-      var cls = document.getElementById('classSelect').value;
-      Promise.all([
-        EQApi.get({ action: 'getStudents', className: cls }),
-        EQApi.get({ action: 'getCh5Submissions' })
-      ]).then(function(results) {
-        var studentsData = results[0] || {};
-        var overview = results[1] || {};
-        if (studentsData.error) throw new Error(studentsData.error);
-        if (overview.error) showToast(overview.error, 'err');
-        var byKey = overview.byKey || {};
-        submissionRows = (studentsData.students || []).map(function(student) {
-          var key = normClass(cls) + '|' + normName(student.name);
-          var entry = byKey[key] || {};
-          var tasks = entry.tasks || [false, false, false, false, false];
-          var submitted = tasks.some(Boolean);
-          return {
-            name: student.name,
-            nickname: student.nickname,
-            no: student.no,
-            meta: 'No. ' + student.no + ' · Unit 2',
-            submitted: submitted,
-            tasks: tasks
-          };
-        });
-        renderSubmissions();
-        showToast('Unit 2 loaded', 'ok');
-      }).catch(showLoadError).finally(resetLoadButton);
-    }
-
-    function renderSubmissions() {
-      var list = document.getElementById('submissionList');
-      if (!submissionRows.length) {
-        list.innerHTML = '<div class="empty-card"><h2 class="empty-title">No students found.</h2><p class="empty-copy">Try another class or check the data connection.</p></div>';
-        updateSummary();
+    function renderList() {
+      var list = document.getElementById('subList');
+      var rows = ALL.filter(function(s){ return filter === 'all' ? true : s.status === 'pending'; });
+      if (!rows.length) {
+        list.innerHTML = '<div class="sub-empty">' + (filter === 'pending' ? '🎉 Nothing waiting — all caught up!' : 'No submissions yet.') + '</div>';
         return;
       }
-      list.innerHTML = submissionRows.map(function(row) {
-        var taskHtml = row.tasks && row.tasks.length
-          ? '<div class="task-chip-row">' + row.tasks.map(function(done, index) {
-              return '<span class="task-chip ' + (done ? 'done' : '') + '">' + (done ? 'Received' : 'Missing') + ' T' + (index + 1) + '</span>';
-            }).join('') + '</div>'
-          : '';
-        return '<article class="submission-row ' + (row.submitted ? '' : 'missing') + '">' +
-          '<div class="submission-avatar">' + escapeHtml(initials(row.nickname || row.name)) + '</div>' +
-          '<div><div class="submission-name">' + escapeHtml(row.nickname || row.name) + '</div><div class="submission-meta">' + escapeHtml(row.meta || '') + (row.nickname ? ' · ' + escapeHtml(row.name) : '') + '</div></div>' +
-          '<div class="submission-state ' + (row.submitted ? '' : 'missing') + '">' + (row.submitted ? 'Submitted' : 'Missing') + '</div>' +
-          taskHtml +
-        '</article>';
+      list.innerHTML = rows.map(function(s) {
+        var pill = '<span class="sub-pill ' + s.status + '">' + (s.status === 'pending' ? '⏳ Pending' : s.status === 'reviewed' ? '✓ Reviewed' : '✕ Rejected') + '</span>';
+        return '<div class="sub-row ' + s.status + '">' +
+          '<div class="sub-task">' + esc(s.task) + '</div>' +
+          '<div><div class="sub-name">' + esc(s.studentName) + '</div>' +
+            '<div class="sub-meta">' + esc(classLabel(s.className)) + ' · ' + esc(s.task) + ' · ' + esc(s.timestamp) + '</div>' +
+            '<div style="margin-top:6px">' + pill + '</div></div>' +
+          '<button class="view-btn" onclick="openSub(\'' + s.subId + '\')">View &amp; check</button>' +
+        '</div>';
       }).join('');
-      updateSummary();
     }
 
-    function updateSummary() {
-      var total = submissionRows.length;
-      var submitted = submissionRows.filter(function(row) { return row.submitted; }).length;
-      var missing = total - submitted;
-      var pct = total ? Math.round(submitted / total * 100) : 0;
-      document.getElementById('summaryGrid').innerHTML =
-        '<div class="summary-card"><strong>' + total + '</strong><span>Students</span></div>' +
-        '<div class="summary-card"><strong>' + submitted + '</strong><span>Submitted</span></div>' +
-        '<div class="summary-card"><strong>' + missing + '</strong><span>Missing</span></div>' +
-        '<div class="summary-card"><strong>' + pct + '%</strong><span>Complete</span></div>';
+    function loadSubs() {
+      var t = EQAuth.getTeacher();
+      var list = document.getElementById('subList');
+      list.innerHTML = '<div class="sub-empty">Loading…</div>';
+      EQApi.get({ action: 'getTaskSubmissions', username: t.username, password: t.password }).then(function(res) {
+        if (!res || !res.success) { list.innerHTML = '<div class="sub-empty">Could not load submissions.</div>'; return; }
+        ALL = res.submissions || [];
+        document.getElementById('pendCount').textContent = res.pending || 0;
+        renderList();
+      }).catch(function() { list.innerHTML = '<div class="sub-empty">Network error. Try Refresh.</div>'; });
     }
 
-    function syncCh5Class() {
-      var teacher = EQAuth.getTeacher();
-      var cls = document.getElementById('classSelect').value;
-      var btn = document.getElementById('syncBtn');
-      var result = document.getElementById('syncResult');
-      btn.disabled = true;
-      btn.textContent = 'Syncing...';
-      result.textContent = 'Syncing Unit 2 submissions into task records...';
-      EQApi.get({
-        action: 'syncCh5Class',
-        username: teacher.username,
-        password: teacher.password,
-        className: cls
-      }).then(function(data) {
-        if (!data.success) throw new Error(data.error || 'Sync failed');
-        result.textContent = 'Synced rows: ' + data.synced + '. Not found in responses: ' + data.notFound + '.';
-        showToast('Unit 2 synced', 'ok');
-      }).catch(function(err) {
-        result.textContent = err.message;
-        showToast(err.message, 'err');
-      }).finally(function() {
-        btn.disabled = false;
-        btn.textContent = 'Sync Unit 2 to Task Records';
+    function openSub(subId) {
+      current = ALL.find(function(s){ return s.subId === subId; });
+      if (!current) return;
+      document.getElementById('mTitle').textContent = current.studentName;
+      document.getElementById('mSub').textContent = classLabel(current.className) + ' · ' + current.task + ' · submitted ' + current.timestamp;
+      document.getElementById('mMsg').textContent = ''; document.getElementById('mMsg').className = 'modal-msg';
+      document.getElementById('mImg').removeAttribute('src');
+      var reviewed = current.status !== 'pending';
+      document.getElementById('btnReviewed').disabled = false;
+      document.getElementById('btnReject').disabled = false;
+      document.getElementById('modalBack').classList.add('on');
+      var t = EQAuth.getTeacher();
+      var img = document.getElementById('mImg');
+      img.alt = 'Loading photo…';
+      EQApi.get({ action: 'getSubmissionPhoto', username: t.username, password: t.password, fileId: current.fileId }).then(function(res) {
+        if (res && res.success && res.dataBase64) img.src = 'data:' + (res.mimeType || 'image/jpeg') + ';base64,' + res.dataBase64;
+        else { document.getElementById('mMsg').className = 'modal-msg err'; document.getElementById('mMsg').textContent = 'Could not load the photo.'; }
+      }).catch(function() { document.getElementById('mMsg').className = 'modal-msg err'; document.getElementById('mMsg').textContent = 'Network error loading photo.'; });
+    }
+
+    function closeModal() { document.getElementById('modalBack').classList.remove('on'); current = null; }
+    document.getElementById('btnClose').onclick = closeModal;
+
+    function review(decision) {
+      if (!current) return;
+      var t = EQAuth.getTeacher();
+      var msg = document.getElementById('mMsg');
+      document.getElementById('btnReviewed').disabled = true;
+      document.getElementById('btnReject').disabled = true;
+      msg.className = 'modal-msg'; msg.textContent = 'Saving…';
+      EQApi.get({ action: 'reviewTaskSubmission', username: t.username, password: t.password, subId: current.subId, decision: decision }).then(function(res) {
+        if (res && res.success) {
+          showToast(decision === 'rejected' ? 'Sent back for resubmit' : 'Marked reviewed', 'ok');
+          closeModal();
+          loadSubs();
+        } else {
+          document.getElementById('btnReviewed').disabled = false;
+          document.getElementById('btnReject').disabled = false;
+          msg.className = 'modal-msg err'; msg.textContent = (res && res.error) || 'Could not save.';
+        }
+      }).catch(function() {
+        document.getElementById('btnReviewed').disabled = false;
+        document.getElementById('btnReject').disabled = false;
+        msg.className = 'modal-msg err'; msg.textContent = 'Network error.';
       });
     }
-
-    function showLoadError(err) {
-      document.getElementById('submissionList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Could not load submissions.</h2><p class="empty-copy">' + escapeHtml(err.message) + '</p></div>';
-      showToast(err.message, 'err');
-    }
-
-    function resetLoadButton() {
-      var btn = document.getElementById('loadBtn');
-      btn.disabled = false;
-      btn.textContent = 'Load';
-    }
-
-    function showToast(message, type) {
-      var toast = document.getElementById('toast');
-      toast.textContent = message;
-      toast.className = 'toast ' + (type || '');
-      setTimeout(function() { toast.classList.add('show'); }, 10);
-      setTimeout(function() { toast.classList.remove('show'); }, 2600);
-    }
-
-    document.getElementById('chapterSelect').addEventListener('change', loadSubmissions);
-    document.getElementById('classSelect').addEventListener('change', loadSubmissions);
+    document.getElementById('btnReviewed').onclick = function(){ review('reviewed'); };
+    document.getElementById('btnReject').onclick = function(){ review('rejected'); };
 
     (function init() {
-      if (window.EQTeacherShell) EQTeacherShell.populateClassSelect('classSelect', { grade: '10' });
-      if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
-      loadSubmissions();
+      var ok = EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' });
+      if (ok) loadSubs();
     })();
   </script>
 </body>

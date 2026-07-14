@@ -3,11 +3,44 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Submission · English Quest</title>
+  <title>Submit Task · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css?v=20260702"/>
   <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260702"/>
+  <style>
+    main { max-width: 900px; margin: 0 auto; padding: 26px 20px 80px; }
+    .sub-need-login { text-align:center; padding:56px 20px; color:#64748b; background:#fff; border:1px solid #e5ecf6; border-radius:20px; }
+    .sub-need-login a { color:var(--blue); font-weight:700; }
+    .sub-intro { color:#64748b; font-size:.9rem; margin:2px 0 20px; line-height:1.55; }
+    .chapter-card { background:#fff; border:1px solid #e5ecf6; border-radius:20px; padding:20px 22px; box-shadow:0 16px 40px rgba(15,23,42,.05); margin-bottom:18px; }
+    .chapter-card h2 { font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:800; margin-bottom:14px; }
+    .task-row { display:flex; align-items:center; gap:12px; padding:12px 0; border-top:1px solid #f1f5f9; }
+    .task-row:first-of-type { border-top:none; }
+    .task-name { font-weight:700; font-size:.95rem; min-width:88px; }
+    .task-status { flex:1; }
+    .pill { display:inline-flex; align-items:center; gap:6px; font-size:.76rem; font-weight:700; padding:4px 11px; border-radius:999px; font-family:'IBM Plex Mono',monospace; }
+    .pill.none { background:#f1f5f9; color:#64748b; }
+    .pill.pending { background:#fef3c7; color:#b45309; }
+    .pill.reviewed { background:#dcfce7; color:#15803d; }
+    .pill.rejected { background:#fee2e2; color:#b91c1c; }
+    .task-btn { border:none; border-radius:11px; padding:9px 16px; font:700 .84rem 'IBM Plex Sans',sans-serif; cursor:pointer; background:var(--blue); color:#fff; white-space:nowrap; }
+    .task-btn.resubmit { background:#fff; color:var(--blue); border:1.5px solid var(--blue); }
+    /* Preview modal */
+    .modal-back { position:fixed; inset:0; background:rgba(15,23,42,.62); display:none; align-items:center; justify-content:center; padding:20px; z-index:60; }
+    .modal-back.on { display:flex; }
+    .modal { background:#fff; border-radius:22px; padding:22px; max-width:420px; width:100%; box-shadow:0 30px 80px rgba(15,23,42,.3); }
+    .modal h3 { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:800; margin-bottom:4px; }
+    .modal .msub { color:#64748b; font-size:.84rem; margin-bottom:14px; }
+    .modal img { width:100%; max-height:46vh; object-fit:contain; border-radius:14px; background:#f8fafc; border:1px solid #e5ecf6; }
+    .modal-actions { display:flex; gap:10px; margin-top:16px; }
+    .modal-actions button { flex:1; border-radius:12px; padding:12px; font:700 .9rem 'IBM Plex Sans',sans-serif; cursor:pointer; border:none; }
+    .btn-cancel { background:#f1f5f9; color:#475569; }
+    .btn-send { background:var(--blue); color:#fff; }
+    .btn-send:disabled { opacity:.55; cursor:not-allowed; }
+    .modal-msg { margin-top:10px; font-size:.84rem; font-weight:600; min-height:1em; text-align:center; }
+    .modal-msg.err { color:#dc2626; } .modal-msg.ok { color:#059669; }
+  </style>
   <script src="../shared/js/classes-20260617.js?v=20260712"></script>
   <script src="../shared/js/student.js"></script>
   <script src="../shared/js/api.js"></script>
@@ -28,333 +61,169 @@
         <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
       </nav>
     </div>
-
     <section class="subpage-hero">
-      <div class="kicker">Task Submission</div>
-      <h1>Submit your work as a clean PDF file.</h1>
-      <p class="hero-copy">Use the published upload forms for your current unit, then check whether your submission has been received.</p>
+      <div class="kicker">Submit Task</div>
+      <h1>Turn in your task with a photo.</h1>
+      <p class="hero-copy">Finished a task? Take a clear photo of it and submit here. Your teacher will see it and check it — your score is added afterwards.</p>
     </section>
   </header>
 
   <main>
-    <section class="content-section submission-guide" aria-labelledby="guideTitle">
-      <div class="content-section-head">
-        <div class="content-title-row">
-          <div class="content-badge">Guide</div>
-          <h2 class="content-title" id="guideTitle">PDF Submission Format</h2>
-        </div>
-      </div>
-      <div class="notice-card danger">Do not submit JPG, PNG, screenshots, or photo files. Only PDF files are accepted.</div>
-      <div class="step-grid">
-        <article class="step-card">
-          <div class="step-number">1</div>
-          <div class="step-title">Take a clear photo</div>
-          <p>Use your phone camera. Make sure the text is readable, bright, and not cropped.</p>
-        </article>
-        <article class="step-card">
-          <div class="step-number">2</div>
-          <div class="step-title">Scan and extract text</div>
-          <p>Use Google Lens or Microsoft Lens to scan your work and copy the text neatly.</p>
-        </article>
-        <article class="step-card">
-          <div class="step-number">3</div>
-          <div class="step-title">Paste into Google Docs</div>
-          <p>Create a document, paste your text, then tidy spacing and formatting.</p>
-        </article>
-        <article class="step-card">
-          <div class="step-number">4</div>
-          <div class="step-title">Download as PDF</div>
-          <p>In Google Docs, choose File, Download, then PDF Document.</p>
-        </article>
-      </div>
-      <div class="tool-row" aria-label="Recommended tools">
-        <a href="https://lens.google/" target="_blank" rel="noopener">Google Lens</a>
-        <a href="https://play.google.com/store/apps/details?id=com.microsoft.office.officelens" target="_blank" rel="noopener">Microsoft Lens</a>
-        <a href="https://docs.google.com" target="_blank" rel="noopener">Google Docs</a>
-        <a href="https://www.ilovepdf.com/jpg_to_pdf" target="_blank" rel="noopener">iLovePDF</a>
-        <a href="https://smallpdf.com/jpg-to-pdf" target="_blank" rel="noopener">SmallPDF</a>
-      </div>
-    </section>
-
-    <section class="content-section" aria-labelledby="formsTitle">
-      <div class="content-section-head">
-        <div class="content-title-row">
-          <div class="content-badge">Forms</div>
-          <h2 class="content-title" id="formsTitle">Upload Links</h2>
-        </div>
-      </div>
-      <div class="module-grid submission-grid">
-        <article class="module submission-card">
-          <div class="module-icon">PDF</div>
-          <div class="module-title">Submissions are not open yet.</div>
-          <p class="module-copy">Upload links will appear here once your teacher opens submissions.</p>
-          <div class="module-link">Not open yet</div>
-        </article>
-      </div>
-    </section>
-
-    <section class="content-section status-panel" aria-labelledby="submissionStatusTitle">
-      <div class="content-section-head">
-        <div class="content-title-row">
-          <div class="content-badge">Status</div>
-          <h2 class="content-title" id="submissionStatusTitle">Submission Status</h2>
-        </div>
-      </div>
-      <div class="status-picker">
-        <div class="field">
-          <label for="stClassSel">Class</label>
-          <select id="stClassSel" onchange="onStatusClassChange()" disabled>
-            <option value="">Loading classes...</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="stNameSel">Your Name</label>
-          <select id="stNameSel" onchange="checkMyStatus()" disabled>
-            <option value="">Select class first</option>
-          </select>
-        </div>
-      </div>
-      <div class="status-result" id="statusResult"></div>
-    </section>
-
-    <section class="content-section status-panel" aria-labelledby="fileStatusTitle">
-      <div class="content-section-head">
-        <div class="content-title-row">
-          <div class="content-badge">Files</div>
-          <h2 class="content-title" id="fileStatusTitle">File Submission Status</h2>
-        </div>
-      </div>
-      <div class="status-picker">
-        <div class="field">
-          <label for="ch5ClassSel">Class</label>
-          <select id="ch5ClassSel" onchange="onCh5ClassChange()">
-            <option value="">Select your class</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="ch5NameSel">Your Name</label>
-          <select id="ch5NameSel" disabled>
-            <option value="">Select class first</option>
-          </select>
-        </div>
-        <button class="btn primary sync-btn" id="ch5SyncBtn" onclick="checkCh5Status()">Check Submission Status</button>
-        <div class="field-hint">Checks whether your published PDF submission has been received.</div>
-      </div>
-      <div class="status-result" id="ch5Result"></div>
-    </section>
+    <p class="sub-intro" id="subIntro" style="display:none">Tap <b>Submit</b> next to a task, choose a photo of your finished work, and send it. Once sent, the task is marked <b>Pending review</b> until your teacher checks it.</p>
+    <div id="chapters"></div>
+    <div class="sub-need-login" id="needLogin" style="display:none">Log in on the <a href="index.html">homepage</a> first to submit your tasks.</div>
   </main>
 
-  <footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta</footer>
+  <div class="modal-back" id="modalBack">
+    <div class="modal">
+      <h3 id="modalTitle">Submit photo</h3>
+      <div class="msub" id="modalSub"></div>
+      <img id="modalImg" alt="Preview"/>
+      <div class="modal-msg" id="modalMsg"></div>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="btnCancel" type="button">Cancel</button>
+        <button class="btn-send" id="btnSend" type="button">Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none"/>
 
   <script>
-    var subData = null;
-    var ROSTERS_READY = window.EQClasses ? EQClasses.rostersReady() : false;
+    var GRADE = '10';
+    var STUDENT = null;      // { classId, studentNo }
+    var pendingKey = null;   // task key being submitted
+    var pendingImage = null; // base64 (no prefix)
 
-    function escapeHtml(value) {
-      return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
-        return {
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#39;'
-        }[ch];
-      });
+    function chaptersForGrade(g) { return g === '11' ? 2 : 3; }
+
+    function statusPill(st) {
+      if (st === 'pending')  return '<span class="pill pending">⏳ Pending review</span>';
+      if (st === 'reviewed') return '<span class="pill reviewed">✓ Reviewed</span>';
+      if (st === 'rejected') return '<span class="pill rejected">✕ Please resubmit</span>';
+      return '<span class="pill none">Not submitted</span>';
     }
 
-    function initClassSelects() {
-      if (window.EQClasses) {
-        EQClasses.fillSelect('stClassSel', '10', '', 'Select your class');
-        EQClasses.fillSelect('ch5ClassSel', '10', '', 'Select your class');
-      }
-    }
-
-    function showPreRosterSubmission() {
-      initClassSelects();
-      ['stClassSel', 'stNameSel', 'ch5ClassSel', 'ch5NameSel', 'ch5SyncBtn'].forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el) el.disabled = true;
-      });
-      document.getElementById('stNameSel').innerHTML = '<option value="">No students found</option>';
-      document.getElementById('ch5NameSel').innerHTML = '<option value="">No students found</option>';
-      document.getElementById('statusResult').innerHTML = '<div class="notice-card">Please reload the page to check submission status.</div>';
-      document.getElementById('statusResult').classList.add('show');
-      document.getElementById('ch5Result').innerHTML = '<div class="notice-card">File checks will open after the new submission source is connected.</div>';
-      document.getElementById('ch5Result').classList.add('show');
-    }
-
-    async function initCh4Status() {
-      if (!ROSTERS_READY) {
-        showPreRosterSubmission();
-        return;
-      }
-      var sel = document.getElementById('stClassSel');
-      var classes = window.EQClasses ? EQClasses.idsForGrade('10') : ['XE1', 'XE2', 'XE3', 'XE4', 'XE5'];
-      sel.innerHTML = '<option value="">Select your class</option>';
-      classes.forEach(function(c) {
-        sel.options.add(new Option(window.EQClasses ? EQClasses.labelFor(c) : c.replace(/^XE(\d+)$/, 'X E-$1'), c));
-      });
-      sel.disabled = false;
-      try {
-        var data = await EQApi.get({ action: 'getSubmissions' });
-        if (data && data.error) throw new Error(data.error);
-        subData = data || { students: {} };
-      } catch(e) {
-        subData = { students: {} };
-        document.getElementById('statusResult').innerHTML = '<div class="notice-card">Submission records are temporarily unavailable. Please try again later.</div>';
-        document.getElementById('statusResult').classList.add('show');
-      }
-    }
-
-    function onStatusClassChange() {
-      var cls = document.getElementById('stClassSel').value;
-      var nameSel = document.getElementById('stNameSel');
-      document.getElementById('statusResult').className = 'status-result';
-      if (!cls || !subData) {
-        nameSel.disabled = true;
-        nameSel.innerHTML = '<option>Select class first</option>';
-        return;
-      }
-      var students = (subData.students[cls] || []).slice().sort(function(a, b) {
-        return a.name.localeCompare(b.name);
-      });
-      if (!students.length) {
-        nameSel.disabled = true;
-        nameSel.innerHTML = '<option value="">No students found</option>';
-        var result = document.getElementById('statusResult');
-        result.innerHTML = '<div class="notice-card">Please reload the page.</div>';
-        result.classList.add('show');
-        return;
-      }
-      nameSel.innerHTML = '<option value="">Select your name</option>';
-      students.forEach(function(s) {
-        nameSel.options.add(new Option(s.name, s.name));
-      });
-      nameSel.disabled = false;
-    }
-
-    function checkMyStatus() {
-      var cls = document.getElementById('stClassSel').value;
-      var name = document.getElementById('stNameSel').value;
-      var result = document.getElementById('statusResult');
-      if (!cls || !name || !subData) {
-        result.className = 'status-result';
-        return;
-      }
-      var student = (subData.students[cls] || []).find(function(s) { return s.name === name; });
-      if (!student) {
-        result.className = 'status-result';
-        return;
-      }
-      result.innerHTML =
-        '<div class="status-student-name">' + escapeHtml(student.name) + '</div>' +
-        '<div class="status-badge-big ' + (student.submitted ? 'status-submitted' : 'status-missing') + '">' +
-          (student.submitted ? 'Submitted' : 'Not Yet Submitted') +
-        '</div>' +
-        '<div class="status-sub-note">' +
-          (student.submitted ? 'Your current-unit tasks have been received.' : 'We have not received your current-unit submission yet. Please submit via the published form when it opens.') +
-        '</div>';
-      result.classList.add('show');
-    }
-
-    var ch5Students = {};
-
-    async function onCh5ClassChange() {
-      if (!ROSTERS_READY) {
-        showPreRosterSubmission();
-        return;
-      }
-      var cls = document.getElementById('ch5ClassSel').value;
-      var nameSel = document.getElementById('ch5NameSel');
-      document.getElementById('ch5Result').className = 'status-result';
-      if (!cls) {
-        nameSel.disabled = true;
-        nameSel.innerHTML = '<option>Select class first</option>';
-        return;
-      }
-      nameSel.innerHTML = '<option>Loading...</option>';
-      nameSel.disabled = true;
-      try {
-        if (!ch5Students[cls]) {
-          var data = await EQApi.get({ action: 'getStudents', className: cls });
-          if (data && data.error) throw new Error(data.error);
-          ch5Students[cls] = data.students || [];
+    function render(statuses) {
+      var wrap = document.getElementById('chapters');
+      var chs = chaptersForGrade(GRADE);
+      var html = '';
+      for (var ch = 1; ch <= chs; ch++) {
+        html += '<div class="chapter-card"><h2>Chapter ' + ch + '</h2>';
+        for (var t = 1; t <= 3; t++) {
+          var key = 'C' + ch + 'T' + t;
+          var st = statuses[key] || '';
+          var label = (st && st !== 'reviewed') ? 'Re-submit' : (st === 'reviewed' ? 'Re-submit' : 'Submit');
+          var cls = st ? 'task-btn resubmit' : 'task-btn';
+          html += '<div class="task-row">' +
+            '<span class="task-name">Task ' + t + '</span>' +
+            '<span class="task-status">' + statusPill(st) + '</span>' +
+            '<button class="' + cls + '" onclick="pickFile(\'' + key + '\')">' + label + '</button>' +
+          '</div>';
         }
-        if (!ch5Students[cls].length) {
-          nameSel.innerHTML = '<option value="">No students found</option>';
-          var emptyResult = document.getElementById('ch5Result');
-          emptyResult.innerHTML = '<div class="notice-card">Please reload the page.</div>';
-          emptyResult.classList.add('show');
-          return;
-        }
-        nameSel.innerHTML = '<option value="">Select your name</option>';
-        ch5Students[cls].forEach(function(s) {
-          nameSel.options.add(new Option(s.nickname || s.name, s.no));
-        });
-        nameSel.disabled = false;
-      } catch(e) {
-        nameSel.innerHTML = '<option value="">Roster temporarily unavailable</option>';
-        var errorResult = document.getElementById('ch5Result');
-        errorResult.innerHTML = '<div class="notice-card">Submission records could not be loaded. Please try again later.</div>';
-        errorResult.classList.add('show');
+        html += '</div>';
       }
+      wrap.innerHTML = html;
     }
 
-    async function checkCh5Status() {
-      if (!ROSTERS_READY) {
-        showPreRosterSubmission();
-        return;
-      }
-      var cls = document.getElementById('ch5ClassSel').value;
-      var no = document.getElementById('ch5NameSel').value;
-      var result = document.getElementById('ch5Result');
-      if (!cls || !no) {
-        result.innerHTML = '<div class="notice-card danger">Please select your class and name first.</div>';
-        result.classList.add('show');
-        return;
-      }
-      var btn = document.getElementById('ch5SyncBtn');
-      if (btn) {
-        btn.disabled = true;
-        btn.textContent = 'Checking...';
-      }
-      result.innerHTML = '<div class="status-loading"><span class="spinner-sm"></span>Checking your submission...</div>';
-      result.classList.add('show');
-      try {
-        var data = await EQApi.get({ action: 'getCh5StudentFiles', className: cls, studentNo: no });
-        var students = ch5Students[cls] || [];
-        var s = students.find(function(st) { return String(st.no) === String(no); });
-        var displayName = (data && data.studentName) || (s ? (s.nickname || s.name) : 'Student');
-        var files = data && data.files ? data.files : {};
-        var fileKeys = Object.keys(files).filter(function(k) { return /^C5T/i.test(k); }).sort();
-        if (!data || data.error || !data.submitted || !fileKeys.length) {
-          result.innerHTML =
-            '<div class="status-student-name">' + escapeHtml(displayName) + '</div>' +
-            '<div class="status-badge-big status-missing">Not Submitted Yet</div>' +
-            '<div class="status-sub-note">We could not find a published PDF submission for you. Make sure you used the current submission form and uploaded at least one PDF.</div>';
+    function loadStatuses() {
+      if (!window.EQApi || !STUDENT) return;
+      EQApi.get({ action: 'getMySubmissions', className: STUDENT.classId, studentNo: STUDENT.studentNo })
+        .then(function(res) { render((res && res.statuses) || {}); })
+        .catch(function() { render({}); });
+    }
+
+    function pickFile(key) {
+      pendingKey = key;
+      var fi = document.getElementById('fileInput');
+      fi.value = '';
+      fi.click();
+    }
+
+    function compressImage(file, maxDim, quality) {
+      return new Promise(function(resolve, reject) {
+        var img = new Image();
+        var url = URL.createObjectURL(file);
+        img.onload = function() {
+          URL.revokeObjectURL(url);
+          var w = img.width, h = img.height;
+          if (w > h && w > maxDim) { h = Math.round(h * maxDim / w); w = maxDim; }
+          else if (h > maxDim) { w = Math.round(w * maxDim / h); h = maxDim; }
+          var canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = function() { URL.revokeObjectURL(url); reject(new Error('Could not read image')); };
+        img.src = url;
+      });
+    }
+
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+      var file = e.target.files && e.target.files[0];
+      if (!file) return;
+      var msg = document.getElementById('modalMsg');
+      msg.textContent = ''; msg.className = 'modal-msg';
+      document.getElementById('btnSend').disabled = false;
+      var parts = pendingKey.match(/C(\d)T(\d)/);
+      document.getElementById('modalSub').textContent = 'Chapter ' + parts[1] + ' · Task ' + parts[2];
+      compressImage(file, 1100, 0.6).then(function(dataUrl) {
+        pendingImage = dataUrl.split(',')[1];
+        document.getElementById('modalImg').src = dataUrl;
+        document.getElementById('modalBack').classList.add('on');
+      }).catch(function() {
+        alert('Sorry, that image could not be read. Please try another photo.');
+      });
+    });
+
+    function closeModal() {
+      document.getElementById('modalBack').classList.remove('on');
+      pendingImage = null;
+    }
+    document.getElementById('btnCancel').onclick = closeModal;
+
+    document.getElementById('btnSend').onclick = function() {
+      if (!pendingImage || !STUDENT) return;
+      var btn = document.getElementById('btnSend'), msg = document.getElementById('modalMsg');
+      btn.disabled = true; msg.className = 'modal-msg'; msg.textContent = 'Sending…';
+      EQApi.post({
+        action: 'submitTaskPhoto',
+        className: STUDENT.classId,
+        studentNo: STUDENT.studentNo,
+        taskKey: pendingKey,
+        image: pendingImage,
+        mimeType: 'image/jpeg'
+      }).then(function() {
+        // no-cors: response is opaque, so confirm by re-reading statuses.
+        return new Promise(function(r) { setTimeout(r, 2200); });
+      }).then(function() {
+        return EQApi.get({ action: 'getMySubmissions', className: STUDENT.classId, studentNo: STUDENT.studentNo });
+      }).then(function(res) {
+        var statuses = (res && res.statuses) || {};
+        if (statuses[pendingKey] === 'pending') {
+          msg.className = 'modal-msg ok'; msg.textContent = '✓ Submitted! Waiting for your teacher.';
+          render(statuses);
+          setTimeout(closeModal, 1100);
         } else {
-          var chips = [1, 2, 3, 4, 5].map(function(num) {
-            var key = 'C5T' + num;
-            var hasFile = !!files[key];
-            return '<span class="task-chip ' + (hasFile ? 'done' : '') + '">' + (hasFile ? 'Received' : 'Missing') + ' Task ' + num + '</span>';
-          }).join('');
-          result.innerHTML =
-            '<div class="status-student-name">' + escapeHtml(displayName) + '</div>' +
-            '<div class="status-badge-big status-submitted">Submission Received</div>' +
-            '<div class="status-sub-note">' + fileKeys.length + ' of 5 PDF task files were found. Task status is updated from the teacher track.</div>' +
-            '<div class="task-chip-row">' + chips + '</div>';
+          btn.disabled = false;
+          msg.className = 'modal-msg err'; msg.textContent = 'Hmm, it may not have saved. Please try again.';
         }
-      } catch(e) {
-        result.innerHTML = '<div class="notice-card danger">Connection failed. Check your internet connection and try again.</div>';
-      }
-      if (btn) {
+      }).catch(function() {
         btn.disabled = false;
-        btn.textContent = 'Check Submission Status';
-      }
-    }
+        msg.className = 'modal-msg err'; msg.textContent = 'Network error. Please try again.';
+      });
+    };
 
-    initClassSelects();
-    initCh4Status();
+    (function init() {
+      var p = EQStudent.read(GRADE);
+      if (p.hasProfile) {
+        STUDENT = { classId: p.classId, studentNo: p.studentNo };
+        document.getElementById('subIntro').style.display = '';
+        loadStatuses();
+      } else {
+        document.getElementById('needLogin').style.display = '';
+      }
+    })();
   </script>
 </body>
 </html>

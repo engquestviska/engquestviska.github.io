@@ -55,12 +55,27 @@
     });
   }
 
+  // POST a JSON body (used for large payloads like image uploads that can't fit
+  // in a GET URL). Apps Script web apps don't return CORS headers, so we send a
+  // "simple" text/plain request in no-cors mode: the request executes on the
+  // server but the response is opaque (unreadable). Callers confirm success with
+  // a follow-up GET (e.g. getMySubmissions) rather than reading the response.
+  function apiPost(body) {
+    return fetch(API_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(body)
+    });
+  }
+
   global.EQApi = {
     url: API_URL,
     classes: CLASSES,
     grade10Classes: GRADE10_CLASSES,
     grade11Classes: GRADE11_CLASSES,
     classLabels: CLASS_LABELS,
-    get: apiGet
+    get: apiGet,
+    post: apiPost
   };
 })(window);

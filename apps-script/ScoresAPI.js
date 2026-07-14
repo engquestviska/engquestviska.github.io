@@ -119,6 +119,11 @@ function doGet(e) {
     else if (action === 'setupRoster')         result = setupRoster(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.names);
     else if (action === 'setupActivenessXP')   result = setupActivenessXP(e.parameter.username, e.parameter.password);
     else if (action === 'setupTaskColumns')    result = setupTaskColumns(e.parameter.username, e.parameter.password);
+    else if (action === 'setupSubmissions')     result = setupSubmissions(e.parameter.username, e.parameter.password);
+    else if (action === 'getTaskSubmissions')   result = getTaskSubmissions(e.parameter.username, e.parameter.password);
+    else if (action === 'getSubmissionPhoto')   result = getSubmissionPhoto(e.parameter.username, e.parameter.password, e.parameter.fileId);
+    else if (action === 'reviewTaskSubmission') result = reviewTaskSubmission(e.parameter.username, e.parameter.password, e.parameter.subId, e.parameter.decision);
+    else if (action === 'getMySubmissions')     result = getMySubmissions(e.parameter.className, e.parameter.studentNo);
     else if (action === 'getVocabulary')       result = getVocabulary(e.parameter.className, e.parameter.studentNo);
     else if (action === 'addVocabulary')        result = addVocabulary(e.parameter.className, e.parameter.studentNo, e.parameter.words);
     else if (action === 'clearVocabulary')      result = clearVocabulary(e.parameter.username, e.parameter.password, e.parameter.className);
@@ -157,6 +162,7 @@ function doPost(e) {
   let result;
   try {
     if (body.action === 'saveTaskStatus') result = saveTaskStatus(body.username, body.password, body.className, body.studentNo, body.tasks || {});
+    else if (body.action === 'submitTaskPhoto') result = submitTaskPhoto(body.className, body.studentNo, body.taskKey, body.image, body.mimeType, body.fileName);
   } catch(err) { result = { error: err.message }; }
   return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
 }
@@ -749,6 +755,163 @@ function setupTaskColumns(username, password) {
     } catch (e) { results[cls] = 'error: ' + e.message; }
   });
   return { success: true, results: results };
+}
+
+// ── TASK PHOTO SUBMISSIONS ────────────────────────────────────
+// Students upload a photo of their finished task; it is stored privately in a
+// Drive folder (never shared), the task is auto-checked in Task_Status, and the
+// submission is queued as "pending" for the teacher to view + clear. The teacher
+// grades the score manually elsewhere. Data model: a central "EQ Task
+// Submissions" spreadsheet (Submissions tab) + a private Drive folder, both
+// referenced via Script Properties.
+
+var SUBMISSIONS_TAB = 'Submissions';
+
+function _tasksForClass(className) {
+  var chapters = /^XI/i.test(className) ? 2 : 3;
+  var keys = [];
+  for (var ch = 1; ch <= chapters; ch++) for (var t = 1; t <= 3; t++) keys.push('C' + ch + 'T' + t);
+  return keys;
+}
+function _submissionsTab() {
+  var id = PropertiesService.getScriptProperties().getProperty('SUBMISSIONS_SHEET_ID');
+  if (!id) return null;
+  try { return SpreadsheetApp.openById(id).getSheetByName(SUBMISSIONS_TAB); } catch (e) { return null; }
+}
+function _fmtDateTime(v) {
+  if (v instanceof Date) return Utilities.formatDate(v, Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm');
+  return String(v == null ? '' : v);
+}
+function _markTask(className, studentNo, taskKey, value) {
+  try {
+    var ts = SpreadsheetApp.openById(SCORE_SHEETS[className]).getSheetByName(TASK_SHEET_NAME);
+    if (!ts) return;
+    var td = ts.getDataRange().getValues(), th = td[0], tr = -1;
+    for (var i = 1; i < td.length; i++) { if (String(td[i][0]) === String(studentNo)) { tr = i; break; } }
+    if (tr < 0) return;
+    for (var c = 3; c < th.length; c++) {
+      if (String(th[c]).trim().toUpperCase() === taskKey) { ts.getRange(tr + 1, c + 1).setValue(value); return; }
+    }
+  } catch (e) {}
+}
+
+// One-time: create the submissions spreadsheet + private Drive folder.
+function setupSubmissions(username, password) {
+  if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
+  var props = PropertiesService.getScriptProperties();
+  var report = {};
+  var sheetId = props.getProperty('SUBMISSIONS_SHEET_ID');
+  var ss = null;
+  if (sheetId) { try { ss = SpreadsheetApp.openById(sheetId); } catch (e) { ss = null; } }
+  if (!ss) { ss = SpreadsheetApp.create('EQ Task Submissions 2026-2027'); props.setProperty('SUBMISSIONS_SHEET_ID', ss.getId()); report.createdSheet = ss.getId(); }
+  else report.sheet = ss.getId();
+  var tab = ss.getSheetByName(SUBMISSIONS_TAB);
+  if (!tab) {
+    tab = ss.getSheets()[0]; tab.setName(SUBMISSIONS_TAB);
+    tab.getRange(1, 1, 1, 10).setValues([['SubId', 'Timestamp', 'Class', 'StudentNo', 'StudentName', 'Task', 'FileId', 'FileName', 'Status', 'ReviewedAt']]);
+    tab.setFrozenRows(1);
+    report.createdTab = true;
+  }
+  var folderId = props.getProperty('SUBMISSIONS_FOLDER_ID');
+  var folder = null;
+  if (folderId) { try { folder = DriveApp.getFolderById(folderId); } catch (e) { folder = null; } }
+  if (!folder) { folder = DriveApp.createFolder('EQ Task Submission Photos'); props.setProperty('SUBMISSIONS_FOLDER_ID', folder.getId()); report.createdFolder = folder.getId(); }
+  else report.folder = folder.getId();
+  return { success: true, report: report };
+}
+
+// Student submits (or replaces) a task photo. No teacher auth — students use it.
+function submitTaskPhoto(className, studentNo, taskKey, imageBase64, mimeType, fileName) {
+  if (!SCORE_SHEETS[className]) return { success: false, error: 'Class not found' };
+  taskKey = String(taskKey || '').trim().toUpperCase();
+  if (_tasksForClass(className).indexOf(taskKey) === -1) return { success: false, error: 'Invalid task for this class' };
+  if (!imageBase64) return { success: false, error: 'No image received' };
+  var name = _studentName(SpreadsheetApp.openById(SCORE_SHEETS[className]), studentNo);
+  if (!name) return { success: false, error: 'Student not found' };
+  var props = PropertiesService.getScriptProperties();
+  var folderId = props.getProperty('SUBMISSIONS_FOLDER_ID');
+  var tab = _submissionsTab();
+  if (!folderId || !tab) return { success: false, error: 'Submissions not set up' };
+  mimeType = mimeType || 'image/jpeg';
+  var ext = mimeType.indexOf('png') > -1 ? 'png' : 'jpg';
+  var now = new Date();
+  var safeName = className + '_no' + studentNo + '_' + taskKey + '_' + now.getTime() + '.' + ext;
+  var blob = Utilities.newBlob(Utilities.base64Decode(imageBase64), mimeType, safeName);
+  var file = DriveApp.getFolderById(folderId).createFile(blob); // private by default
+  // Replace any existing not-yet-reviewed submission for the same task.
+  var data = tab.getDataRange().getValues(), rowIdx = -1;
+  for (var r = 1; r < data.length; r++) {
+    if (String(data[r][2]) === String(className) && String(data[r][3]) === String(studentNo) &&
+        String(data[r][5]).toUpperCase() === taskKey && String(data[r][8]) !== 'reviewed') { rowIdx = r; break; }
+  }
+  if (rowIdx > -1) {
+    var oldId = String(data[rowIdx][6] || '');
+    if (oldId) { try { DriveApp.getFileById(oldId).setTrashed(true); } catch (e) {} }
+    tab.getRange(rowIdx + 1, 2, 1, 9).setValues([[now, className, studentNo, name, taskKey, file.getId(), safeName, 'pending', '']]);
+  } else {
+    var subId = 'S' + now.getTime() + Math.floor(Math.random() * 1000);
+    tab.appendRow([subId, now, className, studentNo, name, taskKey, file.getId(), safeName, 'pending', '']);
+  }
+  _markTask(className, studentNo, taskKey, true);
+  SpreadsheetApp.flush();
+  return { success: true };
+}
+
+// Teacher: list all submissions (newest first) + pending count.
+function getTaskSubmissions(username, password) {
+  if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
+  var tab = _submissionsTab();
+  if (!tab) return { success: true, submissions: [], pending: 0 };
+  var data = tab.getDataRange().getValues(), subs = [];
+  for (var r = 1; r < data.length; r++) {
+    if (!data[r][0]) continue;
+    subs.push({ subId: String(data[r][0]), timestamp: _fmtDateTime(data[r][1]), className: String(data[r][2]),
+      studentNo: data[r][3], studentName: String(data[r][4]), task: String(data[r][5]), fileId: String(data[r][6]),
+      status: String(data[r][8] || 'pending'), reviewedAt: _fmtDateTime(data[r][9]) });
+  }
+  subs.reverse();
+  return { success: true, submissions: subs, pending: subs.filter(function (s) { return s.status === 'pending'; }).length };
+}
+
+// Teacher: fetch one photo as base64 so it renders inline (file stays private).
+function getSubmissionPhoto(username, password, fileId) {
+  if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
+  try {
+    var blob = DriveApp.getFileById(fileId).getBlob();
+    return { success: true, mimeType: blob.getContentType(), dataBase64: Utilities.base64Encode(blob.getBytes()) };
+  } catch (e) { return { success: false, error: 'Photo not found' }; }
+}
+
+// Teacher: clear a submission. decision 'reviewed' (done) or 'rejected' (un-check
+// the task so the student resubmits).
+function reviewTaskSubmission(username, password, subId, decision) {
+  if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
+  var tab = _submissionsTab();
+  if (!tab) return { success: false, error: 'Submissions not set up' };
+  var data = tab.getDataRange().getValues();
+  for (var r = 1; r < data.length; r++) {
+    if (String(data[r][0]) === String(subId)) {
+      var status = decision === 'rejected' ? 'rejected' : 'reviewed';
+      tab.getRange(r + 1, 9).setValue(status);
+      tab.getRange(r + 1, 10).setValue(new Date());
+      if (decision === 'rejected') _markTask(String(data[r][2]), data[r][3], String(data[r][5]).toUpperCase(), false);
+      SpreadsheetApp.flush();
+      return { success: true, status: status };
+    }
+  }
+  return { success: false, error: 'Submission not found' };
+}
+
+// Student: their own submission statuses per task { C1T1:'pending', ... }.
+function getMySubmissions(className, studentNo) {
+  var tab = _submissionsTab();
+  if (!tab) return { success: true, statuses: {} };
+  var data = tab.getDataRange().getValues(), out = {};
+  for (var r = 1; r < data.length; r++) {
+    if (String(data[r][2]) === String(className) && String(data[r][3]) === String(studentNo))
+      out[String(data[r][5]).toUpperCase()] = String(data[r][8] || 'pending');
+  }
+  return { success: true, statuses: out };
 }
 
 // ── VOCABULARY BOX ────────────────────────────────────────────
