@@ -118,6 +118,7 @@ function doGet(e) {
     else if (action === 'setupCalcFormulas')   result = setupCalcFormulas(e.parameter.username, e.parameter.password);
     else if (action === 'setupRoster')         result = setupRoster(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.names);
     else if (action === 'setupActivenessXP')   result = setupActivenessXP(e.parameter.username, e.parameter.password);
+    else if (action === 'setupTaskColumns')    result = setupTaskColumns(e.parameter.username, e.parameter.password);
     else if (action === 'getVocabulary')       result = getVocabulary(e.parameter.className, e.parameter.studentNo);
     else if (action === 'addVocabulary')        result = addVocabulary(e.parameter.className, e.parameter.studentNo, e.parameter.words);
     else if (action === 'clearVocabulary')      result = clearVocabulary(e.parameter.username, e.parameter.password, e.parameter.className);
@@ -717,6 +718,34 @@ function setupActivenessXP(username, password) {
       act.getRange(2, 10, n, 1).setFormulas(tot);
       SpreadsheetApp.flush();
       results[cls] = n + ' rows';
+    } catch (e) { results[cls] = 'error: ' + e.message; }
+  });
+  return { success: true, results: results };
+}
+
+// ── SETUP TASK COLUMNS (3 tasks per chapter) ──
+// Rewrites each class's Task_Status header row (from col D) to C{ch}T{1..3}.
+// Grade X classes (XE*) get 3 chapters (9 tasks); Grade XI classes (XIF*)
+// get 2 chapters (6 tasks). Task columns are boolean (blank = not submitted).
+// Frontend reads these headers dynamically, so this is the single source of
+// truth for how many tasks/chapters exist per grade.
+function setupTaskColumns(username, password) {
+  if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
+  var results = {};
+  Object.keys(SCORE_SHEETS).forEach(function(cls) {
+    try {
+      var sh = SpreadsheetApp.openById(SCORE_SHEETS[cls]).getSheetByName(TASK_SHEET_NAME);
+      if (!sh) { results[cls] = 'no Task_Status'; return; }
+      var chapters = /^XI/i.test(cls) ? 2 : 3;  // Grade XI = 2 chapters, Grade X = 3
+      var cols = [];
+      for (var ch = 1; ch <= chapters; ch++) for (var t = 1; t <= 3; t++) cols.push('C' + ch + 'T' + t);
+      // Clear the whole task area (headers + any old values) from col D onward,
+      // then write the fresh header row. No task data exists yet, so this is safe.
+      var maxCol = sh.getMaxColumns();
+      if (maxCol >= 4) sh.getRange(1, 4, sh.getMaxRows(), maxCol - 3).clearContent();
+      sh.getRange(1, 4, 1, cols.length).setValues([cols]);
+      SpreadsheetApp.flush();
+      results[cls] = cols.join(',');
     } catch (e) { results[cls] = 'error: ' + e.message; }
   });
   return { success: true, results: results };
