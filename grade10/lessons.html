@@ -136,7 +136,7 @@
 
     function loadSavedMaterials() {
       [1, 2, 3].forEach(function(ch) {
-        EQApi.get({ action: 'getMaterials', chapter: ch }).then(function(res) {
+        EQApi.get({ action: 'getMaterials', chapter: ch, grade: '10' }).then(function(res) {
           if (res.materials && res.materials.length > 0) {
             res.materials.forEach(function(m) {
               appendCard(ch, m.title, m.fileId, m.fileType);

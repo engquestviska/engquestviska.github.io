@@ -164,11 +164,18 @@
           <div class="panel-head">
             <div>
               <h2 class="panel-title">Add Material</h2>
-              <p class="panel-copy">Paste a Google Drive file link or file ID. Students will see it on the Grade 10 Lesson Materials page.</p>
+              <p class="panel-copy">Pick a grade, paste a Google Drive file link or file ID. Students of that grade will see it on their Lesson Materials page.</p>
             </div>
           </div>
 
           <div class="material-form">
+            <div>
+              <label for="gradeSelect">Grade</label>
+              <select id="gradeSelect" onchange="onGradeChange()">
+                <option value="10">Grade 10</option>
+                <option value="11">Grade 11</option>
+              </select>
+            </div>
             <div>
               <label for="chapterSelect">Unit</label>
               <select id="chapterSelect">
@@ -262,15 +269,18 @@
       return value === '5' ? 'Unit 2' : 'Unit 1';
     }
 
+    function onGradeChange() { loadMaterials(); }
+
     function loadMaterials() {
       if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
       var chapter = document.getElementById('listChapterSelect').value;
+      var grade = document.getElementById('gradeSelect').value;
       var btn = document.getElementById('loadBtn');
       btn.disabled = true;
       btn.textContent = 'Loading...';
       document.getElementById('materialList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading materials...</h2><p class="empty-copy">Fetching ' + unitLabel(chapter) + ' materials from the class data source.</p></div>';
 
-      EQApi.get({ action: 'getMaterials', chapter: chapter }).then(function(data) {
+      EQApi.get({ action: 'getMaterials', chapter: chapter, grade: grade }).then(function(data) {
         currentMaterials = data.materials || [];
         renderMaterials();
       }).catch(function(err) {
@@ -310,6 +320,7 @@
     function addMaterial() {
       var teacher = EQAuth.getTeacher();
       var chapter = document.getElementById('chapterSelect').value;
+      var grade = document.getElementById('gradeSelect').value;
       var title = document.getElementById('titleInput').value.trim();
       var fileId = extractDriveId(document.getElementById('driveInput').value);
       var fileType = document.getElementById('typeSelect').value;
@@ -335,6 +346,7 @@
         username: teacher.username,
         password: teacher.password,
         chapter: chapter,
+        grade: grade,
         title: title,
         fileId: fileId,
         fileType: fileType
@@ -358,12 +370,14 @@
       if (!confirm('Remove this material from the student page?')) return;
       var teacher = EQAuth.getTeacher();
       var chapter = document.getElementById('listChapterSelect').value;
+      var grade = document.getElementById('gradeSelect').value;
 
       EQApi.get({
         action: 'deleteMaterial',
         username: teacher.username,
         password: teacher.password,
         chapter: chapter,
+        grade: grade,
         fileId: fileId
       }).then(function(data) {
         if (!data.success) throw new Error(data.error || 'Could not remove material');

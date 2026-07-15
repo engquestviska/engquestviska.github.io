@@ -384,8 +384,26 @@
     document.getElementById('changeProfile').addEventListener('click', changeProfile);
     document.getElementById('logoutProfile').addEventListener('click', logoutProfile);
 
+    // Show the teacher's latest announcement if it targets this grade.
+    function loadHomeAnnouncement() {
+      if (!window.EQApi) return;
+      EQApi.get({ action: 'getAnnouncement' }).then(function(res) {
+        var a = res && res.announcement;
+        if (!a || (!a.title && !a.body)) return;
+        var aud = a.audience || 'both';
+        if (aud !== 'both' && aud !== '10') return; // not for Grade 10
+        var t = document.getElementById('announcementTitle');
+        var c = document.getElementById('announcementCopy');
+        var m = document.getElementById('announcementMeta');
+        if (t) t.textContent = a.title || 'Class announcement';
+        if (c) c.textContent = a.body || '';
+        if (m) m.textContent = a.type ? (a.type.charAt(0).toUpperCase() + a.type.slice(1)) : 'Latest update';
+      }).catch(function() {});
+    }
+
     initClassOptions();
     refreshProfileDisplay();
+    loadHomeAnnouncement();
     document.addEventListener('DOMContentLoaded', refreshSidebarClass);
     if (document.getElementById('studentClass').value) loadStudentsForClass();
   </script>

@@ -138,9 +138,9 @@ function doGet(e) {
     else if (action === 'addStrike')          result = addStrike(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.studentNo, e.parameter.reason || '');
     else if (action === 'removeStrike')       result = removeStrike(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.studentNo);
     else if (action === 'debugCh5Names')   result = debugCh5Names(e.parameter.username, e.parameter.password);
-    else if (action === 'getMaterials')    result = getMaterials(e.parameter.chapter);
-    else if (action === 'addMaterial')     result = addMaterial(e.parameter.username, e.parameter.password, e.parameter.chapter, e.parameter.title, e.parameter.fileId, e.parameter.fileType);
-    else if (action === 'deleteMaterial')  result = deleteMaterial(e.parameter.username, e.parameter.password, e.parameter.chapter, e.parameter.fileId);
+    else if (action === 'getMaterials')    result = getMaterials(e.parameter.chapter, e.parameter.grade);
+    else if (action === 'addMaterial')     result = addMaterial(e.parameter.username, e.parameter.password, e.parameter.chapter, e.parameter.title, e.parameter.fileId, e.parameter.fileType, e.parameter.grade);
+    else if (action === 'deleteMaterial')  result = deleteMaterial(e.parameter.username, e.parameter.password, e.parameter.chapter, e.parameter.fileId, e.parameter.grade);
     else if (action === 'setStance')        result = setStance(e.parameter.cls, e.parameter.attNum, e.parameter.stance);
     else if (action === 'setReveal')        result = setReveal(e.parameter.username, e.parameter.password, e.parameter.cls, e.parameter.attNum, e.parameter.revealed);
     else if (action === 'getBannerSlides')  result = getBannerSlides();
@@ -148,7 +148,7 @@ function doGet(e) {
     else if (action === 'teacherHealthCheck') result = teacherHealthCheck(e.parameter.username, e.parameter.password);
     else if (action === 'ping')            result = { ok: true };
     else if (action === 'getAnnouncement')   result = getAnnouncement();
-    else if (action === 'setAnnouncement')   result = setAnnouncement(e.parameter.username, e.parameter.password, e.parameter.title, e.parameter.body, e.parameter.type);
+    else if (action === 'setAnnouncement')   result = setAnnouncement(e.parameter.username, e.parameter.password, e.parameter.title, e.parameter.body, e.parameter.type, e.parameter.audience);
     else if (action === 'clearAnnouncement') result = clearAnnouncement(e.parameter.username, e.parameter.password);
     else result = { error: 'Unknown action' };
   } catch(err) { result = { error: err.message }; }
@@ -1805,38 +1805,41 @@ function getSubmissions() {
   return { classes: sortedClasses, students: result, totalTasks: taskCols.length };
 }
 
-// ── LESSON MATERIALS (stored in Script Properties) ───────────
-function getMaterials(chapter) {
-  const key = 'materials_ch' + chapter;
-  const raw = PropertiesService.getScriptProperties().getProperty(key);
-  if (!raw) return { materials: [] };
-  try { return { materials: JSON.parse(raw) }; }
-  catch(e) { return { materials: [] }; }
+// ── LESSON MATERIALS + ASSIGNMENTS (stored in Script Properties) ───────────
+// Keyed per grade: materials_{grade}_ch{chapter}. Assignments reuse this with
+// namespaced chapter keys (assign4/assign5). Legacy pre-grade data lived under
+// materials_ch{chapter}; Grade 10 reads fall back to it and the first write for
+// a (grade,chapter) migrates it, so nothing is lost.
+function _materialsKey(grade, chapter) { return 'materials_' + (grade || '10') + '_ch' + chapter; }
+
+function _readMaterials(grade, chapter) {
+  const props = PropertiesService.getScriptProperties();
+  let raw = props.getProperty(_materialsKey(grade, chapter));
+  if (raw == null && String(grade || '10') === '10') raw = props.getProperty('materials_ch' + chapter); // legacy
+  let list = [];
+  try { if (raw) list = JSON.parse(raw); } catch(e) {}
+  return list;
 }
 
-function addMaterial(username, password, chapter, title, fileId, fileType) {
+function getMaterials(chapter, grade) {
+  return { materials: _readMaterials(grade, chapter) };
+}
+
+function addMaterial(username, password, chapter, title, fileId, fileType, grade) {
   if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
-  const key = 'materials_ch' + chapter;
   const props = PropertiesService.getScriptProperties();
-  const raw = props.getProperty(key);
-  let materials = [];
-  try { if (raw) materials = JSON.parse(raw); } catch(e) {}
-  // Check duplicate
+  let materials = _readMaterials(grade, chapter); // includes legacy for Grade 10
   if (materials.find(function(m) { return m.fileId === fileId; })) return { success: false, error: 'Already exists' };
   materials.push({ title: title, fileId: fileId, fileType: fileType || 'PDF', addedAt: new Date().toISOString() });
-  props.setProperty(key, JSON.stringify(materials));
+  props.setProperty(_materialsKey(grade, chapter), JSON.stringify(materials));
   return { success: true, materials: materials };
 }
 
-function deleteMaterial(username, password, chapter, fileId) {
+function deleteMaterial(username, password, chapter, fileId, grade) {
   if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
-  const key = 'materials_ch' + chapter;
   const props = PropertiesService.getScriptProperties();
-  const raw = props.getProperty(key);
-  let materials = [];
-  try { if (raw) materials = JSON.parse(raw); } catch(e) {}
-  materials = materials.filter(function(m) { return m.fileId !== fileId; });
-  props.setProperty(key, JSON.stringify(materials));
+  let materials = _readMaterials(grade, chapter).filter(function(m) { return m.fileId !== fileId; });
+  props.setProperty(_materialsKey(grade, chapter), JSON.stringify(materials));
   return { success: true, materials: materials };
 }
 
@@ -1848,12 +1851,15 @@ function getAnnouncement() {
   catch(e) { return { announcement: null }; }
 }
 
-function setAnnouncement(username, password, title, body, type) {
+function setAnnouncement(username, password, title, body, type, audience) {
   if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
+  var aud = String(audience || 'both');
+  if (aud !== '10' && aud !== '11') aud = 'both'; // 10 | 11 | both
   var ann = {
     title: title || '',
     body: body || '',
     type: type || 'info',  // info | warning | success
+    audience: aud,
     postedAt: new Date().toISOString(),
     postedBy: username
   };

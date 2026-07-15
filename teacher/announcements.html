@@ -202,8 +202,8 @@
     </div>
     <section class="hero">
       <div class="kicker">Announcements</div>
-      <h1>Post one clear update for Grade 10.</h1>
-      <p class="hero-copy">Publish the current class announcement from the teacher side. Students only see the latest published update on their Grade 10 home page.</p>
+      <h1>Post one clear update for your students.</h1>
+      <p class="hero-copy">Publish the current class announcement and choose who sees it — Grade 10, Grade 11, or both. Students see the latest published update on their home page.</p>
     </section>
   </header>
 
@@ -254,6 +254,26 @@
                 </label>
               </div>
             </div>
+            <div>
+              <label>Show to</label>
+              <div class="type-grid">
+                <label class="type-option">
+                  <input type="radio" name="announcementAudience" value="both" checked/>
+                  <strong>Both grades</strong>
+                  <span>Everyone</span>
+                </label>
+                <label class="type-option">
+                  <input type="radio" name="announcementAudience" value="10"/>
+                  <strong>Grade 10 only</strong>
+                  <span>X E-1 to E-5</span>
+                </label>
+                <label class="type-option">
+                  <input type="radio" name="announcementAudience" value="11"/>
+                  <strong>Grade 11 only</strong>
+                  <span>XI F-7 to F-9</span>
+                </label>
+              </div>
+            </div>
             <div class="announcement-actions">
               <button class="btn" type="button" id="publishBtn" onclick="publishAnnouncement()">Publish Announcement</button>
               <button class="btn ghost" type="button" onclick="loadAnnouncement()">Reload</button>
@@ -266,7 +286,7 @@
           <div class="announcement-preview-head">
             <div>
               <h2 class="panel-title">Current Student View</h2>
-              <p class="panel-copy">This is what Grade 10 students will see on the home page.</p>
+              <p class="panel-copy">This is what students will see on the home page.</p>
             </div>
             <div class="announcement-state" id="announcementState">Loading</div>
           </div>
@@ -301,6 +321,17 @@
     function setType(value) {
       var type = safeType(value || 'info');
       var option = document.querySelector('input[name="announcementType"][value="' + type + '"]');
+      if (option) option.checked = true;
+    }
+
+    function selectedAudience() {
+      var checked = document.querySelector('input[name="announcementAudience"]:checked');
+      return checked ? checked.value : 'both';
+    }
+
+    function setAudience(value) {
+      var aud = (value === '10' || value === '11') ? value : 'both';
+      var option = document.querySelector('input[name="announcementAudience"][value="' + aud + '"]');
       if (option) option.checked = true;
     }
 
@@ -348,6 +379,7 @@
       document.getElementById('announcementTitle').value = announcement.title || '';
       document.getElementById('announcementBody').value = announcement.body || '';
       setType(announcement.type || 'info');
+      setAudience(announcement.audience || 'both');
     }
 
     function loadAnnouncement() {
@@ -386,7 +418,8 @@
         password: teacher.password,
         title: title,
         body: body,
-        type: selectedType()
+        type: selectedType(),
+        audience: selectedAudience()
       }).then(function(data) {
         if (!data.success) throw new Error(data.error || 'Could not publish announcement');
         renderAnnouncement(data.announcement);
@@ -400,7 +433,7 @@
     }
 
     function clearAnnouncement() {
-      if (!confirm('Clear the current announcement from the Grade 10 home page?')) return;
+      if (!confirm('Clear the current announcement from the student home page?')) return;
       var teacher = EQAuth.getTeacher();
       var btn = document.getElementById('clearBtn');
       btn.disabled = true;

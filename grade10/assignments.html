@@ -178,7 +178,7 @@
 
     function loadSaved() {
       [1, 2, 3].forEach(function(ch) {
-        EQApi.get({ action: 'getMaterials', chapter: 'assign' + ch }).then(function(res) {
+        EQApi.get({ action: 'getMaterials', chapter: 'assign' + ch, grade: '10' }).then(function(res) {
           if (res.materials && res.materials.length) {
             var empty = document.getElementById('ch' + ch + '-empty');
             if (empty) empty.remove();
