@@ -124,6 +124,7 @@ function doGet(e) {
     else if (action === 'getSubmissionPhoto')   result = getSubmissionPhoto(e.parameter.username, e.parameter.password, e.parameter.fileId);
     else if (action === 'reviewTaskSubmission') result = reviewTaskSubmission(e.parameter.username, e.parameter.password, e.parameter.subId, e.parameter.decision);
     else if (action === 'getMySubmissions')     result = getMySubmissions(e.parameter.className, e.parameter.studentNo);
+    else if (action === 'adminClearSubmissions') result = adminClearSubmissions(e.parameter.username, e.parameter.password, e.parameter.onlyReviewed);
     else if (action === 'getVocabulary')       result = getVocabulary(e.parameter.className, e.parameter.studentNo);
     else if (action === 'addVocabulary')        result = addVocabulary(e.parameter.className, e.parameter.studentNo, e.parameter.words);
     else if (action === 'clearVocabulary')      result = clearVocabulary(e.parameter.username, e.parameter.password, e.parameter.className);
@@ -795,9 +796,24 @@ function _markTask(className, studentNo, taskKey, value) {
   } catch (e) {}
 }
 
+// ⇩⇩⇩ RUN THIS ONE FROM THE APPS SCRIPT EDITOR (once) ⇩⇩⇩
+// Select "AUTHORIZE_AND_SETUP_SUBMISSIONS" in the function dropdown and click Run.
+// It takes NO password (so it actually runs, unlike setupSubmissions which the
+// website calls with a password). The first run pops the Google permission
+// screen for Drive — click Allow — then it creates the private photo folder +
+// submissions sheet. Safe to run again; it reuses what already exists.
+function AUTHORIZE_AND_SETUP_SUBMISSIONS() {
+  return _doSetupSubmissions();
+}
+
 // One-time: create the submissions spreadsheet + private Drive folder.
+// Called by the website (password-gated) via the setupSubmissions action.
 function setupSubmissions(username, password) {
   if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
+  return _doSetupSubmissions();
+}
+
+function _doSetupSubmissions() {
   var props = PropertiesService.getScriptProperties();
   var report = {};
   var sheetId = props.getProperty('SUBMISSIONS_SHEET_ID');
@@ -912,6 +928,29 @@ function getMySubmissions(className, studentNo) {
       out[String(data[r][5]).toUpperCase()] = String(data[r][8] || 'pending');
   }
   return { success: true, statuses: out };
+}
+
+// Teacher: clear submissions. onlyReviewed='true' clears just the already-checked
+// ones; otherwise clears ALL. For each cleared row it un-checks the task and
+// trashes the photo file, then removes the row. Use at semester-end or to tidy up.
+function adminClearSubmissions(username, password, onlyReviewed) {
+  if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
+  var tab = _submissionsTab();
+  if (!tab) return { success: false, error: 'Submissions not set up' };
+  var data = tab.getDataRange().getValues();
+  var reviewedOnly = String(onlyReviewed) === 'true';
+  var cleared = 0;
+  for (var r = data.length - 1; r >= 1; r--) {
+    if (!data[r][0]) continue;
+    if (reviewedOnly && String(data[r][8]) !== 'reviewed') continue;
+    var fileId = String(data[r][6] || '');
+    if (fileId) { try { DriveApp.getFileById(fileId).setTrashed(true); } catch (e) {} }
+    _markTask(String(data[r][2]), data[r][3], String(data[r][5]).toUpperCase(), false);
+    tab.deleteRow(r + 1);
+    cleared++;
+  }
+  SpreadsheetApp.flush();
+  return { success: true, cleared: cleared };
 }
 
 // ── VOCABULARY BOX ────────────────────────────────────────────
