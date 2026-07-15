@@ -126,7 +126,7 @@
   <script src="../shared/js/api.js"></script>
   <script src="../shared/js/dom-utils.js"></script>
   <script src="../shared/js/auth.js"></script>
-  <script src="../shared/js/teacher-sidebar.js?v=20260711"></script>
+  <script src="../shared/js/teacher-sidebar.js?v=20260715"></script>
 </head>
 <body class="teacher-tool-page" data-page="tasks">
   <header>
@@ -147,7 +147,7 @@
     <section class="hero">
       <div class="kicker">Task Status Manager</div>
       <h1>Update student task progress from one room.</h1>
-      <p class="hero-copy">Choose a Grade 10 class, review Unit 1 or Unit 2 task status, and save changes directly to the task records. Students only see the read-only result.</p>
+      <p class="hero-copy">Choose any class (Grade 10 or 11), review task status by chapter, and save changes directly to the task records. Students only see the read-only result.</p>
     </section>
   </header>
 
@@ -162,7 +162,7 @@
       <div class="panel">
         <div class="panel-head">
           <div>
-            <h2 class="panel-title">Grade 10 Task Records</h2>
+            <h2 class="panel-title">Task Records</h2>
             <p class="panel-copy">Toggle tasks for each student, then save the row. Unsaved rows turn amber so it is clear what still needs writing.</p>
           </div>
           <div class="status-pill" id="loginPill">Teacher</div>
@@ -171,7 +171,7 @@
         <div class="controls">
           <div>
             <label for="classSelect">Class</label>
-            <select id="classSelect" data-eq-class-select data-grade="10"></select>
+            <select id="classSelect" data-eq-class-select data-grade="all"></select>
           </div>
           <div>
             <label for="searchInput">Search student</label>
@@ -403,7 +403,7 @@
     document.getElementById('searchInput').addEventListener('input', renderTasks);
 
     (function init() {
-      if (window.EQTeacherShell) EQTeacherShell.populateClassSelect('classSelect', { grade: '10' });
+      if (window.EQTeacherShell) EQTeacherShell.populateClassSelect('classSelect', { grade: 'all' });
       if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
       loadTasks();
     })();

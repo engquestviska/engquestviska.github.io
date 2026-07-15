@@ -72,6 +72,10 @@
 
   function classesForGrade(grade) {
     var gradeId = String(grade || '10');
+    // 'all' → every class across both grades (Grade 10 first, then Grade 11).
+    if (gradeId === 'all') {
+      return classesForGrade('10').concat(classesForGrade('11'));
+    }
     if (window.EQClasses && typeof window.EQClasses.listForGrade === 'function') {
       return window.EQClasses.listForGrade(gradeId);
     }

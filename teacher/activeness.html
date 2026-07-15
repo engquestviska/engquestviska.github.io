@@ -154,7 +154,7 @@
   <script src="../shared/js/api.js"></script>
   <script src="../shared/js/dom-utils.js"></script>
   <script src="../shared/js/auth.js"></script>
-  <script src="../shared/js/teacher-sidebar.js?v=20260711"></script>
+  <script src="../shared/js/teacher-sidebar.js?v=20260715"></script>
 </head>
 <body class="teacher-tool-page" data-page="activeness">
   <header>
@@ -175,7 +175,7 @@
     <section class="hero">
       <div class="kicker">Level / XP Manager</div>
       <h1>Update participation points from the teacher side.</h1>
-      <p class="hero-copy">Load a Grade 10 class, adjust participation categories, and keep the student page as a read-only Level / XP dashboard.</p>
+      <p class="hero-copy">Load any class (Grade 10 or 11), adjust participation categories, and keep the student page as a read-only Level / XP dashboard.</p>
     </section>
   </header>
 
@@ -190,7 +190,7 @@
       <div class="panel">
         <div class="panel-head">
           <div>
-            <h2 class="panel-title">Grade 10 Level / XP Records</h2>
+            <h2 class="panel-title">Level / XP Records</h2>
             <p class="panel-copy">Use plus and minus controls for each category. Each click saves immediately to the class data source.</p>
           </div>
           <div class="status-pill" id="loginPill">Teacher</div>
@@ -199,7 +199,7 @@
         <div class="controls">
           <div>
             <label for="classSelect">Class</label>
-            <select id="classSelect" data-eq-class-select data-grade="10"></select>
+            <select id="classSelect" data-eq-class-select data-grade="all"></select>
           </div>
           <div>
             <label for="searchInput">Search student</label>
@@ -372,7 +372,7 @@
     document.getElementById('searchInput').addEventListener('input', renderActiveness);
 
     (function init() {
-      if (window.EQTeacherShell) EQTeacherShell.populateClassSelect('classSelect', { grade: '10' });
+      if (window.EQTeacherShell) EQTeacherShell.populateClassSelect('classSelect', { grade: 'all' });
       if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
       loadActiveness();
     })();
