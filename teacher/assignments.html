@@ -174,10 +174,7 @@
             </div>
             <div>
               <label for="chapterSelect">Unit</label>
-              <select id="chapterSelect">
-                <option value="assign4">Unit 1 · Placeholder task set</option>
-                <option value="assign5">Unit 2 · Placeholder task set</option>
-              </select>
+              <select id="chapterSelect"></select>
             </div>
             <div>
               <label for="titleInput">Assignment Title</label>
@@ -212,10 +209,7 @@
             <div class="controls">
               <div>
                 <label for="listChapterSelect">Unit</label>
-                <select id="listChapterSelect">
-                  <option value="assign4">Unit 1</option>
-                  <option value="assign5">Unit 2</option>
-                </select>
+                <select id="listChapterSelect" onchange="loadAssignments()"></select>
               </div>
               <button class="btn" type="button" id="loadBtn" onclick="loadAssignments()">Load Assignments</button>
             </div>
@@ -237,8 +231,30 @@
       EQAuth.logoutTeacher('index.html');
     }
 
+    // Unit names per grade (Grade 10 = 3 units, Grade 11 = 2). Keys are
+    // assign1..assignN and match what the student Assignment pages read.
+    var UNIT_NAMES = {
+      '10': ['Chapter 1', 'Chapter 2', 'Chapter 3'],
+      '11': ['Narrative Text', 'Chapter 2']
+    };
+    function currentUnitNames() {
+      return UNIT_NAMES[document.getElementById('gradeSelect').value] || UNIT_NAMES['10'];
+    }
     function chapterLabel(key) {
-      return key === 'assign5' ? 'Unit 2' : 'Unit 1';
+      var n = parseInt(String(key).replace('assign', ''), 10);
+      var names = currentUnitNames();
+      return 'Unit ' + n + (names[n - 1] ? ' · ' + names[n - 1] : '');
+    }
+    function rebuildUnits() {
+      var names = currentUnitNames();
+      var add = document.getElementById('chapterSelect');
+      var list = document.getElementById('listChapterSelect');
+      var prevAdd = add.value, prevList = list.value;
+      var html = names.map(function(n, i) { return '<option value="assign' + (i + 1) + '">Unit ' + (i + 1) + ' · ' + escapeHtml(n) + '</option>'; }).join('');
+      add.innerHTML = html;
+      list.innerHTML = html;
+      if (prevAdd && add.querySelector('option[value="' + prevAdd + '"]')) add.value = prevAdd;
+      if (prevList && list.querySelector('option[value="' + prevList + '"]')) list.value = prevList;
     }
 
     function extractDriveId(value) {
@@ -260,7 +276,7 @@
       return 'https://drive.google.com/file/d/' + encodeURIComponent(fileId) + '/preview';
     }
 
-    function onGradeChange() { loadAssignments(); }
+    function onGradeChange() { rebuildUnits(); loadAssignments(); }
 
     function loadAssignments() {
       if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
@@ -396,6 +412,7 @@
     });
 
     (function init() {
+      rebuildUnits();
       if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
       loadAssignments();
     })();
