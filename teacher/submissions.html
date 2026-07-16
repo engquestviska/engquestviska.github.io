@@ -36,6 +36,11 @@
     .modal .msub { color:#64748b; font-size:.85rem; margin:2px 0 14px; }
     .photo-wrap { min-height:200px; display:grid; place-items:center; background:#f8fafc; border:1px solid #e5ecf6; border-radius:14px; overflow:hidden; }
     .photo-wrap img { width:100%; object-fit:contain; max-height:60vh; display:block; }
+    .photo-gallery { display:flex; flex-direction:column; gap:10px; }
+    .photo-gallery .gphoto { position:relative; min-height:120px; display:grid; place-items:center; background:#f8fafc; border:1px solid #e5ecf6; border-radius:14px; overflow:hidden; }
+    .photo-gallery .gphoto img { width:100%; object-fit:contain; max-height:60vh; display:block; }
+    .photo-gallery .gnum { position:absolute; top:8px; left:8px; background:rgba(15,23,42,.7); color:#fff; font:800 .72rem 'IBM Plex Mono',monospace; padding:2px 9px; border-radius:999px; }
+    .photo-gallery .gload { color:#94a3b8; font-size:.85rem; padding:30px; }
     .modal-actions { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
     .modal-actions button { flex:1; min-width:130px; border-radius:12px; padding:13px; font:800 .92rem 'IBM Plex Sans',sans-serif; cursor:pointer; border:none; }
     .btn-reviewed { background:linear-gradient(135deg,#10b981,#059669); color:#fff; }
@@ -109,7 +114,7 @@
     <div class="modal">
       <h3 id="mTitle">Submission</h3>
       <div class="msub" id="mSub"></div>
-      <div class="photo-wrap"><img id="mImg" alt="Submitted work"/></div>
+      <div class="photo-gallery" id="mGallery"></div>
       <div class="modal-msg" id="mMsg"></div>
       <div class="modal-actions">
         <button class="btn-reviewed" id="btnReviewed" type="button">✓ Mark reviewed</button>
@@ -156,7 +161,7 @@
         return '<div class="sub-row ' + s.status + '">' +
           '<div class="sub-task">' + esc(s.task) + '</div>' +
           '<div><div class="sub-name">' + esc(s.studentName) + '</div>' +
-            '<div class="sub-meta">' + esc(classLabel(s.className)) + ' · ' + esc(s.task) + ' · ' + esc(s.timestamp) + '</div>' +
+            '<div class="sub-meta">' + esc(classLabel(s.className)) + ' · ' + esc(s.task) + ' · ' + (s.photoCount || 1) + '📷 · ' + esc(s.timestamp) + '</div>' +
             '<div style="margin-top:6px">' + pill + '</div></div>' +
           '<button class="view-btn" onclick="openSub(\'' + s.subId + '\')">View &amp; check</button>' +
         '</div>';
@@ -178,21 +183,28 @@
     function openSub(subId) {
       current = ALL.find(function(s){ return s.subId === subId; });
       if (!current) return;
+      var fileIds = current.fileIds && current.fileIds.length ? current.fileIds : (current.fileId ? [current.fileId] : []);
       document.getElementById('mTitle').textContent = current.studentName;
-      document.getElementById('mSub').textContent = classLabel(current.className) + ' · ' + current.task + ' · submitted ' + current.timestamp;
+      document.getElementById('mSub').textContent = classLabel(current.className) + ' · ' + current.task + ' · ' + fileIds.length + ' photo' + (fileIds.length > 1 ? 's' : '') + ' · submitted ' + current.timestamp;
       document.getElementById('mMsg').textContent = ''; document.getElementById('mMsg').className = 'modal-msg';
-      document.getElementById('mImg').removeAttribute('src');
-      var reviewed = current.status !== 'pending';
       document.getElementById('btnReviewed').disabled = false;
       document.getElementById('btnReject').disabled = false;
       document.getElementById('modalBack').classList.add('on');
       var t = EQAuth.getTeacher();
-      var img = document.getElementById('mImg');
-      img.alt = 'Loading photo…';
-      EQApi.get({ action: 'getSubmissionPhoto', username: t.username, password: t.password, fileId: current.fileId }).then(function(res) {
-        if (res && res.success && res.dataBase64) img.src = 'data:' + (res.mimeType || 'image/jpeg') + ';base64,' + res.dataBase64;
-        else { document.getElementById('mMsg').className = 'modal-msg err'; document.getElementById('mMsg').textContent = 'Could not load the photo.'; }
-      }).catch(function() { document.getElementById('mMsg').className = 'modal-msg err'; document.getElementById('mMsg').textContent = 'Network error loading photo.'; });
+      var gallery = document.getElementById('mGallery');
+      // Placeholders in order; each photo fills in as it loads.
+      gallery.innerHTML = fileIds.map(function(_, i) {
+        return '<div class="gphoto" id="gph-' + i + '"><span class="gnum">' + (i + 1) + '/' + fileIds.length + '</span><span class="gload">Loading…</span></div>';
+      }).join('');
+      fileIds.forEach(function(fid, i) {
+        EQApi.get({ action: 'getSubmissionPhoto', username: t.username, password: t.password, fileId: fid }).then(function(res) {
+          var box = document.getElementById('gph-' + i);
+          if (!box) return;
+          if (res && res.success && res.dataBase64) {
+            box.innerHTML = '<span class="gnum">' + (i + 1) + '/' + fileIds.length + '</span><img src="data:' + (res.mimeType || 'image/jpeg') + ';base64,' + res.dataBase64 + '"/>';
+          } else { box.querySelector('.gload').textContent = 'Could not load this photo'; }
+        }).catch(function() { var box = document.getElementById('gph-' + i); if (box) box.querySelector('.gload').textContent = 'Network error'; });
+      });
     }
 
     function closeModal() { document.getElementById('modalBack').classList.remove('on'); current = null; }

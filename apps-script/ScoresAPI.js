@@ -163,7 +163,7 @@ function doPost(e) {
   let result;
   try {
     if (body.action === 'saveTaskStatus') result = saveTaskStatus(body.username, body.password, body.className, body.studentNo, body.tasks || {});
-    else if (body.action === 'submitTaskPhoto') result = submitTaskPhoto(body.className, body.studentNo, body.taskKey, body.image, body.mimeType, body.fileName);
+    else if (body.action === 'submitTaskPhoto') result = submitTaskPhoto(body.className, body.studentNo, body.taskKey, body.images, body.mimeType, body.image);
   } catch(err) { result = { error: err.message }; }
   return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
 }
@@ -836,24 +836,46 @@ function _doSetupSubmissions() {
   return { success: true, report: report };
 }
 
-// Student submits (or replaces) a task photo. No teacher auth — students use it.
-function submitTaskPhoto(className, studentNo, taskKey, imageBase64, mimeType, fileName) {
+var SUBMISSION_MAX_PHOTOS = 6;
+
+// Trash a comma-separated list of Drive file ids (used when replacing/clearing).
+function _trashFiles(str) {
+  String(str || '').split(',').forEach(function (id) {
+    id = id.trim();
+    if (id) { try { DriveApp.getFileById(id).setTrashed(true); } catch (e) {} }
+  });
+}
+
+// Student submits (or replaces) a task's photos. No teacher auth — students use
+// it. `images` is an array of base64 strings (1..SUBMISSION_MAX_PHOTOS); a single
+// `image` is still accepted for backward-compat. All photos for a task live in
+// one row: FileId / FileName hold comma-joined lists.
+function submitTaskPhoto(className, studentNo, taskKey, images, mimeType, singleImage) {
   if (!SCORE_SHEETS[className]) return { success: false, error: 'Class not found' };
   taskKey = String(taskKey || '').trim().toUpperCase();
   if (_tasksForClass(className).indexOf(taskKey) === -1) return { success: false, error: 'Invalid task for this class' };
-  if (!imageBase64) return { success: false, error: 'No image received' };
+  if ((!images || !images.length) && singleImage) images = [singleImage];
+  if (!images || !images.length) return { success: false, error: 'No image received' };
+  if (images.length > SUBMISSION_MAX_PHOTOS) images = images.slice(0, SUBMISSION_MAX_PHOTOS);
   var name = _studentName(SpreadsheetApp.openById(SCORE_SHEETS[className]), studentNo);
   if (!name) return { success: false, error: 'Student not found' };
   var props = PropertiesService.getScriptProperties();
   var folderId = props.getProperty('SUBMISSIONS_FOLDER_ID');
   var tab = _submissionsTab();
   if (!folderId || !tab) return { success: false, error: 'Submissions not set up' };
+  var folder = DriveApp.getFolderById(folderId);
   mimeType = mimeType || 'image/jpeg';
   var ext = mimeType.indexOf('png') > -1 ? 'png' : 'jpg';
   var now = new Date();
-  var safeName = className + '_no' + studentNo + '_' + taskKey + '_' + now.getTime() + '.' + ext;
-  var blob = Utilities.newBlob(Utilities.base64Decode(imageBase64), mimeType, safeName);
-  var file = DriveApp.getFolderById(folderId).createFile(blob); // private by default
+  var ids = [], names = [];
+  for (var k = 0; k < images.length; k++) {
+    if (!images[k]) continue;
+    var safeName = className + '_no' + studentNo + '_' + taskKey + '_' + now.getTime() + '_' + (k + 1) + '.' + ext;
+    var file = folder.createFile(Utilities.newBlob(Utilities.base64Decode(images[k]), mimeType, safeName));
+    ids.push(file.getId()); names.push(safeName);
+  }
+  if (!ids.length) return { success: false, error: 'No image received' };
+  var idStr = ids.join(','), nameStr = names.join(',');
   // Replace any existing not-yet-reviewed submission for the same task.
   var data = tab.getDataRange().getValues(), rowIdx = -1;
   for (var r = 1; r < data.length; r++) {
@@ -861,16 +883,15 @@ function submitTaskPhoto(className, studentNo, taskKey, imageBase64, mimeType, f
         String(data[r][5]).toUpperCase() === taskKey && String(data[r][8]) !== 'reviewed') { rowIdx = r; break; }
   }
   if (rowIdx > -1) {
-    var oldId = String(data[rowIdx][6] || '');
-    if (oldId) { try { DriveApp.getFileById(oldId).setTrashed(true); } catch (e) {} }
-    tab.getRange(rowIdx + 1, 2, 1, 9).setValues([[now, className, studentNo, name, taskKey, file.getId(), safeName, 'pending', '']]);
+    _trashFiles(String(data[rowIdx][6] || ''));
+    tab.getRange(rowIdx + 1, 2, 1, 9).setValues([[now, className, studentNo, name, taskKey, idStr, nameStr, 'pending', '']]);
   } else {
     var subId = 'S' + now.getTime() + Math.floor(Math.random() * 1000);
-    tab.appendRow([subId, now, className, studentNo, name, taskKey, file.getId(), safeName, 'pending', '']);
+    tab.appendRow([subId, now, className, studentNo, name, taskKey, idStr, nameStr, 'pending', '']);
   }
   _markTask(className, studentNo, taskKey, true);
   SpreadsheetApp.flush();
-  return { success: true };
+  return { success: true, count: ids.length };
 }
 
 // Teacher: list all submissions (newest first) + pending count.
@@ -881,8 +902,11 @@ function getTaskSubmissions(username, password) {
   var data = tab.getDataRange().getValues(), subs = [];
   for (var r = 1; r < data.length; r++) {
     if (!data[r][0]) continue;
+    var idStr = String(data[r][6] || '');
+    var fileIds = idStr ? idStr.split(',').map(function (s) { return s.trim(); }).filter(Boolean) : [];
     subs.push({ subId: String(data[r][0]), timestamp: _fmtDateTime(data[r][1]), className: String(data[r][2]),
-      studentNo: data[r][3], studentName: String(data[r][4]), task: String(data[r][5]), fileId: String(data[r][6]),
+      studentNo: data[r][3], studentName: String(data[r][4]), task: String(data[r][5]),
+      fileId: fileIds[0] || '', fileIds: fileIds, photoCount: fileIds.length,
       status: String(data[r][8] || 'pending'), reviewedAt: _fmtDateTime(data[r][9]) });
   }
   subs.reverse();
@@ -943,8 +967,7 @@ function adminClearSubmissions(username, password, onlyReviewed) {
   for (var r = data.length - 1; r >= 1; r--) {
     if (!data[r][0]) continue;
     if (reviewedOnly && String(data[r][8]) !== 'reviewed') continue;
-    var fileId = String(data[r][6] || '');
-    if (fileId) { try { DriveApp.getFileById(fileId).setTrashed(true); } catch (e) {} }
+    _trashFiles(String(data[r][6] || ''));
     _markTask(String(data[r][2]), data[r][3], String(data[r][5]).toUpperCase(), false);
     tab.deleteRow(r + 1);
     cleared++;

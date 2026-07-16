@@ -26,12 +26,18 @@
     .pill.rejected { background:#fee2e2; color:#b91c1c; }
     .task-btn { border:none; border-radius:11px; padding:9px 16px; font:700 .84rem 'IBM Plex Sans',sans-serif; cursor:pointer; background:var(--blue); color:#fff; white-space:nowrap; }
     .task-btn.resubmit { background:#fff; color:var(--blue); border:1.5px solid var(--blue); }
+    /* Preview modal */
     .modal-back { position:fixed; inset:0; background:rgba(15,23,42,.62); display:none; align-items:center; justify-content:center; padding:20px; z-index:60; }
     .modal-back.on { display:flex; }
     .modal { background:#fff; border-radius:22px; padding:22px; max-width:420px; width:100%; box-shadow:0 30px 80px rgba(15,23,42,.3); }
     .modal h3 { font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:800; margin-bottom:4px; }
     .modal .msub { color:#64748b; font-size:.84rem; margin-bottom:14px; }
-    .modal img { width:100%; max-height:46vh; object-fit:contain; border-radius:14px; background:#f8fafc; border:1px solid #e5ecf6; }
+    .thumb-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:8px; }
+    .thumb { position:relative; aspect-ratio:1; border-radius:12px; overflow:hidden; border:1px solid #e5ecf6; background:#f8fafc; }
+    .thumb img { width:100%; height:100%; object-fit:cover; }
+    .thumb .rm { position:absolute; top:4px; right:4px; width:22px; height:22px; border:none; border-radius:50%; background:rgba(15,23,42,.72); color:#fff; font-weight:800; cursor:pointer; line-height:20px; padding:0; }
+    .add-photo { width:100%; border:1.5px dashed var(--blue); background:#fff; color:var(--blue); border-radius:12px; padding:12px; font:700 .9rem 'IBM Plex Sans',sans-serif; cursor:pointer; }
+    .add-photo:disabled { opacity:.5; cursor:not-allowed; }
     .modal-actions { display:flex; gap:10px; margin-top:16px; }
     .modal-actions button { flex:1; border-radius:12px; padding:12px; font:700 .9rem 'IBM Plex Sans',sans-serif; cursor:pointer; border:none; }
     .btn-cancel { background:#f1f5f9; color:#475569; }
@@ -75,9 +81,10 @@
 
   <div class="modal-back" id="modalBack">
     <div class="modal">
-      <h3 id="modalTitle">Submit photo</h3>
+      <h3 id="modalTitle">Submit photos</h3>
       <div class="msub" id="modalSub"></div>
-      <img id="modalImg" alt="Preview"/>
+      <div class="thumb-grid" id="thumbGrid"></div>
+      <button class="add-photo" id="btnAdd" type="button">＋ Add photo</button>
       <div class="modal-msg" id="modalMsg"></div>
       <div class="modal-actions">
         <button class="btn-cancel" id="btnCancel" type="button">Cancel</button>
@@ -86,13 +93,14 @@
     </div>
   </div>
 
-  <input type="file" id="fileInput" accept="image/*" capture="environment" style="display:none"/>
+  <input type="file" id="fileInput" accept="image/*" capture="environment" multiple style="display:none"/>
 
   <script>
     var GRADE = '11';
-    var STUDENT = null;
-    var pendingKey = null;
-    var pendingImage = null;
+    var STUDENT = null;      // { classId, studentNo }
+    var pendingKey = null;   // task key being submitted
+    var pendingImages = [];  // array of base64 strings (no prefix)
+    var MAX_PHOTOS = 6;
 
     function chaptersForGrade(g) { return g === '11' ? 2 : 3; }
 
@@ -112,7 +120,7 @@
         for (var t = 1; t <= 3; t++) {
           var key = 'C' + ch + 'T' + t;
           var st = statuses[key] || '';
-          var label = st ? 'Re-submit' : 'Submit';
+          var label = (st && st !== 'reviewed') ? 'Re-submit' : (st === 'reviewed' ? 'Re-submit' : 'Submit');
           var cls = st ? 'task-btn resubmit' : 'task-btn';
           html += '<div class="task-row">' +
             '<span class="task-name">Task ' + t + '</span>' +
@@ -134,10 +142,36 @@
 
     function pickFile(key) {
       pendingKey = key;
+      pendingImages = [];
+      var parts = key.match(/C(\d)T(\d)/);
+      document.getElementById('modalSub').textContent = 'Chapter ' + parts[1] + ' · Task ' + parts[2] + ' — add one or more photos';
+      var msg = document.getElementById('modalMsg'); msg.textContent = ''; msg.className = 'modal-msg';
+      renderThumbs();
+      document.getElementById('modalBack').classList.add('on');
+      openPicker();
+    }
+
+    function openPicker() {
       var fi = document.getElementById('fileInput');
       fi.value = '';
       fi.click();
     }
+    document.getElementById('btnAdd').onclick = openPicker;
+
+    function renderThumbs() {
+      var grid = document.getElementById('thumbGrid');
+      grid.innerHTML = pendingImages.map(function(b64, i) {
+        return '<div class="thumb"><img src="data:image/jpeg;base64,' + b64 + '"/>' +
+               '<button class="rm" type="button" onclick="removeThumb(' + i + ')">×</button></div>';
+      }).join('');
+      document.getElementById('btnSend').disabled = pendingImages.length === 0;
+      var add = document.getElementById('btnAdd');
+      add.disabled = pendingImages.length >= MAX_PHOTOS;
+      add.textContent = pendingImages.length >= MAX_PHOTOS ? 'Maximum ' + MAX_PHOTOS + ' photos' :
+        (pendingImages.length ? '＋ Add another photo (' + pendingImages.length + '/' + MAX_PHOTOS + ')' : '＋ Add photo');
+    }
+
+    function removeThumb(i) { pendingImages.splice(i, 1); renderThumbs(); }
 
     function compressImage(file, maxDim, quality) {
       return new Promise(function(resolve, reject) {
@@ -159,40 +193,40 @@
     }
 
     document.getElementById('fileInput').addEventListener('change', function(e) {
-      var file = e.target.files && e.target.files[0];
-      if (!file) return;
+      var files = Array.prototype.slice.call(e.target.files || []);
+      if (!files.length) return;
       var msg = document.getElementById('modalMsg');
-      msg.textContent = ''; msg.className = 'modal-msg';
-      document.getElementById('btnSend').disabled = false;
-      var parts = pendingKey.match(/C(\d)T(\d)/);
-      document.getElementById('modalSub').textContent = 'Chapter ' + parts[1] + ' · Task ' + parts[2];
-      compressImage(file, 1100, 0.6).then(function(dataUrl) {
-        pendingImage = dataUrl.split(',')[1];
-        document.getElementById('modalImg').src = dataUrl;
-        document.getElementById('modalBack').classList.add('on');
-      }).catch(function() {
-        alert('Sorry, that image could not be read. Please try another photo.');
-      });
+      msg.className = 'modal-msg'; msg.textContent = 'Processing…';
+      var room = MAX_PHOTOS - pendingImages.length;
+      files = files.slice(0, room);
+      // Smaller output: 1000px longest side, JPEG quality 0.5.
+      Promise.all(files.map(function(f) { return compressImage(f, 1000, 0.5).then(function(d) { return d.split(',')[1]; }).catch(function() { return null; }); }))
+        .then(function(results) {
+          results.forEach(function(b64) { if (b64 && pendingImages.length < MAX_PHOTOS) pendingImages.push(b64); });
+          msg.textContent = '';
+          renderThumbs();
+        });
     });
 
     function closeModal() {
       document.getElementById('modalBack').classList.remove('on');
-      pendingImage = null;
+      pendingImages = [];
     }
     document.getElementById('btnCancel').onclick = closeModal;
 
     document.getElementById('btnSend').onclick = function() {
-      if (!pendingImage || !STUDENT) return;
+      if (!pendingImages.length || !STUDENT) return;
       var btn = document.getElementById('btnSend'), msg = document.getElementById('modalMsg');
-      btn.disabled = true; msg.className = 'modal-msg'; msg.textContent = 'Sending…';
+      btn.disabled = true; msg.className = 'modal-msg'; msg.textContent = 'Sending ' + pendingImages.length + ' photo' + (pendingImages.length > 1 ? 's' : '') + '…';
       EQApi.post({
         action: 'submitTaskPhoto',
         className: STUDENT.classId,
         studentNo: STUDENT.studentNo,
         taskKey: pendingKey,
-        image: pendingImage,
+        images: pendingImages,
         mimeType: 'image/jpeg'
       }).then(function() {
+        // no-cors: response is opaque, so confirm by re-reading statuses.
         return new Promise(function(r) { setTimeout(r, 2200); });
       }).then(function() {
         return EQApi.get({ action: 'getMySubmissions', className: STUDENT.classId, studentNo: STUDENT.studentNo });
