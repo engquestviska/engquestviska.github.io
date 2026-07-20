@@ -233,12 +233,18 @@
 
     // Unit names per grade (Grade 10 = 3 units, Grade 11 = 2). Keys are
     // assign1..assignN and match what the student Assignment pages read.
+    // Fallback only — live names come from the backend (edit them on the
+    // Materials page) and are cached here once fetched.
     var UNIT_NAMES = {
       '10': ['Descriptive Text', 'Recount', 'Procedure'],
       '11': ['Narrative Text', 'Analytical & Hortatory Exposition Text']
     };
-    function currentUnitNames() {
-      return UNIT_NAMES[document.getElementById('gradeSelect').value] || UNIT_NAMES['10'];
+    function currentGrade() { return document.getElementById('gradeSelect').value; }
+    function currentUnitNames() { return UNIT_NAMES[currentGrade()] || UNIT_NAMES['10']; }
+    function fetchUnitNames(grade, done) {
+      EQApi.get({ action: 'getUnitNames', grade: grade }).then(function(res) {
+        if (res && res.names && res.names.length) UNIT_NAMES[grade] = res.names;
+      }).catch(function() {}).then(function() { if (done) done(); });
     }
     function chapterLabel(key) {
       var n = parseInt(String(key).replace('assign', ''), 10);
@@ -276,7 +282,9 @@
       return 'https://drive.google.com/file/d/' + encodeURIComponent(fileId) + '/preview';
     }
 
-    function onGradeChange() { rebuildUnits(); loadAssignments(); }
+    function onGradeChange() {
+      fetchUnitNames(currentGrade(), function() { rebuildUnits(); loadAssignments(); });
+    }
 
     function loadAssignments() {
       if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
@@ -414,7 +422,7 @@
     (function init() {
       rebuildUnits();
       if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
-      loadAssignments();
+      fetchUnitNames(currentGrade(), function() { rebuildUnits(); loadAssignments(); });
     })();
   </script>
 </body>

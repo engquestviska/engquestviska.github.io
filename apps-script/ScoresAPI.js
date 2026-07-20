@@ -147,6 +147,8 @@ function doGet(e) {
     else if (action === 'setBannerSlides')  result = setBannerSlides(e.parameter.username, e.parameter.password, e.parameter.data);
     else if (action === 'teacherHealthCheck') result = teacherHealthCheck(e.parameter.username, e.parameter.password);
     else if (action === 'ping')            result = { ok: true };
+    else if (action === 'getUnitNames')      result = getUnitNames(e.parameter.grade);
+    else if (action === 'setUnitNames')      result = setUnitNames(e.parameter.username, e.parameter.password, e.parameter.grade, e.parameter.names);
     else if (action === 'getAnnouncement')   result = getAnnouncement();
     else if (action === 'setAnnouncement')   result = setAnnouncement(e.parameter.username, e.parameter.password, e.parameter.title, e.parameter.body, e.parameter.type, e.parameter.audience);
     else if (action === 'clearAnnouncement') result = clearAnnouncement(e.parameter.username, e.parameter.password);
@@ -1864,6 +1866,43 @@ function deleteMaterial(username, password, chapter, fileId, grade) {
   let materials = _readMaterials(grade, chapter).filter(function(m) { return m.fileId !== fileId; });
   props.setProperty(_materialsKey(grade, chapter), JSON.stringify(materials));
   return { success: true, materials: materials };
+}
+
+// ── UNIT NAMES (teacher-editable, per grade) ──────────────────
+// Stored in Script Properties as unit_names_{grade} = JSON array. Grade 10 has
+// 3 units, Grade 11 has 2. Falls back to these defaults until the teacher edits
+// them, so the site always shows sensible names.
+function _unitCount(grade) { return String(grade) === '11' ? 2 : 3; }
+function _defaultUnitNames(grade) {
+  return String(grade) === '11'
+    ? ['Narrative Text', 'Analytical & Hortatory Exposition Text']
+    : ['Descriptive Text', 'Recount', 'Procedure'];
+}
+
+// Public — students read this to label their Units.
+function getUnitNames(grade) {
+  grade = String(grade || '10');
+  var raw = PropertiesService.getScriptProperties().getProperty('unit_names_' + grade);
+  var names = null;
+  try { if (raw) names = JSON.parse(raw); } catch (e) {}
+  var fallback = _defaultUnitNames(grade);
+  var count = _unitCount(grade), out = [];
+  for (var i = 0; i < count; i++) {
+    var v = (names && names[i] != null) ? String(names[i]).trim() : '';
+    out.push(v || fallback[i] || '');
+  }
+  return { success: true, grade: grade, names: out };
+}
+
+function setUnitNames(username, password, grade, namesJson) {
+  if (!authOk(username, password)) return { success: false, error: 'Unauthorized' };
+  grade = String(grade || '10');
+  var names;
+  try { names = JSON.parse(namesJson || '[]'); } catch (e) { return { success: false, error: 'Bad names' }; }
+  var count = _unitCount(grade), out = [];
+  for (var i = 0; i < count; i++) out.push(String(names[i] == null ? '' : names[i]).trim().slice(0, 60));
+  PropertiesService.getScriptProperties().setProperty('unit_names_' + grade, JSON.stringify(out));
+  return getUnitNames(grade);
 }
 
 // ── ANNOUNCEMENTS ─────────────────────────────────────────────

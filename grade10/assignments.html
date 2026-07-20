@@ -196,6 +196,25 @@
       }
     });
 
+    // Unit names are set by the teacher (Materials page) — pull the live ones.
+    function applyUnitNames(names) {
+      names.forEach(function(n, i) {
+        var ch = i + 1;
+        var t = document.getElementById('chapter' + ch + 'Title');
+        if (t) t.textContent = 'Unit ' + ch + (n ? ' · ' + n : '');
+        var box = document.getElementById('ch' + ch + '-empty');
+        if (box) {
+          var et = box.querySelector('.empty-material-title');
+          if (et) et.textContent = (n || ('Unit ' + ch)) + ' Assignments';
+        }
+      });
+    }
+    if (window.EQApi) {
+      EQApi.get({ action: 'getUnitNames', grade: '10' }).then(function(res) {
+        if (res && res.names && res.names.length) applyUnitNames(res.names);
+      }).catch(function() {});
+    }
+
     loadSaved();
   </script>
 </body>

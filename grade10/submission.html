@@ -135,11 +135,20 @@
       wrap.innerHTML = html;
     }
 
+    var lastStatuses = {};
     function loadStatuses() {
       if (!window.EQApi || !STUDENT) return;
       EQApi.get({ action: 'getMySubmissions', className: STUDENT.classId, studentNo: STUDENT.studentNo })
-        .then(function(res) { render((res && res.statuses) || {}); })
-        .catch(function() { render({}); });
+        .then(function(res) { lastStatuses = (res && res.statuses) || {}; render(lastStatuses); })
+        .catch(function() { render(lastStatuses); });
+    }
+
+    // Unit names are set by the teacher (Materials page); the list above is a fallback.
+    function loadUnitNames() {
+      if (!window.EQApi) return;
+      EQApi.get({ action: 'getUnitNames', grade: GRADE }).then(function(res) {
+        if (res && res.names && res.names.length) { UNIT_NAMES = res.names; render(lastStatuses); }
+      }).catch(function() {});
     }
 
     function pickFile(key) {
@@ -253,6 +262,7 @@
       if (p.hasProfile) {
         STUDENT = { classId: p.classId, studentNo: p.studentNo };
         document.getElementById('subIntro').style.display = '';
+        loadUnitNames();
         loadStatuses();
       } else {
         document.getElementById('needLogin').style.display = '';

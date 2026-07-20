@@ -208,6 +208,28 @@
       }
     });
 
+    // Unit names are set by the teacher (Materials page) — pull the live ones
+    // and relabel the sections. The list above is only a fallback.
+    function applyUnitNames() {
+      UNIT_NAMES.forEach(function(n, i) {
+        var ch = i + 1;
+        var t = document.getElementById('chapter' + ch + 'Title');
+        if (t) t.textContent = 'Unit ' + ch + (n ? ' · ' + n : '');
+        var box = document.getElementById('ch' + ch + '-empty');
+        if (box) {
+          var et = box.querySelector('.empty-material-title');
+          if (et) et.textContent = unitName(ch) + ' Materials';
+        }
+      });
+    }
+    function loadUnitNames() {
+      if (!window.EQApi) return;
+      EQApi.get({ action: 'getUnitNames', grade: '11' }).then(function(res) {
+        if (res && res.names && res.names.length) { UNIT_NAMES = res.names; applyUnitNames(); }
+      }).catch(function() {});
+    }
+
+    loadUnitNames();
     loadSavedMaterials();
   </script>
 </body>

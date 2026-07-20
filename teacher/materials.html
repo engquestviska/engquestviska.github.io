@@ -159,6 +159,23 @@
     </section>
 
     <section id="appPanel" hidden>
+      <div class="panel" style="margin-bottom:18px;">
+        <div class="panel-head">
+          <div>
+            <h2 class="panel-title">Unit Names</h2>
+            <p class="panel-copy">Rename the units for the grade selected below. These names appear everywhere students see them — Lesson Materials, Assignments, and Submit Task.</p>
+          </div>
+          <button class="btn ghost" type="button" id="unitToggle" onclick="toggleUnitEditor()">Edit unit names</button>
+        </div>
+        <div id="unitEditor" hidden>
+          <div id="unitFields" style="display:grid;gap:10px;margin-top:6px;"></div>
+          <div style="display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap;">
+            <button class="btn" type="button" id="saveUnitsBtn" onclick="saveUnitNames()">Save unit names</button>
+            <span id="unitMsg" style="font-size:.86rem;font-weight:700;"></span>
+          </div>
+        </div>
+      </div>
+
       <div class="material-manager-grid">
         <div class="panel">
           <div class="panel-head">
@@ -259,14 +276,55 @@
       return 'https://drive.google.com/file/d/' + encodeURIComponent(fileId) + '/preview';
     }
 
-    // Unit names per grade (Grade 10 = 3 units, Grade 11 = 2 units). Keys are
-    // 1..N and match what the student Lesson pages read.
+    // Unit names per grade. These are only a fallback — the live names come from
+    // the backend (teacher-editable) and are cached here once fetched.
     var UNIT_NAMES = {
       '10': ['Descriptive Text', 'Recount', 'Procedure'],
       '11': ['Narrative Text', 'Analytical & Hortatory Exposition Text']
     };
-    function currentUnitNames() {
-      return UNIT_NAMES[document.getElementById('gradeSelect').value] || UNIT_NAMES['10'];
+    function currentGrade() { return document.getElementById('gradeSelect').value; }
+    function currentUnitNames() { return UNIT_NAMES[currentGrade()] || UNIT_NAMES['10']; }
+
+    function fetchUnitNames(grade, done) {
+      EQApi.get({ action: 'getUnitNames', grade: grade }).then(function(res) {
+        if (res && res.names && res.names.length) UNIT_NAMES[grade] = res.names;
+      }).catch(function() {}).then(function() { if (done) done(); });
+    }
+
+    function toggleUnitEditor() {
+      var ed = document.getElementById('unitEditor');
+      ed.hidden = !ed.hidden;
+      document.getElementById('unitToggle').textContent = ed.hidden ? 'Edit unit names' : 'Hide';
+      if (!ed.hidden) renderUnitFields();
+    }
+
+    function renderUnitFields() {
+      document.getElementById('unitMsg').textContent = '';
+      document.getElementById('unitFields').innerHTML = currentUnitNames().map(function(n, i) {
+        return '<div><label for="uname' + i + '">Unit ' + (i + 1) + '</label>' +
+          '<input id="uname' + i + '" type="text" maxlength="60" value="' + escapeHtml(n) + '" placeholder="e.g. Descriptive Text"/></div>';
+      }).join('');
+    }
+
+    function saveUnitNames() {
+      var teacher = EQAuth.getTeacher();
+      var grade = currentGrade();
+      var names = currentUnitNames().map(function(_, i) {
+        var el = document.getElementById('uname' + i);
+        return el ? el.value.trim() : '';
+      });
+      var btn = document.getElementById('saveUnitsBtn'), msg = document.getElementById('unitMsg');
+      btn.disabled = true; msg.style.color = '#64748b'; msg.textContent = 'Saving…';
+      EQApi.get({ action: 'setUnitNames', username: teacher.username, password: teacher.password, grade: grade, names: JSON.stringify(names) })
+        .then(function(res) {
+          btn.disabled = false;
+          if (res && res.success) {
+            UNIT_NAMES[grade] = res.names;
+            rebuildUnits(); renderUnitFields();
+            msg.style.color = '#059669'; msg.textContent = '✓ Saved — students see the new names now.';
+            showToast('Unit names saved', 'ok');
+          } else { msg.style.color = '#dc2626'; msg.textContent = (res && res.error) || 'Could not save.'; }
+        }).catch(function() { btn.disabled = false; msg.style.color = '#dc2626'; msg.textContent = 'Network error.'; });
     }
     function unitLabel(value) {
       var names = currentUnitNames();
@@ -285,7 +343,13 @@
       if (prevList && list.querySelector('option[value="' + prevList + '"]')) list.value = prevList;
     }
 
-    function onGradeChange() { rebuildUnits(); loadMaterials(); }
+    function onGradeChange() {
+      fetchUnitNames(currentGrade(), function() {
+        rebuildUnits();
+        if (!document.getElementById('unitEditor').hidden) renderUnitFields();
+        loadMaterials();
+      });
+    }
 
     function loadMaterials() {
       if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
@@ -422,7 +486,7 @@
     (function init() {
       rebuildUnits();
       if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
-      loadMaterials();
+      fetchUnitNames(currentGrade(), function() { rebuildUnits(); loadMaterials(); });
     })();
   </script>
 </body>
