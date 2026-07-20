@@ -101,7 +101,7 @@
     var pendingKey = null;   // task key being submitted
     var pendingImages = [];  // array of base64 strings (no prefix)
     var MAX_PHOTOS = 6;
-    var UNIT_NAMES = ['Descriptive Text', '', ''];  // '' = not named yet
+    var UNIT_NAMES = ['Descriptive Text', 'Recount', 'Procedure'];
     function unitTitle(ch) { return 'Unit ' + ch + (UNIT_NAMES[ch - 1] ? ' · ' + UNIT_NAMES[ch - 1] : ''); }
 
     function chaptersForGrade(g) { return g === '11' ? 2 : 3; }

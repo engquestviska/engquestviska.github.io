@@ -73,14 +73,14 @@
       <div class="content-section-head">
         <div class="content-title-row">
           <div class="content-badge">Semester 1</div>
-          <h2 class="content-title" id="chapter2Title">Unit 2</h2>
+          <h2 class="content-title" id="chapter2Title">Unit 2 · Analytical &amp; Hortatory Exposition Text</h2>
         </div>
       </div>
       <div class="material-grid" id="grid-ch2">
         <div class="empty-material-card" id="ch2-empty">
           <div class="empty-material-icon">📘</div>
           <div>
-            <div class="empty-material-title">Chapter 2 Materials</div>
+            <div class="empty-material-title">Analytical &amp; Hortatory Exposition Text Materials</div>
             <div class="empty-material-copy">Will be uploaded soon. Stay tuned!</div>
           </div>
           <div class="empty-material-badge">Coming Soon</div>
@@ -128,6 +128,9 @@
       });
     }
 
+    var UNIT_NAMES = ['Narrative Text', 'Analytical & Hortatory Exposition Text'];
+    function unitName(ch) { return UNIT_NAMES[ch - 1] || ('Unit ' + ch); }
+
     function appendCard(ch, name, fileId, fileType) {
       fileId = safeDriveId(fileId);
       if (!fileId) return;
@@ -168,7 +171,7 @@
         '<div class="material-meta"></div>' +
         '<div class="material-actions"></div>';
       info.querySelector('.material-name').textContent = name;
-      info.querySelector('.material-meta').textContent = (fileType || 'PDF') + ' · Chapter ' + ch;
+      info.querySelector('.material-meta').textContent = (fileType || 'PDF') + ' · Unit ' + ch;
 
       var actions = info.querySelector('.material-actions');
       var btnView = document.createElement('button');
@@ -195,7 +198,7 @@
       var empty = document.createElement('div');
       empty.className = 'empty-material-card';
       empty.id = 'ch' + ch + '-empty';
-      empty.innerHTML = '<div class="empty-material-icon">📘</div><div><div class="empty-material-title">Chapter ' + ch + ' Materials</div><div class="empty-material-copy">No materials yet.</div></div><div class="empty-material-badge">Empty</div>';
+      empty.innerHTML = '<div class="empty-material-icon">📘</div><div><div class="empty-material-title">' + unitName(ch) + ' Materials</div><div class="empty-material-copy">No materials yet.</div></div><div class="empty-material-badge">Empty</div>';
       grid.appendChild(empty);
     }
 

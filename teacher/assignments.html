@@ -234,8 +234,8 @@
     // Unit names per grade (Grade 10 = 3 units, Grade 11 = 2). Keys are
     // assign1..assignN and match what the student Assignment pages read.
     var UNIT_NAMES = {
-      '10': ['Descriptive Text', '', ''],   // '' = not named yet
-      '11': ['Narrative Text', '']
+      '10': ['Descriptive Text', 'Recount', 'Procedure'],
+      '11': ['Narrative Text', 'Analytical & Hortatory Exposition Text']
     };
     function currentUnitNames() {
       return UNIT_NAMES[document.getElementById('gradeSelect').value] || UNIT_NAMES['10'];
