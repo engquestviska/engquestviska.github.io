@@ -234,8 +234,8 @@
     // Unit names per grade (Grade 10 = 3 units, Grade 11 = 2). Keys are
     // assign1..assignN and match what the student Assignment pages read.
     var UNIT_NAMES = {
-      '10': ['Chapter 1', 'Chapter 2', 'Chapter 3'],
-      '11': ['Narrative Text', 'Chapter 2']
+      '10': ['Descriptive Text', '', ''],   // '' = not named yet
+      '11': ['Narrative Text', '']
     };
     function currentUnitNames() {
       return UNIT_NAMES[document.getElementById('gradeSelect').value] || UNIT_NAMES['10'];
@@ -250,7 +250,7 @@
       var add = document.getElementById('chapterSelect');
       var list = document.getElementById('listChapterSelect');
       var prevAdd = add.value, prevList = list.value;
-      var html = names.map(function(n, i) { return '<option value="assign' + (i + 1) + '">Unit ' + (i + 1) + ' · ' + escapeHtml(n) + '</option>'; }).join('');
+      var html = names.map(function(n, i) { return '<option value="assign' + (i + 1) + '">Unit ' + (i + 1) + (n ? ' · ' + escapeHtml(n) : '') + '</option>'; }).join('');
       add.innerHTML = html;
       list.innerHTML = html;
       if (prevAdd && add.querySelector('option[value="' + prevAdd + '"]')) add.value = prevAdd;

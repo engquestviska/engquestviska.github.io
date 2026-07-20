@@ -262,8 +262,8 @@
     // Unit names per grade (Grade 10 = 3 units, Grade 11 = 2 units). Keys are
     // 1..N and match what the student Lesson pages read.
     var UNIT_NAMES = {
-      '10': ['Chapter 1', 'Chapter 2', 'Chapter 3'],
-      '11': ['Narrative Text', 'Chapter 2']
+      '10': ['Descriptive Text', '', ''],   // '' = not named yet
+      '11': ['Narrative Text', '']
     };
     function currentUnitNames() {
       return UNIT_NAMES[document.getElementById('gradeSelect').value] || UNIT_NAMES['10'];
@@ -278,8 +278,9 @@
       var add = document.getElementById('chapterSelect');
       var list = document.getElementById('listChapterSelect');
       var prevAdd = add.value, prevList = list.value;
-      add.innerHTML = names.map(function(n, i) { return '<option value="' + (i + 1) + '">Unit ' + (i + 1) + ' · ' + escapeHtml(n) + '</option>'; }).join('');
-      list.innerHTML = names.map(function(n, i) { return '<option value="' + (i + 1) + '">Unit ' + (i + 1) + ' · ' + escapeHtml(n) + '</option>'; }).join('');
+      var mk = function(n, i) { return '<option value="' + (i + 1) + '">Unit ' + (i + 1) + (n ? ' · ' + escapeHtml(n) : '') + '</option>'; };
+      add.innerHTML = names.map(mk).join('');
+      list.innerHTML = names.map(mk).join('');
       if (prevAdd && add.querySelector('option[value="' + prevAdd + '"]')) add.value = prevAdd;
       if (prevList && list.querySelector('option[value="' + prevList + '"]')) list.value = prevList;
     }

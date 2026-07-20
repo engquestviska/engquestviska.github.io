@@ -101,6 +101,8 @@
     var pendingKey = null;   // task key being submitted
     var pendingImages = [];  // array of base64 strings (no prefix)
     var MAX_PHOTOS = 6;
+    var UNIT_NAMES = ['Narrative Text', ''];  // '' = not named yet
+    function unitTitle(ch) { return 'Unit ' + ch + (UNIT_NAMES[ch - 1] ? ' · ' + UNIT_NAMES[ch - 1] : ''); }
 
     function chaptersForGrade(g) { return g === '11' ? 2 : 3; }
 
@@ -116,7 +118,7 @@
       var chs = chaptersForGrade(GRADE);
       var html = '';
       for (var ch = 1; ch <= chs; ch++) {
-        html += '<div class="chapter-card"><h2>Chapter ' + ch + '</h2>';
+        html += '<div class="chapter-card"><h2>' + unitTitle(ch) + '</h2>';
         for (var t = 1; t <= 3; t++) {
           var key = 'C' + ch + 'T' + t;
           var st = statuses[key] || '';
@@ -144,7 +146,7 @@
       pendingKey = key;
       pendingImages = [];
       var parts = key.match(/C(\d)T(\d)/);
-      document.getElementById('modalSub').textContent = 'Chapter ' + parts[1] + ' · Task ' + parts[2] + ' — add one or more photos';
+      document.getElementById('modalSub').textContent = unitTitle(parts[1]) + ' · Task ' + parts[2] + ' — add one or more photos';
       var msg = document.getElementById('modalMsg'); msg.textContent = ''; msg.className = 'modal-msg';
       renderThumbs();
       document.getElementById('modalBack').classList.add('on');
