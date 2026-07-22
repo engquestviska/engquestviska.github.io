@@ -203,9 +203,17 @@
       EQApi.get({ action: 'saveAttendance', username: teacher.username, password: teacher.password, className: cls, date: date, records: JSON.stringify(records) }).then(function(res) {
         if (!res || !res.success) throw new Error((res && res.error) || 'Save failed');
         showToast('Attendance saved for ' + date, 'ok');
-        return EQApi.get({ action: 'getClassData', className: cls });
-      }).then(function(data) {
-        if (data && !data.error) { students = data.students || []; meetings = data.meetings || []; renderMarking(date); }
+        // Update the display from what we just saved — no second round-trip.
+        var mnum = res.meetingNumber;
+        if (mnum != null) {
+          if (!meetings.some(function(m) { return String(m.number) === String(mnum); })) meetings.push({ number: mnum, date: date });
+          var byNo = {};
+          records.forEach(function(r) { byNo[String(r.no)] = r.status; });
+          students.forEach(function(s) {
+            if (byNo[String(s.no)] !== undefined) { s.attendance = s.attendance || {}; s.attendance['m' + mnum] = byNo[String(s.no)]; }
+          });
+          renderMarking(date);
+        }
       }).catch(function(err) {
         showToast(err.message, 'err');
       }).finally(function() {

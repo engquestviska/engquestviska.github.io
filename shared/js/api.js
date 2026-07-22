@@ -16,27 +16,25 @@
   var GRADE10_CLASSES = classConfig ? classConfig.idsForGrade('10') : ['XE1', 'XE2', 'XE3', 'XE4', 'XE5'];
   var GRADE11_CLASSES = classConfig ? classConfig.idsForGrade('11') : ['XIF7', 'XIF8', 'XIF9'];
 
+  // Apps Script web apps do NOT send CORS headers, so a normal cross-origin
+  // fetch() can never read the response — it just hangs/redirects for many
+  // seconds before failing, delaying every call. So we go straight to JSONP
+  // (a <script> tag), which is the only path that actually works here.
   function attemptGet(params) {
-    var url = API_URL + '?' + new URLSearchParams(params);
-    return fetch(url).then(function(res) {
-      if (!res.ok) throw new Error('Network error');
-      return res.json();
-    }).catch(function() {
-      return new Promise(function(resolve, reject) {
-        var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-        var p = Object.assign({}, params, { callback: cb, _t: Date.now() });
-        var script = document.createElement('script');
-        var timer = setTimeout(function() { cleanup(); reject(new Error('Connection timed out')); }, 15000);
-        function cleanup() {
-          delete global[cb];
-          clearTimeout(timer);
-          if (script.parentNode) script.parentNode.removeChild(script);
-        }
-        global[cb] = function(data) { cleanup(); resolve(data); };
-        script.onerror = function() { cleanup(); reject(new Error('Network error')); };
-        script.src = API_URL + '?' + new URLSearchParams(p);
-        document.body.appendChild(script);
-      });
+    return new Promise(function(resolve, reject) {
+      var cb = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+      var p = Object.assign({}, params, { callback: cb, _t: Date.now() });
+      var script = document.createElement('script');
+      var timer = setTimeout(function() { cleanup(); reject(new Error('Connection timed out')); }, 20000);
+      function cleanup() {
+        delete global[cb];
+        clearTimeout(timer);
+        if (script.parentNode) script.parentNode.removeChild(script);
+      }
+      global[cb] = function(data) { cleanup(); resolve(data); };
+      script.onerror = function() { cleanup(); reject(new Error('Network error')); };
+      script.src = API_URL + '?' + new URLSearchParams(p);
+      document.body.appendChild(script);
     });
   }
 
