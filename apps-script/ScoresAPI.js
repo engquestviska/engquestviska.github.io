@@ -127,6 +127,7 @@ function doGet(e) {
     else if (action === 'adminClearSubmissions') result = adminClearSubmissions(e.parameter.username, e.parameter.password, e.parameter.onlyReviewed);
     else if (action === 'getVocabulary')       result = getVocabulary(e.parameter.className, e.parameter.studentNo);
     else if (action === 'addVocabulary')        result = addVocabulary(e.parameter.className, e.parameter.studentNo, e.parameter.words);
+    else if (action === 'getClassVocabulary')   result = getClassVocabulary(e.parameter.className);
     else if (action === 'checkVocabulary')      result = checkVocabulary(e.parameter.className, e.parameter.studentNo);
     else if (action === 'removeVocabulary')     result = removeVocabulary(e.parameter.className, e.parameter.studentNo, e.parameter.english);
     else if (action === 'clearVocabulary')      result = clearVocabulary(e.parameter.username, e.parameter.password, e.parameter.className);
@@ -1035,6 +1036,34 @@ function _checkMeaning(en, id) {
     if (near(norm(LanguageApp.translate(id, 'id', 'en')), sen)) return 'correct';
     return 'wrong';
   } catch (e) { return 'unknown'; }
+}
+
+// Teacher overview: every student in the class + their vocabulary in ONE call,
+// so the teacher can see who submitted (and how much) without clicking each one.
+function getClassVocabulary(className) {
+  var sheetId = SCORE_SHEETS[className];
+  if (!sheetId) return { success: false, error: 'Class not found' };
+  var ss = SpreadsheetApp.openById(sheetId);
+  var first = ss.getSheets()[0];
+  var rdata = first.getRange(1, 1, first.getLastRow(), 3).getValues();
+  var vdata = _vocabSheet(ss).getDataRange().getValues();
+  var byNo = {};
+  for (var r = 1; r < vdata.length; r++) {
+    var sn = String(vdata[r][0]); if (!sn) continue;
+    if (!byNo[sn]) byNo[sn] = { words: [], c: 0, w: 0, u: 0 };
+    var st = String(vdata[r][5] || '');
+    byNo[sn].words.push({ english: String(vdata[r][2] || ''), indonesian: String(vdata[r][3] || ''), at: vdata[r][4], status: st });
+    if (st === 'correct') byNo[sn].c++; else if (st === 'wrong') byNo[sn].w++; else byNo[sn].u++;
+  }
+  var students = [];
+  for (var i = 1; i < rdata.length; i++) {
+    var no = rdata[i][0], name = rdata[i][1];
+    if (!no || !String(name).trim()) break;
+    var v = byNo[String(no)] || { words: [], c: 0, w: 0, u: 0 };
+    students.push({ no: no, name: String(name).trim(), nickname: String(rdata[i][2] || '').trim(),
+      total: v.words.length, correct: v.c, wrong: v.w, unchecked: v.u, words: v.words });
+  }
+  return { success: true, students: students };
 }
 
 // Student-triggered: check any of this student's not-yet-checked words and store
