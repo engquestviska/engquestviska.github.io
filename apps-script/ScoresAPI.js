@@ -113,6 +113,7 @@ function doGet(e) {
     else if (action === 'setSummative')     result = setSummative(e.parameter.username, e.parameter.password, e.parameter.data);
     else if (action === 'clearSummative')   result = clearSummative(e.parameter.username, e.parameter.password);
     else if (action === 'getAllActiveness')    result = getAllActiveness(e.parameter.className);
+    else if (action === 'getLeaderboard')      result = getLeaderboard(e.parameter.limit);
     else if (action === 'incrementActiveness') result = incrementActiveness(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.studentNo, e.parameter.column, e.parameter.delta || 1);
     else if (action === 'setupQuizColumn')     result = setupQuizColumn(e.parameter.username, e.parameter.password);
     else if (action === 'setupCalcFormulas')   result = setupCalcFormulas(e.parameter.username, e.parameter.password);
@@ -525,6 +526,37 @@ function getAllActiveness(className) {
     });
   }
   return { students, headers: Object.keys(cols) };
+}
+
+// Dashboard: rank every student across ALL classes by Total XP and return the
+// top N, plus a couple of headline totals. One call for the teacher homepage.
+function getLeaderboard(limit) {
+  limit = Number(limit) || 5;
+  var all = [], totalStudents = 0, totalTasks = 0;
+  Object.keys(SCORE_SHEETS).forEach(function (cls) {
+    try {
+      var act = SpreadsheetApp.openById(SCORE_SHEETS[cls]).getSheetByName('Activeness');
+      if (!act) return;
+      var data = act.getDataRange().getValues(), headers = data[0];
+      var totalCol = -1, taskCol = -1;
+      for (var c = 0; c < headers.length; c++) {
+        var h = String(headers[c] || '').toLowerCase().trim();
+        if (h === 'total') totalCol = c;
+        if (h === 'doing task' || h === 'doing task on time') taskCol = c;
+      }
+      for (var r = 1; r < data.length; r++) {
+        var no = data[r][0], name = data[r][1];
+        if (!no || !String(name).trim()) break;
+        totalStudents++;
+        var xp = totalCol > -1 ? Number(data[r][totalCol]) : 0;
+        if (isNaN(xp)) xp = 0;
+        if (taskCol > -1) { var t = Number(data[r][taskCol]); if (!isNaN(t)) totalTasks += t; }
+        all.push({ name: String(name).trim(), className: cls, xp: xp });
+      }
+    } catch (e) {}
+  });
+  all.sort(function (a, b) { return b.xp - a.xp; });
+  return { success: true, top: all.slice(0, limit), totalStudents: totalStudents, totalTasksCompleted: totalTasks };
 }
 
 // ── SETUP QUIZ COLUMN (run once to add Quiz col to all sheets) ──

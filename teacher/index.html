@@ -261,12 +261,61 @@
       showLogin();
     }
 
+    function dashLevelFromXP(xp) { var lvl = 1, need = 10, rem = Number(xp) || 0; while (rem >= need) { rem -= need; lvl++; need = 5 + 5 * lvl; } return lvl; }
+    function dashClassLabel(id) { return (window.EQApi && EQApi.classLabels && EQApi.classLabels[id]) || id; }
+    // Short display name for the narrow podium cards: first name + initials.
+    function shortName(full) {
+      var p = String(full || '').trim().split(/\s+/);
+      if (p.length <= 1) return p[0] || '';
+      return p[0] + ' ' + p.slice(1).map(function(w) { return w.charAt(0).toUpperCase() + '.'; }).join('');
+    }
+    function setMetricFull(color, label, value, note) {
+      var card = document.querySelector('.metric-card.' + color);
+      if (!card) return;
+      var l = card.querySelector('div > span'); if (l && label != null) l.textContent = label;
+      var strong = card.querySelector('strong'); if (strong) strong.textContent = value;
+      var small = card.querySelector('small'); if (small && note != null) small.textContent = note;
+    }
+    function setMetric(color, value, note) {
+      var card = document.querySelector('.metric-card.' + color);
+      if (!card) return;
+      var strong = card.querySelector('strong'); if (strong) strong.textContent = value;
+      if (note != null) { var small = card.querySelector('small'); if (small) small.textContent = note; }
+    }
+
+    // Fill the Champions podium with the real top-5 students by Level (XP), and
+    // fill the headline totals — so the dashboard shows live data, not "--".
+    function loadDashboardStats() {
+      EQApi.get({ action: 'getLeaderboard', limit: 5 }).then(function(res) {
+        if (!res || !res.success) return;
+        setMetric('green', res.totalStudents, 'Across your 8 classes');
+        setMetric('cyan', res.totalTasksCompleted, res.totalTasksCompleted ? 'Tasks marked done' : 'None marked done yet');
+        var top = (res.top || []).filter(function(s) { return s.xp > 0; });
+        ['first', 'second', 'third', 'fourth', 'fifth'].forEach(function(pos, i) {
+          var card = document.querySelector('.podium-card.' + pos);
+          var s = top[i];
+          if (!card || !s) return;
+          var strong = card.querySelector('strong'); if (strong) { strong.textContent = shortName(s.name); strong.title = s.name; }
+          var spans = card.querySelectorAll('span'); if (spans[1]) spans[1].textContent = dashClassLabel(s.className);
+          var b = card.querySelector('b'); if (b) b.textContent = 'Level ' + dashLevelFromXP(s.xp);
+        });
+        if (top.length) {
+          var h = document.querySelector('.champion-heading h2'); if (h) h.textContent = 'Top Students by Level';
+          var p = document.querySelector('.champion-heading p'); if (p) p.textContent = 'Your highest-level students across all classes right now.';
+          // Repurpose the last placeholder metric into a real "Top Level" stat.
+          setMetricFull('purple', 'Top Level', 'Level ' + dashLevelFromXP(top[0].xp), shortName(top[0].name) + ' · ' + top[0].xp + ' XP');
+        }
+        if (window.lucide) lucide.createIcons();
+      }).catch(function() {});
+    }
+
     function loadPendingSubmissions() {
       var teacher = EQAuth.getTeacher();
       if (!teacher.username || !teacher.password) return;
       EQApi.get({ action: 'getTaskSubmissions', username: teacher.username, password: teacher.password }).then(function(res) {
         if (!res || !res.success) return;
         var n = res.pending || 0;
+        setMetric('amber', (res.submissions || []).length, n + ' pending review');
         var dot = document.querySelector('.notification-dot');
         if (dot) dot.textContent = n;
         var alertEl = document.getElementById('submissionAlert');
@@ -295,6 +344,7 @@
           EQAuth.markTeacherVerified(teacher.username);
           hideLogin();
           loadPendingSubmissions();
+          loadDashboardStats();
         } else {
           EQAuth.logoutTeacher();
           showLogin('Your teacher session expired. Please log in again.');
