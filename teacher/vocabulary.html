@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Vocabulary · English Quest</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="../shared/css/system.css?v=20260702"/>
+  <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260702"/>
+  <style>
+    .controls { display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; margin-bottom:18px; }
+    .controls > div { display:flex; flex-direction:column; gap:6px; }
+    .controls label { font-size:.72rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#64748b; font-family:'IBM Plex Mono',monospace; }
+    .controls select { min-height:46px; min-width:200px; border:1.5px solid #dbeafe; border-radius:12px; background:#fff; padding:0 14px; font:600 .92rem 'IBM Plex Sans',sans-serif; color:#0f172a; }
+
+    .vsummary { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+    .vstat { background:#fff; border:1px solid #e5ecf6; border-radius:14px; padding:10px 16px; font-weight:800; }
+    .vstat span { display:block; font-size:.72rem; font-weight:700; color:#64748b; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; }
+    .vstat.g b { color:#15803d; } .vstat.r b { color:#b91c1c; } .vstat.n b { color:#0f172a; }
+
+    .vtable { width:100%; border-collapse:collapse; }
+    .vtable th { text-align:left; font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; color:#64748b; font-family:'IBM Plex Mono',monospace; padding:8px 10px; border-bottom:2px solid #e5ecf6; }
+    .vtable td { padding:10px; border-bottom:1px solid #f1f5f9; font-size:.92rem; vertical-align:middle; }
+    .vtable tr.wrong td { background:#fff7f7; }
+    .vtable .en { font-weight:800; }
+    .vpill { display:inline-flex; align-items:center; gap:5px; font-size:.74rem; font-weight:800; padding:3px 10px; border-radius:999px; font-family:'IBM Plex Mono',monospace; }
+    .vpill.correct { background:#dcfce7; color:#15803d; } .vpill.wrong { background:#fee2e2; color:#b91c1c; } .vpill.unknown { background:#f1f5f9; color:#94a3b8; }
+    .vdate { color:#94a3b8; font-size:.8rem; font-family:'IBM Plex Mono',monospace; white-space:nowrap; }
+    .vrm { border:none; background:#fff1f2; color:#be123c; border:1px solid #fecdd3; border-radius:9px; padding:6px 11px; font:700 .82rem 'IBM Plex Sans',sans-serif; cursor:pointer; }
+    .vempty { text-align:center; padding:44px 20px; color:#64748b; }
+    .recheck { border:1.5px solid #dbeafe; background:#fff; color:#2563eb; border-radius:12px; padding:9px 16px; font:700 .84rem 'IBM Plex Sans',sans-serif; cursor:pointer; }
+  </style>
+  <script src="../shared/js/classes-20260617.js?v=20260712"></script>
+  <script src="../shared/js/api.js"></script>
+  <script src="../shared/js/dom-utils.js"></script>
+  <script src="../shared/js/auth.js"></script>
+  <script src="../shared/js/teacher-sidebar.js?v=20260723"></script>
+</head>
+<body class="teacher-tool-page" data-page="vocabulary">
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <img src="../logo.jpg" alt="English Quest Logo"/>
+        <div>
+          <div class="brand-title">English Quest</div>
+          <div class="brand-sub">Teacher Control Room</div>
+        </div>
+      </div>
+      <nav class="nav-actions" aria-label="Teacher navigation">
+        <a href="index.html">Dashboard</a>
+        <a href="flashcards.html">Flashcards</a>
+        <button type="button" onclick="teacherLogout()">Logout</button>
+      </nav>
+    </div>
+    <section class="hero">
+      <div class="kicker">Student Vocabulary</div>
+      <h1>See the words your students collected.</h1>
+      <p class="hero-copy">Pick a class and student to read their Vocabulary Box. Green = the meaning looks correct, red = worth double-checking. You can remove a word if it's junk (this also takes back its XP).</p>
+    </section>
+  </header>
+
+  <main>
+    <section class="access-card" id="accessCard" hidden>
+      <h2 class="access-title">Teacher login required.</h2>
+      <p class="access-copy">Open the teacher dashboard and log in first. This page uses your saved teacher session.</p>
+      <a class="btn" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none;">Open Teacher Login</a>
+    </section>
+
+    <section id="appPanel" hidden>
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2 class="panel-title">Vocabulary Box</h2>
+            <p class="panel-copy">Choose a class and student to load their saved words.</p>
+          </div>
+          <div class="status-pill" id="loginPill">Teacher</div>
+        </div>
+
+        <div class="controls">
+          <div>
+            <label for="classSelect">Class</label>
+            <select id="classSelect" onchange="onClassChange()"><option value="">Choose class</option></select>
+          </div>
+          <div>
+            <label for="studentSelect">Student</label>
+            <select id="studentSelect" onchange="loadVocab()" disabled><option value="">Choose class first</option></select>
+          </div>
+          <button class="recheck" type="button" id="recheckBtn" onclick="recheck()" style="display:none">↻ Check meanings</button>
+        </div>
+
+        <div class="vsummary" id="vsummary" style="display:none"></div>
+        <div id="vbody"></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    var students = [];
+    var currentWords = [];
+
+    function esc(v) { return (window.EQStudent && EQStudent.escapeHtml) ? EQStudent.escapeHtml(v) : String(v == null ? '' : v); }
+    function teacherLogout() { EQAuth.logoutTeacher('index.html'); }
+    function cls() { return document.getElementById('classSelect').value; }
+    function no() { return document.getElementById('studentSelect').value; }
+
+    function showToast(message, type) {
+      var toast = document.getElementById('toast');
+      toast.textContent = message; toast.className = 'toast ' + (type || '');
+      setTimeout(function() { toast.classList.add('show'); }, 10);
+      setTimeout(function() { toast.classList.remove('show'); }, 2600);
+    }
+
+    function populateClasses() {
+      var sel = document.getElementById('classSelect');
+      var all = (window.EQClasses && EQClasses.all) || [];
+      sel.innerHTML = '<option value="">Choose class</option>' +
+        all.map(function(c) { return '<option value="' + c.id + '">' + esc(c.label) + '</option>'; }).join('');
+    }
+
+    function onClassChange() {
+      var sSel = document.getElementById('studentSelect');
+      document.getElementById('vsummary').style.display = 'none';
+      document.getElementById('vbody').innerHTML = '';
+      document.getElementById('recheckBtn').style.display = 'none';
+      if (!cls()) { sSel.innerHTML = '<option value="">Choose class first</option>'; sSel.disabled = true; return; }
+      sSel.innerHTML = '<option value="">Loading…</option>'; sSel.disabled = true;
+      EQApi.get({ action: 'getStudents', className: cls() }).then(function(res) {
+        students = (res && res.students) || [];
+        sSel.innerHTML = '<option value="">Choose your student</option>' +
+          students.map(function(s) {
+            var label = s.nickname ? s.name + ' (' + s.nickname + ')' : s.name;
+            return '<option value="' + esc(s.no) + '">' + esc(label) + '</option>';
+          }).join('');
+        sSel.disabled = false;
+      }).catch(function() { sSel.innerHTML = '<option value="">Could not load roster</option>'; });
+    }
+
+    function render() {
+      var body = document.getElementById('vbody');
+      var sum = document.getElementById('vsummary');
+      if (!currentWords.length) {
+        sum.style.display = 'none';
+        body.innerHTML = '<div class="vempty">📭 This student hasn\'t added any vocabulary yet.</div>';
+        return;
+      }
+      var g = 0, r = 0, u = 0;
+      currentWords.forEach(function(w) { if (w.status === 'correct') g++; else if (w.status === 'wrong') r++; else u++; });
+      sum.style.display = '';
+      sum.innerHTML =
+        '<div class="vstat n"><b>' + currentWords.length + '</b><span>Words</span></div>' +
+        '<div class="vstat g"><b>' + g + '</b><span>Looks correct</span></div>' +
+        '<div class="vstat r"><b>' + r + '</b><span>Double-check</span></div>' +
+        (u ? '<div class="vstat"><b>' + u + '</b><span>Not checked</span></div>' : '');
+      var rows = currentWords.slice().reverse().map(function(w) {
+        var st = w.status === 'correct' ? 'correct' : (w.status === 'wrong' ? 'wrong' : 'unknown');
+        var lbl = st === 'correct' ? '✓ correct' : (st === 'wrong' ? '! check' : '… not checked');
+        var d = w.at ? new Date(w.at) : null;
+        var ds = d && !isNaN(d.getTime()) ? (d.getDate() + '/' + (d.getMonth() + 1)) : '';
+        return '<tr class="' + (st === 'wrong' ? 'wrong' : '') + '">' +
+          '<td class="en">' + esc(w.english) + '</td>' +
+          '<td>' + esc(w.indonesian) + '</td>' +
+          '<td><span class="vpill ' + st + '">' + lbl + '</span></td>' +
+          '<td class="vdate">' + ds + '</td>' +
+          '<td><button class="vrm" data-en="' + esc(w.english) + '">Remove</button></td>' +
+        '</tr>';
+      }).join('');
+      body.innerHTML = '<table class="vtable"><thead><tr><th>English</th><th>Meaning (Indonesian)</th><th>Check</th><th>Added</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+    }
+
+    function loadVocab() {
+      if (!cls() || !no()) { document.getElementById('vbody').innerHTML = ''; document.getElementById('vsummary').style.display = 'none'; document.getElementById('recheckBtn').style.display = 'none'; return; }
+      document.getElementById('vbody').innerHTML = '<div class="vempty">Loading…</div>';
+      EQApi.get({ action: 'getVocabulary', className: cls(), studentNo: no() }).then(function(res) {
+        currentWords = (res && res.words) || [];
+        render();
+        document.getElementById('recheckBtn').style.display = currentWords.length ? '' : 'none';
+        if (currentWords.some(function(w) { return w.status !== 'correct' && w.status !== 'wrong'; })) checkLoop(0);
+      }).catch(function() { document.getElementById('vbody').innerHTML = '<div class="vempty">Could not load vocabulary.</div>'; });
+    }
+
+    function checkLoop(tries) {
+      EQApi.get({ action: 'checkVocabulary', className: cls(), studentNo: no() }).then(function(res) {
+        if (!res || !res.words) return;
+        currentWords = res.words; render();
+        var more = res.words.some(function(w) { return w.status !== 'correct' && w.status !== 'wrong'; });
+        if (more && res.checked > 0 && tries < 5) checkLoop(tries + 1);
+      }).catch(function(){});
+    }
+
+    function recheck() { if (cls() && no()) { showToast('Checking meanings…'); checkLoop(0); } }
+
+    function removeWord(en) {
+      if (!en) return;
+      if (!window.confirm('Remove “' + en + '” from this student\'s vocabulary? This also takes back the 2 XP they earned for it.')) return;
+      EQApi.get({ action: 'removeVocabulary', className: cls(), studentNo: no(), english: en }).then(function(res) {
+        currentWords = (res && res.words) || [];
+        render();
+        showToast('Removed “' + en + '”', 'ok');
+      }).catch(function() { showToast('Could not remove', 'err'); });
+    }
+
+    document.addEventListener('click', function(e) {
+      var b = e.target && e.target.closest ? e.target.closest('.vrm') : null;
+      if (b) removeWord(b.getAttribute('data-en'));
+    });
+
+    (function init() {
+      populateClasses();
+      EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' });
+    })();
+  </script>
+</body>
+</html>

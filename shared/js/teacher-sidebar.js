@@ -11,6 +11,7 @@
     { page: 'attendance', href: 'attendance.html', icon: 'calendar-check', name: 'Attendance' },
     { page: 'activeness', href: 'activeness.html', icon: 'zap', name: 'Level / XP' },
     { page: 'flashcards', href: 'flashcards.html', icon: 'square-stack', name: 'Flashcards' },
+    { page: 'vocabulary', href: 'vocabulary.html', icon: 'book-a', name: 'Vocabulary' },
     { page: 'announcements', href: 'announcements.html', icon: 'megaphone', name: 'Announcements' },
     { page: 'strikes', href: 'strikes.html', icon: 'shield-alert', name: 'Strikes' },
     { page: 'settings', href: 'settings.html', icon: 'settings', name: 'Settings' }
