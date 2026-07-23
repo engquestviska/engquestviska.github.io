@@ -128,6 +128,7 @@ function doGet(e) {
     else if (action === 'getVocabulary')       result = getVocabulary(e.parameter.className, e.parameter.studentNo);
     else if (action === 'addVocabulary')        result = addVocabulary(e.parameter.className, e.parameter.studentNo, e.parameter.words);
     else if (action === 'getClassVocabulary')   result = getClassVocabulary(e.parameter.className);
+    else if (action === 'checkMeanings')        result = checkMeanings(e.parameter.pairs);
     else if (action === 'checkVocabulary')      result = checkVocabulary(e.parameter.className, e.parameter.studentNo);
     else if (action === 'removeVocabulary')     result = removeVocabulary(e.parameter.className, e.parameter.studentNo, e.parameter.english);
     else if (action === 'clearVocabulary')      result = clearVocabulary(e.parameter.username, e.parameter.password, e.parameter.className);
@@ -1036,6 +1037,20 @@ function _checkMeaning(en, id) {
     if (near(norm(LanguageApp.translate(id, 'id', 'en')), sen)) return 'correct';
     return 'wrong';
   } catch (e) { return 'unknown'; }
+}
+
+// Student-triggered pre-submit check: judge typed pairs WITHOUT saving them, so a
+// student can verify before submitting. pairs = JSON [{english, indonesian}, ...].
+function checkMeanings(pairsJson) {
+  var pairs;
+  try { pairs = JSON.parse(pairsJson || '[]'); } catch (e) { return { success: false, error: 'Bad pairs' }; }
+  if (!pairs.length) return { success: true, results: [] };
+  if (pairs.length > 10) pairs = pairs.slice(0, 10);
+  var results = pairs.map(function (p) {
+    var en = String((p && p.english) || ''), id = String((p && p.indonesian) || '');
+    return { english: en, indonesian: id, status: _checkMeaning(en, id) };
+  });
+  return { success: true, results: results };
 }
 
 // Teacher overview: every student in the class + their vocabulary in ONE call,

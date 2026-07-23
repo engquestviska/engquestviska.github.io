@@ -19,7 +19,14 @@
     .vocab-head .rem { font-size:.78rem; font-weight:700; color:#b45309; background:#fef3c7; padding:4px 12px; border-radius:999px; font-family:'IBM Plex Mono',monospace; }
     .vocab-intro { color:#64748b; font-size:.86rem; margin:6px 0 16px; line-height:1.5; }
     .vocab-rows { display:flex; flex-direction:column; gap:8px; }
-    .vocab-row { display:grid; grid-template-columns:26px 1fr 1fr; gap:8px; align-items:center; }
+    .vocab-row { display:grid; grid-template-columns:22px 1fr 1fr 22px; gap:8px; align-items:center; }
+    .v-check { font-family:'IBM Plex Mono',monospace; font-weight:800; text-align:center; font-size:1rem; }
+    .vocab-row.ok .v-check { color:#15803d; } .vocab-row.bad .v-check { color:#b91c1c; } .vocab-row.chk .v-check { color:#cbd5e1; }
+    .vocab-row.ok .v-id { border-color:#86efac; background:#f0fdf4; }
+    .vocab-row.bad .v-id { border-color:#fca5a5; background:#fef2f2; }
+    .vocab-actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:14px; }
+    .vocab-check { border:1.5px solid #f59e0b; background:#fff; color:#b45309; border-radius:12px; padding:12px 18px; font:700 .9rem 'IBM Plex Sans',sans-serif; cursor:pointer; }
+    .vocab-check:disabled { opacity:.6; cursor:not-allowed; }
     .vocab-row .n { font-family:'IBM Plex Mono',monospace; font-size:.8rem; color:#94a3b8; text-align:center; }
     .vocab-row input { min-height:42px; border:1.5px solid #e2e8f0; border-radius:10px; padding:0 12px; font:500 .9rem 'IBM Plex Sans',sans-serif; outline:none; width:100%; }
     .vocab-row input:focus { border-color:#f59e0b; }
@@ -83,21 +90,60 @@
       for (var i = 1; i <= VOCAB_MAX; i++) {
         rows += '<div class="vocab-row"><span class="n">' + i + '</span>' +
           '<input class="v-en" placeholder="English word" autocomplete="off" />' +
-          '<input class="v-id" placeholder="Arti (Bahasa Indonesia)" autocomplete="off" /></div>';
+          '<input class="v-id" placeholder="Arti (Bahasa Indonesia)" autocomplete="off" />' +
+          '<span class="v-check"></span></div>';
       }
       wrap.innerHTML =
         '<div class="vocab-wrap">' +
           '<div class="vocab-head"><h2>📚 Vocabulary Box</h2><span class="rem" id="vocabRem">…</span></div>' +
-          '<p class="vocab-intro">Read something in English (a book, article, or movie), then add new words with their Indonesian meaning. Each new word = <b>+2 XP</b>. No repeats, up to 30 words per week.</p>' +
+          '<p class="vocab-intro">Read something in English (a book, article, or movie), then add new words with their Indonesian meaning. Each new word = <b>+2 XP</b>. No repeats, up to 30 words per week. Tap <b>Check meanings</b> to see if your Indonesian looks right before you submit.</p>' +
           '<div class="vocab-rows">' + rows + '</div>' +
-          '<button class="vocab-submit" id="vocabBtn">✨ Submit &amp; Earn XP</button>' +
+          '<div class="vocab-actions"><button class="vocab-check" id="vocabCheckBtn">🔍 Check meanings</button><button class="vocab-submit" id="vocabBtn">✨ Submit &amp; Earn XP</button></div>' +
           '<div class="vocab-msg" id="vocabMsg"></div>' +
           '<div class="vocab-list" id="vocabList"></div>' +
           '<div class="vocab-legend"><span><b class="g">✓ green</b> = looks correct</span><span><b class="r">! red</b> = double-check this</span><span><b>×</b> = remove word (−2 XP)</span></div>' +
         '</div>';
       var btn = document.getElementById('vocabBtn');
       if (btn) btn.onclick = function() { submitVocab(cls, no); };
+      var chk = document.getElementById('vocabCheckBtn');
+      if (chk) chk.onclick = checkTyped;
       loadVocab(cls, no);
+    }
+
+    // Pre-submit check: colour the rows the student has typed so they can fix
+    // wrong meanings before submitting (and earning XP on them).
+    function checkTyped() {
+      var rows = Array.prototype.slice.call(document.querySelectorAll('#vocabWrap .vocab-row'));
+      var pairs = [], used = [];
+      rows.forEach(function(row) {
+        var en = row.querySelector('.v-en').value.trim(), id = row.querySelector('.v-id').value.trim();
+        row.classList.remove('ok', 'bad', 'chk'); row.querySelector('.v-check').textContent = '';
+        if (en && id) { pairs.push({ english: en, indonesian: id }); used.push(row); }
+      });
+      var msg = document.getElementById('vocabMsg');
+      if (!pairs.length) { msg.className = 'vocab-msg warn'; msg.textContent = 'Type at least one word and its meaning first.'; return; }
+      var btn = document.getElementById('vocabCheckBtn'); btn.disabled = true; btn.textContent = 'Checking…';
+      used.forEach(function(row) { row.classList.add('chk'); row.querySelector('.v-check').textContent = '…'; });
+      EQApi.get({ action: 'checkMeanings', pairs: JSON.stringify(pairs) }).then(function(res) {
+        btn.disabled = false; btn.textContent = '🔍 Check meanings';
+        var results = (res && res.results) || [];
+        results.forEach(function(r, k) {
+          var row = used[k]; if (!row) return;
+          var mark = row.querySelector('.v-check'); row.classList.remove('chk');
+          if (r.status === 'correct') { row.classList.add('ok'); mark.textContent = '✓'; mark.title = 'Looks correct'; }
+          else if (r.status === 'wrong') { row.classList.add('bad'); mark.textContent = '!'; mark.title = 'Double-check this meaning'; }
+          else { mark.textContent = '?'; mark.title = 'Could not check'; }
+        });
+        var reds = results.filter(function(r) { return r.status === 'wrong'; }).length;
+        msg.className = 'vocab-msg ' + (reds ? 'warn' : 'ok');
+        msg.textContent = reds
+          ? (reds + ' meaning' + (reds > 1 ? 's' : '') + ' to double-check (red). Fix them, or submit anyway if you\'re sure.')
+          : '✓ All look correct — you can submit!';
+      }).catch(function() {
+        btn.disabled = false; btn.textContent = '🔍 Check meanings';
+        used.forEach(function(row) { row.classList.remove('chk'); row.querySelector('.v-check').textContent = ''; });
+        msg.className = 'vocab-msg err'; msg.textContent = 'Could not check right now. Please try again.';
+      });
     }
     var VCLS = '', VNO = '';
 
@@ -177,6 +223,7 @@
         msg.className = 'vocab-msg ' + (res.added ? 'ok' : 'warn');
         msg.textContent = parts.join(' · ') || 'No new words added.';
         for (var j = 0; j < ens.length; j++) { ens[j].value = ''; ids[j].value = ''; }
+        document.querySelectorAll('#vocabWrap .vocab-row').forEach(function(row) { row.classList.remove('ok', 'bad', 'chk'); var m = row.querySelector('.v-check'); if (m) m.textContent = ''; });
         loadVocab(cls, no);
       }).catch(function() { btn.disabled = false; msg.className = 'vocab-msg err'; msg.textContent = 'Network error. Please try again.'; });
     }
