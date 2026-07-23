@@ -28,8 +28,16 @@
     .vocab-msg { margin-top:12px; font-size:.86rem; font-weight:600; min-height:1em; }
     .vocab-msg.ok { color:#059669; } .vocab-msg.warn { color:#b45309; } .vocab-msg.err { color:#e11d48; }
     .vocab-list { margin-top:16px; display:flex; flex-wrap:wrap; gap:8px; }
-    .vocab-chip { background:#f8fafc; border:1px solid #e2e8f0; border-radius:999px; padding:5px 12px; font-size:.8rem; }
-    .vocab-chip b { color:#0f172a; } .vocab-chip span { color:#94a3b8; }
+    .vocab-chip { display:inline-flex; align-items:center; gap:6px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:999px; padding:5px 8px 5px 12px; font-size:.8rem; }
+    .vocab-chip b { color:#0f172a; } .vocab-chip > span { color:#94a3b8; }
+    .vocab-chip.ok { background:#dcfce7; border-color:#86efac; }
+    .vocab-chip.bad { background:#fee2e2; border-color:#fca5a5; }
+    .vc-mark { font-family:'IBM Plex Mono',monospace; font-weight:800; }
+    .vocab-chip.ok .vc-mark { color:#15803d; } .vocab-chip.bad .vc-mark { color:#b91c1c; } .vocab-chip.pending .vc-mark { color:#cbd5e1; }
+    .vc-rm { border:none; background:transparent; color:#94a3b8; font-weight:800; cursor:pointer; font-size:1.05rem; line-height:1; padding:0 3px; }
+    .vc-rm:hover { color:#dc2626; }
+    .vocab-legend { margin-top:10px; font-size:.76rem; color:#64748b; display:flex; gap:14px; flex-wrap:wrap; }
+    .vocab-legend b { font-weight:800; } .vocab-legend .g { color:#15803d; } .vocab-legend .r { color:#b91c1c; }
   </style>
   <script src="../shared/js/classes-20260617.js?v=20260712"></script>
   <script src="../shared/js/student.js"></script>
@@ -85,27 +93,68 @@
           '<button class="vocab-submit" id="vocabBtn">✨ Submit &amp; Earn XP</button>' +
           '<div class="vocab-msg" id="vocabMsg"></div>' +
           '<div class="vocab-list" id="vocabList"></div>' +
+          '<div class="vocab-legend"><span><b class="g">✓ green</b> = looks correct</span><span><b class="r">! red</b> = double-check this</span><span><b>×</b> = remove word (−2 XP)</span></div>' +
         '</div>';
       var btn = document.getElementById('vocabBtn');
       if (btn) btn.onclick = function() { submitVocab(cls, no); };
       loadVocab(cls, no);
     }
+    var VCLS = '', VNO = '';
+
+    function setRemaining(res) {
+      var rem = document.getElementById('vocabRem');
+      if (rem && res && res.weeklyRemaining != null) rem.textContent = res.weeklyRemaining + ' words left this week';
+    }
+
+    function renderVocab(words) {
+      var list = document.getElementById('vocabList');
+      if (!list) return;
+      if (!words.length) { list.innerHTML = '<span class="vocab-chip"><span>No words yet — add your first!</span></span>'; return; }
+      list.innerHTML = words.slice(-60).reverse().map(function(w) {
+        var st = w.status, cls = st === 'correct' ? 'ok' : (st === 'wrong' ? 'bad' : 'pending');
+        var mark = st === 'correct' ? '✓' : (st === 'wrong' ? '!' : '…');
+        return '<span class="vocab-chip ' + cls + '">' +
+          '<span class="vc-mark">' + mark + '</span>' +
+          '<b>' + escapeHtml(w.english) + '</b><span>· ' + escapeHtml(w.indonesian) + '</span>' +
+          '<button class="vc-rm" data-en="' + escapeHtml(w.english) + '" title="Remove this word (−2 XP)">×</button>' +
+        '</span>';
+      }).join('');
+    }
+
     function loadVocab(cls, no) {
       if (!window.EQApi) return;
       EQApi.get({ action: 'getVocabulary', className: cls, studentNo: no }).then(function(res) {
-        var rem = document.getElementById('vocabRem');
-        if (rem) rem.textContent = (res && res.weeklyRemaining != null ? res.weeklyRemaining : '?') + ' words left this week';
-        var list = document.getElementById('vocabList');
-        if (list) {
-          var words = (res && res.words) || [];
-          list.innerHTML = words.length
-            ? words.slice(-60).reverse().map(function(w) {
-                return '<span class="vocab-chip"><b>' + escapeHtml(w.english) + '</b> <span>· ' + escapeHtml(w.indonesian) + '</span></span>';
-              }).join('')
-            : '<span class="vocab-chip"><span>No words yet — add your first!</span></span>';
-        }
+        setRemaining(res);
+        var words = (res && res.words) || [];
+        renderVocab(words);
+        if (words.some(function(w) { return w.status !== 'correct' && w.status !== 'wrong'; })) checkLoop(cls, no, 0);
       }).catch(function(){});
     }
+
+    // Ask the server to check any not-yet-checked words (colours them), looping
+    // a few times in case there are more than one batch.
+    function checkLoop(cls, no, tries) {
+      EQApi.get({ action: 'checkVocabulary', className: cls, studentNo: no }).then(function(res) {
+        if (!res || !res.words) return;
+        setRemaining(res); renderVocab(res.words);
+        var more = res.words.some(function(w) { return w.status !== 'correct' && w.status !== 'wrong'; });
+        if (more && res.checked > 0 && tries < 4) checkLoop(cls, no, tries + 1);
+      }).catch(function(){});
+    }
+
+    function removeWord(en) {
+      if (!en || !window.EQApi) return;
+      if (!window.confirm('Remove “' + en + '”? You will lose the 2 XP you earned for it.')) return;
+      EQApi.get({ action: 'removeVocabulary', className: VCLS, studentNo: VNO, english: en }).then(function(res) {
+        setRemaining(res);
+        renderVocab((res && res.words) || []);
+      }).catch(function(){});
+    }
+
+    document.addEventListener('click', function(e) {
+      var b = e.target && e.target.closest ? e.target.closest('.vc-rm') : null;
+      if (b) removeWord(b.getAttribute('data-en'));
+    });
     function submitVocab(cls, no) {
       var btn = document.getElementById('vocabBtn'), msg = document.getElementById('vocabMsg');
       var ens = document.querySelectorAll('#vocabWrap .v-en'), ids = document.querySelectorAll('#vocabWrap .v-id');
@@ -134,7 +183,7 @@
 
     (function init() {
       var p = EQStudent.read('10');
-      if (p.hasProfile) { initVocab(p.classId, p.studentNo); }
+      if (p.hasProfile) { VCLS = p.classId; VNO = p.studentNo; initVocab(p.classId, p.studentNo); }
       else { document.getElementById('needLogin').style.display = ''; }
     })();
   </script>

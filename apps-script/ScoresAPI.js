@@ -127,6 +127,8 @@ function doGet(e) {
     else if (action === 'adminClearSubmissions') result = adminClearSubmissions(e.parameter.username, e.parameter.password, e.parameter.onlyReviewed);
     else if (action === 'getVocabulary')       result = getVocabulary(e.parameter.className, e.parameter.studentNo);
     else if (action === 'addVocabulary')        result = addVocabulary(e.parameter.className, e.parameter.studentNo, e.parameter.words);
+    else if (action === 'checkVocabulary')      result = checkVocabulary(e.parameter.className, e.parameter.studentNo);
+    else if (action === 'removeVocabulary')     result = removeVocabulary(e.parameter.className, e.parameter.studentNo, e.parameter.english);
     else if (action === 'clearVocabulary')      result = clearVocabulary(e.parameter.username, e.parameter.password, e.parameter.className);
     else if (action === 'setupAttendanceSheet') result = setupAttendanceSheet(e.parameter.username, e.parameter.password);
     else if (action === 'getClassData')         result = getClassData(e.parameter.className);
@@ -1010,10 +1012,85 @@ function getVocabulary(className, studentNo) {
     if (String(data[r][0]) !== String(studentNo)) continue;
     var ts = data[r][4] ? new Date(data[r][4]).getTime() : 0;
     if (ts >= weekAgo) weekCount++;
-    words.push({ english: String(data[r][2] || ''), indonesian: String(data[r][3] || ''), at: data[r][4] });
+    words.push({ english: String(data[r][2] || ''), indonesian: String(data[r][3] || ''), at: data[r][4],
+                 status: String(data[r][5] || '') });
   }
   return { words: words, total: words.length, weekCount: weekCount,
            weeklyCap: VOCAB_WEEKLY_CAP, weeklyRemaining: Math.max(0, VOCAB_WEEKLY_CAP - weekCount) };
+}
+
+// Judge whether `id` is an acceptable Indonesian meaning of English `en`, using
+// the free built-in Google Translate. Two-way check so synonyms pass: accept if
+// the student's answer ~ the machine translation, OR translating the student's
+// answer back to English ~ the original word. Returns 'correct' | 'wrong' |
+// 'unknown' (unknown when translation is unavailable — never shown as wrong).
+function _checkMeaning(en, id) {
+  en = String(en || '').trim(); id = String(id || '').trim();
+  if (!en || !id) return 'unknown';
+  try {
+    var norm = function (s) { return String(s).toLowerCase().replace(/[^a-z\s]/g, ' ').replace(/\s+/g, ' ').trim(); };
+    var near = function (a, b) { if (!a || !b) return false; return a === b || (' ' + a + ' ').indexOf(' ' + b + ' ') > -1 || (' ' + b + ' ').indexOf(' ' + a + ' ') > -1; };
+    var sid = norm(id), sen = norm(en);
+    if (near(sid, norm(LanguageApp.translate(en, 'en', 'id')))) return 'correct';
+    if (near(norm(LanguageApp.translate(id, 'id', 'en')), sen)) return 'correct';
+    return 'wrong';
+  } catch (e) { return 'unknown'; }
+}
+
+// Student-triggered: check any of this student's not-yet-checked words and store
+// the verdict in column F. Capped per call to avoid timeouts; the frontend calls
+// again if words remain unchecked.
+function checkVocabulary(className, studentNo) {
+  var sheetId = SCORE_SHEETS[className];
+  if (!sheetId) return { success: false, error: 'Class not found' };
+  var ss = SpreadsheetApp.openById(sheetId);
+  var sh = _vocabSheet(ss);
+  var data = sh.getDataRange().getValues();
+  var checked = 0, LIMIT = 10;
+  for (var r = 1; r < data.length && checked < LIMIT; r++) {
+    if (String(data[r][0]) !== String(studentNo)) continue;
+    var status = String(data[r][5] || '').trim();
+    if (status === 'correct' || status === 'wrong') continue;
+    sh.getRange(r + 1, 6).setValue(_checkMeaning(data[r][2], data[r][3]));
+    checked++;
+  }
+  if (checked) SpreadsheetApp.flush();
+  var res = getVocabulary(className, studentNo);
+  res.checked = checked;
+  return res;
+}
+
+// Student-triggered: delete one of their own words and roll back its XP (the
+// Vocabulary Box counter in Activeness, ×2 = XP). No teacher auth — self-service.
+function removeVocabulary(className, studentNo, english) {
+  var sheetId = SCORE_SHEETS[className];
+  if (!sheetId) return { success: false, error: 'Class not found' };
+  if (!studentNo || !english) return { success: false, error: 'Missing word' };
+  var ss = SpreadsheetApp.openById(sheetId);
+  var sh = _vocabSheet(ss);
+  var data = sh.getDataRange().getValues();
+  var target = String(english).trim().toLowerCase(), removed = 0;
+  for (var r = data.length - 1; r >= 1; r--) {
+    if (String(data[r][0]) === String(studentNo) && String(data[r][2] || '').trim().toLowerCase() === target) {
+      sh.deleteRow(r + 1); removed++;
+    }
+  }
+  if (removed) {
+    var act = ss.getSheetByName('Activeness');
+    if (act) {
+      var adata = act.getDataRange().getValues();
+      for (var ar = 1; ar < adata.length; ar++) {
+        if (String(adata[ar][0]) === String(studentNo)) {
+          act.getRange(ar + 1, 4).setValue(Math.max(0, Number(adata[ar][3] || 0) - removed));
+          break;
+        }
+      }
+    }
+    SpreadsheetApp.flush();
+  }
+  var res = getVocabulary(className, studentNo);
+  res.removed = removed; res.success = true;
+  return res;
 }
 
 // Student self-submit (no teacher auth). Guarded by: max 10/call, no duplicate
