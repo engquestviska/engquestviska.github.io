@@ -48,8 +48,20 @@
     .vocab-legend { margin-top:10px; font-size:.76rem; color:#64748b; display:flex; gap:14px; flex-wrap:wrap; }
     .vocab-legend b { font-weight:800; } .vocab-legend .g { color:#15803d; } .vocab-legend .r { color:#b91c1c; }
     .vc-type { background:#eef2ff; color:#4f46e5; border-radius:999px; padding:1px 8px; font-size:.68rem; font-weight:800; font-family:'IBM Plex Mono',monospace; }
-    .vocab-almanac { margin-top:14px; background:#faf5ff; border:1px solid #e9d5ff; border-radius:14px; padding:12px 16px; font-size:.86rem; color:#6b21a8; line-height:1.6; }
-    .vocab-almanac b { color:#4c1d95; } .vocab-almanac .muted { color:#a78bca; font-weight:600; }
+    .vocab-almanac { margin-top:16px; }
+    .almanac-title { font-family:'Playfair Display',serif; font-weight:800; font-size:1.2rem; color:#4c1d95; display:flex; align-items:baseline; gap:10px; }
+    .almanac-title span { font-size:.78rem; font-weight:700; color:#a78bca; font-family:'IBM Plex Mono',monospace; }
+    .almanac-empty { margin-top:12px; color:#94a3b8; background:#faf5ff; border:1px dashed #e9d5ff; border-radius:14px; padding:22px; text-align:center; }
+    .almanac-sec { margin-top:12px; background:#faf7ff; border:1px solid #ede0ff; border-radius:16px; padding:12px 16px; }
+    .almanac-sec h4 { font-weight:800; color:#6b21a8; font-size:.94rem; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+    .almanac-sec h4 em { font-style:normal; color:#a78bca; font-family:'IBM Plex Mono',monospace; font-size:.76rem; font-weight:700; }
+    .almanac-entries { display:flex; flex-direction:column; }
+    .alm-entry { display:grid; grid-template-columns:18px 1fr 22px; gap:8px; align-items:center; padding:7px 2px; border-bottom:1px solid #f1e9fb; }
+    .alm-entry:last-child { border-bottom:none; }
+    .alm-entry.bad { background:#fff7f7; border-radius:8px; }
+    .alm-body b { color:#0f172a; font-weight:800; } .alm-mean { color:#64748b; }
+    .alm-mark { font-family:'IBM Plex Mono',monospace; font-weight:800; text-align:center; color:#cbd5e1; }
+    .alm-entry.ok .alm-mark { color:#15803d; } .alm-entry.bad .alm-mark { color:#b91c1c; }
     .vocab-head .rem.locked { color:#b91c1c; background:#fee2e2; }
   </style>
   <script src="../shared/js/classes-20260617.js?v=20260712"></script>
@@ -185,35 +197,40 @@
       }
     }
 
+    // The "almanac" = the student's word-book, organized into sections by word
+    // type. Each entry shows English · meaning, its check mark, and a remove ×.
+    var ALM_SECTIONS = [['noun', '📗 Nouns'], ['verb', '📘 Verbs'], ['adjective', '📙 Adjectives'], ['adverb', '📕 Adverbs'], ['other', '📒 Other'], ['', '📔 Not typed yet']];
     function renderVocab(words) {
-      var list = document.getElementById('vocabList');
-      if (!list) return;
-      renderAlmanac(words);
-      if (!words.length) { list.innerHTML = '<span class="vocab-chip"><span>No words yet — add your first!</span></span>'; return; }
-      list.innerHTML = words.slice(-60).reverse().map(function(w) {
-        var st = w.status, cls = st === 'correct' ? 'ok' : (st === 'wrong' ? 'bad' : 'pending');
-        var mark = st === 'correct' ? '✓' : (st === 'wrong' ? '!' : '…');
-        var tag = w.type ? ' <span class="vc-type">' + escapeHtml(w.type) + '</span>' : '';
-        return '<span class="vocab-chip ' + cls + '">' +
-          '<span class="vc-mark">' + mark + '</span>' +
-          '<b>' + escapeHtml(w.english) + '</b><span>· ' + escapeHtml(w.indonesian) + '</span>' + tag +
-          '<button class="vc-rm" data-en="' + escapeHtml(w.english) + '" title="Remove this word (−2 XP)">×</button>' +
-        '</span>';
-      }).join('');
-    }
-
-    // "Almanac": a summary of how the student's words break down by word type.
-    function renderAlmanac(words) {
       var box = document.getElementById('vocabAlmanac');
+      var list = document.getElementById('vocabList'); if (list) list.innerHTML = '';
       if (!box) return;
-      if (!words.length) { box.innerHTML = ''; return; }
-      var c = { noun: 0, verb: 0, adjective: 0, adverb: 0, other: 0, untyped: 0 };
-      words.forEach(function(w) { var t = String(w.type || '').toLowerCase(); if (c[t] !== undefined && t) c[t]++; else c.untyped++; });
-      var order = [['noun', 'noun'], ['verb', 'verb'], ['adjective', 'adjective'], ['adverb', 'adverb'], ['other', 'other']];
-      var parts = order.filter(function(o) { return c[o[0]]; }).map(function(o) { return '<b>' + c[o[0]] + '</b> ' + o[1] + (c[o[0]] > 1 ? 's' : ''); });
-      box.innerHTML = '📔 <b>Your almanac</b> (' + words.length + ' words): ' +
-        (parts.length ? parts.join(' · ') : 'pick a type when you add words') +
-        (c.untyped ? ' <span class="muted">· ' + c.untyped + ' untyped</span>' : '');
+      if (!words.length) {
+        box.innerHTML = '<div class="almanac-title">📖 My Word Almanac</div><div class="almanac-empty">Your word-book is empty — add your first word above!</div>';
+        return;
+      }
+      var groups = {};
+      words.forEach(function(w) {
+        var t = String(w.type || '').toLowerCase();
+        if (['noun', 'verb', 'adjective', 'adverb', 'other'].indexOf(t) === -1) t = '';
+        (groups[t] = groups[t] || []).push(w);
+      });
+      var html = '<div class="almanac-title">📖 My Word Almanac <span>' + words.length + ' word' + (words.length > 1 ? 's' : '') + '</span></div>';
+      ALM_SECTIONS.forEach(function(sec) {
+        var g = groups[sec[0]];
+        if (!g || !g.length) return;
+        g.sort(function(a, b) { return String(a.english).toLowerCase().localeCompare(String(b.english).toLowerCase()); });
+        html += '<section class="almanac-sec"><h4>' + sec[1] + ' <em>(' + g.length + ')</em></h4><div class="almanac-entries">' +
+          g.map(function(w) {
+            var st = w.status === 'correct' ? 'ok' : (w.status === 'wrong' ? 'bad' : '');
+            var mk = w.status === 'correct' ? '✓' : (w.status === 'wrong' ? '!' : '·');
+            return '<div class="alm-entry ' + st + '">' +
+              '<span class="alm-mark">' + mk + '</span>' +
+              '<div class="alm-body"><b>' + escapeHtml(w.english) + '</b> · <span class="alm-mean">' + escapeHtml(w.indonesian) + '</span></div>' +
+              '<button class="vc-rm" data-en="' + escapeHtml(w.english) + '" title="Remove this word (−2 XP)">×</button>' +
+            '</div>';
+          }).join('') + '</div></section>';
+      });
+      box.innerHTML = html;
     }
 
     function loadVocab(cls, no) {
