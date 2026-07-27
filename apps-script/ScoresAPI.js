@@ -139,7 +139,7 @@ function doGet(e) {
     else if (action === 'removeAttendanceMeeting') result = removeAttendanceMeeting(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.date);
     else if (action === 'getStudentStrikes')  result = getStudentStrikes(e.parameter.className, e.parameter.studentNo);
     else if (action === 'debugStrikeHeaders')  result = debugStrikeHeaders(e.parameter.className);
-    else if (action === 'getAllStrikes')       result = getAllStrikes(e.parameter.className);
+    else if (action === 'getAllStrikes')       result = getAllStrikes(e.parameter.username, e.parameter.password, e.parameter.className);
     else if (action === 'addStrike')          result = addStrike(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.studentNo, e.parameter.reason || '');
     else if (action === 'removeStrike')       result = removeStrike(e.parameter.username, e.parameter.password, e.parameter.className, e.parameter.studentNo);
     else if (action === 'debugCh5Names')   result = debugCh5Names(e.parameter.username, e.parameter.password);
@@ -1433,7 +1433,8 @@ function getStudentStrikes(className, studentNo) {
 }
 
 // ── GET ALL STRIKES FOR A CLASS ───────────────────────────────
-function getAllStrikes(className) {
+function getAllStrikes(username, password, className) {
+  if (!authOk(username, password)) return { error: 'Unauthorized' };
   const sheetId = SCORE_SHEETS[className];
   if (!sheetId) return { error: 'Class not found' };
   const sheet = SpreadsheetApp.openById(sheetId).getSheetByName('Strike');
@@ -1682,10 +1683,9 @@ function saveQuizScore(username, password, className, studentNo, chapter, score)
 // Browser calls Gemini directly (no CORS issues with Gemini)
 // Apps Script just securely provides the key
 function getGeminiKey(username, password) {
-  if (!authOk(username, password)) {
-    // For quiz generation, we allow any call since students need it
-    // Key is read-only and rate-limited by Google
-  }
+  // Gated: only an authenticated teacher may retrieve the key (no page uses it,
+  // and it must never be handed to anonymous callers).
+  if (!authOk(username, password)) return { error: 'Unauthorized' };
   const key = PropertiesService.getScriptProperties().getProperty('GEMINI_API_KEY');
   if (!key) return { error: 'Gemini API key not configured' };
   return { key };
