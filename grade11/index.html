@@ -138,6 +138,50 @@
         </div>
       </section>
 
+      <style>
+        .eqh-appbar { border-radius: 20px; padding: 16px 18px; color:#fff;
+          background: linear-gradient(120deg,#0d9488,#0f766e 60%,#115e59);
+          box-shadow: 0 14px 30px rgba(15,118,110,.22); flex-direction:column; gap:10px; }
+        .eqh-appbar-main { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+        .eqh-appbar-icon { width:46px; height:46px; flex:none; display:flex; align-items:center; justify-content:center;
+          border-radius:14px; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.28); }
+        .eqh-appbar-icon svg { width:24px; height:24px; }
+        .eqh-appbar-text { flex:1 1 240px; min-width:200px; }
+        .eqh-appbar-text b { display:block; font-size:1.05rem; font-weight:800; }
+        .eqh-appbar-text p { margin:2px 0 0; font-size:.9rem; opacity:.92; line-height:1.45; }
+        .eqh-appbar-btn { flex:none; display:inline-flex; align-items:center; gap:8px; text-decoration:none;
+          background:#fff; color:#0f766e; font-weight:800; font-size:.92rem; padding:11px 18px; border-radius:999px;
+          box-shadow:0 6px 14px rgba(0,0,0,.14); transition:transform .12s ease; }
+        .eqh-appbar-btn svg { width:18px; height:18px; }
+        .eqh-appbar-btn:hover { transform:translateY(-1px); }
+        .eqh-appbar-help { font-size:.85rem; }
+        .eqh-appbar-help summary { cursor:pointer; font-weight:700; opacity:.95; list-style:none; display:inline-flex; align-items:center; gap:6px; }
+        .eqh-appbar-help summary::-webkit-details-marker { display:none; }
+        .eqh-appbar-help summary::before { content:"\25B8"; font-size:.8em; }
+        .eqh-appbar-help[open] summary::before { content:"\25BE"; }
+        .eqh-appbar-help ol { margin:8px 0 2px; padding-left:20px; display:grid; gap:5px; font-size:.86rem; opacity:.95; line-height:1.45; }
+        .eqh-appbar-help a, .eqh-appbar-help b { color:#fff; }
+      </style>
+      <!-- App download banner: shown ONLY to logged-in students (toggled in refreshProfileDisplay). -->
+      <section class="eqh-appbar" id="appDownloadBanner" style="display:none" aria-label="Get the EngQuest app">
+        <div class="eqh-appbar-main">
+          <div class="eqh-appbar-icon"><i data-lucide="smartphone"></i></div>
+          <div class="eqh-appbar-text">
+            <b>Get the EngQuest app</b>
+            <p>Install EngQuest on your phone for one-tap access — no browser needed. Just for our class.</p>
+          </div>
+          <a class="eqh-appbar-btn" href="../EngQuest-app-7fq93kx2.apk" download="EngQuest.apk"><i data-lucide="download"></i> Download app</a>
+        </div>
+        <details class="eqh-appbar-help">
+          <summary>How to install</summary>
+          <ol>
+            <li>Tap <b>Download app</b> — the file <b>EngQuest.apk</b> saves to your phone.</li>
+            <li>Open the downloaded file. If your phone warns about an “unknown source”, tap <b>Allow</b> / <b>Settings</b> once, then <b>Install</b>.</li>
+            <li>Open <b>EngQuest</b> from your home screen. Done!</li>
+          </ol>
+        </details>
+      </section>
+
       <section class="eqh-cards" aria-label="Your summary">
         <a class="eqh-stat" href="scores.html"><span class="ic eqh-c1"><i data-lucide="chart-no-axes-column-increasing"></i></span><div class="lab">Current Score</div><div class="val">--</div><div class="sub">Open scores</div></a>
         <a class="eqh-stat" href="tasks.html"><span class="ic eqh-c2"><i data-lucide="circle-check-big"></i></span><div class="lab">Tasks Done</div><div class="val">--</div><div class="sub">Task status</div></a>
@@ -225,6 +269,8 @@
       var cls = profile.classId, no = profile.studentNo, name = profile.studentName, hasProfile = profile.hasProfile;
 
       document.getElementById('profile').classList.toggle('logged-in', hasProfile);
+      var appBar = document.getElementById('appDownloadBanner');
+      if (appBar) appBar.style.display = hasProfile ? 'flex' : 'none';
       document.getElementById('profileStatus').textContent = hasProfile ? 'Logged in' : 'Not logged in';
       document.getElementById('welcomeName').textContent = hasProfile ? name.split(' ')[0] : 'Student';
       document.getElementById('accountName').textContent = hasProfile ? name : 'Student';
