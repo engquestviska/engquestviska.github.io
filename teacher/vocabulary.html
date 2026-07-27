@@ -39,6 +39,7 @@
     .vtable .en { font-weight:800; }
     .vpill { display:inline-flex; align-items:center; gap:4px; font-size:.72rem; font-weight:800; padding:2px 9px; border-radius:999px; font-family:'IBM Plex Mono',monospace; white-space:nowrap; }
     .vpill.correct { background:#dcfce7; color:#15803d; } .vpill.wrong { background:#fee2e2; color:#b91c1c; } .vpill.unknown { background:#f1f5f9; color:#94a3b8; }
+    .vtype { background:#eef2ff; color:#4f46e5; border-radius:999px; padding:2px 9px; font-size:.72rem; font-weight:800; font-family:'IBM Plex Mono',monospace; }
     .vrm { border:1px solid #fecdd3; background:#fff1f2; color:#be123c; border-radius:8px; padding:5px 10px; font:700 .78rem 'IBM Plex Sans',sans-serif; cursor:pointer; }
 
     .empty-toggle { margin-top:18px; border:1.5px dashed #cbd5e1; background:#f8fafc; border-radius:14px; padding:12px 16px; color:#64748b; font-weight:700; font-size:.88rem; cursor:pointer; width:100%; text-align:left; }
@@ -140,11 +141,12 @@
         var ds = d && !isNaN(d.getTime()) ? (d.getDate() + '/' + (d.getMonth() + 1)) : '';
         return '<tr class="' + (st === 'wrong' ? 'wrong' : '') + '">' +
           '<td class="en">' + esc(w.english) + '</td><td>' + esc(w.indonesian) + '</td>' +
+          '<td>' + (w.type ? '<span class="vtype">' + esc(w.type) + '</span>' : '<span class="vdate">—</span>') + '</td>' +
           '<td><span class="vpill ' + st + '">' + lbl + '</span></td>' +
           '<td class="vdate">' + ds + '</td>' +
           '<td><button class="vrm" data-en="' + esc(w.english) + '" data-no="' + esc(s.no) + '">Remove</button></td></tr>';
       }).join('');
-      return '<table class="vtable"><thead><tr><th>English</th><th>Meaning</th><th>Check</th><th>Added</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
+      return '<table class="vtable"><thead><tr><th>English</th><th>Meaning</th><th>Type</th><th>Check</th><th>Added</th><th></th></tr></thead><tbody>' + rows + '</tbody></table>';
     }
 
     function render() {

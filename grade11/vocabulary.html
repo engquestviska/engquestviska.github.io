@@ -19,7 +19,9 @@
     .vocab-head .rem { font-size:.78rem; font-weight:700; color:#b45309; background:#fef3c7; padding:4px 12px; border-radius:999px; font-family:'IBM Plex Mono',monospace; }
     .vocab-intro { color:#64748b; font-size:.86rem; margin:6px 0 16px; line-height:1.5; }
     .vocab-rows { display:flex; flex-direction:column; gap:8px; }
-    .vocab-row { display:grid; grid-template-columns:22px 1fr 1fr 22px; gap:8px; align-items:center; }
+    .vocab-row { display:grid; grid-template-columns:20px 1fr 1fr 66px 20px; gap:6px; align-items:center; }
+    .v-type { min-height:42px; border:1.5px solid #e2e8f0; border-radius:10px; background:#fff; font:600 .76rem 'IBM Plex Sans',sans-serif; color:#0f172a; padding:0 3px; width:100%; }
+    .v-type:focus { border-color:#f59e0b; outline:none; }
     .v-check { font-family:'IBM Plex Mono',monospace; font-weight:800; text-align:center; font-size:1rem; }
     .vocab-row.ok .v-check { color:#15803d; } .vocab-row.bad .v-check { color:#b91c1c; } .vocab-row.chk .v-check { color:#cbd5e1; }
     .vocab-row.ok .v-id { border-color:#86efac; background:#f0fdf4; }
@@ -45,6 +47,10 @@
     .vc-rm:hover { color:#dc2626; }
     .vocab-legend { margin-top:10px; font-size:.76rem; color:#64748b; display:flex; gap:14px; flex-wrap:wrap; }
     .vocab-legend b { font-weight:800; } .vocab-legend .g { color:#15803d; } .vocab-legend .r { color:#b91c1c; }
+    .vc-type { background:#eef2ff; color:#4f46e5; border-radius:999px; padding:1px 8px; font-size:.68rem; font-weight:800; font-family:'IBM Plex Mono',monospace; }
+    .vocab-almanac { margin-top:14px; background:#faf5ff; border:1px solid #e9d5ff; border-radius:14px; padding:12px 16px; font-size:.86rem; color:#6b21a8; line-height:1.6; }
+    .vocab-almanac b { color:#4c1d95; } .vocab-almanac .muted { color:#a78bca; font-weight:600; }
+    .vocab-head .rem.locked { color:#b91c1c; background:#fee2e2; }
   </style>
   <script src="../shared/js/classes-20260617.js?v=20260712"></script>
   <script src="../shared/js/student.js"></script>
@@ -91,15 +97,17 @@
         rows += '<div class="vocab-row"><span class="n">' + i + '</span>' +
           '<input class="v-en" placeholder="English word" autocomplete="off" />' +
           '<input class="v-id" placeholder="Arti (Bahasa Indonesia)" autocomplete="off" />' +
+          '<select class="v-type"><option value="">Type</option><option value="noun">Noun</option><option value="verb">Verb</option><option value="adjective">Adj.</option><option value="adverb">Adv.</option><option value="other">Other</option></select>' +
           '<span class="v-check"></span></div>';
       }
       wrap.innerHTML =
         '<div class="vocab-wrap">' +
           '<div class="vocab-head"><h2>📚 Vocabulary Box</h2><span class="rem" id="vocabRem">…</span></div>' +
-          '<p class="vocab-intro">Read something in English (a book, article, or movie), then add new words with their Indonesian meaning. Each new word = <b>+2 XP</b>. No repeats, up to 30 words per week. Tap <b>Check meanings</b> to see if your Indonesian looks right before you submit.</p>' +
+          '<p class="vocab-intro">Read something in English, then add new words with their Indonesian meaning and pick the <b>word type</b> (noun, verb, adjective, adverb). Each new word = <b>+2 XP</b>. No repeats, up to 30 words per week. Tap <b>Check meanings</b> to see if your Indonesian looks right before you submit.</p>' +
           '<div class="vocab-rows">' + rows + '</div>' +
           '<div class="vocab-actions"><button class="vocab-check" id="vocabCheckBtn">🔍 Check meanings</button><button class="vocab-submit" id="vocabBtn">✨ Submit &amp; Earn XP</button></div>' +
           '<div class="vocab-msg" id="vocabMsg"></div>' +
+          '<div class="vocab-almanac" id="vocabAlmanac"></div>' +
           '<div class="vocab-list" id="vocabList"></div>' +
           '<div class="vocab-legend"><span><b class="g">✓ green</b> = looks correct</span><span><b class="r">! red</b> = double-check this</span><span><b>×</b> = remove word (−2 XP)</span></div>' +
         '</div>';
@@ -147,24 +155,65 @@
     }
     var VCLS = '', VNO = '';
 
+    var _cdTimer = null;
+    function fmtDur(ms) {
+      if (ms <= 0) return 'now';
+      var s = Math.floor(ms / 1000), d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60);
+      if (d > 0) return d + 'd ' + h + 'h';
+      if (h > 0) return h + 'h ' + m + 'm';
+      return (m + 1) + 'm';
+    }
     function setRemaining(res) {
       var rem = document.getElementById('vocabRem');
-      if (rem && res && res.weeklyRemaining != null) rem.textContent = res.weeklyRemaining + ' words left this week';
+      if (!rem || !res) return;
+      if (_cdTimer) { clearInterval(_cdTimer); _cdTimer = null; }
+      if (res.weeklyRemaining == null || res.weeklyRemaining > 0) {
+        rem.classList.remove('locked');
+        rem.textContent = (res.weeklyRemaining == null ? '…' : res.weeklyRemaining) + ' words left this week';
+        return;
+      }
+      rem.classList.add('locked');
+      if (res.nextSlotAt) {
+        var tick = function() {
+          var left = res.nextSlotAt - Date.now();
+          if (left <= 0) { clearInterval(_cdTimer); _cdTimer = null; if (VCLS && VNO) loadVocab(VCLS, VNO); return; }
+          rem.textContent = '🔒 Full — 1 more in ' + fmtDur(left);
+        };
+        tick(); _cdTimer = setInterval(tick, 30000);
+      } else {
+        rem.textContent = '🔒 Weekly limit reached';
+      }
     }
 
     function renderVocab(words) {
       var list = document.getElementById('vocabList');
       if (!list) return;
+      renderAlmanac(words);
       if (!words.length) { list.innerHTML = '<span class="vocab-chip"><span>No words yet — add your first!</span></span>'; return; }
       list.innerHTML = words.slice(-60).reverse().map(function(w) {
         var st = w.status, cls = st === 'correct' ? 'ok' : (st === 'wrong' ? 'bad' : 'pending');
         var mark = st === 'correct' ? '✓' : (st === 'wrong' ? '!' : '…');
+        var tag = w.type ? ' <span class="vc-type">' + escapeHtml(w.type) + '</span>' : '';
         return '<span class="vocab-chip ' + cls + '">' +
           '<span class="vc-mark">' + mark + '</span>' +
-          '<b>' + escapeHtml(w.english) + '</b><span>· ' + escapeHtml(w.indonesian) + '</span>' +
+          '<b>' + escapeHtml(w.english) + '</b><span>· ' + escapeHtml(w.indonesian) + '</span>' + tag +
           '<button class="vc-rm" data-en="' + escapeHtml(w.english) + '" title="Remove this word (−2 XP)">×</button>' +
         '</span>';
       }).join('');
+    }
+
+    // "Almanac": a summary of how the student's words break down by word type.
+    function renderAlmanac(words) {
+      var box = document.getElementById('vocabAlmanac');
+      if (!box) return;
+      if (!words.length) { box.innerHTML = ''; return; }
+      var c = { noun: 0, verb: 0, adjective: 0, adverb: 0, other: 0, untyped: 0 };
+      words.forEach(function(w) { var t = String(w.type || '').toLowerCase(); if (c[t] !== undefined && t) c[t]++; else c.untyped++; });
+      var order = [['noun', 'noun'], ['verb', 'verb'], ['adjective', 'adjective'], ['adverb', 'adverb'], ['other', 'other']];
+      var parts = order.filter(function(o) { return c[o[0]]; }).map(function(o) { return '<b>' + c[o[0]] + '</b> ' + o[1] + (c[o[0]] > 1 ? 's' : ''); });
+      box.innerHTML = '📔 <b>Your almanac</b> (' + words.length + ' words): ' +
+        (parts.length ? parts.join(' · ') : 'pick a type when you add words') +
+        (c.untyped ? ' <span class="muted">· ' + c.untyped + ' untyped</span>' : '');
     }
 
     function loadVocab(cls, no) {
@@ -203,11 +252,11 @@
     });
     function submitVocab(cls, no) {
       var btn = document.getElementById('vocabBtn'), msg = document.getElementById('vocabMsg');
-      var ens = document.querySelectorAll('#vocabWrap .v-en'), ids = document.querySelectorAll('#vocabWrap .v-id');
+      var ens = document.querySelectorAll('#vocabWrap .v-en'), ids = document.querySelectorAll('#vocabWrap .v-id'), types = document.querySelectorAll('#vocabWrap .v-type');
       var words = [];
       for (var i = 0; i < ens.length; i++) {
         var en = ens[i].value.trim(), id = ids[i].value.trim();
-        if (en || id) words.push({ english: en, indonesian: id });
+        if (en || id) words.push({ english: en, indonesian: id, type: types[i] ? types[i].value : '' });
       }
       if (!words.length) { msg.className = 'vocab-msg warn'; msg.textContent = 'Type at least one word pair first.'; return; }
       btn.disabled = true; msg.className = 'vocab-msg'; msg.textContent = 'Saving…';
@@ -222,7 +271,7 @@
         if (capped) parts.push(capped + ' over the weekly limit');
         msg.className = 'vocab-msg ' + (res.added ? 'ok' : 'warn');
         msg.textContent = parts.join(' · ') || 'No new words added.';
-        for (var j = 0; j < ens.length; j++) { ens[j].value = ''; ids[j].value = ''; }
+        for (var j = 0; j < ens.length; j++) { ens[j].value = ''; ids[j].value = ''; if (types[j]) types[j].value = ''; }
         document.querySelectorAll('#vocabWrap .vocab-row').forEach(function(row) { row.classList.remove('ok', 'bad', 'chk'); var m = row.querySelector('.v-check'); if (m) m.textContent = ''; });
         loadVocab(cls, no);
       }).catch(function() { btn.disabled = false; msg.className = 'vocab-msg err'; msg.textContent = 'Network error. Please try again.'; });

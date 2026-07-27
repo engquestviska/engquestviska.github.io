@@ -1022,7 +1022,7 @@ function _vocabSheet(ss) {
   var sh = ss.getSheetByName(VOCAB_TAB);
   if (!sh) {
     sh = ss.insertSheet(VOCAB_TAB);
-    sh.getRange(1, 1, 1, 5).setValues([['No', 'Name', 'English', 'Indonesian', 'Timestamp']]);
+    sh.getRange(1, 1, 1, 7).setValues([['No', 'Name', 'English', 'Indonesian', 'Timestamp', 'Status', 'Type']]);
   }
   return sh;
 }
@@ -1041,16 +1041,20 @@ function getVocabulary(className, studentNo) {
   if (!sheetId) return { error: 'Class not found' };
   var sh = _vocabSheet(SpreadsheetApp.openById(sheetId));
   var data = sh.getDataRange().getValues();
-  var words = [], weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000, weekCount = 0;
+  var words = [], weekMs = 7 * 24 * 60 * 60 * 1000, weekAgo = Date.now() - weekMs, weekCount = 0, oldestInWindow = 0;
   for (var r = 1; r < data.length; r++) {
     if (String(data[r][0]) !== String(studentNo)) continue;
     var ts = data[r][4] ? new Date(data[r][4]).getTime() : 0;
-    if (ts >= weekAgo) weekCount++;
+    if (ts >= weekAgo) { weekCount++; if (!oldestInWindow || ts < oldestInWindow) oldestInWindow = ts; }
     words.push({ english: String(data[r][2] || ''), indonesian: String(data[r][3] || ''), at: data[r][4],
-                 status: String(data[r][5] || '') });
+                 status: String(data[r][5] || ''), type: String(data[r][6] || '') });
   }
+  var remaining = Math.max(0, VOCAB_WEEKLY_CAP - weekCount);
+  // When the weekly cap is full, the next slot frees when the oldest word in the
+  // 7-day window ages out — that's the countdown target the student sees.
+  var nextSlotAt = (remaining === 0 && oldestInWindow) ? (oldestInWindow + weekMs) : 0;
   return { words: words, total: words.length, weekCount: weekCount,
-           weeklyCap: VOCAB_WEEKLY_CAP, weeklyRemaining: Math.max(0, VOCAB_WEEKLY_CAP - weekCount) };
+           weeklyCap: VOCAB_WEEKLY_CAP, weeklyRemaining: remaining, nextSlotAt: nextSlotAt };
 }
 
 // Judge whether `id` is an acceptable Indonesian meaning of English `en`, using
@@ -1099,7 +1103,7 @@ function getClassVocabulary(className) {
     var sn = String(vdata[r][0]); if (!sn) continue;
     if (!byNo[sn]) byNo[sn] = { words: [], c: 0, w: 0, u: 0 };
     var st = String(vdata[r][5] || '');
-    byNo[sn].words.push({ english: String(vdata[r][2] || ''), indonesian: String(vdata[r][3] || ''), at: vdata[r][4], status: st });
+    byNo[sn].words.push({ english: String(vdata[r][2] || ''), indonesian: String(vdata[r][3] || ''), at: vdata[r][4], status: st, type: String(vdata[r][6] || '') });
     if (st === 'correct') byNo[sn].c++; else if (st === 'wrong') byNo[sn].w++; else byNo[sn].u++;
   }
   var students = [];
@@ -1192,18 +1196,21 @@ function addVocabulary(className, studentNo, wordsJson) {
   }
   var name = _studentName(ss, studentNo), now = new Date();
   var accepted = [], rejected = [], seen = {}, remaining = VOCAB_WEEKLY_CAP - weekCount;
+  var VALID_TYPES = { noun: 1, verb: 1, adjective: 1, adverb: 1, other: 1 };
   words.forEach(function(w) {
     var en = String((w && w.english) || '').trim();
     var id = String((w && w.indonesian) || '').trim();
+    var type = String((w && w.type) || '').trim().toLowerCase();
+    if (!VALID_TYPES[type]) type = '';
     var key = en.toLowerCase();
     if (!en || !id) { rejected.push({ english: en, reason: 'empty' }); return; }
     if (existing[key] || seen[key]) { rejected.push({ english: en, reason: 'duplicate' }); return; }
     if (accepted.length >= remaining) { rejected.push({ english: en, reason: 'weekly-cap' }); return; }
     seen[key] = true;
-    accepted.push([studentNo, name, en, id, now]);
+    accepted.push([studentNo, name, en, id, now, '', type]);  // cols A–G (F=Status blank, G=Type)
   });
   if (accepted.length) {
-    sh.getRange(sh.getLastRow() + 1, 1, accepted.length, 5).setValues(accepted);
+    sh.getRange(sh.getLastRow() + 1, 1, accepted.length, 7).setValues(accepted);
     var act = ss.getSheetByName('Activeness');
     if (act) {
       var adata = act.getDataRange().getValues();
