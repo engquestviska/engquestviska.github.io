@@ -1,6 +1,6 @@
 {
-  "versionCode": 6,
-  "versionName": "1.5",
+  "versionCode": 7,
+  "versionName": "1.6",
   "apk": "EngQuest-app-7fq93kx2.apk",
-  "notes": "Added the menu button (top-left) — tap it for the full menu: Assignments, Attendance, Reading, Vocabulary, Strikes, Student List, Logout, and everything else."
+  "notes": "Smoother updates: tapping Update now downloads inside the app and opens the installer for you — no browser, no duplicate files."
 }
