@@ -56,10 +56,13 @@
     .almanac-sec h4 { font-weight:800; color:#6b21a8; font-size:.94rem; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
     .almanac-sec h4 em { font-style:normal; color:#a78bca; font-family:'IBM Plex Mono',monospace; font-size:.76rem; font-weight:700; }
     .almanac-entries { display:flex; flex-direction:column; }
-    .alm-entry { display:grid; grid-template-columns:18px 1fr 22px; gap:8px; align-items:center; padding:7px 2px; border-bottom:1px solid #f1e9fb; }
+    .alm-entry { display:grid; grid-template-columns:18px 1fr auto 22px; gap:8px; align-items:center; padding:7px 2px; border-bottom:1px solid #f1e9fb; }
     .alm-entry:last-child { border-bottom:none; }
     .alm-entry.bad { background:#fff7f7; border-radius:8px; }
     .alm-body b { color:#0f172a; font-weight:800; } .alm-mean { color:#64748b; }
+    .alm-type { border:1.5px solid #e2e8f0; border-radius:8px; background:#fff; font:700 .7rem 'IBM Plex Mono',monospace; color:#6b21a8; padding:4px 4px; cursor:pointer; }
+    .alm-type:focus { border-color:#a78bca; outline:none; }
+    .alm-type.untyped { border-color:#f0abfc; background:#fdf4ff; color:#a21caf; }
     .alm-mark { font-family:'IBM Plex Mono',monospace; font-weight:800; text-align:center; color:#cbd5e1; }
     .alm-entry.ok .alm-mark { color:#15803d; } .alm-entry.bad .alm-mark { color:#b91c1c; }
     .vocab-head .rem.locked { color:#b91c1c; background:#fee2e2; }
@@ -223,9 +226,14 @@
           g.map(function(w) {
             var st = w.status === 'correct' ? 'ok' : (w.status === 'wrong' ? 'bad' : '');
             var mk = w.status === 'correct' ? '✓' : (w.status === 'wrong' ? '!' : '·');
+            var cur = ['noun', 'verb', 'adjective', 'adverb', 'other'].indexOf(String(w.type || '').toLowerCase()) > -1 ? String(w.type).toLowerCase() : '';
+            var opts = [['', 'Type?'], ['noun', 'Noun'], ['verb', 'Verb'], ['adjective', 'Adj.'], ['adverb', 'Adv.'], ['other', 'Other']].map(function(o) {
+              return '<option value="' + o[0] + '"' + (o[0] === cur ? ' selected' : '') + '>' + o[1] + '</option>';
+            }).join('');
             return '<div class="alm-entry ' + st + '">' +
               '<span class="alm-mark">' + mk + '</span>' +
               '<div class="alm-body"><b>' + escapeHtml(w.english) + '</b> · <span class="alm-mean">' + escapeHtml(w.indonesian) + '</span></div>' +
+              '<select class="alm-type' + (cur ? '' : ' untyped') + '" data-en="' + escapeHtml(w.english) + '" title="Label this word\'s type">' + opts + '</select>' +
               '<button class="vc-rm" data-en="' + escapeHtml(w.english) + '" title="Remove this word (−2 XP)">×</button>' +
             '</div>';
           }).join('') + '</div></section>';
@@ -267,6 +275,20 @@
       var b = e.target && e.target.closest ? e.target.closest('.vc-rm') : null;
       if (b) removeWord(b.getAttribute('data-en'));
     });
+
+    // Label / relabel an existing word's type straight from the almanac — for
+    // words added before the type picker existed (or to fix a wrong label).
+    document.addEventListener('change', function(e) {
+      var s = e.target;
+      if (s && s.classList && s.classList.contains('alm-type')) setWordType(s.getAttribute('data-en'), s.value);
+    });
+    function setWordType(en, type) {
+      if (!en || !window.EQApi) return;
+      EQApi.get({ action: 'setVocabularyType', className: VCLS, studentNo: VNO, english: en, type: type }).then(function(res) {
+        setRemaining(res);
+        renderVocab((res && res.words) || []);
+      }).catch(function(){});
+    }
     function submitVocab(cls, no) {
       var btn = document.getElementById('vocabBtn'), msg = document.getElementById('vocabMsg');
       var ens = document.querySelectorAll('#vocabWrap .v-en'), ids = document.querySelectorAll('#vocabWrap .v-id'), types = document.querySelectorAll('#vocabWrap .v-type');

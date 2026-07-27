@@ -132,6 +132,7 @@ function doGet(e) {
     else if (action === 'checkMeanings')        result = checkMeanings(e.parameter.pairs);
     else if (action === 'checkVocabulary')      result = checkVocabulary(e.parameter.className, e.parameter.studentNo);
     else if (action === 'removeVocabulary')     result = removeVocabulary(e.parameter.className, e.parameter.studentNo, e.parameter.english);
+    else if (action === 'setVocabularyType')    result = setVocabularyType(e.parameter.className, e.parameter.studentNo, e.parameter.english, e.parameter.type);
     else if (action === 'clearVocabulary')      result = clearVocabulary(e.parameter.username, e.parameter.password, e.parameter.className);
     else if (action === 'setupAttendanceSheet') result = setupAttendanceSheet(e.parameter.username, e.parameter.password);
     else if (action === 'getClassData')         result = getClassData(e.parameter.className);
@@ -1170,6 +1171,31 @@ function removeVocabulary(className, studentNo, english) {
   }
   var res = getVocabulary(className, studentNo);
   res.removed = removed; res.success = true;
+  return res;
+}
+
+// Student self-service: label / relabel one existing word's type (col G). Lets
+// students type words they added before the type picker existed, or fix a wrong
+// label. No teacher auth. Empty type clears the label (back to "Not typed yet").
+function setVocabularyType(className, studentNo, english, type) {
+  var sheetId = SCORE_SHEETS[className];
+  if (!sheetId) return { success: false, error: 'Class not found' };
+  if (!studentNo || !english) return { success: false, error: 'Missing word' };
+  var VALID_TYPES = { noun: 1, verb: 1, adjective: 1, adverb: 1, other: 1 };
+  type = String(type || '').trim().toLowerCase();
+  if (type && !VALID_TYPES[type]) type = '';
+  var ss = SpreadsheetApp.openById(sheetId);
+  var sh = _vocabSheet(ss);
+  var data = sh.getDataRange().getValues();
+  var target = String(english).trim().toLowerCase(), updated = 0;
+  for (var r = 1; r < data.length; r++) {
+    if (String(data[r][0]) === String(studentNo) && String(data[r][2] || '').trim().toLowerCase() === target) {
+      sh.getRange(r + 1, 7).setValue(type); updated++;
+    }
+  }
+  if (updated) SpreadsheetApp.flush();
+  var res = getVocabulary(className, studentNo);
+  res.updated = updated; res.success = true;
   return res;
 }
 
