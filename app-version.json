@@ -1,6 +1,6 @@
 {
-  "versionCode": 5,
-  "versionName": "1.4",
+  "versionCode": 6,
+  "versionName": "1.5",
   "apk": "EngQuest-app-7fq93kx2.apk",
-  "notes": "Big update! A real app feel: a bottom menu bar (Home, Materials, Submit, Scores, Me), your grade is remembered, and no more grade-choosing screen every time."
+  "notes": "Added the menu button (top-left) — tap it for the full menu: Assignments, Attendance, Reading, Vocabulary, Strikes, Student List, Logout, and everything else."
 }
