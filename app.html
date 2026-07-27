@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EngQuest App</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'IBM Plex Sans', system-ui, sans-serif; background: #eef2f7; color: #0f172a; }
+    .wrap { max-width: 640px; margin: 0 auto; padding: 22px 16px 52px; }
+    .hero { background: linear-gradient(125deg, #2563eb, #1d4ed8 55%, #1e3a8a); color: #fff; border-radius: 24px; padding: 32px 26px; text-align: center; box-shadow: 0 18px 40px rgba(30, 58, 138, 0.25); }
+    .hero img { width: 78px; height: 78px; border-radius: 18px; }
+    .hero h1 { font-family: 'Playfair Display', serif; font-weight: 800; font-size: 2rem; margin: 14px 0 2px; }
+    .hero .tag { opacity: 0.9; font-size: 0.95rem; margin: 0; }
+    .ver { display: inline-block; margin-top: 12px; background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.3); padding: 5px 15px; border-radius: 999px; font-size: 0.85rem; font-weight: 600; }
+    .dl { display: inline-flex; align-items: center; gap: 8px; margin-top: 22px; background: #fff; color: #1d4ed8; font-weight: 700; font-size: 1.08rem; text-decoration: none; padding: 15px 30px; border-radius: 999px; box-shadow: 0 8px 18px rgba(0,0,0,0.18); }
+    .dl:active { transform: translateY(1px); }
+    .card { background: #fff; border-radius: 18px; padding: 20px 22px; margin-top: 18px; box-shadow: 0 4px 14px rgba(15,23,42,0.06); }
+    .card h2 { font-size: 1.15rem; margin: 0 0 12px; }
+    .whatsnew { margin: 0; padding-left: 20px; }
+    .whatsnew li { margin: 7px 0; line-height: 1.5; }
+    .steps { counter-reset: s; list-style: none; padding: 0; margin: 0; }
+    .steps li { position: relative; padding: 8px 0 8px 40px; line-height: 1.5; }
+    .steps li::before { counter-increment: s; content: counter(s); position: absolute; left: 0; top: 5px; width: 27px; height: 27px; background: #dbeafe; color: #1d4ed8; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; }
+    .hist details { border-top: 1px solid #e6ebf2; padding: 11px 0; }
+    .hist details:first-child { border-top: none; }
+    .hist summary { cursor: pointer; font-weight: 600; list-style: none; }
+    .hist summary::-webkit-details-marker { display: none; }
+    .hist summary::before { content: "\25B8"; margin-right: 8px; color: #94a3b8; font-size: 0.8em; }
+    .hist details[open] summary::before { content: "\25BE"; }
+    .hist ul { margin: 8px 0 2px; padding-left: 22px; color: #475569; }
+    .hist ul li { margin: 4px 0; line-height: 1.45; }
+    .note { text-align: center; color: #64748b; font-size: 0.85rem; margin-top: 22px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <img src="logo.jpg" alt="EngQuest logo"/>
+      <h1>EngQuest App</h1>
+      <p class="tag">Your class, as an app on your phone.</p>
+      <div class="ver" id="ver">Checking latest version…</div>
+      <div><a class="dl" id="dl" href="#" download="EngQuest.apk">Download / Update</a></div>
+    </div>
+
+    <div class="card">
+      <h2>What's new</h2>
+      <ul class="whatsnew" id="whatsnew"><li>Loading…</li></ul>
+    </div>
+
+    <div class="card">
+      <h2>How to install</h2>
+      <ol class="steps">
+        <li>Tap <b>Download / Update</b> above.</li>
+        <li>Open the downloaded file. If your phone warns about an "unknown source", tap <b>Settings</b> / <b>Allow</b> once, then <b>Install</b>.</li>
+        <li>Open <b>EngQuest</b> from your home screen. Done!</li>
+      </ol>
+    </div>
+
+    <div class="card hist">
+      <h2>Version history</h2>
+      <div id="history"></div>
+    </div>
+
+    <div class="note" id="note"></div>
+  </div>
+
+  <script>
+    (function () {
+      fetch('app-version.json?ts=' + Date.now())
+        .then(function (r) { return r.json(); })
+        .then(function (d) {
+          document.getElementById('ver').textContent = 'Latest version: ' + (d.versionName || '');
+          var dl = document.getElementById('dl');
+          if (d.apk) dl.href = d.apk;
+          var history = Array.isArray(d.history) ? d.history : [];
+
+          var wn = document.getElementById('whatsnew');
+          wn.innerHTML = '';
+          var latest = (history[0] && history[0].notes) ? history[0].notes : (d.notes ? [d.notes] : []);
+          if (!latest.length) { wn.innerHTML = '<li>Improvements and fixes.</li>'; }
+          latest.forEach(function (n) { var li = document.createElement('li'); li.textContent = n; wn.appendChild(li); });
+
+          var h = document.getElementById('history');
+          history.forEach(function (v, i) {
+            var det = document.createElement('details');
+            if (i === 0) det.open = true;
+            var sum = document.createElement('summary');
+            sum.textContent = 'Version ' + v.version + (v.date ? '  ·  ' + v.date : '');
+            det.appendChild(sum);
+            var ul = document.createElement('ul');
+            (v.notes || []).forEach(function (n) { var li = document.createElement('li'); li.textContent = n; ul.appendChild(li); });
+            det.appendChild(ul);
+            h.appendChild(det);
+          });
+
+          document.getElementById('note').textContent =
+            'This is always the newest version (' + (d.versionName || '') + '). If you already have it, you are up to date.';
+        })
+        .catch(function () {
+          document.getElementById('ver').textContent = 'Could not check the version. Please try again later.';
+        });
+    })();
+  </script>
+</body>
+</html>

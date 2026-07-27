@@ -1,6 +1,13 @@
 {
-  "versionCode": 7,
-  "versionName": "1.6",
+  "versionCode": 8,
+  "versionName": "1.7",
   "apk": "EngQuest-app-7fq93kx2.apk",
-  "notes": "Smoother updates: tapping Update now downloads inside the app and opens the installer for you — no browser, no duplicate files."
+  "notes": "A proper Updates page so you can see what's new before installing.",
+  "history": [
+    { "version": "1.7", "date": "2026-07-27", "notes": ["New Updates page — see what's new before you install, instead of a blank download", "The Download button installs the app for you"] },
+    { "version": "1.6", "date": "2026-07-27", "notes": ["Smoother updates: the app downloads and opens the installer for you", "No more browser or duplicate downloaded files"] },
+    { "version": "1.5", "date": "2026-07-27", "notes": ["Added the menu button (top-left) for the full menu: Assignments, Attendance, Reading, Vocabulary, Strikes, and more"] },
+    { "version": "1.4", "date": "2026-07-27", "notes": ["A real app feel with a bottom menu bar: Home, Materials, Submit, Scores, Me", "Your grade is remembered — no more grade-choosing every time"] },
+    { "version": "1.3", "date": "2026-07-27", "notes": ["The back button remembers where you were", "Added update notices"] }
+  ]
 }
