@@ -331,10 +331,26 @@
           return EQApi.get({ action: 'reviewTaskSubmission', username: t.username, password: t.password, subId: id, decision: decision });
         });
       });
+      // On approve, also tick that task in the student's Task Status (C1T1 → the
+      // student's C1T1 checkbox). One call per approved photo's task.
+      var ticked = 0;
+      if (decision === 'reviewed') {
+        ids.forEach(function(id){
+          var s = ALL.find(function(x){ return x.subId === id; });
+          if (!s || !s.task) return;
+          ticked++;
+          var tasks = {}; tasks[s.task] = true;
+          chain = chain.then(function(){
+            return EQApi.get({ action: 'saveTaskStatus', username: t.username, password: t.password,
+              className: s.className, studentNo: s.studentNo, tasks: JSON.stringify(tasks) });
+          });
+        });
+      }
       chain.then(function(){
         var note = decision === 'rejected' ? 'Sent back for resubmit'
-          : scoreSave ? ('Approved · ' + scoreSave.column + ' = ' + scoreSave.value)
-          : 'Marked reviewed';
+          : scoreSave ? ('Approved · ' + scoreSave.column + ' = ' + scoreSave.value + ' · task ticked')
+          : ticked > 1 ? ('Approved ' + ticked + ' · tasks ticked')
+          : 'Approved · task ticked';
         showToast(note, 'ok');
         loadSubs();
       }).catch(function(){ showToast('Could not save — try again', 'err'); if (btn) btn.disabled = false; });
