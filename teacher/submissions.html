@@ -15,40 +15,47 @@
     .seg { display:inline-flex; border:1.5px solid #dbeafe; border-radius:12px; overflow:hidden; }
     .seg button { border:none; background:#fff; padding:8px 16px; font:700 .84rem 'IBM Plex Sans',sans-serif; color:#475569; cursor:pointer; }
     .seg button.on { background:#2563eb; color:#fff; }
+    .class-select { border:1.5px solid #dbeafe; border-radius:12px; padding:8px 14px; font:700 .84rem 'IBM Plex Sans',sans-serif; color:#1e293b; background:#fff; cursor:pointer; }
     .refresh-btn { margin-left:auto; border:1.5px solid #dbeafe; background:#fff; border-radius:12px; padding:8px 16px; font:700 .84rem 'IBM Plex Sans',sans-serif; color:#2563eb; cursor:pointer; }
 
+    /* Grouped-by-student list */
     .sub-list { display:grid; gap:12px; }
-    .sub-row { display:grid; grid-template-columns:52px minmax(160px,1fr) auto; gap:14px; align-items:center; border:1.5px solid #dbeafe; border-radius:18px; background:#fff; padding:14px 16px; box-shadow:0 12px 26px rgba(37,99,235,.06); }
-    .sub-row.reviewed { border-color:#bbf7d0; background:linear-gradient(135deg,#fff,#f3fdf6); }
-    .sub-row.rejected { border-color:#fecaca; background:linear-gradient(135deg,#fff,#fff5f5); }
-    .sub-task { width:48px; height:48px; display:grid; place-items:center; border-radius:14px; background:#2563eb; color:#fff; font-family:'IBM Plex Mono',monospace; font-weight:800; font-size:.82rem; }
-    .sub-name { font-weight:800; line-height:1.25; }
-    .sub-meta { margin-top:4px; color:var(--muted); font-size:.82rem; font-weight:600; }
-    .sub-pill { display:inline-flex; align-items:center; gap:5px; font-size:.72rem; font-weight:800; padding:3px 10px; border-radius:999px; font-family:'IBM Plex Mono',monospace; }
-    .sub-pill.pending { background:#fef3c7; color:#b45309; } .sub-pill.reviewed { background:#dcfce7; color:#15803d; } .sub-pill.rejected { background:#fee2e2; color:#b91c1c; }
-    .view-btn { border:none; background:#2563eb; color:#fff; border-radius:11px; padding:10px 18px; font:700 .85rem 'IBM Plex Sans',sans-serif; cursor:pointer; white-space:nowrap; }
+    .stu-group { border:1.5px solid #dbeafe; border-radius:18px; background:#fff; overflow:hidden; box-shadow:0 12px 26px rgba(37,99,235,.06); }
+    .stu-group[open] { border-color:#bfdbfe; }
+    .stu-sum { list-style:none; cursor:pointer; display:flex; align-items:center; gap:12px; padding:15px 18px; }
+    .stu-sum::-webkit-details-marker { display:none; }
+    .stu-sum .chev { color:#94a3b8; font-size:.9rem; transition:transform .15s; }
+    .stu-group[open] .stu-sum .chev { transform:rotate(90deg); }
+    .stu-no { width:38px; height:38px; flex:0 0 auto; display:grid; place-items:center; border-radius:11px; background:#eff6ff; color:#2563eb; font-family:'IBM Plex Mono',monospace; font-weight:800; font-size:.8rem; }
+    .stu-name { font-weight:800; line-height:1.2; }
+    .stu-meta { color:var(--muted); font-size:.82rem; font-weight:600; margin-top:2px; }
+    .stu-badge { margin-left:auto; font-size:.72rem; font-weight:800; padding:4px 11px; border-radius:999px; font-family:'IBM Plex Mono',monospace; white-space:nowrap; }
+    .stu-badge.pend { background:#fef3c7; color:#b45309; } .stu-badge.done { background:#dcfce7; color:#15803d; }
+
+    .photos { display:flex; flex-wrap:wrap; gap:14px; padding:4px 18px 18px; border-top:1px solid #eef4ff; }
+    .ph { width:210px; border:1px solid #e5ecf6; border-radius:14px; overflow:hidden; background:#fff; }
+    .ph-img { min-height:180px; display:grid; place-items:center; background:#f8fafc; }
+    .ph-img img { width:100%; height:190px; object-fit:contain; display:block; background:#f1f5f9; cursor:zoom-in; }
+    .ph-load { color:#94a3b8; font-size:.82rem; padding:30px; }
+    .ph-info { padding:10px 12px; }
+    .ph-task { font-weight:800; font-size:.85rem; }
+    .ph-date { color:var(--muted); font-size:.78rem; margin-top:2px; }
+    .ph-pill { display:inline-flex; align-items:center; gap:4px; font-size:.68rem; font-weight:800; padding:3px 9px; border-radius:999px; font-family:'IBM Plex Mono',monospace; margin-top:8px; }
+    .ph-pill.reviewed { background:#dcfce7; color:#15803d; } .ph-pill.rejected { background:#fee2e2; color:#b91c1c; }
+    .ph-actions { display:flex; gap:6px; margin-top:8px; }
+    .ph-actions button { flex:1; border-radius:9px; padding:7px 4px; font:800 .76rem 'IBM Plex Sans',sans-serif; cursor:pointer; border:1.5px solid transparent; }
+    .ph-actions .ok { background:#ecfdf5; color:#059669; border-color:#bbf7d0; }
+    .ph-actions .no { background:#fff1f2; color:#be123c; border-color:#fecdd3; }
+    .ph-actions button:disabled { opacity:.5; cursor:not-allowed; }
+    .bulk { padding:0 18px 16px; }
+    .bulk button { border:1.5px solid #bbf7d0; background:#ecfdf5; color:#059669; border-radius:11px; padding:9px 16px; font:800 .82rem 'IBM Plex Sans',sans-serif; cursor:pointer; }
     .sub-empty { text-align:center; padding:50px 20px; color:#64748b; }
 
-    .modal-back { position:fixed; inset:0; background:rgba(15,23,42,.7); display:none; align-items:center; justify-content:center; padding:18px; z-index:70; }
-    .modal-back.on { display:flex; }
-    .modal { background:#fff; border-radius:22px; padding:20px; max-width:560px; width:100%; max-height:92vh; overflow:auto; box-shadow:0 30px 80px rgba(15,23,42,.35); }
-    .modal h3 { font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:800; }
-    .modal .msub { color:#64748b; font-size:.85rem; margin:2px 0 14px; }
-    .photo-wrap { min-height:200px; display:grid; place-items:center; background:#f8fafc; border:1px solid #e5ecf6; border-radius:14px; overflow:hidden; }
-    .photo-wrap img { width:100%; object-fit:contain; max-height:60vh; display:block; }
-    .photo-gallery { display:flex; flex-direction:column; gap:10px; }
-    .photo-gallery .gphoto { position:relative; min-height:120px; display:grid; place-items:center; background:#f8fafc; border:1px solid #e5ecf6; border-radius:14px; overflow:hidden; }
-    .photo-gallery .gphoto img { width:100%; object-fit:contain; max-height:60vh; display:block; }
-    .photo-gallery .gnum { position:absolute; top:8px; left:8px; background:rgba(15,23,42,.7); color:#fff; font:800 .72rem 'IBM Plex Mono',monospace; padding:2px 9px; border-radius:999px; }
-    .photo-gallery .gload { color:#94a3b8; font-size:.85rem; padding:30px; }
-    .modal-actions { display:flex; gap:10px; margin-top:16px; flex-wrap:wrap; }
-    .modal-actions button { flex:1; min-width:130px; border-radius:12px; padding:13px; font:800 .92rem 'IBM Plex Sans',sans-serif; cursor:pointer; border:none; }
-    .btn-reviewed { background:linear-gradient(135deg,#10b981,#059669); color:#fff; }
-    .btn-reject { background:#fff1f2; color:#be123c; border:1.5px solid #fecdd3; }
-    .btn-close { background:#f1f5f9; color:#475569; flex:0 0 auto; min-width:90px; }
-    .modal-actions button:disabled { opacity:.5; cursor:not-allowed; }
-    .modal-msg { margin-top:8px; font-size:.84rem; font-weight:700; text-align:center; min-height:1em; }
-    .modal-msg.err { color:#dc2626; } .modal-msg.ok { color:#059669; }
+    /* Lightbox for a full-size photo */
+    .lightbox { position:fixed; inset:0; background:rgba(15,23,42,.82); display:none; align-items:center; justify-content:center; padding:24px; z-index:80; }
+    .lightbox.on { display:flex; }
+    .lightbox img { max-width:100%; max-height:92vh; border-radius:12px; box-shadow:0 30px 80px rgba(0,0,0,.5); }
+    .lightbox .lx-close { position:absolute; top:18px; right:22px; background:#fff; border:none; border-radius:999px; width:42px; height:42px; font-size:1.2rem; font-weight:800; cursor:pointer; color:#334155; }
   </style>
   <script src="../shared/js/classes-20260617.js?v=20260712"></script>
   <script src="../shared/js/api.js"></script>
@@ -75,7 +82,7 @@
     <section class="hero">
       <div class="kicker">Task Submissions</div>
       <h1>Check the photos students turned in.</h1>
-      <p class="hero-copy">Students submit a photo of each finished task. Review it right here — no downloads — then mark it done. You enter the score in Students &amp; Scores.</p>
+      <p class="hero-copy">Grouped by student — click a name to open all their photos together. Approve or send back to resubmit, right here. You enter the score in Students &amp; Scores.</p>
     </section>
   </header>
 
@@ -91,7 +98,7 @@
         <div class="panel-head">
           <div>
             <h2 class="panel-title">Submission Inbox</h2>
-            <p class="panel-copy">Newest first. Tap a submission to see the photo and check it.</p>
+            <p class="panel-copy">Click a student to open their photos. Groups with photos waiting open automatically.</p>
           </div>
           <div class="status-pill" id="loginPill">Teacher</div>
         </div>
@@ -102,6 +109,9 @@
             <button id="segPending" class="on" onclick="setFilter('pending')">Pending</button>
             <button id="segAll" onclick="setFilter('all')">All</button>
           </div>
+          <select class="class-select" id="classFilter" onchange="setClassFilter(this.value)">
+            <option value="">All classes</option>
+          </select>
           <button class="refresh-btn" onclick="loadSubs()">↻ Refresh</button>
         </div>
 
@@ -110,26 +120,19 @@
     </section>
   </main>
 
-  <div class="modal-back" id="modalBack">
-    <div class="modal">
-      <h3 id="mTitle">Submission</h3>
-      <div class="msub" id="mSub"></div>
-      <div class="photo-gallery" id="mGallery"></div>
-      <div class="modal-msg" id="mMsg"></div>
-      <div class="modal-actions">
-        <button class="btn-reviewed" id="btnReviewed" type="button">✓ Mark reviewed</button>
-        <button class="btn-reject" id="btnReject" type="button">Reject (resubmit)</button>
-        <button class="btn-close" id="btnClose" type="button">Close</button>
-      </div>
-    </div>
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <button class="lx-close" type="button" onclick="closeLightbox()">✕</button>
+    <img id="lxImg" alt="Submission photo"/>
   </div>
 
   <div class="toast" id="toast"></div>
 
   <script>
     var ALL = [];
-    var filter = 'pending';
-    var current = null; // current submission being viewed
+    var filter = 'pending';       // 'pending' | 'all'
+    var classFilter = '';         // '' = every class
+    var GROUPS = {};              // key -> group object (for lazy photo loading)
+    var loadedGroups = {};        // key -> true once its photos have been fetched
 
     function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
     function teacherLogout() { EQAuth.logoutTeacher('index.html'); }
@@ -142,30 +145,146 @@
       setTimeout(function(){ t.classList.remove('show'); }, 2600);
     }
 
+    function initClassFilter() {
+      var sel = document.getElementById('classFilter');
+      var ids = (window.EQApi && EQApi.classes) ? EQApi.classes : [];
+      sel.innerHTML = '<option value="">All classes</option>' +
+        ids.map(function(id){ return '<option value="' + esc(id) + '">' + esc(classLabel(id)) + '</option>'; }).join('');
+      sel.value = classFilter;
+    }
+
     function setFilter(f) {
       filter = f;
       document.getElementById('segPending').classList.toggle('on', f === 'pending');
       document.getElementById('segAll').classList.toggle('on', f === 'all');
       renderList();
     }
+    function setClassFilter(v) { classFilter = v; renderList(); }
+
+    function currentRows() {
+      return ALL.filter(function(s){
+        if (filter !== 'all' && s.status !== 'pending') return false;
+        if (classFilter && s.className !== classFilter) return false;
+        return true;
+      });
+    }
+
+    // One expandable panel per student, all their photos inside.
+    function buildGroups(rows) {
+      var map = {}, order = [];
+      rows.forEach(function(s){
+        var key = s.className + '|' + s.studentNo + '|' + s.studentName;
+        if (!map[key]) { map[key] = { key:key, studentNo:s.studentNo, studentName:s.studentName, className:s.className, items:[] }; order.push(key); }
+        map[key].items.push(s);
+      });
+      order.sort(function(a,b){
+        var A = map[a], B = map[b];
+        if (A.className !== B.className) return A.className < B.className ? -1 : 1;
+        return (Number(A.studentNo)||0) - (Number(B.studentNo)||0);
+      });
+      return order.map(function(k){ return map[k]; });
+    }
 
     function renderList() {
       var list = document.getElementById('subList');
-      var rows = ALL.filter(function(s){ return filter === 'all' ? true : s.status === 'pending'; });
-      if (!rows.length) {
-        list.innerHTML = '<div class="sub-empty">' + (filter === 'pending' ? '🎉 Nothing waiting — all caught up!' : 'No submissions yet.') + '</div>';
+      var groups = buildGroups(currentRows());
+      GROUPS = {}; loadedGroups = {};
+      if (!groups.length) {
+        list.innerHTML = '<div class="sub-empty">' + (filter === 'pending' ? '🎉 Nothing waiting — all caught up!' : 'No submissions here.') + '</div>';
         return;
       }
-      list.innerHTML = rows.map(function(s) {
-        var pill = '<span class="sub-pill ' + s.status + '">' + (s.status === 'pending' ? '⏳ Pending' : s.status === 'reviewed' ? '✓ Reviewed' : '✕ Rejected') + '</span>';
-        return '<div class="sub-row ' + s.status + '">' +
-          '<div class="sub-task">' + esc(s.task) + '</div>' +
-          '<div><div class="sub-name">' + esc(s.studentName) + '</div>' +
-            '<div class="sub-meta">' + esc(classLabel(s.className)) + ' · ' + esc(s.task) + ' · ' + (s.photoCount || 1) + '📷 · ' + esc(s.timestamp) + '</div>' +
-            '<div style="margin-top:6px">' + pill + '</div></div>' +
-          '<button class="view-btn" onclick="openSub(\'' + s.subId + '\')">View &amp; check</button>' +
-        '</div>';
-      }).join('');
+      list.innerHTML = groups.map(function(g){ GROUPS[g.key] = g; return groupHtml(g); }).join('');
+
+      // Wire expand → lazy-load photos; wire review buttons.
+      list.querySelectorAll('details.stu-group').forEach(function(d){
+        d.addEventListener('toggle', function(){ if (d.open) loadGroupPhotos(d.dataset.key); });
+        if (d.open) loadGroupPhotos(d.dataset.key);   // auto-opened (pending) groups
+      });
+      list.querySelectorAll('button[data-review]').forEach(function(b){
+        b.onclick = function(){ reviewMany(b.dataset.ids.split(','), b.dataset.review, b); };
+      });
+    }
+
+    function groupHtml(g) {
+      var pending = g.items.filter(function(i){ return i.status === 'pending'; });
+      var pendIds = pending.map(function(i){ return i.subId; }).join(',');
+      var badge = pending.length
+        ? '<span class="stu-badge pend">' + pending.length + ' pending</span>'
+        : '<span class="stu-badge done">all done</span>';
+      var bulk = pending.length > 1
+        ? '<div class="bulk"><button data-review="reviewed" data-ids="' + pendIds + '">✓ Approve all ' + pending.length + '</button></div>'
+        : '';
+      var photos = g.items.map(photoHtml).join('');
+      return '<details class="stu-group"' + (pending.length ? ' open' : '') + ' data-key="' + esc(g.key) + '">' +
+        '<summary class="stu-sum">' +
+          '<span class="chev">▶</span>' +
+          '<span class="stu-no">#' + esc(g.studentNo) + '</span>' +
+          '<span><span class="stu-name">' + esc(g.studentName) + '</span>' +
+            '<span class="stu-meta">' + esc(classLabel(g.className)) + ' · ' + g.items.length + ' photo' + (g.items.length > 1 ? 's' : '') + '</span></span>' +
+          badge +
+        '</summary>' +
+        '<div class="photos">' + photos + '</div>' + bulk +
+      '</details>';
+    }
+
+    function photoHtml(s) {
+      var actions;
+      if (s.status === 'pending') {
+        actions = '<div class="ph-actions">' +
+          '<button class="ok" data-review="reviewed" data-ids="' + s.subId + '">Approve</button>' +
+          '<button class="no" data-review="rejected" data-ids="' + s.subId + '">Reject</button></div>';
+      } else {
+        var lbl = s.status === 'reviewed' ? '✓ Reviewed' : '✕ Rejected';
+        actions = '<span class="ph-pill ' + s.status + '">' + lbl + '</span>';
+      }
+      return '<div class="ph">' +
+        '<div class="ph-img" id="phimg-' + esc(s.subId) + '"><span class="ph-load">Loading…</span></div>' +
+        '<div class="ph-info">' +
+          '<div class="ph-task">Task ' + esc(s.task || '—') + '</div>' +
+          '<div class="ph-date">' + esc(s.timestamp) + '</div>' +
+          actions +
+        '</div></div>';
+    }
+
+    // Load every photo in a group once (base64 via the auth-gated endpoint, like the
+    // old modal did — <img> can't carry the teacher login, so we fetch + inline it).
+    function loadGroupPhotos(key) {
+      if (loadedGroups[key]) return;
+      var g = GROUPS[key]; if (!g) return;
+      loadedGroups[key] = true;
+      var t = EQAuth.getTeacher();
+      g.items.forEach(function(s){
+        EQApi.get({ action: 'getSubmissionPhoto', username: t.username, password: t.password, fileId: s.subId }).then(function(res){
+          var box = document.getElementById('phimg-' + s.subId);
+          if (!box) return;
+          if (res && res.success && res.dataBase64) {
+            var src = 'data:' + (res.mimeType || 'image/jpeg') + ';base64,' + res.dataBase64;
+            var img = document.createElement('img');
+            img.src = src; img.alt = 'Task photo';
+            img.onclick = function(){ openLightbox(src); };
+            box.innerHTML = ''; box.appendChild(img);
+          } else { box.innerHTML = '<span class="ph-load">Could not load photo</span>'; }
+        }).catch(function(){ var box = document.getElementById('phimg-' + s.subId); if (box) box.innerHTML = '<span class="ph-load">Network error</span>'; });
+      });
+    }
+
+    function openLightbox(src) { document.getElementById('lxImg').src = src; document.getElementById('lightbox').classList.add('on'); }
+    function closeLightbox() { document.getElementById('lightbox').classList.remove('on'); }
+
+    // Review one or many submissions (Approve / Reject / Approve-all), then refresh.
+    function reviewMany(ids, decision, btn) {
+      var t = EQAuth.getTeacher();
+      if (btn) btn.disabled = true;
+      var chain = Promise.resolve();
+      ids.forEach(function(id){
+        chain = chain.then(function(){
+          return EQApi.get({ action: 'reviewTaskSubmission', username: t.username, password: t.password, subId: id, decision: decision });
+        });
+      });
+      chain.then(function(){
+        showToast(decision === 'rejected' ? 'Sent back for resubmit' : 'Marked reviewed', 'ok');
+        loadSubs();
+      }).catch(function(){ showToast('Could not save — try again', 'err'); if (btn) btn.disabled = false; });
     }
 
     function loadSubs() {
@@ -173,72 +292,24 @@
       var list = document.getElementById('subList');
       list.innerHTML = '<div class="sub-empty">Loading…</div>';
       EQApi.get({ action: 'getTaskSubmissions', username: t.username, password: t.password }).then(function(res) {
-        if (!res || !res.success) { list.innerHTML = '<div class="sub-empty">Could not load submissions.</div>'; return; }
+        // Stale/mismatched teacher session (the page can stay open up to 8h on a cached
+        // "verified" flag while the saved password no longer matches). Don't dead-end —
+        // clear the cached verification and send them to a fresh login.
+        if (res && res.error === 'Unauthorized') {
+          EQAuth.clearVerification();
+          list.innerHTML = '<div class="sub-empty">Your teacher session expired. <a href="index.html">Log in again</a> to view submissions.</div>';
+          return;
+        }
+        if (!res || !res.success) { list.innerHTML = '<div class="sub-empty">Could not load submissions. Please Refresh, or log in again.</div>'; return; }
         ALL = res.submissions || [];
         document.getElementById('pendCount').textContent = res.pending || 0;
         renderList();
       }).catch(function() { list.innerHTML = '<div class="sub-empty">Network error. Try Refresh.</div>'; });
     }
 
-    function openSub(subId) {
-      current = ALL.find(function(s){ return s.subId === subId; });
-      if (!current) return;
-      var fileIds = current.fileIds && current.fileIds.length ? current.fileIds : (current.fileId ? [current.fileId] : []);
-      document.getElementById('mTitle').textContent = current.studentName;
-      document.getElementById('mSub').textContent = classLabel(current.className) + ' · ' + current.task + ' · ' + fileIds.length + ' photo' + (fileIds.length > 1 ? 's' : '') + ' · submitted ' + current.timestamp;
-      document.getElementById('mMsg').textContent = ''; document.getElementById('mMsg').className = 'modal-msg';
-      document.getElementById('btnReviewed').disabled = false;
-      document.getElementById('btnReject').disabled = false;
-      document.getElementById('modalBack').classList.add('on');
-      var t = EQAuth.getTeacher();
-      var gallery = document.getElementById('mGallery');
-      // Placeholders in order; each photo fills in as it loads.
-      gallery.innerHTML = fileIds.map(function(_, i) {
-        return '<div class="gphoto" id="gph-' + i + '"><span class="gnum">' + (i + 1) + '/' + fileIds.length + '</span><span class="gload">Loading…</span></div>';
-      }).join('');
-      fileIds.forEach(function(fid, i) {
-        EQApi.get({ action: 'getSubmissionPhoto', username: t.username, password: t.password, fileId: fid }).then(function(res) {
-          var box = document.getElementById('gph-' + i);
-          if (!box) return;
-          if (res && res.success && res.dataBase64) {
-            box.innerHTML = '<span class="gnum">' + (i + 1) + '/' + fileIds.length + '</span><img src="data:' + (res.mimeType || 'image/jpeg') + ';base64,' + res.dataBase64 + '"/>';
-          } else { box.querySelector('.gload').textContent = 'Could not load this photo'; }
-        }).catch(function() { var box = document.getElementById('gph-' + i); if (box) box.querySelector('.gload').textContent = 'Network error'; });
-      });
-    }
-
-    function closeModal() { document.getElementById('modalBack').classList.remove('on'); current = null; }
-    document.getElementById('btnClose').onclick = closeModal;
-
-    function review(decision) {
-      if (!current) return;
-      var t = EQAuth.getTeacher();
-      var msg = document.getElementById('mMsg');
-      document.getElementById('btnReviewed').disabled = true;
-      document.getElementById('btnReject').disabled = true;
-      msg.className = 'modal-msg'; msg.textContent = 'Saving…';
-      EQApi.get({ action: 'reviewTaskSubmission', username: t.username, password: t.password, subId: current.subId, decision: decision }).then(function(res) {
-        if (res && res.success) {
-          showToast(decision === 'rejected' ? 'Sent back for resubmit' : 'Marked reviewed', 'ok');
-          closeModal();
-          loadSubs();
-        } else {
-          document.getElementById('btnReviewed').disabled = false;
-          document.getElementById('btnReject').disabled = false;
-          msg.className = 'modal-msg err'; msg.textContent = (res && res.error) || 'Could not save.';
-        }
-      }).catch(function() {
-        document.getElementById('btnReviewed').disabled = false;
-        document.getElementById('btnReject').disabled = false;
-        msg.className = 'modal-msg err'; msg.textContent = 'Network error.';
-      });
-    }
-    document.getElementById('btnReviewed').onclick = function(){ review('reviewed'); };
-    document.getElementById('btnReject').onclick = function(){ review('rejected'); };
-
     (function init() {
       var ok = EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' });
-      if (ok) loadSubs();
+      if (ok) { initClassFilter(); loadSubs(); }
     })();
   </script>
 </body>
