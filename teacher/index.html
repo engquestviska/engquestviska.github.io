@@ -223,14 +223,6 @@
       document.getElementById('loginGate').hidden = true;
     }
 
-    function hashPass(plain) {
-      return crypto.subtle.digest('SHA-256', new TextEncoder().encode(plain)).then(function(buffer) {
-        return Array.from(new Uint8Array(buffer)).map(function(byte) {
-          return byte.toString(16).padStart(2, '0');
-        }).join('');
-      });
-    }
-
     function teacherLogin(event) {
       event.preventDefault();
       var btn = event.target.querySelector('button[type="submit"]');
@@ -243,10 +235,12 @@
 
       EQApi.get({ action: 'checkLogin', username: username, password: password }).then(function(data) {
         if (!data.ok) throw new Error('Incorrect username or password.');
-        return hashPass(password);
-      }).then(function(hashed) {
+        // Store the password exactly as typed. The backend re-hashes it (with a
+        // per-account salt) on every call, so it must receive the plain password
+        // — NOT a pre-hashed one. (The old Apps Script backend also accepted a
+        // pre-hashed value; the Turso/Cloudflare backend does not.)
         sessionStorage.setItem('eq_tu', username);
-        sessionStorage.setItem('eq_tp', hashed);
+        sessionStorage.setItem('eq_tp', password);
         EQAuth.markTeacherVerified(username);
         displayTeacher(username);
         hideLogin();
