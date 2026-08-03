@@ -588,7 +588,7 @@ function buildScoreCardHTML(name, cls, nickname, responses, no) {
   CHAPTERS.forEach(function(ch, i) {
     var res = responses[i] || {};
     var stu = res.students ? res.students.find(function(s) { return String(s.no) === String(no); }) : null;
-    tabsHtml += '<button class="ch-tab' + (i === 0 ? ' active' : '') + '" id="stab' + ch + '" onclick="switchStudentTab(' + ch + ')">Chapter ' + ch + '</button>';
+    tabsHtml += '<button class="ch-tab' + (i === 0 ? ' active' : '') + '" id="stab' + ch + '" onclick="switchStudentTab(' + ch + ')">Unit ' + ch + '</button>';
     blocksHtml += '<div id="sScoreCh' + ch + '"' + (i === 0 ? '' : ' style="display:none"') + '>' + buildStudentChapterHTML(stu, res.inputCols, ch) + '</div>';
   });
   tabsHtml += '<button class="ch-tab" id="stabF" onclick="switchStudentTab(&apos;F&apos;)">&#127942; Final Score</button>';
@@ -775,7 +775,7 @@ function renderLeaderboard(cls) {
   // Build filter buttons via JS (avoids string escaping issues)
   var lbFilters = document.getElementById('lbFilters');
   if (lbFilters) {
-    [['overall','Overall']].concat(CHAPTERS.map(function(ch) { return [String(ch), 'Chapter ' + ch]; })).forEach(function(f) {
+    [['overall','Overall']].concat(CHAPTERS.map(function(ch) { return [String(ch), 'Unit ' + ch]; })).forEach(function(f) {
       var btn = document.createElement('button');
       btn.className = 'lb-filter-btn' + (lbChapter === f[0] ? ' active' : '');
       btn.textContent = f[1];
