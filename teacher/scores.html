@@ -3,870 +3,359 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Student Scores · English Quest</title>
+  <title>Teacher Scores · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css?v=20260702"/>
   <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260702"/>
-  <script src="../shared/js/classes-20260617.js?v=20260712"></script>
-  <script src="../shared/js/student.js"></script>
-  <script src="../shared/js/api.js"></script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --purple: #2563EB; --purple-light: #60A5FA; --purple-soft: #DBEAFE;
-      --purple-mid: #93C5FD; --white: #FFFFFF; --off-white: #F8FAFC;
-      --text-dark: #0F172A; --text-muted: #475569; --border: #DBEAFE;
-      --accent: #F59E0B; --green: #10B981; --red: #EF4444;
+    .score-shell {
+      overflow: hidden;
     }
-    body { font-family: 'IBM Plex Sans', sans-serif; background: var(--off-white); color: var(--text-dark); min-height: 100vh; }
-
-    header { background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 50%, #1E3A8A 100%); padding: 36px 24px 52px; text-align: center; position: relative; overflow: hidden; }
-    header::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px); background-size: 28px 28px; pointer-events: none; }
-    .back-btn { position: absolute; top: 20px; left: 20px; z-index: 2; background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); color: #fff; font-size: 0.88rem; font-weight: 600; padding: 8px 18px; border-radius: 999px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-family: inherit; }
-    .back-btn:hover { background: rgba(255,255,255,0.25); }
-    header h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem,5vw,2.8rem); font-weight: 800; color: #fff; position: relative; z-index: 1; }
-    header h1 span { color: var(--accent); font-style: italic; }
-    .header-sub { color: rgba(255,255,255,0.75); font-size: 0.95rem; margin-top: 8px; position: relative; z-index: 1; }
-    .wave { display: block; width: 100%; margin-top: -2px; }
-
-    main { max-width: 1100px; margin: 0 auto; padding: 28px 20px 80px; }
-
-    /* MODE BADGE */
-    .mode-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; font-family: 'IBM Plex Mono', monospace; margin-bottom: 20px; }
-    .mode-badge.student { background: var(--purple-soft); color: var(--purple); border: 1.5px solid var(--purple-mid); }
-
-    /* FILTERS */
-    .filters { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; align-items: center; }
-    .filter-label { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; }
-    .filter-select { padding: 10px 16px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.9rem; color: var(--text-dark); background: var(--white); outline: none; cursor: pointer; }
-    .filter-select:focus { border-color: var(--purple-light); }
-
-    /* STUDENT PICKER (student mode) */
-    .student-picker { background: var(--white); border: 1.5px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 20px; display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
-    .picker-field { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 160px; }
-    .picker-field label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; font-family: 'IBM Plex Mono', monospace; }
-    .picker-field select { padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.9rem; color: var(--text-dark); background: var(--off-white); outline: none; }
-    .picker-field select:focus { border-color: var(--purple-light); background: #fff; }
-    .btn-view-scores { padding: 11px 24px; background: linear-gradient(135deg, var(--purple), #1D4ED8); color: #fff; border: none; border-radius: 12px; font-weight: 700; font-size: 0.9rem; cursor: pointer; font-family: inherit; white-space: nowrap; }
-
-    /* STUDENT SCORE CARD */
-    .student-score-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; margin-bottom: 20px; }
-    .score-card-header { background: linear-gradient(135deg, var(--purple), #1D4ED8); padding: 20px 24px; display: flex; align-items: center; gap: 16px; }
-    .score-card-avatar { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 800; color: #fff; font-family: 'Playfair Display', serif; flex-shrink: 0; }
-    .score-card-name { color: #fff; }
-    .score-card-name .name { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
-    .score-card-name .meta { font-size: 0.8rem; opacity: 0.8; margin-top: 2px; }
-    .score-card-body { padding: 20px 24px; }
-
-    /* CHAPTER TABS */
-    .chapter-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
-    .ch-tab { padding: 9px 20px; border-radius: 999px; border: 1.5px solid var(--border); background: var(--white); color: var(--text-muted); font-size: 0.85rem; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Mono', monospace; transition: all 0.15s; }
-    .ch-tab.active { background: var(--purple); color: #fff; border-color: var(--purple); }
-
-    /* SCORE GRID (student view) */
-    .score-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
-    .score-tile { background: var(--off-white); border: 1.5px solid var(--border); border-radius: 14px; padding: 14px 16px; text-align: center; }
-    .score-tile-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-family: 'IBM Plex Mono', monospace; margin-bottom: 8px; }
-    .score-tile-val { font-size: 1.5rem; font-weight: 800; font-family: 'IBM Plex Mono', monospace; color: var(--text-dark); }
-    .score-tile-val.empty { color: var(--border); font-size: 1.2rem; }
-    .score-tile.highlight { background: linear-gradient(135deg, var(--purple-soft), #F3E8FF); border-color: var(--purple-mid); }
-    .score-tile.highlight .score-tile-val { color: var(--purple); }
-
-    /* FINAL SUMMARY */
-    .final-summary { display: flex; gap: 12px; flex-wrap: wrap; }
-    .summary-item { flex: 1; min-width: 120px; background: var(--off-white); border: 1.5px solid var(--border); border-radius: 14px; padding: 14px 16px; text-align: center; }
-    .summary-item.grade { background: linear-gradient(135deg, #D1FAE5, #A7F3D0); border-color: #6EE7B7; }
-    .summary-label { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; font-family: 'IBM Plex Mono', monospace; margin-bottom: 6px; }
-    .summary-val { font-size: 1.6rem; font-weight: 800; font-family: 'IBM Plex Mono', monospace; color: var(--text-dark); }
-    .grade-badge { display: inline-block; font-size: 1.6rem; font-weight: 800; font-family: 'IBM Plex Mono', monospace; }
-    .grade-A { color: #065F46; } .grade-B { color: #1E40AF; } .grade-C { color: #92400E; } .grade-D { color: #991B1B; }
-
-    .ind-A { background: #D1FAE5; color: #065F46; } .ind-B { background: #DBEAFE; color: #1E40AF; }
-    .ind-C { background: #FEF3C7; color: #92400E; } .ind-D { background: #FEE2E2; color: #991B1B; }
-    .ind-X { background: var(--off-white); color: var(--text-muted); }
-
-    /* STATE CARDS */
-    .state-card { text-align: center; padding: 60px 20px; }
-    .state-icon { font-size: 2.5rem; margin-bottom: 12px; }
-    .state-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
-    .state-sub { font-size: 0.85rem; color: var(--text-muted); }
-    .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--purple); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    footer { background: var(--text-dark); color: rgba(255,255,255,0.5); text-align: center; padding: 20px; font-size: 0.85rem; }
-    footer strong { color: var(--purple-light); }
-    @media (max-width: 600px) {
-      .filters { flex-direction: column; align-items: stretch; }
-      .score-grid { grid-template-columns: repeat(2, 1fr); }
+    .table-wrap {
+      overflow-x: auto;
     }
-
-    /* ── LEADERBOARD ─────────────────────────────────────────── */
-    .leaderboard { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; margin-top: 28px; }
-    .leaderboard-header { background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); padding: 16px 24px; display: flex; align-items: center; gap: 10px; }
-    .leaderboard-header h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 800; color: #fff; margin: 0; }
-    .leaderboard-header .lb-sub { font-size: 0.78rem; color: rgba(255,255,255,0.8); margin-top: 2px; }
-    .leaderboard-body { padding: 16px 20px; }
-    .lb-row { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 14px; margin-bottom: 8px; background: var(--off-white); border: 1.5px solid var(--border); transition: background 0.15s; }
-    .lb-row:last-child { margin-bottom: 0; }
-    .lb-row.rank-1 { background: linear-gradient(135deg, #FFFBEB, #FEF3C7); border-color: #FCD34D; }
-    .lb-row.rank-2 { background: linear-gradient(135deg, #F8FAFC, #F1F5F9); border-color: #CBD5E1; }
-    .lb-row.rank-3 { background: linear-gradient(135deg, #FFF7ED, #FFEDD5); border-color: #FDBA74; }
-    .lb-medal { font-size: 1.4rem; width: 32px; text-align: center; flex-shrink: 0; }
-    .lb-rank-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); width: 20px; text-align: center; flex-shrink: 0; }
-    .lb-name { flex: 1; font-weight: 600; font-size: 0.92rem; color: var(--text-dark); }
-    .lb-name .lb-nick { font-size: 0.75rem; color: var(--text-muted); font-weight: 400; display: block; }
-    .lb-avg { font-family: 'IBM Plex Mono', monospace; font-size: 1.1rem; font-weight: 800; color: var(--purple); background: var(--purple-soft); border: 1.5px solid var(--purple-mid); padding: 4px 12px; border-radius: 999px; flex-shrink: 0; }
-    .lb-row.rank-1 .lb-avg { color: #92400E; background: #FEF3C7; border-color: #FCD34D; }
-    .lb-filters { display: flex; gap: 8px; margin-bottom: 14px; }
-    .lb-filter-btn { padding: 6px 16px; border-radius: 999px; border: 1.5px solid var(--border); background: var(--white); color: var(--text-muted); font-size: 0.78rem; font-weight: 700; cursor: pointer; font-family: 'IBM Plex Mono', monospace; transition: all 0.15s; }
-    .lb-filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-    .lb-loading { text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.88rem; }
-    .lb-empty { text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.85rem; }
-
-    /* ── SIDEBAR (shared) ───────────────────────────────────── */
-    .hamburger { position:absolute; top:20px; right:20px; z-index:10; background:rgba(255,255,255,0.15); border:1.5px solid rgba(255,255,255,0.3); border-radius:10px; width:40px; height:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; cursor:pointer; padding:0; }
-    .hamburger span { display:block; width:18px; height:2px; background:#fff; border-radius:999px; transition:all 0.3s; }
-    .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
-    .hamburger.open span:nth-child(2) { opacity:0; }
-    .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
-    .sidebar-overlay { position:fixed; inset:0; background:rgba(15,10,40,0.6); backdrop-filter:blur(6px); z-index:300; opacity:0; pointer-events:none; transition:opacity 0.3s; }
-    .sidebar-overlay.open { opacity:1; pointer-events:all; }
-    .sidebar { position:fixed; top:0; right:0; height:100%; width:min(320px,85vw); background:#0F172A; z-index:301; transform:translateX(100%); transition:transform 0.35s cubic-bezier(0.34,1.1,0.64,1); display:flex; flex-direction:column; overflow-y:auto; }
-    .sidebar.open { transform:translateX(0); }
-    .sidebar-head { padding:24px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; gap:12px; }
-    .sidebar-logo { width:36px; height:36px; border-radius:10px; object-fit:cover; }
-    .sidebar-head-text { flex:1; }
-    .sidebar-head-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:800; color:#fff; }
-    .sidebar-head-sub { font-size:0.7rem; color:rgba(255,255,255,0.45); margin-top:1px; }
-    .sidebar-close { width:38px; min-width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.08); border:none; color:rgba(255,255,255,0.5); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
-    .sidebar-section { padding:14px 16px 4px; }
-    .sidebar-section-label { font-size:0.65rem; font-weight:700; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.12em; font-family:'IBM Plex Mono',monospace; padding:0 4px; margin-bottom:6px; }
-    .sidebar-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; text-decoration:none; transition:background 0.15s; margin-bottom:2px; }
-    .sidebar-item:hover, .sidebar-item:active { background:rgba(255,255,255,0.08); }
-    .sidebar-item.active { background:rgba(255,255,255,0.12); border-left:3px solid #60A5FA; padding-left:9px; }
-    .sidebar-item-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0; }
-    .sidebar-item-name { font-size:0.88rem; font-weight:600; color:#fff; flex:1; }
-    .sidebar-item-badge { font-size:0.6rem; font-weight:800; padding:2px 7px; border-radius:999px; font-family:'IBM Plex Mono',monospace; background:#F59E0B; color:#fff; }
-    .sidebar-divider { height:1px; background:rgba(255,255,255,0.07); margin:8px 16px; }
-    .sidebar-home-btn { display:flex; align-items:center; gap:10px; margin:12px 16px 4px; padding:11px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:12px; text-decoration:none; }
-    .sidebar-home-btn:hover { background:rgba(255,255,255,0.1); }
-    .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
-    .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
-
-    /* SCORES REVAMP */
-    body.scores-page {
-      background:
-        radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 30rem),
-        linear-gradient(180deg, #eff6ff 0%, #f8fafc 38%, #f8fafc 100%) !important;
-      color: #0f172a !important;
+    table {
+      width: 100%;
+      min-width: 900px;
+      border-collapse: separate;
+      border-spacing: 0;
     }
-    body.scores-page .subpage-header {
-      text-align: left !important;
-      padding: 24px 28px 28px !important;
-      background: linear-gradient(125deg, #2563eb 0%, #1d4ed8 55%, #1e3a8a 100%) !important;
-      overflow: hidden !important;
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      padding: 14px 12px;
+      background: #1d4ed8;
+      color: #fff;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.74rem;
+      text-align: left;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
     }
-    body.scores-page .subpage-header::before {
-      content: "" !important;
-      position: absolute !important;
-      inset: 0 !important;
-      background-image: none !important;
-      pointer-events: none !important;
+    th.calc { background: #0f172a; }
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #dbeafe;
+      background: rgba(255,255,255,0.94);
+      vertical-align: middle;
     }
-    body.scores-page .topbar {
-      position: relative !important;
-      z-index: 2 !important;
-      width: min(1180px, 100%) !important;
-      margin-inline: auto !important;
-      margin-bottom: 70px !important;
+    tr:nth-child(even) td { background: #f8fbff; }
+    .student-cell {
+      min-width: 230px;
+      font-weight: 800;
     }
-    body.scores-page .brand-title,
-    body.scores-page .brand-sub,
-    body.scores-page .subpage-hero,
-    body.scores-page .subpage-hero h1,
-    body.scores-page .hero-copy {
-      color: #fff !important;
+    .student-meta {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
     }
-    body.scores-page .brand img {
-      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.18) !important;
+    .score-input {
+      width: 92px;
+      min-height: 42px;
+      border-radius: 12px;
+      padding: 0 10px;
+      text-align: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 800;
+      background: #fff;
     }
-    body.scores-page .nav a,
-    body.scores-page .nav button {
-      color: #fff !important;
-      background: rgba(255, 255, 255, 0.12) !important;
-      border-color: rgba(255, 255, 255, 0.35) !important;
-    }
-    body.scores-page .subpage-hero {
-      position: relative !important;
-      z-index: 1 !important;
-      width: min(1180px, 100%) !important;
-      margin-inline: auto !important;
-    }
-    body.scores-page .subpage-hero h1 {
-      max-width: 760px !important;
-      font-size: clamp(1.7rem, 3.5vw, 2.7rem) !important;
-      line-height: 1.1 !important;
-      margin: 12px 0 20px !important;
-      letter-spacing: 0 !important;
-    }
-    body.scores-page .kicker {
-      color: #bfdbfe !important;
-    }
-    body.scores-page .hero-copy {
-      max-width: 670px !important;
-      font-size: 1.05rem !important;
-      line-height: 1.8 !important;
-      opacity: 0.86 !important;
-    }
-    body.scores-page .wave {
-      display: none !important;
-    }
-    body.scores-page main {
-      padding: 26px 28px 80px !important;
-    }
-    body.scores-page #mainContent > * {
-      max-width: 1120px !important;
-      margin-left: auto !important;
-      margin-right: auto !important;
-    }
-    body.scores-page .mode-badge {
-      display: inline-flex !important;
-      margin-bottom: 16px !important;
-      border-radius: 999px !important;
-      background: #fff !important;
-      color: #1d4ed8 !important;
-      border: 1.5px solid #bfdbfe !important;
-      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.08) !important;
-    }
-    body.scores-page .identity-card,
-    body.scores-page .student-score-card,
-    body.scores-page .leaderboard,
-    body.scores-page .state-card {
-      border: 1.5px solid #bfdbfe !important;
-      border-radius: 28px !important;
-      background: rgba(255, 255, 255, 0.96) !important;
-      box-shadow: 0 22px 64px rgba(37, 99, 235, 0.1) !important;
-    }
-    body.scores-page .identity-card {
-      padding: clamp(22px, 4vw, 34px) !important;
-      margin-bottom: 22px !important;
-    }
-    body.scores-page .identity-head {
-      display: flex !important;
-      align-items: center !important;
-      gap: 16px !important;
-      margin-bottom: 20px !important;
-    }
-    body.scores-page .identity-icon {
-      width: 54px !important;
-      height: 54px !important;
-      border-radius: 18px !important;
-      display: grid !important;
-      place-items: center !important;
-      background: #dbeafe !important;
-      color: #1d4ed8 !important;
-      font-size: 1.35rem !important;
-    }
-    body.scores-page .identity-title {
-      font-family: 'Playfair Display', serif !important;
-      font-size: clamp(1.55rem, 3vw, 2.15rem) !important;
-      font-weight: 800 !important;
-      line-height: 1 !important;
-      margin-bottom: 6px !important;
-    }
-    body.scores-page .identity-copy {
-      color: #64748b !important;
-      font-size: 0.95rem !important;
-    }
-    body.scores-page .identity-controls {
-      display: grid !important;
-      grid-template-columns: minmax(150px, 0.45fr) minmax(220px, 1fr) !important;
-      gap: 12px !important;
-    }
-    body.scores-page .filter-select {
-      min-height: 52px !important;
-      border-radius: 16px !important;
-      background: #f8fafc !important;
-      border-color: #bfdbfe !important;
-      color: #0f172a !important;
-      font-weight: 600 !important;
-    }
-    body.scores-page .student-score-card {
-      overflow: hidden !important;
-      margin-bottom: 22px !important;
-    }
-    body.scores-page .score-card-header {
-      background: linear-gradient(135deg, #2563eb, #1e40af) !important;
-      padding: 24px !important;
-    }
-    body.scores-page .score-card-avatar {
-      width: 58px !important;
-      height: 58px !important;
-      border-radius: 18px !important;
-      background: rgba(255, 255, 255, 0.2) !important;
-      font-family: 'IBM Plex Mono', monospace !important;
-    }
-    body.scores-page .score-card-name .name {
-      font-size: clamp(1.3rem, 2.3vw, 1.85rem) !important;
-      line-height: 1.05 !important;
-    }
-    body.scores-page .score-card-body {
-      padding: clamp(18px, 4vw, 28px) !important;
-    }
-    body.scores-page .chapter-tabs,
-    body.scores-page .lb-filters {
-      display: flex !important;
-      gap: 10px !important;
-      flex-wrap: wrap !important;
-    }
-    body.scores-page .ch-tab,
-    body.scores-page .lb-filter-btn {
-      min-height: 42px !important;
-      border-radius: 999px !important;
-      font-weight: 800 !important;
-      border-color: #bfdbfe !important;
-    }
-    body.scores-page .score-grid {
-      display: grid !important;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
-      gap: 12px !important;
-    }
-    body.scores-page .score-tile,
-    body.scores-page .summary-item {
-      border-radius: 20px !important;
-      background: linear-gradient(135deg, #fff, #f8fbff) !important;
-      border-color: #dbeafe !important;
-      min-height: 112px !important;
-      display: grid !important;
-      align-content: center !important;
-      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04) !important;
-    }
-    body.scores-page .score-tile-val,
-    body.scores-page .summary-val {
-      color: #0f172a !important;
-      font-size: clamp(1.6rem, 3vw, 2rem) !important;
-    }
-    body.scores-page .score-tile.highlight,
-    body.scores-page .summary-item.grade {
-      background: linear-gradient(135deg, #dbeafe, #bfdbfe) !important;
-      border-color: #93c5fd !important;
-    }
-    body.scores-page .final-summary {
-      display: grid !important;
-      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-      gap: 12px !important;
-    }
-    body.scores-page .leaderboard {
-      overflow: hidden !important;
-      margin-top: 22px !important;
-    }
-    body.scores-page .leaderboard-header {
-      background: linear-gradient(135deg, #0f172a, #1e3a8a) !important;
-      padding: 20px 24px !important;
-    }
-    body.scores-page .leaderboard-body {
-      padding: 18px !important;
-    }
-    body.scores-page .lb-row {
-      border-radius: 18px !important;
-      background: #f8fafc !important;
-      border-color: #dbeafe !important;
-    }
-    body.scores-page footer {
-      background: transparent !important;
-      color: #64748b !important;
-    }
-    @media (max-width: 720px) {
-      body.scores-page .subpage-header {
-        padding: 18px 14px 22px !important;
-      }
-      body.scores-page .topbar {
-        margin-bottom: 8px !important;
-      }
-      body.scores-page .subpage-hero h1 {
-        font-size: clamp(1.5rem, 6vw, 2rem) !important;
-      }
-      body.scores-page main {
-        padding: 18px 14px 60px !important;
-      }
-      body.scores-page .identity-controls,
-      body.scores-page .final-summary {
-        grid-template-columns: 1fr !important;
-      }
-      body.scores-page .score-card-header,
-      body.scores-page .identity-head {
-        align-items: flex-start !important;
-      }
+    .score-input.saved { border-color: #34d399; background: var(--green-soft); }
+    .score-input.error { border-color: #f87171; background: var(--red-soft); }
+    .score-input.saving { border-color: var(--amber); background: var(--amber-soft); }
+    .calc-pill {
+      display: inline-flex;
+      min-width: 72px;
+      min-height: 34px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      padding: 0 12px;
+      background: var(--blue-soft);
+      color: #1d4ed8;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 800;
+      white-space: nowrap;
     }
   </style>
-  <script src="../shared/js/sidebar.js?v=20260711"></script>
+  <script src="../shared/js/classes-20260617.js?v=20260712"></script>
+  <script src="../shared/js/api.js"></script>
+  <script src="../shared/js/dom-utils.js"></script>
+  <script src="../shared/js/auth.js"></script>
+  <script src="../shared/js/teacher-sidebar.js?v=20260723"></script>
 </head>
-<body class="grade10-subpage scores-page" data-page="scores">
-
-<header class="subpage-header">
-  <div class="topbar">
-    <div class="brand">
-      <img src="../logo.jpg" alt="English Quest Logo"/>
-      <div>
-        <div class="brand-title">English Quest</div>
-        <div class="brand-sub">Grade 10 Student Track</div>
+<body class="teacher-tool-page" data-page="scores">
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <img src="../logo.jpg" alt="English Quest Logo"/>
+        <div>
+          <div class="brand-title">English Quest</div>
+          <div class="brand-sub">Teacher Control Room</div>
+        </div>
       </div>
+      <nav class="nav-actions" aria-label="Teacher navigation">
+        <a href="index.html">Dashboard</a>
+        <a href="../grade10/scores.html">Student View</a>
+        <button type="button" onclick="teacherLogout()">Logout</button>
+      </nav>
     </div>
-    <nav class="nav" aria-label="Main navigation">
-      <a href="index.html">Grade 10 Home</a>
-      <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><span></span><span></span><span></span></button>
-    </nav>
-  </div>
+    <section class="hero">
+      <div class="kicker">Scores Manager</div>
+      <h1>Edit unit and final scores in one table.</h1>
+      <p class="hero-copy">Load a Grade 10 class, switch between Unit 1, Unit 2, Unit 3, and Final Scores, then update editable score cells directly from the teacher room.</p>
+    </section>
+  </header>
 
-  <section class="subpage-hero">
-    <div class="kicker">Scores</div>
-    <h1>Check your scores without digging through sheets.</h1>
-    <p class="hero-copy">Open your own score summary from a clean, read-only view.</p>
-  </section>
-</header>
-<svg class="wave" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 48" preserveAspectRatio="none">
-  <path fill="#1E3A8A" d="M0,32 C360,0 1080,64 1440,32 L1440,0 L0,0 Z"/>
-  <path fill="#F8FAFC" d="M0,48 C360,16 1080,64 1440,32 L1440,48 Z"/>
-</svg>
+  <main>
+    <section class="access-card" id="accessCard" hidden>
+      <h2 class="access-title">Teacher login required.</h2>
+      <p class="access-copy">Open the teacher dashboard and log in first. This page uses the saved teacher session to write score changes.</p>
+      <a class="btn" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none;">Open Teacher Login</a>
+    </section>
 
-<main id="mainContent"></main>
+    <section id="appPanel" hidden>
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2 class="panel-title">Grade 10 Score Records</h2>
+            <p class="panel-copy">Editable cells save immediately when changed. Calculated columns stay read-only and refresh when the class is loaded again.</p>
+          </div>
+          <div class="status-pill" id="loginPill">Teacher</div>
+        </div>
 
-<footer>© 2026 <strong>English Quest</strong> · SMA Negeri 6 Surakarta</footer>
+        <div class="controls">
+          <div>
+            <label for="classSelect">Class</label>
+            <select id="classSelect" data-eq-class-select data-grade="10"></select>
+          </div>
+          <div>
+            <label for="searchInput">Search student</label>
+            <input id="searchInput" type="search" placeholder="Type name, nickname, or number"/>
+          </div>
+          <button class="btn" type="button" id="loadBtn" onclick="loadScores()">Load Scores</button>
+        </div>
 
-<script>
-const CLASSES = window.EQClasses ? EQClasses.idsForGrade('10') : ['XE1','XE2','XE3','XE4','XE5'];
-const CLASS_LABELS = window.EQClasses ? EQClasses.labels : { XE1:'X E-1', XE2:'X E-2', XE3:'X E-3', XE4:'X E-4', XE5:'X E-5' };
-const ROSTERS_READY = window.EQClasses ? EQClasses.rostersReady() : false;
+        <div class="summary-grid" id="summaryGrid">
+          <div class="summary-card"><strong>0</strong><span>Students</span></div>
+          <div class="summary-card"><strong>0</strong><span>Editable Columns</span></div>
+          <div class="summary-card"><strong>0</strong><span>Filled Cells</span></div>
+          <div class="summary-card"><strong>0</strong><span>Empty Cells</span></div>
+        </div>
+      </div>
 
-var currentClass   = localStorage.getItem('eq_last_class') || 'XE1';
-if (CLASSES.indexOf(currentClass) === -1) currentClass = 'XE1';
-var allStudents    = [];
+      <div class="toolbar">
+        <div class="tabs" id="tabs">
+          <button class="tab active" type="button" data-mode="4" onclick="setMode('4')">Unit 1</button>
+          <button class="tab" type="button" data-mode="5" onclick="setMode('5')">Unit 2</button>
+          <button class="tab" type="button" data-mode="6" onclick="setMode('6')">Unit 3</button>
+          <button class="tab" type="button" data-mode="final" onclick="setMode('final')">Final Scores</button>
+        </div>
+      </div>
 
+      <div id="scoreArea"></div>
+    </section>
+  </main>
 
-// ── CACHE LAYER ───────────────────────────────────────────────
-var CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+  <footer>© 2026 English Quest · Teacher Scores Manager</footer>
+  <div class="toast" id="toast"></div>
 
-function cacheKey(params) {
-  var sorted = Object.keys(params).sort();
-  var parts = sorted.map(function(k) { return k + '=' + params[k]; });
-  return 'eq_cache_' + parts.join('_').replace(/[^a-zA-Z0-9_=]/g, '_');
-}
+  <script>
+    var mode = '4';
+    var scoreData = { students: [], inputCols: [], calcCols: [] };
 
-function cacheGet(params) {
-  try {
-    var raw = localStorage.getItem(cacheKey(params));
-    if (!raw) return null;
-    var entry = JSON.parse(raw);
-    if (Date.now() - entry.ts > CACHE_TTL) { localStorage.removeItem(cacheKey(params)); return null; }
-    return entry.data;
-  } catch(e) { return null; }
-}
-
-function cacheSet(params, data) {
-  try { localStorage.setItem(cacheKey(params), JSON.stringify({ ts: Date.now(), data: data })); } catch(e) {}
-}
-
-function cachedApiGet(params) {
-  var cached = cacheGet(params);
-  if (cached) {
-    // Return cache immediately, refresh in background
-    EQApi.get(params).then(function(fresh) { cacheSet(params, fresh); }).catch(function() {});
-    return Promise.resolve(cached);
-  }
-  return EQApi.get(params).then(function(data) { cacheSet(params, data); return data; });
-}
-
-function escapeHtml(value) {
-  if (window.EQStudent && typeof EQStudent.escapeHtml === 'function') {
-    return EQStudent.escapeHtml(value);
-  }
-  return String(value === undefined || value === null ? '' : value)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-
-function init() {
-  renderStudentMode();
-}
-
-function renderPreRosterScores() {
-  document.getElementById('mainContent').innerHTML =
-    '<div class="mode-badge student">&#128203; Student View</div>' +
-    '<div class="state-card">' +
-      '<div class="state-icon">&#128101;</div>' +
-      '<div class="state-title">Scores are not available right now.</div>' +
-      '<div class="state-sub">Please reload the page or try again later.</div>' +
-    '</div>';
-}
-
-// ── STUDENT MODE ─────────────────────────────────────────────
-function renderStudentMode() {
-  if (!ROSTERS_READY) {
-    renderPreRosterScores();
-    return;
-  }
-  var main = document.getElementById('mainContent');
-
-  // Check if student identity is saved
-  var profile = EQStudent.read('10');
-  var savedCls = profile.classId;
-  var savedNo = profile.studentNo;
-  var savedName = profile.studentName;
-
-  if (profile.hasProfile) {
-    // Auto-load their scores directly
-    var clsLabel = CLASS_LABELS[savedCls] || savedCls;
-    main.innerHTML =
-      '<div class="mode-badge student">&#128203; ' + escapeHtml(savedName.split(' ')[0]) + ' &mdash; ' + escapeHtml(clsLabel) + ' <span onclick="forgetStudent()" style="margin-left:8px;cursor:pointer;opacity:0.7;font-size:0.85em;">&#10005; Not you?</span></div>' +
-      '<div id="sResult"><div class="state-card"><div class="spinner"></div><div class="state-title">Loading your scores...</div></div></div>';
-
-    currentClass = savedCls;
-    autoLoadStudentScores(savedCls, savedNo, savedName);
-    return;
-  }
-
-  // No identity saved — show picker
-  var classOptions = CLASSES.map(function(c) {
-    return '<option value="' + escapeHtml(c) + '"' + (c === currentClass ? ' selected' : '') + '>' + escapeHtml(CLASS_LABELS[c]) + '</option>';
-  }).join('');
-
-  main.innerHTML =
-    '<div class="mode-badge student">&#128203; Student View</div>' +
-    '<div class="identity-card">' +
-      '<div class="identity-head">' +
-        '<div class="identity-icon">&#128100;</div>' +
-        '<div>' +
-          '<div class="identity-title">Choose your score profile.</div>' +
-          '<div class="identity-copy">Pick your class and name to open your score records.</div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="identity-controls">' +
-        '<select class="filter-select" id="sClass">' + classOptions + '</select>' +
-        '<select class="filter-select" id="sStudent"><option value="">-- Select class first --</option></select>' +
-      '</div>' +
-    '</div>' +
-    '<div id="sResult"></div>';
-
-  document.getElementById('sClass').addEventListener('change', function() {
-    currentClass = this.value;
-    localStorage.setItem('eq_last_class', currentClass);
-    loadStudentList();
-    document.getElementById('sResult').innerHTML = '';
-  });
-  document.addEventListener('change', function(e) {
-    if (e.target && e.target.id === 'sStudent' && e.target.value) {
-      viewStudentScores();
-    }
-  });
-  loadStudentList();
-}
-
-function forgetStudent() {
-  EQStudent.clear();
-  renderStudentMode();
-}
-
-var CHAPTERS = [1, 2, 3];
-
-// Fetch every chapter (1..3) + the final Scores tab for a class, in parallel.
-function fetchStudentScores(cls) {
-  var calls = CHAPTERS.map(function(ch) {
-    return cachedApiGet({ action: 'getChapterScores', className: cls, chapter: ch });
-  });
-  calls.push(cachedApiGet({ action: 'getFinalScores', className: cls }).then(function(r) { return r && !r.error ? r : {}; }).catch(function() { return {}; }));
-  return Promise.all(calls);
-}
-
-// Build the student score card (chapter tabs + final) from responses [ch1,ch2,ch3,final].
-function buildScoreCardHTML(name, cls, nickname, responses, no) {
-  var initial = name ? name.charAt(0).toUpperCase() : '?';
-  var tabsHtml = '', blocksHtml = '';
-  CHAPTERS.forEach(function(ch, i) {
-    var res = responses[i] || {};
-    var stu = res.students ? res.students.find(function(s) { return String(s.no) === String(no); }) : null;
-    tabsHtml += '<button class="ch-tab' + (i === 0 ? ' active' : '') + '" id="stab' + ch + '" onclick="switchStudentTab(' + ch + ')">Unit ' + ch + '</button>';
-    blocksHtml += '<div id="sScoreCh' + ch + '"' + (i === 0 ? '' : ' style="display:none"') + '>' + buildStudentChapterHTML(stu, res.inputCols, ch) + '</div>';
-  });
-  tabsHtml += '<button class="ch-tab" id="stabF" onclick="switchStudentTab(&apos;F&apos;)">&#127942; Final Score</button>';
-  var finRes = responses[CHAPTERS.length] || {};
-  var finStu = finRes.students ? finRes.students.find(function(s) { return String(s.no) === String(no); }) : null;
-  var finHtml = buildStudentFinalHTML(finStu, finRes.inputCols, finRes.calcCols);
-  return '<div class="student-score-card">' +
-      '<div class="score-card-header">' +
-        '<div class="score-card-avatar">' + escapeHtml(initial) + '</div>' +
-        '<div class="score-card-name">' +
-          '<div class="name">' + escapeHtml(name || '') + '</div>' +
-          '<div class="meta">' + escapeHtml(CLASS_LABELS[cls] || cls) + (nickname ? ' &middot; ' + escapeHtml(nickname) : '') + '</div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="score-card-body">' +
-        '<div class="chapter-tabs">' + tabsHtml + '</div>' +
-        blocksHtml +
-        '<div id="sScoreF" style="display:none">' + finHtml + '</div>' +
-      '</div>' +
-    '</div>' +
-    '<div id="leaderboardArea"></div>';
-}
-
-function autoLoadStudentScores(cls, no, name) {
-  fetchStudentScores(cls).then(function(responses) {
-    document.getElementById('sResult').innerHTML = buildScoreCardHTML(name, cls, '', responses, no);
-    renderLeaderboard(cls);
-  }).catch(function(e) {
-    document.getElementById('sResult').innerHTML = '<div class="state-card"><div class="state-icon">&#8635;</div><div class="state-title">Scores are temporarily unavailable</div><div class="state-sub">Your records have not been changed. Please reload the page or try again later.</div></div>';
-  });
-}
-function loadStudentList() {
-  var sel = document.getElementById('sStudent');
-  sel.innerHTML = '<option value="">Loading...</option>';
-  EQApi.get({ action: 'getStudents', className: currentClass }).then(function(res) {
-    if (res && res.error) throw new Error(res.error);
-    allStudents = (res && res.students) || [];
-    if (!Array.isArray(allStudents) || !allStudents.length) {
-      allStudents = [];
-      sel.innerHTML = '<option value="">No students found</option>';
-      document.getElementById('sResult').innerHTML = '<div class="state-card"><div class="state-icon">&#128101;</div><div class="state-title">No students in this class</div><div class="state-sub">Please reload the page, or pick a different class.</div></div>';
-      return;
-    }
-    sel.innerHTML = '<option value="">-- Select your name --</option>';
-    allStudents.forEach(function(s) {
-      var label = s.nickname ? s.name + ' (' + s.nickname + ')' : s.name;
-      sel.innerHTML += '<option value="' + escapeHtml(s.no) + '">' + escapeHtml(label) + '</option>';
-    });
-  }).catch(function() {
-    allStudents = [];
-    sel.innerHTML = '<option value="">Roster temporarily unavailable</option>';
-    document.getElementById('sResult').innerHTML = '<div class="state-card"><div class="state-icon">&#8635;</div><div class="state-title">Roster could not be loaded</div><div class="state-sub">Please reload the page or try again later.</div></div>';
-  });
-}
-
-function viewStudentScores() {
-  var studentNo = document.getElementById('sStudent').value;
-  if (!studentNo) return;
-  var student = allStudents.find(function(s) { return String(s.no) === String(studentNo); });
-  var result = document.getElementById('sResult');
-  result.innerHTML = '<div class="state-card"><div class="spinner"></div><div class="state-title">Loading scores...</div></div>';
-
-  // Save identity so other student pages can auto-load the same profile.
-  if (student) {
-    EQStudent.save({
-      grade: '10',
-      classId: currentClass,
-      studentNo: studentNo,
-      studentName: student.name
-    });
-  }
-
-  // Load chapters + final in parallel
-  fetchStudentScores(currentClass).then(function(responses) {
-    renderStudentScoreCard(student, responses, studentNo);
-  }).catch(function() {
-    result.innerHTML = '<div class="state-card"><div class="state-icon">&#8635;</div><div class="state-title">Scores are temporarily unavailable</div><div class="state-sub">Your records have not been changed. Please reload the page or try again later.</div></div>';
-  });
-}
-
-function renderStudentScoreCard(student, responses, no) {
-  document.getElementById('sResult').innerHTML =
-    buildScoreCardHTML(student ? student.name : '', currentClass, student && student.nickname ? student.nickname : '', responses, no);
-  renderLeaderboard(currentClass);
-}
-
-function buildStudentChapterHTML(chData, cols, ch) {
-  if (!chData) return '<div class="state-card"><div class="state-icon">&#128203;</div><div class="state-title">No data yet</div><div class="state-sub">This unit score has not been entered yet.</div></div>';
-
-  var html = '<div class="score-grid">';
-  if (cols) {
-    cols.forEach(function(col) {
-      var val = chData.scores[col];
-      var isEmpty = val === '' || val === undefined || val === null;
-      html += '<div class="score-tile"><div class="score-tile-label">' + escapeHtml(col) + '</div><div class="score-tile-val' + (isEmpty ? ' empty' : '') + '">' + (isEmpty ? '-' : escapeHtml(val)) + '</div></div>';
-    });
-  }
-  html += '</div>';
-
-  // Summary row
-  var avg   = chData.average   !== '' && chData.average   !== undefined ? Number(chData.average).toFixed(1)   : '-';
-  var final = chData.finalScore !== '' && chData.finalScore !== undefined ? Number(chData.finalScore).toFixed(1) : '-';
-  var ind   = chData.indicator || '-';
-  var gradeClass = ind !== '-' ? 'grade-' + ind.charAt(0).toUpperCase() : '';
-
-  html += '<div class="final-summary">';
-  html += '<div class="summary-item"><div class="summary-label">Final Score</div><div class="summary-val">' + escapeHtml(final) + '</div></div>';
-  html += '<div class="summary-item grade"><div class="summary-label">Grade</div><div class="summary-val"><span class="grade-badge ' + escapeHtml(gradeClass) + '">' + escapeHtml(ind) + '</span></div></div>';
-  html += '</div>';
-
-  return html;
-}
-
-function buildStudentFinalHTML(finData, inputCols, calcCols) {
-  if (!finData) return '<div class="state-card"><div class="state-icon">&#128203;</div><div class="state-title">No data yet</div><div class="state-sub">Final scores haven&#39;t been entered yet.</div></div>';
-
-  var html = '<div class="score-grid">';
-
-  // Input cols — plain tiles
-  if (inputCols) {
-    inputCols.forEach(function(col) {
-      var val = finData.scores ? finData.scores[col] : '';
-      var isEmpty = val === '' || val === undefined || val === null;
-      html += '<div class="score-tile"><div class="score-tile-label">' + escapeHtml(col) + '</div><div class="score-tile-val' + (isEmpty ? ' empty' : '') + '">' + (isEmpty ? '-' : escapeHtml(val)) + '</div></div>';
-    });
-  }
-
-  // Calc cols — highlighted purple tiles (same style as chapter summary)
-  if (calcCols && calcCols.length && finData.calc) {
-    calcCols.forEach(function(col) {
-      var val = finData.calc[col];
-      var isEmpty = val === '' || val === undefined || val === null;
-      var isGrade = /indicator|grade|indikator/i.test(col);
-      if (isGrade) {
-        var ind = isEmpty ? '-' : String(val);
-        var gradeClass = ind !== '-' ? 'grade-' + ind.charAt(0).toUpperCase() : '';
-        html += '<div class="score-tile highlight"><div class="score-tile-label">' + escapeHtml(col) + '</div><div class="score-tile-val"><span class="grade-badge ' + escapeHtml(gradeClass) + '">' + escapeHtml(ind) + '</span></div></div>';
-      } else {
-        var num = isEmpty ? '-' : (isNaN(Number(val)) ? val : Number(val).toFixed(1));
-        html += '<div class="score-tile highlight"><div class="score-tile-label">' + escapeHtml(col) + '</div><div class="score-tile-val">' + (isEmpty ? '-' : escapeHtml(num)) + '</div></div>';
-      }
-    });
-  }
-
-  html += '</div>';
-  return html;
-}
-
-function switchStudentTab(ch) {
-  CHAPTERS.forEach(function(c) {
-    var tab = document.getElementById('stab' + c);
-    var blk = document.getElementById('sScoreCh' + c);
-    if (tab) tab.className = 'ch-tab' + (ch === c ? ' active' : '');
-    if (blk) blk.style.display = (ch === c) ? '' : 'none';
-  });
-  var stabF = document.getElementById('stabF');
-  if (stabF) stabF.className = 'ch-tab' + (ch === 'F' ? ' active' : '');
-  var sScoreF = document.getElementById('sScoreF');
-  if (sScoreF) sScoreF.style.display = (ch === 'F') ? '' : 'none';
-}
-
-// ── LEADERBOARD ───────────────────────────────────────────────
-var lbChapter = 'overall'; // 'overall' | '1' | '2' | '3'
-
-function renderLeaderboard(cls) {
-  var container = document.getElementById('leaderboardArea');
-  if (!container) return;
-  var clsLabel = CLASS_LABELS[cls] || cls;
-  container.innerHTML =
-    '<div class="leaderboard">' +
-      '<div class="leaderboard-header">' +
-        '<div>' +
-          '<h3>&#127942; Class Leaderboard</h3>' +
-          '<div class="lb-sub">' + escapeHtml(clsLabel) + ' &mdash; Top 5 by Average Score</div>' +
-        '</div>' +
-      '</div>' +
-      '<div class="leaderboard-body">' +
-        '<div class="lb-filters" id="lbFilters"></div>' +
-        '<div id="lbRankings"><div class="lb-loading"><div class="spinner" style="width:24px;height:24px;margin:0 auto 8px;"></div>Loading leaderboard...</div></div>' +
-      '</div>' +
-    '</div>';
-
-  loadLbRankings(cls);
-  // Build filter buttons via JS (avoids string escaping issues)
-  var lbFilters = document.getElementById('lbFilters');
-  if (lbFilters) {
-    [['overall','Overall']].concat(CHAPTERS.map(function(ch) { return [String(ch), 'Unit ' + ch]; })).forEach(function(f) {
-      var btn = document.createElement('button');
-      btn.className = 'lb-filter-btn' + (lbChapter === f[0] ? ' active' : '');
-      btn.textContent = f[1];
-      btn.dataset.f = f[0];
-      btn.onclick = function() { switchLbFilter(cls, f[0]); };
-      lbFilters.appendChild(btn);
-    });
-  }
-}
-
-function switchLbFilter(cls, chapter) {
-  lbChapter = chapter;
-  // Update button styles
-  document.querySelectorAll('.lb-filter-btn').forEach(function(btn) {
-    btn.classList.toggle('active', btn.dataset.f === chapter);
-  });
-  document.getElementById('lbRankings').innerHTML = '<div class="lb-loading"><div class="spinner" style="width:24px;height:24px;margin:0 auto 8px;"></div>Loading...</div>';
-  loadLbRankings(cls);
-}
-
-function loadLbRankings(cls) {
-  Promise.all(CHAPTERS.map(function(ch) {
-    return cachedApiGet({ action: 'getChapterScores', className: cls, chapter: ch });
-  })).then(function(responses) {
-    // Build map: studentNo -> { name, nickname, avgs: {chapter: value} }
-    var map = {};
-    CHAPTERS.forEach(function(ch, i) {
-      var students = (responses[i] && responses[i].students) || [];
-      students.forEach(function(s) {
-        if (!map[s.no]) map[s.no] = { name: s.name, nickname: s.nickname || '', avgs: {} };
-        var v = Number(s.average);
-        if (s.average !== '' && s.average !== undefined && s.average !== null && !isNaN(v))
-          map[s.no].avgs[ch] = v;
+    function setMode(nextMode) {
+      mode = nextMode;
+      document.querySelectorAll('.tab').forEach(function(tab) {
+        var active = tab.getAttribute('data-mode') === nextMode;
+        tab.classList.toggle('active', active);
       });
-    });
-
-    // Compute score based on selected filter
-    var ranked = [];
-    Object.keys(map).forEach(function(no) {
-      var entry = map[no];
-      var score = null;
-      if (lbChapter === 'overall') {
-        var vals = CHAPTERS.map(function(ch) { return entry.avgs[ch]; }).filter(function(v) { return v !== undefined && v !== null; });
-        if (vals.length) score = vals.reduce(function(a, b) { return a + b; }, 0) / vals.length;
-      } else {
-        var sv = entry.avgs[Number(lbChapter)];
-        score = (sv === undefined) ? null : sv;
-      }
-      if (score === null || isNaN(score)) return;
-      ranked.push({ name: entry.name, nickname: entry.nickname, avg: score });
-    });
-
-    ranked.sort(function(a, b) { return b.avg - a.avg; });
-    var top5 = ranked.slice(0, 5);
-    var rankings = document.getElementById('lbRankings');
-    if (!rankings) return;
-
-    if (!top5.length) {
-      rankings.innerHTML = '<div class="lb-empty">No scores available yet.</div>';
-      return;
+      loadScores();
     }
 
-    var medals = ['&#129351;','&#129352;','&#129353;'];
-    var html = '';
-    var displayRank = 1;
-    top5.forEach(function(s, i) {
-      if (i > 0 && s.avg === top5[i - 1].avg) { /* tied */ }
-      else { displayRank = i + 1; }
-      var rankClass = displayRank <= 3 ? ' rank-' + displayRank : '';
-      var medal     = displayRank <= 3 ? medals[displayRank - 1] : '';
-      var rankNum   = displayRank > 3  ? '#' + displayRank : '';
-      html += '<div class="lb-row' + rankClass + '">';
-      html += '<div class="lb-medal">' + medal + '</div>';
-      html += '<div class="lb-rank-num">' + rankNum + '</div>';
-      html += '<div class="lb-name">' + escapeHtml(s.name) + (s.nickname ? '<span class="lb-nick">' + escapeHtml(s.nickname) + '</span>' : '') + '</div>';
-      html += '<div class="lb-avg">' + s.avg.toFixed(1) + '</div>';
-      html += '</div>';
-    });
-    rankings.innerHTML = html;
-  }).catch(function() {
-    var rankings = document.getElementById('lbRankings');
-    if (rankings) rankings.innerHTML = '<div class="lb-empty">Could not load leaderboard.</div>';
-  });
-}
+    function loadScores() {
+      var cls = document.getElementById('classSelect').value;
+      var btn = document.getElementById('loadBtn');
+      btn.disabled = true;
+      btn.textContent = 'Loading...';
+      document.getElementById('scoreArea').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading scores...</h2><p class="empty-copy">Fetching ' + escapeHtml(EQApi.classLabels[cls] || cls) + ' score records.</p></div>';
+      var params = mode === 'final'
+        ? { action: 'getFinalScores', className: cls }
+        : { action: 'getChapterScores', className: cls, chapter: mode };
+      EQApi.get(params).then(function(data) {
+        if (data.error) throw new Error(data.error);
+        scoreData = {
+          students: data.students || [],
+          inputCols: data.inputCols || [],
+          calcCols: data.calcCols || []
+        };
+        renderScores();
+        showToast('Scores loaded', 'ok');
+      }).catch(function(err) {
+        document.getElementById('scoreArea').innerHTML = '<div class="empty-card"><h2 class="empty-title">Could not load scores.</h2><p class="empty-copy">' + escapeHtml(err.message) + '</p></div>';
+        showToast(err.message, 'err');
+      }).finally(function() {
+        btn.disabled = false;
+        btn.textContent = 'Load Scores';
+        updateSummary();
+      });
+    }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
-</script>
+    function renderScores() {
+      var query = document.getElementById('searchInput').value.trim().toLowerCase();
+      var students = scoreData.students.filter(function(student) {
+        var searchable = [student.no, student.name, student.nickname].join(' ').toLowerCase();
+        return !query || searchable.indexOf(query) > -1;
+      });
+      if (!scoreData.students.length) {
+        document.getElementById('scoreArea').innerHTML = '<div class="empty-card"><h2 class="empty-title">No score data yet.</h2><p class="empty-copy">Try another class or tab.</p></div>';
+        updateSummary();
+        return;
+      }
+      if (!students.length) {
+        document.getElementById('scoreArea').innerHTML = '<div class="empty-card"><h2 class="empty-title">No matching students.</h2><p class="empty-copy">Try a different search.</p></div>';
+        updateSummary();
+        return;
+      }
 
+      var calcCols = mode === 'final' ? scoreData.calcCols : ['Average', 'Final Score', 'Indicator'];
+      var head = '<tr><th>Student</th>' +
+        scoreData.inputCols.map(function(col) { return '<th>' + escapeHtml(col) + '</th>'; }).join('') +
+        calcCols.map(function(col) { return '<th class="calc">' + escapeHtml(col) + '</th>'; }).join('') +
+        '</tr>';
+      var rows = students.map(function(student) {
+        return '<tr>' +
+          '<td class="student-cell">' + escapeHtml(student.name) + '<span class="student-meta">No. ' + escapeHtml(student.no) + (student.nickname ? ' · ' + escapeHtml(student.nickname) : '') + '</span></td>' +
+          scoreData.inputCols.map(function(col) {
+            var val = student.scores && student.scores[col] !== undefined ? student.scores[col] : '';
+            return '<td><input class="score-input" type="number" inputmode="decimal" min="0" max="100" step="0.01" value="' + escapeHtml(val) + '" data-no="' + escapeHtml(student.no) + '" data-col="' + escapeHtml(col) + '" onchange="saveScore(this)"/></td>';
+          }).join('') +
+          calcCols.map(function(col) {
+            var val = calcValue(student, col);
+            return '<td><span class="calc-pill">' + (val === '' || val === undefined || val === null ? '-' : escapeHtml(val)) + '</span></td>';
+          }).join('') +
+        '</tr>';
+      }).join('');
+
+      document.getElementById('scoreArea').innerHTML =
+        '<section class="score-shell"><div class="table-wrap"><table><thead>' + head + '</thead><tbody>' + rows + '</tbody></table></div></section>';
+      updateSummary();
+    }
+
+    function calcValue(student, col) {
+      if (mode === 'final') return student.calc ? student.calc[col] : '';
+      if (col === 'Average') return student.average;
+      if (col === 'Final Score') return student.finalScore;
+      if (col === 'Indicator') return student.indicator;
+      return '';
+    }
+
+    function saveScore(input) {
+      var credentials = EQAuth.getTeacher();
+      if (!credentials.username || !credentials.password) {
+        showAccess();
+        return;
+      }
+      var value = input.value;
+      if (value !== '' && (Number(value) < 0 || Number(value) > 100)) {
+        input.className = 'score-input error';
+        showToast('Score must be between 0 and 100', 'err');
+        return;
+      }
+      input.className = 'score-input saving';
+      input.disabled = true;
+      var cls = document.getElementById('classSelect').value;
+      var params = mode === 'final'
+        ? {
+            action: 'saveFinalScore',
+            username: credentials.username,
+            password: credentials.password,
+            className: cls,
+            studentNo: input.getAttribute('data-no'),
+            column: input.getAttribute('data-col'),
+            value: value
+          }
+        : {
+            action: 'saveChapterScore',
+            username: credentials.username,
+            password: credentials.password,
+            className: cls,
+            chapter: mode,
+            studentNo: input.getAttribute('data-no'),
+            column: input.getAttribute('data-col'),
+            value: value
+          };
+      EQApi.get(params).then(function(data) {
+        if (!data || data.error || data.success === false) throw new Error((data && data.error) || 'Save failed');
+        updateLocalValue(input.getAttribute('data-no'), input.getAttribute('data-col'), value, data.calc);
+        input.className = 'score-input saved';
+        showToast('Score saved', 'ok');
+        setTimeout(function() { input.className = 'score-input'; }, 900);
+        updateSummary();
+      }).catch(function(err) {
+        input.className = 'score-input error';
+        showToast(err.message, 'err');
+      }).finally(function() {
+        input.disabled = false;
+      });
+    }
+
+    function updateLocalValue(studentNo, column, value, calc) {
+      var student = scoreData.students.find(function(item) { return String(item.no) === String(studentNo); });
+      if (!student) return;
+      if (!student.scores) student.scores = {};
+      student.scores[column] = value;
+      if (mode === 'final' && calc) student.calc = Object.assign(student.calc || {}, calc);
+    }
+
+    function updateSummary() {
+      var filled = 0;
+      var editable = scoreData.students.length * scoreData.inputCols.length;
+      scoreData.students.forEach(function(student) {
+        scoreData.inputCols.forEach(function(col) {
+          var value = student.scores ? student.scores[col] : '';
+          if (value !== '' && value !== undefined && value !== null) filled++;
+        });
+      });
+      document.getElementById('summaryGrid').innerHTML =
+        '<div class="summary-card"><strong>' + scoreData.students.length + '</strong><span>Students</span></div>' +
+        '<div class="summary-card"><strong>' + scoreData.inputCols.length + '</strong><span>Editable Columns</span></div>' +
+        '<div class="summary-card"><strong>' + filled + '</strong><span>Filled Cells</span></div>' +
+        '<div class="summary-card"><strong>' + Math.max(editable - filled, 0) + '</strong><span>Empty Cells</span></div>';
+    }
+
+    function showAccess() {
+      EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' });
+    }
+
+    function showApp() {
+      EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' });
+    }
+
+    function teacherLogout() {
+      EQAuth.logoutTeacher('index.html');
+    }
+
+    function showToast(message, type) {
+      var toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast ' + (type || '');
+      setTimeout(function() { toast.classList.add('show'); }, 10);
+      setTimeout(function() { toast.classList.remove('show'); }, 2600);
+    }
+
+    document.getElementById('classSelect').addEventListener('change', loadScores);
+    document.getElementById('searchInput').addEventListener('input', renderScores);
+
+    (function init() {
+      if (window.EQTeacherShell) EQTeacherShell.populateClassSelect('classSelect', { grade: '10' });
+      if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
+      loadScores();
+    })();
+  </script>
 </body>
 </html>
