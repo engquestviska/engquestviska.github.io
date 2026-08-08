@@ -107,7 +107,7 @@
     <section class="hero">
       <div class="kicker">Scores Manager</div>
       <h1>Edit unit and final scores in one table.</h1>
-      <p class="hero-copy">Load a Grade 10 class, switch between Unit 1, Unit 2, Unit 3, and Final Scores, then update editable score cells directly from the teacher room.</p>
+      <p class="hero-copy">Load any Grade 10 or 11 class, switch between Unit 1, Unit 2, Unit 3, and Final Scores, then update editable score cells directly from the teacher room.</p>
     </section>
   </header>
 
@@ -122,7 +122,7 @@
       <div class="panel">
         <div class="panel-head">
           <div>
-            <h2 class="panel-title">Grade 10 Score Records</h2>
+            <h2 class="panel-title" id="panelTitle">Score Records</h2>
             <p class="panel-copy">Editable cells save immediately when changed. Calculated columns stay read-only and refresh when the class is loaded again.</p>
           </div>
           <div class="status-pill" id="loginPill">Teacher</div>
@@ -131,7 +131,7 @@
         <div class="controls">
           <div>
             <label for="classSelect">Class</label>
-            <select id="classSelect" data-eq-class-select data-grade="10"></select>
+            <select id="classSelect" data-eq-class-select data-grade="all"></select>
           </div>
           <div>
             <label for="searchInput">Search student</label>
@@ -177,7 +177,14 @@
       loadScores();
     }
 
+    function updatePanelTitle() {
+      var cls = document.getElementById('classSelect').value;
+      var grade = (window.EQClasses && EQClasses.gradeFor) ? EQClasses.gradeFor(cls) : '';
+      document.getElementById('panelTitle').textContent = grade ? ('Grade ' + grade + ' Score Records') : 'Score Records';
+    }
+
     function loadScores() {
+      updatePanelTitle();
       var cls = document.getElementById('classSelect').value;
       var btn = document.getElementById('loadBtn');
       btn.disabled = true;
@@ -352,7 +359,8 @@
     document.getElementById('searchInput').addEventListener('input', renderScores);
 
     (function init() {
-      if (window.EQTeacherShell) EQTeacherShell.populateClassSelect('classSelect', { grade: '10' });
+      if (window.EQTeacherShell) EQTeacherShell.populateClassSelect('classSelect', { grade: 'all' });
+      updatePanelTitle();
       if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
       loadScores();
     })();
