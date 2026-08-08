@@ -77,6 +77,9 @@
     if (gradeId === 'all') {
       return classesForGrade('10').concat(classesForGrade('11'));
     }
+    if (gradeId === 'all') {
+      return (window.EQClasses && Array.isArray(window.EQClasses.all)) ? window.EQClasses.all : CLASSES;
+    }
     if (window.EQClasses && typeof window.EQClasses.listForGrade === 'function') {
       return window.EQClasses.listForGrade(gradeId);
     }
