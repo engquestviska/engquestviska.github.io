@@ -107,7 +107,7 @@
     <section class="hero">
       <div class="kicker">Scores Manager</div>
       <h1>Edit unit and final scores in one table.</h1>
-      <p class="hero-copy">Load any Grade 10 or 11 class, switch between Unit 1, Unit 2, Unit 3, and Final Scores, then update editable score cells directly from the teacher room.</p>
+      <p class="hero-copy">Load any Grade 10 or 11 class, switch between Unit 1, Unit 2 (and Unit 3 for Grade 10), and Final Scores, then update editable score cells directly from the teacher room.</p>
     </section>
   </header>
 
@@ -152,7 +152,7 @@
         <div class="tabs" id="tabs">
           <button class="tab active" type="button" data-mode="4" onclick="setMode('4')">Unit 1</button>
           <button class="tab" type="button" data-mode="5" onclick="setMode('5')">Unit 2</button>
-          <button class="tab" type="button" data-mode="6" onclick="setMode('6')">Unit 3</button>
+          <button class="tab" type="button" id="tabUnit3" data-mode="6" onclick="setMode('6')">Unit 3</button>
           <button class="tab" type="button" data-mode="final" onclick="setMode('final')">Final Scores</button>
         </div>
       </div>
@@ -177,14 +177,41 @@
       loadScores();
     }
 
-    function updatePanelTitle() {
+    function currentGrade() {
       var cls = document.getElementById('classSelect').value;
-      var grade = (window.EQClasses && EQClasses.gradeFor) ? EQClasses.gradeFor(cls) : '';
+      return (window.EQClasses && EQClasses.gradeFor) ? String(EQClasses.gradeFor(cls)) : '';
+    }
+
+    function updatePanelTitle() {
+      var grade = currentGrade();
       document.getElementById('panelTitle').textContent = grade ? ('Grade ' + grade + ' Score Records') : 'Score Records';
+    }
+
+    // Grade 11 only has Unit 1 + Unit 2 (no Unit 3). Hide the tab and bounce off it if selected.
+    function updateTabsForGrade() {
+      var isG11 = currentGrade() === '11';
+      var unit3Tab = document.getElementById('tabUnit3');
+      if (unit3Tab) unit3Tab.style.display = isG11 ? 'none' : '';
+      if (isG11 && mode === '6') {
+        mode = '4';
+        document.querySelectorAll('.tab').forEach(function(tab) {
+          tab.classList.toggle('active', tab.getAttribute('data-mode') === mode);
+        });
+      }
+    }
+
+    // Grade 11 Final Scores only has Chapter 1 + Chapter 2 + ASAT (no Chapter 3).
+    function getDisplayInputCols() {
+      var cols = scoreData.inputCols || [];
+      if (mode === 'final' && currentGrade() === '11') {
+        cols = cols.filter(function(col) { return !/chapter\s*3/i.test(col); });
+      }
+      return cols;
     }
 
     function loadScores() {
       updatePanelTitle();
+      updateTabsForGrade();
       var cls = document.getElementById('classSelect').value;
       var btn = document.getElementById('loadBtn');
       btn.disabled = true;
@@ -229,15 +256,16 @@
         return;
       }
 
+      var inputCols = getDisplayInputCols();
       var calcCols = mode === 'final' ? scoreData.calcCols : ['Average', 'Final Score', 'Indicator'];
       var head = '<tr><th>Student</th>' +
-        scoreData.inputCols.map(function(col) { return '<th>' + escapeHtml(col) + '</th>'; }).join('') +
+        inputCols.map(function(col) { return '<th>' + escapeHtml(col) + '</th>'; }).join('') +
         calcCols.map(function(col) { return '<th class="calc">' + escapeHtml(col) + '</th>'; }).join('') +
         '</tr>';
       var rows = students.map(function(student) {
         return '<tr>' +
           '<td class="student-cell">' + escapeHtml(student.name) + '<span class="student-meta">No. ' + escapeHtml(student.no) + (student.nickname ? ' · ' + escapeHtml(student.nickname) : '') + '</span></td>' +
-          scoreData.inputCols.map(function(col) {
+          inputCols.map(function(col) {
             var val = student.scores && student.scores[col] !== undefined ? student.scores[col] : '';
             return '<td><input class="score-input" type="number" inputmode="decimal" min="0" max="100" step="0.01" value="' + escapeHtml(val) + '" data-no="' + escapeHtml(student.no) + '" data-col="' + escapeHtml(col) + '" onchange="saveScore(this)"/></td>';
           }).join('') +
@@ -320,17 +348,18 @@
     }
 
     function updateSummary() {
+      var inputCols = getDisplayInputCols();
       var filled = 0;
-      var editable = scoreData.students.length * scoreData.inputCols.length;
+      var editable = scoreData.students.length * inputCols.length;
       scoreData.students.forEach(function(student) {
-        scoreData.inputCols.forEach(function(col) {
+        inputCols.forEach(function(col) {
           var value = student.scores ? student.scores[col] : '';
           if (value !== '' && value !== undefined && value !== null) filled++;
         });
       });
       document.getElementById('summaryGrid').innerHTML =
         '<div class="summary-card"><strong>' + scoreData.students.length + '</strong><span>Students</span></div>' +
-        '<div class="summary-card"><strong>' + scoreData.inputCols.length + '</strong><span>Editable Columns</span></div>' +
+        '<div class="summary-card"><strong>' + inputCols.length + '</strong><span>Editable Columns</span></div>' +
         '<div class="summary-card"><strong>' + filled + '</strong><span>Filled Cells</span></div>' +
         '<div class="summary-card"><strong>' + Math.max(editable - filled, 0) + '</strong><span>Empty Cells</span></div>';
     }
@@ -361,6 +390,7 @@
     (function init() {
       if (window.EQTeacherShell) EQTeacherShell.populateClassSelect('classSelect', { grade: 'all' });
       updatePanelTitle();
+      updateTabsForGrade();
       if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
       loadScores();
     })();
