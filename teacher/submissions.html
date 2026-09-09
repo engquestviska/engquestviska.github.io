@@ -32,6 +32,12 @@
     .stu-badge { margin-left:auto; font-size:.72rem; font-weight:800; padding:4px 11px; border-radius:999px; font-family:'IBM Plex Mono',monospace; white-space:nowrap; }
     .stu-badge.pend { background:#fef3c7; color:#b45309; } .stu-badge.done { background:#dcfce7; color:#15803d; }
 
+    .task-chips { display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; }
+    .task-chip { font-size:.7rem; font-weight:800; padding:2px 9px; border-radius:999px; font-family:'IBM Plex Mono',monospace; }
+    .task-chip.pending { background:#fef3c7; color:#b45309; }
+    .task-chip.reviewed { background:#dcfce7; color:#15803d; }
+    .task-chip.rejected { background:#fee2e2; color:#b91c1c; }
+
     .photos { display:flex; flex-wrap:wrap; gap:14px; padding:4px 18px 18px; border-top:1px solid #eef4ff; }
     .ph { width:210px; border:1px solid #e5ecf6; border-radius:14px; overflow:hidden; background:#fff; }
     .ph-img { min-height:180px; display:grid; place-items:center; background:#f8fafc; }
@@ -101,7 +107,7 @@
         <div class="panel-head">
           <div>
             <h2 class="panel-title">Submission Inbox</h2>
-            <p class="panel-copy">Select a class above first. Photos only download when you click a student's name to open their row.</p>
+            <p class="panel-copy">Select a class above first. Each row shows which task codes were submitted, at a glance — click a name only when you need to view the actual photo.</p>
           </div>
           <div class="status-pill" id="loginPill">Teacher</div>
         </div>
@@ -256,6 +262,12 @@
       var bulk = pending.length > 1
         ? '<div class="bulk"><button data-review="reviewed" data-ids="' + pendIds + '">✓ Approve all ' + pending.length + '</button></div>'
         : '';
+      // Task chips show which chapter/task codes came in and their status — this
+      // is plain text from data already fetched in loadSubs(), so it costs zero
+      // extra data and is visible without clicking anything.
+      var chips = g.items.map(function(i){
+        return '<span class="task-chip ' + esc(i.status) + '">' + esc(i.task || '—') + '</span>';
+      }).join('');
       // Nothing auto-opens anymore — clicking the student's name is itself the
       // "load photos" action (see the toggle listener in renderList).
       var photos = g.items.map(photoHtml).join('');
@@ -264,7 +276,8 @@
           '<span class="chev">▶</span>' +
           '<span class="stu-no">#' + esc(g.studentNo) + '</span>' +
           '<span><span class="stu-name">' + esc(g.studentName) + '</span>' +
-            '<span class="stu-meta">' + esc(classLabel(g.className)) + ' · ' + g.items.length + ' photo' + (g.items.length > 1 ? 's' : '') + '</span></span>' +
+            '<span class="stu-meta">' + esc(classLabel(g.className)) + ' · ' + g.items.length + ' photo' + (g.items.length > 1 ? 's' : '') + '</span>' +
+            '<div class="task-chips">' + chips + '</div></span>' +
           badge +
         '</summary>' +
         '<div class="photos">' + photos + '</div>' + bulk +
