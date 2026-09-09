@@ -54,6 +54,10 @@
     .bulk button { border:1.5px solid #bbf7d0; background:#ecfdf5; color:#059669; border-radius:11px; padding:9px 16px; font:800 .82rem 'IBM Plex Sans',sans-serif; cursor:pointer; }
     .sub-empty { text-align:center; padding:50px 20px; color:#64748b; }
 
+    /* Manual "load photos" button — shown instead of auto-fetching images on open */
+    .load-photos-btn { border:1.5px solid #dbeafe; background:#eff6ff; color:#2563eb; border-radius:11px; padding:10px 18px; font:800 .82rem 'IBM Plex Sans',sans-serif; cursor:pointer; margin:4px 0; }
+    .load-photos-btn:hover { background:#dbeafe; }
+
     /* Lightbox for a full-size photo */
     .lightbox { position:fixed; inset:0; background:rgba(15,23,42,.82); display:none; align-items:center; justify-content:center; padding:24px; z-index:80; }
     .lightbox.on { display:flex; }
@@ -85,7 +89,7 @@
     <section class="hero">
       <div class="kicker">Task Submissions</div>
       <h1>Check the photos students turned in.</h1>
-      <p class="hero-copy">Grouped by student — click a name to open all their photos together. Approve or send back to resubmit, right here. You enter the score in Students &amp; Scores.</p>
+      <p class="hero-copy">Grouped by student — click a name to open, then tap "Load photos" to view them. Approve or send back to resubmit, right here. You enter the score in Students &amp; Scores.</p>
     </section>
   </header>
 
@@ -101,7 +105,7 @@
         <div class="panel-head">
           <div>
             <h2 class="panel-title">Submission Inbox</h2>
-            <p class="panel-copy">Click a student to open their photos. Groups with photos waiting open automatically.</p>
+            <p class="panel-copy">Click a student to open, then tap "Load photos" to fetch them (saves your data — nothing downloads until you ask).</p>
           </div>
           <div class="status-pill" id="loginPill">Teacher</div>
         </div>
@@ -135,7 +139,8 @@
     var filter = 'pending';       // 'pending' | 'all'
     var classFilter = '';         // '' = every class
     var GROUPS = {};              // key -> group object (for lazy photo loading)
-    var loadedGroups = {};        // key -> true once its photos have been fetched
+    var loadedGroups = {};        // key -> true once its photos have been fetched into the DOM this render
+    var PHOTO_CACHE = {};         // subId -> dataURL, kept across Refresh clicks so we never re-download in this session
 
     function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
     function teacherLogout() { EQAuth.logoutTeacher('index.html'); }
@@ -198,10 +203,11 @@
       }
       list.innerHTML = groups.map(function(g){ GROUPS[g.key] = g; return groupHtml(g); }).join('');
 
-      // Wire expand → lazy-load photos; wire review buttons.
-      list.querySelectorAll('details.stu-group').forEach(function(d){
-        d.addEventListener('toggle', function(){ if (d.open) loadGroupPhotos(d.dataset.key); });
-        if (d.open) loadGroupPhotos(d.dataset.key);   // auto-opened (pending) groups
+      // NOTE: groups no longer auto-fetch photos on open. Photos only download when
+      // the "Load photos" button inside a group is tapped — this is what keeps data
+      // usage low, since nothing downloads just from opening the page or refreshing.
+      list.querySelectorAll('button[data-load]').forEach(function(b){
+        b.onclick = function(){ loadGroupPhotos(b.dataset.load); };
       });
       list.querySelectorAll('button[data-review]').forEach(function(b){
         b.onclick = function(){ onReview(b); };
@@ -247,7 +253,7 @@
       var bulk = pending.length > 1
         ? '<div class="bulk"><button data-review="reviewed" data-ids="' + pendIds + '">✓ Approve all ' + pending.length + '</button></div>'
         : '';
-      var photos = g.items.map(photoHtml).join('');
+      // Photos area starts as a single "Load photos" button — nothing is fetched yet.
       return '<details class="stu-group"' + (pending.length ? ' open' : '') + ' data-key="' + esc(g.key) + '">' +
         '<summary class="stu-sum">' +
           '<span class="chev">▶</span>' +
@@ -256,7 +262,9 @@
             '<span class="stu-meta">' + esc(classLabel(g.className)) + ' · ' + g.items.length + ' photo' + (g.items.length > 1 ? 's' : '') + '</span></span>' +
           badge +
         '</summary>' +
-        '<div class="photos">' + photos + '</div>' + bulk +
+        '<div class="photos" id="photos-' + esc(g.key) + '">' +
+          '<button class="load-photos-btn" type="button" data-load="' + esc(g.key) + '">📷 Load ' + g.items.length + ' photo' + (g.items.length > 1 ? 's' : '') + '</button>' +
+        '</div>' + bulk +
       '</details>';
     }
 
@@ -286,25 +294,42 @@
         '</div></div>';
     }
 
-    // Load every photo in a group once (base64 via the auth-gated endpoint, like the
-    // old modal did — <img> can't carry the teacher login, so we fetch + inline it).
+    // Load every photo in a group — only runs when the user taps "Load photos".
+    // Anything already in PHOTO_CACHE (downloaded earlier this session) is reused
+    // instead of being re-fetched, so hitting Refresh never re-downloads photos.
     function loadGroupPhotos(key) {
       if (loadedGroups[key]) return;
       var g = GROUPS[key]; if (!g) return;
       loadedGroups[key] = true;
+
+      var container = document.getElementById('photos-' + key);
+      if (container) container.innerHTML = g.items.map(photoHtml).join('');
+
       var t = EQAuth.getTeacher();
       g.items.forEach(function(s){
+        var box = document.getElementById('phimg-' + s.subId);
+        if (!box) return;
+
+        if (PHOTO_CACHE[s.subId]) {
+          var img0 = document.createElement('img');
+          img0.src = PHOTO_CACHE[s.subId]; img0.alt = 'Task photo';
+          img0.onclick = function(){ openLightbox(PHOTO_CACHE[s.subId]); };
+          box.innerHTML = ''; box.appendChild(img0);
+          return;
+        }
+
         EQApi.get({ action: 'getSubmissionPhoto', username: t.username, password: t.password, fileId: s.subId }).then(function(res){
-          var box = document.getElementById('phimg-' + s.subId);
-          if (!box) return;
+          var box2 = document.getElementById('phimg-' + s.subId);
+          if (!box2) return;
           if (res && res.success && res.dataBase64) {
             var src = 'data:' + (res.mimeType || 'image/jpeg') + ';base64,' + res.dataBase64;
+            PHOTO_CACHE[s.subId] = src;
             var img = document.createElement('img');
             img.src = src; img.alt = 'Task photo';
             img.onclick = function(){ openLightbox(src); };
-            box.innerHTML = ''; box.appendChild(img);
-          } else { box.innerHTML = '<span class="ph-load">Could not load photo</span>'; }
-        }).catch(function(){ var box = document.getElementById('phimg-' + s.subId); if (box) box.innerHTML = '<span class="ph-load">Network error</span>'; });
+            box2.innerHTML = ''; box2.appendChild(img);
+          } else { box2.innerHTML = '<span class="ph-load">Could not load photo</span>'; }
+        }).catch(function(){ var box2 = document.getElementById('phimg-' + s.subId); if (box2) box2.innerHTML = '<span class="ph-load">Network error</span>'; });
       });
     }
 
