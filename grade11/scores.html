@@ -705,11 +705,12 @@ function buildStudentChapterHTML(chData, cols, ch) {
 function buildStudentFinalHTML(finData, inputCols, calcCols) {
   if (!finData) return '<div class="state-card"><div class="state-icon">&#128203;</div><div class="state-title">No data yet</div><div class="state-sub">Final scores haven&#39;t been entered yet.</div></div>';
 
-  var html = '<div class="score-grid">';
+    var html = '<div class="score-grid">';
 
-  // Input cols — plain tiles
-  if (inputCols) {
-    inputCols.forEach(function(col) {
+  // Input cols — plain tiles (Grade 11 Final Scores has no Chapter 3)
+  var displayInputCols = (inputCols || []).filter(function(col) { return !/chapter\s*3/i.test(col); });
+  if (displayInputCols.length) {
+    displayInputCols.forEach(function(col) {
       var val = finData.scores ? finData.scores[col] : '';
       var isEmpty = val === '' || val === undefined || val === null;
       html += '<div class="score-tile"><div class="score-tile-label">' + escapeHtml(col) + '</div><div class="score-tile-val' + (isEmpty ? ' empty' : '') + '">' + (isEmpty ? '-' : escapeHtml(val)) + '</div></div>';
