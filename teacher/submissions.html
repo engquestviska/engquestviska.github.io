@@ -54,10 +54,6 @@
     .bulk button { border:1.5px solid #bbf7d0; background:#ecfdf5; color:#059669; border-radius:11px; padding:9px 16px; font:800 .82rem 'IBM Plex Sans',sans-serif; cursor:pointer; }
     .sub-empty { text-align:center; padding:50px 20px; color:#64748b; }
 
-    /* Manual "load photos" button — shown instead of auto-fetching images on open */
-    .load-photos-btn { border:1.5px solid #dbeafe; background:#eff6ff; color:#2563eb; border-radius:11px; padding:10px 18px; font:800 .82rem 'IBM Plex Sans',sans-serif; cursor:pointer; margin:4px 0; }
-    .load-photos-btn:hover { background:#dbeafe; }
-
     /* Lightbox for a full-size photo */
     .lightbox { position:fixed; inset:0; background:rgba(15,23,42,.82); display:none; align-items:center; justify-content:center; padding:24px; z-index:80; }
     .lightbox.on { display:flex; }
@@ -89,7 +85,7 @@
     <section class="hero">
       <div class="kicker">Task Submissions</div>
       <h1>Check the photos students turned in.</h1>
-      <p class="hero-copy">Grouped by student — click a name to open, then tap "Load photos" to view them. Approve or send back to resubmit, right here. You enter the score in Students &amp; Scores.</p>
+      <p class="hero-copy">Pick a class, then click a student's name to load their photos. Approve or send back to resubmit, right here. You enter the score in Students &amp; Scores.</p>
     </section>
   </header>
 
@@ -105,7 +101,7 @@
         <div class="panel-head">
           <div>
             <h2 class="panel-title">Submission Inbox</h2>
-            <p class="panel-copy">Click a student to open, then tap "Load photos" to fetch them (saves your data — nothing downloads until you ask).</p>
+            <p class="panel-copy">Select a class above first. Photos only download when you click a student's name to open their row.</p>
           </div>
           <div class="status-pill" id="loginPill">Teacher</div>
         </div>
@@ -117,7 +113,7 @@
             <button id="segAll" onclick="setFilter('all')">All</button>
           </div>
           <select class="class-select" id="classFilter" onchange="setClassFilter(this.value)">
-            <option value="">All classes</option>
+            <option value="">Select a class…</option>
           </select>
           <button class="refresh-btn" onclick="loadSubs()">↻ Refresh</button>
         </div>
@@ -156,7 +152,7 @@
     function initClassFilter() {
       var sel = document.getElementById('classFilter');
       var ids = (window.EQApi && EQApi.classes) ? EQApi.classes : [];
-      sel.innerHTML = '<option value="">All classes</option>' +
+      sel.innerHTML = '<option value="">Select a class…</option>' +
         ids.map(function(id){ return '<option value="' + esc(id) + '">' + esc(classLabel(id)) + '</option>'; }).join('');
       sel.value = classFilter;
     }
@@ -195,19 +191,26 @@
 
     function renderList() {
       var list = document.getElementById('subList');
-      var groups = buildGroups(currentRows());
       GROUPS = {}; loadedGroups = {};
+
+      // Nothing renders — and nothing is fetched — until a class is chosen.
+      // This is what stops the page from ever pulling every class's data at once.
+      if (!classFilter) {
+        list.innerHTML = '<div class="sub-empty">Pick a class above to see its submissions.</div>';
+        return;
+      }
+
+      var groups = buildGroups(currentRows());
       if (!groups.length) {
         list.innerHTML = '<div class="sub-empty">' + (filter === 'pending' ? '🎉 Nothing waiting — all caught up!' : 'No submissions here.') + '</div>';
         return;
       }
       list.innerHTML = groups.map(function(g){ GROUPS[g.key] = g; return groupHtml(g); }).join('');
 
-      // NOTE: groups no longer auto-fetch photos on open. Photos only download when
-      // the "Load photos" button inside a group is tapped — this is what keeps data
-      // usage low, since nothing downloads just from opening the page or refreshing.
-      list.querySelectorAll('button[data-load]').forEach(function(b){
-        b.onclick = function(){ loadGroupPhotos(b.dataset.load); };
+      // Photos are not fetched until the student's row is clicked open — clicking
+      // the name is what triggers the download, nothing loads automatically.
+      list.querySelectorAll('details.stu-group').forEach(function(d){
+        d.addEventListener('toggle', function(){ if (d.open) loadGroupPhotos(d.dataset.key); });
       });
       list.querySelectorAll('button[data-review]').forEach(function(b){
         b.onclick = function(){ onReview(b); };
@@ -253,8 +256,10 @@
       var bulk = pending.length > 1
         ? '<div class="bulk"><button data-review="reviewed" data-ids="' + pendIds + '">✓ Approve all ' + pending.length + '</button></div>'
         : '';
-      // Photos area starts as a single "Load photos" button — nothing is fetched yet.
-      return '<details class="stu-group"' + (pending.length ? ' open' : '') + ' data-key="' + esc(g.key) + '">' +
+      // Nothing auto-opens anymore — clicking the student's name is itself the
+      // "load photos" action (see the toggle listener in renderList).
+      var photos = g.items.map(photoHtml).join('');
+      return '<details class="stu-group" data-key="' + esc(g.key) + '">' +
         '<summary class="stu-sum">' +
           '<span class="chev">▶</span>' +
           '<span class="stu-no">#' + esc(g.studentNo) + '</span>' +
@@ -262,9 +267,7 @@
             '<span class="stu-meta">' + esc(classLabel(g.className)) + ' · ' + g.items.length + ' photo' + (g.items.length > 1 ? 's' : '') + '</span></span>' +
           badge +
         '</summary>' +
-        '<div class="photos" id="photos-' + esc(g.key) + '">' +
-          '<button class="load-photos-btn" type="button" data-load="' + esc(g.key) + '">📷 Load ' + g.items.length + ' photo' + (g.items.length > 1 ? 's' : '') + '</button>' +
-        '</div>' + bulk +
+        '<div class="photos">' + photos + '</div>' + bulk +
       '</details>';
     }
 
@@ -294,16 +297,14 @@
         '</div></div>';
     }
 
-    // Load every photo in a group — only runs when the user taps "Load photos".
-    // Anything already in PHOTO_CACHE (downloaded earlier this session) is reused
-    // instead of being re-fetched, so hitting Refresh never re-downloads photos.
+    // Load every photo in a group — only runs when the student's row is clicked
+    // open. Anything already in PHOTO_CACHE (downloaded earlier this session) is
+    // reused instead of being re-fetched, so hitting Refresh never re-downloads
+    // photos, and closing/reopening a row doesn't re-download it either.
     function loadGroupPhotos(key) {
       if (loadedGroups[key]) return;
       var g = GROUPS[key]; if (!g) return;
       loadedGroups[key] = true;
-
-      var container = document.getElementById('photos-' + key);
-      if (container) container.innerHTML = g.items.map(photoHtml).join('');
 
       var t = EQAuth.getTeacher();
       g.items.forEach(function(s){
