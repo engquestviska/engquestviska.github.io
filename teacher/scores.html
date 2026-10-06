@@ -107,7 +107,7 @@
     <section class="hero">
       <div class="kicker">Scores Manager</div>
       <h1>Edit unit and final scores in one table.</h1>
-      <p class="hero-copy">Load any Grade 10 or 11 class, switch between Unit 1, Unit 2 (and Unit 3 for Grade 10), and Final Scores, then update editable score cells directly from the teacher room.</p>
+      <p class="hero-copy">Load any Grade 10 or 11 class, switch between Unit 1, Unit 2, Unit 3, and Final Scores, then update editable score cells directly from the teacher room.</p>
     </section>
   </header>
 
@@ -187,28 +187,16 @@
       document.getElementById('panelTitle').textContent = grade ? ('Grade ' + grade + ' Score Records') : 'Score Records';
     }
 
-    // Grade 11 only has Unit 1 + Unit 2 (no Unit 3). Hide the tab and bounce off it if selected.
+        // Both Grade 10 and Grade 11 have Unit 1, Unit 2 and Unit 3, so the tab is always visible.
     function updateTabsForGrade() {
-      var isG11 = currentGrade() === '11';
       var unit3Tab = document.getElementById('tabUnit3');
-      if (unit3Tab) unit3Tab.style.display = isG11 ? 'none' : '';
-      if (isG11 && mode === '6') {
-        mode = '4';
-        document.querySelectorAll('.tab').forEach(function(tab) {
-          tab.classList.toggle('active', tab.getAttribute('data-mode') === mode);
-        });
-      }
+      if (unit3Tab) unit3Tab.style.display = '';
     }
 
-    // Grade 11 Final Scores only has Chapter 1 + Chapter 2 + ASAT (no Chapter 3).
-    function getDisplayInputCols() {
-      var cols = scoreData.inputCols || [];
-      if (mode === 'final' && currentGrade() === '11') {
-        cols = cols.filter(function(col) { return !/chapter\s*3/i.test(col); });
-      }
-      return cols;
+       function getDisplayInputCols() {
+      return scoreData.inputCols || [];
     }
-
+    
     function loadScores() {
       updatePanelTitle();
       updateTabsForGrade();
