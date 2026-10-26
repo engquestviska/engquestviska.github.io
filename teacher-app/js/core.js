@@ -21,6 +21,24 @@
     return 'data:' + mime + ';base64,' + b64;
   }
 
+  // Same formula as the backend's getFinalScores: plain average of the chapter
+  // finals that exist plus the exam score, rounded; 75 or more is Safe.
+  function finalScore(calc, exam) {
+    var vals = ['Chapter 1', 'Chapter 2', 'Chapter 3'].map(function (k) { return calc ? calc[k] : ''; })
+      .concat([exam])
+      .filter(function (v) { return v !== '' && v != null && !isNaN(Number(v)); })
+      .map(Number);
+    if (!vals.length) return { average: '', final: '', indicator: '' };
+    var avg = Math.round(vals.reduce(function (a, b) { return a + b; }, 0) / vals.length * 100) / 100;
+    var fin = Math.round(avg);
+    return { average: avg, final: fin, indicator: fin >= 75 ? 'Safe' : 'Not Safe' };
+  }
+
+  // The backend column is named ASAT all year; semester 1's exam is called ASAS.
+  function colLabel(col) {
+    return col === 'ASAT' ? 'ASAS' : col;
+  }
+
   function validateScore(value) {
     var v = String(value == null ? '' : value).trim();
     if (v === '') return { ok: true, value: '' };
@@ -107,6 +125,8 @@
     STATUSES: STATUSES,
     taskToChapterCol: taskToChapterCol,
     photoSrc: photoSrc,
+    finalScore: finalScore,
+    colLabel: colLabel,
     validateScore: validateScore,
     isLowScore: isLowScore,
     attendanceInitial: attendanceInitial,

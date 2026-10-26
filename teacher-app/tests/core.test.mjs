@@ -32,6 +32,21 @@ test('photoSrc only builds image data URLs from safe parts', () => {
   assert.equal(core.photoSrc('image/png', ''), null);
 });
 
+test('finalScore averages the chapter finals and the exam, like the backend', () => {
+  assert.deepEqual(core.finalScore({ 'Chapter 1': 80, 'Chapter 2': '', 'Chapter 3': 90 }, '70'),
+    { average: 80, final: 80, indicator: 'Safe' });
+  assert.deepEqual(core.finalScore({ 'Chapter 1': 80, 'Chapter 2': 91 }, ''),
+    { average: 85.5, final: 86, indicator: 'Safe' });
+  assert.deepEqual(core.finalScore({ 'Chapter 1': 60 }, '70'),
+    { average: 65, final: 65, indicator: 'Not Safe' });
+  assert.deepEqual(core.finalScore({}, ''), { average: '', final: '', indicator: '' });
+});
+
+test('colLabel shows the semester 1 exam as ASAS', () => {
+  assert.equal(core.colLabel('ASAT'), 'ASAS');
+  assert.equal(core.colLabel('Task 1'), 'Task 1');
+});
+
 test('validateScore accepts empty or 0-100 and trims', () => {
   assert.equal(core.validateScore('85').ok, true);
   assert.equal(core.validateScore('').ok, true);

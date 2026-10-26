@@ -178,6 +178,13 @@ button, input, select { font: inherit; color: inherit; }
 .tile b { display: block; font-size: .8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tile small { font-size: .68rem; color: var(--muted); font-weight: 700; }
 .pop { position: absolute; left: 50%; top: 8px; transform: translateX(-50%); font-weight: 800; color: var(--ok); font-size: .95rem; pointer-events: none; animation: pop-up .8s ease forwards; }
+.pop.neg { color: var(--bad); }
+.xp-mode { display: flex; gap: 4px; background: #e2e8f0; border-radius: 12px; padding: 3px; margin-bottom: 8px; }
+.xp-mode button { flex: 1; border: 0; background: none; border-radius: 9px; padding: 8px 0; font-size: .82rem; font-weight: 800; color: var(--muted); cursor: pointer; }
+.xp-mode button.on { background: #fff; color: var(--brand); box-shadow: 0 1px 3px rgba(0, 0, 0, .08); }
+.xp-mode button.minus.on { background: var(--bad); color: #fff; }
+.xp-grid.minus .tile { border-color: #fecaca; background: #fff7f7; }
+.xp-grid.minus .tile:active { background: var(--bad-soft); }
 @keyframes pop-up { from { opacity: 1; top: 12px; } to { opacity: 0; top: -16px; } }
 
 /* Scores */

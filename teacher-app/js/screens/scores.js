@@ -52,15 +52,17 @@
 
   function drawCols() {
     var esc = st.ctx.esc;
-    st.ctx.setSubtitle(chapterLabel() + (st.col ? ' · ' + st.col : ''));
+    st.ctx.setSubtitle(chapterLabel() + (st.col ? ' · ' + label(st.col) : ''));
     st.cols.innerHTML = st.inputCols.length > 1 ? st.inputCols.map(function (c) {
       return '<button type="button" class="' + (c === st.col ? 'on' : '') + '" data-col="' + esc(c) + '">' + esc(short(c)) + '</button>';
     }).join('') : '';
     st.cols.hidden = st.inputCols.length < 2;
   }
 
+  function label(col) { return st.ctx.core.colLabel(col); }
+
   function short(col) {
-    return col.replace(/^Formative$/, 'Form.').replace(/^Summative$/, 'Summ.');
+    return label(col).replace(/^Formative$/, 'Form.').replace(/^Summative$/, 'Summ.');
   }
 
   function value(s, col) {
@@ -71,9 +73,8 @@
   // Plain average of the entered inputs (owner decision D3), used after a save.
   function average(s) {
     if (st.chapter === 'final') {
-      var c = s.calc || {};
-      var key = st.calcCols[0];
-      return key && c[key] !== undefined && c[key] !== '' ? c[key] : '';
+      var fin = s.calc ? s.calc['Final Score'] : '';
+      return fin === undefined || fin === null ? '' : fin;
     }
     var nums = st.inputCols.map(function (c) { return value(s, c); }).filter(function (v) { return v !== '' && !isNaN(Number(v)); }).map(Number);
     if (!nums.length) return '';
@@ -90,14 +91,14 @@
       st.list.innerHTML = '<div class="state"><b>Nothing to enter here</b>This tab has no score columns.</div>';
       return;
     }
-    var avgLabel = st.chapter === 'final' ? (st.calcCols[0] || 'Avg') : 'avg';
+    var avgLabel = st.chapter === 'final' ? 'final' : 'avg';
     st.list.innerHTML = '<div class="sc-status" id="scStatus">Type a score, then tap Next. Each score saves by itself.</div>' +
       '<div class="sc-list">' + st.students.map(function (s, i) {
         var v = value(s, st.col), a = average(s);
         return '<div class="sc-row" data-no="' + esc(s.no) + '">' +
           '<span class="no">' + esc(s.no) + '</span>' +
           '<span class="nm">' + esc(s.nickname || s.name) + '</span>' +
-          '<input class="sc-in' + (ctx.core.isLowScore(v) ? ' low' : '') + '" data-i="' + i + '" inputmode="decimal" enterkeyhint="' + (i === st.students.length - 1 ? 'done' : 'next') + '" autocomplete="off" value="' + esc(v) + '" placeholder="–" aria-label="' + esc(st.col + ' for ' + s.name) + '">' +
+          '<input class="sc-in' + (ctx.core.isLowScore(v) ? ' low' : '') + '" data-i="' + i + '" inputmode="decimal" enterkeyhint="' + (i === st.students.length - 1 ? 'done' : 'next') + '" autocomplete="off" value="' + esc(v) + '" placeholder="–" aria-label="' + esc(label(st.col) + ' for ' + s.name) + '">' +
           '<span class="avg">' + esc(avgLabel) + '<b>' + (a === '' ? '–' : esc(a)) + '</b></span></div>';
       }).join('') + '</div>';
     var inputs = st.list.querySelectorAll('.sc-in');
@@ -153,7 +154,11 @@
     ctx.session.call(params).then(function (res) {
       s.scores = s.scores || {};
       s.scores[col] = check.value;
-      if (chapter === 'final' && res.calc) s.calc = Object.assign(s.calc || {}, res.calc);
+      if (chapter === 'final') {
+        // The save reply has no totals, so work out the new final score the backend's way.
+        var f = ctx.core.finalScore(s.calc, check.value);
+        s.calc = Object.assign(s.calc || {}, { 'Average': f.average, 'Final Score': f.final, 'Indicator': f.indicator }, res.calc || {});
+      }
       input.classList.remove('saving');
       if (token !== st.token || again()) return;
       input.classList.toggle('low', ctx.core.isLowScore(check.value));
@@ -162,11 +167,11 @@
       var a = average(s);
       var row = input.closest('.sc-row');
       if (row) row.querySelector('.avg b').textContent = a === '' ? '–' : a;
-      status('Saved ✓ ' + ctx.core.firstName(s.name) + ' · ' + col + (check.value === '' ? ' cleared' : ' = ' + check.value), 'ok');
+      status('Saved ✓ ' + ctx.core.firstName(s.name) + ' · ' + label(col) + (check.value === '' ? ' cleared' : ' = ' + check.value), 'ok');
     }).catch(function (err) {
       input.classList.remove('saving'); input.classList.add('bad', 'unsaved');
       // Warn even if the teacher already moved on: this score did not reach the backend.
-      if (err.message !== 'Session expired') ctx.toast('Not saved: ' + ctx.core.firstName(s.name) + ' · ' + col + ' = ' + check.value, 'err');
+      if (err.message !== 'Session expired') ctx.toast('Not saved: ' + ctx.core.firstName(s.name) + ' · ' + label(col) + ' = ' + check.value, 'err');
       if (token !== st.token || again()) return;
       status('Not saved: ' + err.message + '. Tap the red box, then Next, to try again.', 'err');
     });

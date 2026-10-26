@@ -113,7 +113,9 @@
       case 'getAllActiveness':
         return { students: (db.classes[cls] || []).map(function (s) {
           var x = xpOf(cls, s.no);
-          return { no: s.no, name: s.name, nickname: '', Total: total(x), Indicator: total(x) > 100 ? 'Excellent' : 'Good' };
+          return { no: s.no, name: s.name, nickname: '', Total: total(x), Indicator: total(x) > 100 ? 'Excellent' : 'Good',
+            VocabularyBox: x['Vocabulary Box'], Answering: x['Answering'], Presenting: x['Presenting'],
+            DoingTaskOnTime: x['Doing Task On Time'], HelpingHand: x['Helping Hand'], Quiz: x['Quiz'] };
         }) };
       case 'incrementActiveness': {
         var x = xpOf(cls, p.studentNo); x[p.column] = Math.max(0, x[p.column] + Number(p.delta));
@@ -125,14 +127,20 @@
           return { no: s.no, name: s.name, nickname: '', scores: Object.assign({}, sc), average: avg(sc), finalScore: avg(sc), indicator: avg(sc) >= 75 ? 'Safe' : 'Not Safe' };
         }) };
       case 'saveChapterScore': scoresOf(cls, p.chapter, p.studentNo)[p.column] = p.value; return { success: true };
+      // Same shape as the real bridge: chapter finals first in calcCols, no calc on save.
       case 'getFinalScores':
-        return { inputCols: ['ASAT'], calcCols: ['Average', 'Indicator'], students: (db.classes[cls] || []).map(function (s) {
-          var f = db.finals[cls + '|' + s.no] || { ASAT: '' };
-          return { no: s.no, name: s.name, nickname: '', scores: Object.assign({}, f), calc: { Average: 80, Indicator: 'Safe' } };
-        }) };
+        return { inputCols: ['ASAT'], calcCols: ['Chapter 1', 'Chapter 2', 'Chapter 3', 'Average', 'Final Score', 'Indicator'],
+          students: (db.classes[cls] || []).map(function (s) {
+            var f = db.finals[cls + '|' + s.no] || { ASAT: '' };
+            var ch = ['4', '5', '6'].map(function (c) { return Math.round(avg(scoresOf(cls, c, s.no)) || 0) || ''; });
+            var vals = ch.concat([f.ASAT]).filter(function (v) { return v !== '' && v != null; }).map(Number);
+            var a = vals.length ? Math.round(vals.reduce(function (x, y) { return x + y; }, 0) / vals.length * 100) / 100 : '';
+            return { no: s.no, name: s.name, nickname: '', scores: Object.assign({}, f),
+              calc: { 'Chapter 1': ch[0], 'Chapter 2': ch[1], 'Chapter 3': ch[2], Average: a, 'Final Score': a === '' ? '' : Math.round(a), Indicator: a === '' ? '' : (Math.round(a) >= 75 ? 'Safe' : 'Not Safe') } };
+          }) };
       case 'saveFinalScore':
         (db.finals[cls + '|' + p.studentNo] = db.finals[cls + '|' + p.studentNo] || {})[p.column] = p.value;
-        return { success: true, calc: { Average: 81, Indicator: 'Safe' } };
+        return { success: true };
     }
     return { error: 'Mock: unknown action ' + p.action };
   }
