@@ -163,6 +163,23 @@ button, input, select { font: inherit; color: inherit; }
 .pv-close { position: absolute; top: 12px; right: 12px; z-index: 1; width: 42px; height: 42px; border-radius: 50%; border: 0; background: rgba(255, 255, 255, .18); color: #fff; font-size: 1.1rem; cursor: pointer; }
 .pv-hint { color: #94a3b8; text-align: center; font-size: .76rem; margin: 8px 0 calc(12px + var(--safe-b)); }
 
+/* Give XP */
+.cats { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; margin: 0 -12px 8px; padding-left: 12px; padding-right: 12px; scrollbar-width: none; }
+.cats::-webkit-scrollbar { display: none; }
+.cat { flex: 0 0 auto; border: 1.5px solid var(--line); background: #fff; border-radius: 12px; padding: 9px 12px; font-size: .8rem; font-weight: 800; cursor: pointer; }
+.cat em { font-style: normal; color: var(--brand-2); margin-left: 5px; }
+.cat.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+.cat.on em { color: #c7d2fe; }
+.xp-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.tile { position: relative; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 12px 6px 10px; text-align: center; cursor: pointer; user-select: none; transition: transform .08s; min-width: 0; }
+.tile:active { transform: scale(.95); background: var(--brand-soft); }
+.tno { position: absolute; top: 6px; left: 8px; font-size: .62rem; font-weight: 800; color: #94a3b8; }
+.av { width: 42px; height: 42px; border-radius: 50%; margin: 0 auto 6px; display: grid; place-items: center; font-weight: 800; font-size: .84rem; color: #fff; }
+.tile b { display: block; font-size: .8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile small { font-size: .68rem; color: var(--muted); font-weight: 700; }
+.pop { position: absolute; left: 50%; top: 8px; transform: translateX(-50%); font-weight: 800; color: var(--ok); font-size: .95rem; pointer-events: none; animation: pop-up .8s ease forwards; }
+@keyframes pop-up { from { opacity: 1; top: 12px; } to { opacity: 0; top: -16px; } }
+
 /* More */
 .more-list { display: grid; gap: 8px; }
 .more-item { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 13px 14px; text-decoration: none; color: var(--ink); font-weight: 700; font-size: .92rem; }
