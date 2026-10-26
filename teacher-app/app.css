@@ -180,6 +180,27 @@ button, input, select { font: inherit; color: inherit; }
 .pop { position: absolute; left: 50%; top: 8px; transform: translateX(-50%); font-weight: 800; color: var(--ok); font-size: .95rem; pointer-events: none; animation: pop-up .8s ease forwards; }
 @keyframes pop-up { from { opacity: 1; top: 12px; } to { opacity: 0; top: -16px; } }
 
+/* Scores */
+.pickers { display: flex; gap: 6px; margin-bottom: 8px; }
+.chip { flex: 1; background: #fff; border: 1.5px solid var(--line); border-radius: 12px; padding: 9px 0; font-size: .82rem; font-weight: 800; cursor: pointer; }
+.chip.on { border-color: var(--brand); background: var(--brand); color: #fff; }
+.colseg { display: flex; gap: 3px; background: #e2e8f0; border-radius: 12px; padding: 3px; margin-bottom: 10px; }
+.colseg button { flex: 1; min-width: 0; border: 0; background: none; border-radius: 9px; padding: 8px 0; font-size: .74rem; font-weight: 800; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.colseg button.on { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(0, 0, 0, .08); }
+.sc-status { font-size: .76rem; font-weight: 700; color: var(--muted); margin: 0 4px 8px; min-height: 1.2em; }
+.sc-status.ok { color: var(--ok); }
+.sc-status.err { color: var(--bad); }
+.sc-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+.sc-row { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 7px 8px 7px 10px; }
+.sc-in { width: 68px; height: 42px; flex: 0 0 auto; border-radius: 11px; border: 1.5px solid var(--line); background: #f8fafc; font-size: 1.05rem; font-weight: 800; text-align: center; transition: background .2s, border-color .2s; }
+.sc-in:focus { outline: none; border-color: var(--brand-2); background: #fff; box-shadow: 0 0 0 3px #e0e7ff; }
+.sc-in.low { color: var(--bad); }
+.sc-in.saving { border-color: #a5b4fc; background: var(--brand-soft); }
+.sc-in.saved { border-color: var(--ok); background: var(--ok-soft); }
+.sc-in.bad { border-color: var(--bad); background: var(--bad-soft); color: var(--bad); }
+.avg { flex: 0 0 auto; width: 44px; text-align: right; font-size: .64rem; font-weight: 700; color: var(--muted); }
+.avg b { display: block; font-size: .86rem; color: var(--ink); }
+
 /* More */
 .more-list { display: grid; gap: 8px; }
 .more-item { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 13px 14px; text-decoration: none; color: var(--ink); font-weight: 700; font-size: .92rem; }
