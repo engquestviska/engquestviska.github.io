@@ -6,6 +6,12 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "8099"],
       "port": 8099
+    },
+    {
+      "name": "teacher-app",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["teacher-app/dev/serve.mjs"],
+      "port": 5173
     }
   ]
 }
