@@ -54,7 +54,7 @@
       <div class="content-section-head">
         <div class="content-title-row">
           <div class="content-badge">Semester 1</div>
-          <h2 class="content-title" id="chapter1Title">Unit 1 · Descriptive Text</h2>
+          <h2 class="content-title" id="chapter1Title">Chapter 1 · Descriptive Text</h2>
         </div>
       </div>
       <div class="material-grid" id="grid-ch1">
@@ -73,7 +73,7 @@
       <div class="content-section-head">
         <div class="content-title-row">
           <div class="content-badge">Semester 1</div>
-          <h2 class="content-title" id="chapter2Title">Unit 2 · Recount</h2>
+          <h2 class="content-title" id="chapter2Title">Chapter 2 · Recount</h2>
         </div>
       </div>
       <div class="material-grid" id="grid-ch2">
@@ -92,7 +92,7 @@
       <div class="content-section-head">
         <div class="content-title-row">
           <div class="content-badge">Semester 1</div>
-          <h2 class="content-title" id="chapter3Title">Unit 3 · Procedure</h2>
+          <h2 class="content-title" id="chapter3Title">Chapter 3 · Procedure</h2>
         </div>
       </div>
       <div class="material-grid" id="grid-ch3">
@@ -147,7 +147,7 @@
     }
 
     var UNIT_NAMES = ['Descriptive Text', 'Recount', 'Procedure'];
-    function unitName(ch) { return UNIT_NAMES[ch - 1] || ('Unit ' + ch); }
+    function unitName(ch) { return UNIT_NAMES[ch - 1] || ('Chapter ' + ch); }
 
     function appendCard(ch, name, fileId, fileType) {
       fileId = safeDriveId(fileId);
@@ -189,7 +189,7 @@
         '<div class="material-meta"></div>' +
         '<div class="material-actions"></div>';
       info.querySelector('.material-name').textContent = name;
-      info.querySelector('.material-meta').textContent = (fileType || 'PDF') + ' · Unit ' + ch;
+      info.querySelector('.material-meta').textContent = (fileType || 'PDF') + ' · Chapter ' + ch;
 
       var actions = info.querySelector('.material-actions');
       var btnView = document.createElement('button');
@@ -232,7 +232,7 @@
       UNIT_NAMES.forEach(function(n, i) {
         var ch = i + 1;
         var t = document.getElementById('chapter' + ch + 'Title');
-        if (t) t.textContent = 'Unit ' + ch + (n ? ' · ' + n : '');
+        if (t) t.textContent = 'Chapter ' + ch + (n ? ' · ' + n : '');
         var box = document.getElementById('ch' + ch + '-empty');
         if (box) {
           var et = box.querySelector('.empty-material-title');

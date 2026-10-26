@@ -143,7 +143,7 @@
     <section class="hero">
       <div class="kicker">Assignment Manager</div>
       <h1>Publish task files without touching student pages.</h1>
-      <p class="hero-copy">Add Google Drive assignment files by grade and unit, review published tasks, and remove dynamic tasks from the student view.</p>
+      <p class="hero-copy">Add Google Drive assignment files by grade and chapter, review published tasks, and remove dynamic tasks from the student view.</p>
     </section>
   </header>
 
@@ -173,7 +173,7 @@
               </select>
             </div>
             <div>
-              <label for="chapterSelect">Unit</label>
+              <label for="chapterSelect">Chapter</label>
               <select id="chapterSelect"></select>
             </div>
             <div>
@@ -208,7 +208,7 @@
             </div>
             <div class="controls">
               <div>
-                <label for="listChapterSelect">Unit</label>
+                <label for="listChapterSelect">Chapter</label>
                 <select id="listChapterSelect" onchange="loadAssignments()"></select>
               </div>
               <button class="btn" type="button" id="loadBtn" onclick="loadAssignments()">Load Assignments</button>
@@ -249,14 +249,14 @@
     function chapterLabel(key) {
       var n = parseInt(String(key).replace('assign', ''), 10);
       var names = currentUnitNames();
-      return 'Unit ' + n + (names[n - 1] ? ' · ' + names[n - 1] : '');
+      return 'Chapter ' + n + (names[n - 1] ? ' · ' + names[n - 1] : '');
     }
     function rebuildUnits() {
       var names = currentUnitNames();
       var add = document.getElementById('chapterSelect');
       var list = document.getElementById('listChapterSelect');
       var prevAdd = add.value, prevList = list.value;
-      var html = names.map(function(n, i) { return '<option value="assign' + (i + 1) + '">Unit ' + (i + 1) + (n ? ' · ' + escapeHtml(n) : '') + '</option>'; }).join('');
+      var html = names.map(function(n, i) { return '<option value="assign' + (i + 1) + '">Chapter ' + (i + 1) + (n ? ' · ' + escapeHtml(n) : '') + '</option>'; }).join('');
       add.innerHTML = html;
       list.innerHTML = html;
       if (prevAdd && add.querySelector('option[value="' + prevAdd + '"]')) add.value = prevAdd;

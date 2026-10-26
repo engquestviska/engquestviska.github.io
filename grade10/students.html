@@ -885,12 +885,12 @@ async function openActModal(name, cls) {
 
     // Point rules per activity
     const pointRules = {
-      VocabularyBox:    { pts: 1, unit: 'pt each',  info: 'Each vocab box submission' },
-      Answering:        { pts: 2, unit: 'pts each', info: 'Each question answered' },
-      Presenting:       { pts: 5, unit: 'pts each', info: 'Each presentation done' },
-      DoingTaskOnTime:  { pts: 2, unit: 'pts each', info: 'Tasks submitted on time' },
-      HelpingHand:      { pts: 1, unit: 'pt each',  info: 'Helping classmates' },
-      Quiz:             { pts: 1, unit: 'pt each',  info: 'Quiz activeness score' },
+      VocabularyBox:    { pts: 2, unit: 'pts each', info: 'Each vocab box submission' },
+      Answering:        { pts: 5, unit: 'pts each', info: 'Each question answered' },
+      Presenting:       { pts: 20, unit: 'pts each', info: 'Each presentation done' },
+      DoingTaskOnTime:  { pts: 20, unit: 'pts each', info: 'Tasks submitted on time' },
+      HelpingHand:      { pts: 20, unit: 'pts each', info: 'Helping classmates' },
+      Quiz:             { pts: 10, unit: 'pts each', info: 'Quiz activeness score' },
     };
 
     const statsHtml = ACTS.map(a => {

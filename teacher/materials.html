@@ -147,7 +147,7 @@
     <section class="hero">
       <div class="kicker">Materials Manager</div>
       <h1>Publish lesson files from the teacher side.</h1>
-      <p class="hero-copy">Add Google Drive materials by unit, review what students can open, and remove dynamic materials without exposing controls on the student page.</p>
+      <p class="hero-copy">Add Google Drive materials by chapter, review what students can open, and remove dynamic materials without exposing controls on the student page.</p>
     </section>
   </header>
 
@@ -162,15 +162,15 @@
       <div class="panel" style="margin-bottom:18px;">
         <div class="panel-head">
           <div>
-            <h2 class="panel-title">Unit Names</h2>
+            <h2 class="panel-title">Chapter Names</h2>
             <p class="panel-copy">Rename the units for the grade selected below. These names appear everywhere students see them — Lesson Materials, Assignments, and Submit Task.</p>
           </div>
-          <button class="btn ghost" type="button" id="unitToggle" onclick="toggleUnitEditor()">Edit unit names</button>
+          <button class="btn ghost" type="button" id="unitToggle" onclick="toggleUnitEditor()">Edit chapter names</button>
         </div>
         <div id="unitEditor" hidden>
           <div id="unitFields" style="display:grid;gap:10px;margin-top:6px;"></div>
           <div style="display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap;">
-            <button class="btn" type="button" id="saveUnitsBtn" onclick="saveUnitNames()">Save unit names</button>
+            <button class="btn" type="button" id="saveUnitsBtn" onclick="saveUnitNames()">Save chapter names</button>
             <span id="unitMsg" style="font-size:.86rem;font-weight:700;"></span>
           </div>
         </div>
@@ -194,7 +194,7 @@
               </select>
             </div>
             <div>
-              <label for="chapterSelect">Unit</label>
+              <label for="chapterSelect">Chapter</label>
               <select id="chapterSelect"></select>
             </div>
             <div>
@@ -234,7 +234,7 @@
             </div>
             <div class="controls">
               <div>
-                <label for="listChapterSelect">Unit</label>
+                <label for="listChapterSelect">Chapter</label>
                 <select id="listChapterSelect" onchange="loadMaterials()"></select>
               </div>
               <button class="btn" type="button" id="loadBtn" onclick="loadMaterials()">Load Materials</button>
@@ -294,14 +294,14 @@
     function toggleUnitEditor() {
       var ed = document.getElementById('unitEditor');
       ed.hidden = !ed.hidden;
-      document.getElementById('unitToggle').textContent = ed.hidden ? 'Edit unit names' : 'Hide';
+      document.getElementById('unitToggle').textContent = ed.hidden ? 'Edit chapter names' : 'Hide';
       if (!ed.hidden) renderUnitFields();
     }
 
     function renderUnitFields() {
       document.getElementById('unitMsg').textContent = '';
       document.getElementById('unitFields').innerHTML = currentUnitNames().map(function(n, i) {
-        return '<div><label for="uname' + i + '">Unit ' + (i + 1) + '</label>' +
+        return '<div><label for="uname' + i + '">Chapter ' + (i + 1) + '</label>' +
           '<input id="uname' + i + '" type="text" maxlength="60" value="' + escapeHtml(n) + '" placeholder="e.g. Descriptive Text"/></div>';
       }).join('');
     }
@@ -322,21 +322,21 @@
             UNIT_NAMES[grade] = res.names;
             rebuildUnits(); renderUnitFields();
             msg.style.color = '#059669'; msg.textContent = '✓ Saved — students see the new names now.';
-            showToast('Unit names saved', 'ok');
+            showToast('Chapter names saved', 'ok');
           } else { msg.style.color = '#dc2626'; msg.textContent = (res && res.error) || 'Could not save.'; }
         }).catch(function() { btn.disabled = false; msg.style.color = '#dc2626'; msg.textContent = 'Network error.'; });
     }
     function unitLabel(value) {
       var names = currentUnitNames();
       var idx = parseInt(value, 10) - 1;
-      return 'Unit ' + value + (names[idx] ? ' · ' + names[idx] : '');
+      return 'Chapter ' + value + (names[idx] ? ' · ' + names[idx] : '');
     }
     function rebuildUnits() {
       var names = currentUnitNames();
       var add = document.getElementById('chapterSelect');
       var list = document.getElementById('listChapterSelect');
       var prevAdd = add.value, prevList = list.value;
-      var mk = function(n, i) { return '<option value="' + (i + 1) + '">Unit ' + (i + 1) + (n ? ' · ' + escapeHtml(n) : '') + '</option>'; };
+      var mk = function(n, i) { return '<option value="' + (i + 1) + '">Chapter ' + (i + 1) + (n ? ' · ' + escapeHtml(n) : '') + '</option>'; };
       add.innerHTML = names.map(mk).join('');
       list.innerHTML = names.map(mk).join('');
       if (prevAdd && add.querySelector('option[value="' + prevAdd + '"]')) add.value = prevAdd;

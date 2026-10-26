@@ -52,9 +52,6 @@
     .ph-date { color:var(--muted); font-size:.78rem; margin-top:2px; }
     .ph-pill { display:inline-flex; align-items:center; gap:4px; font-size:.68rem; font-weight:800; padding:3px 9px; border-radius:999px; font-family:'IBM Plex Mono',monospace; margin-top:8px; }
     .ph-pill.reviewed { background:#dcfce7; color:#15803d; } .ph-pill.rejected { background:#fee2e2; color:#b91c1c; }
-    .ph-score { width:100%; margin-top:8px; border:1.5px solid #dbeafe; border-radius:9px; padding:7px 10px; font:700 .82rem 'IBM Plex Sans',sans-serif; color:#1e293b; box-sizing:border-box; }
-    .ph-score:focus { outline:none; border-color:#2563eb; }
-    .ph-score-lbl { display:block; margin-top:8px; font-size:.72rem; font-weight:700; color:var(--muted); }
     .ph-actions { display:flex; gap:6px; margin-top:8px; }
     .ph-actions button { flex:1; border-radius:9px; padding:7px 4px; font:800 .76rem 'IBM Plex Sans',sans-serif; cursor:pointer; border:1.5px solid transparent; }
     .ph-actions .ok { background:#ecfdf5; color:#059669; border-color:#bbf7d0; }
@@ -225,18 +222,7 @@
       });
     }
 
-    // Map a task code to its Scores-grid target. C1T1 → {chapter:'1', column:'Task 1'};
-    // C1F → Formative, C1S → Summative. Returns null if it can't be mapped (then no
-    // score field is shown and Approve just approves).
-    function taskToChapterCol(task) {
-      var s = String(task || '').toUpperCase();
-      var m = /^C(\d+)T(\d+)$/.exec(s);   if (m) return { chapter: m[1], column: 'Task ' + m[2] };
-      var f = /^C(\d+)F$/.exec(s);        if (f) return { chapter: f[1], column: 'Formative' };
-      var u = /^C(\d+)S$/.exec(s);        if (u) return { chapter: u[1], column: 'Summative' };
-      return null;
-    }
-
-    // Same C{chapter}T{task}/F/S codes as above, but as a sort key so chips and
+    // Task codes C{chapter}T{task}/F/S as a sort key so chips and
     // photos always read C1T1, C1T2, C1T3, C1F, C1S, C2T1... regardless of the
     // order students happened to upload them in.
     function taskSortKey(task) {
@@ -252,31 +238,17 @@
     }
 
     // Approve a student's pending items straight from the collapsed row — no need
-    // to open photos first, since approving here never touches the score field.
+    // to open photos first.
     function quickApprove(evt, btn) {
       evt.stopPropagation();
       evt.preventDefault();
       var ids = btn.dataset.ids.split(',');
-      reviewMany(ids, 'reviewed', btn, null);
+      reviewMany(ids, 'reviewed', btn);
     }
 
-    // Approve/Reject click. A single Approve may carry an optional score → save it to
-    // the chapter grid first, then mark the submission reviewed.
+    // Approve/Reject click on a single photo.
     function onReview(btn) {
-      var ids = btn.dataset.ids.split(',');
-      var decision = btn.dataset.review;
-      var scoreSave = null;
-      if (decision === 'reviewed' && ids.length === 1) {
-        var input = document.getElementById('score-' + ids[0]);
-        if (input && input.value !== '') {
-          var v = Number(input.value);
-          if (!isFinite(v) || v < 0 || v > 100) { showToast('Score must be a number 0–100', 'err'); return; }
-          var s = ALL.find(function(x){ return x.subId === ids[0]; });
-          var target = s && taskToChapterCol(s.task);
-          if (target) scoreSave = { className: s.className, studentNo: s.studentNo, chapter: target.chapter, column: target.column, value: v };
-        }
-      }
-      reviewMany(ids, decision, btn, scoreSave);
+      reviewMany(btn.dataset.ids.split(','), btn.dataset.review, btn);
     }
 
     function groupHtml(g) {
@@ -314,14 +286,7 @@
     function photoHtml(s) {
       var actions;
       if (s.status === 'pending') {
-        // Optional score entered at approval time — writes into the same Chapter/Task
-        // cell the Scores page uses (e.g. C1T1 → Chapter 1, Task 1).
-        var target = taskToChapterCol(s.task);
-        var scoreField = target
-          ? '<label class="ph-score-lbl">Score for ' + esc(target.column) + ' (optional)</label>' +
-            '<input class="ph-score" id="score-' + esc(s.subId) + '" type="number" min="0" max="100" inputmode="numeric" placeholder="0–100">'
-          : '';
-        actions = scoreField + '<div class="ph-actions">' +
+        actions = '<div class="ph-actions">' +
           '<button class="ok" data-review="reviewed" data-ids="' + s.subId + '">Approve</button>' +
           '<button class="no" data-review="rejected" data-ids="' + s.subId + '">Reject</button></div>';
       } else {
@@ -378,20 +343,10 @@
     function closeLightbox() { document.getElementById('lightbox').classList.remove('on'); }
 
     // Review one or many submissions (Approve / Reject / Approve-all), then refresh.
-    // An optional scoreSave writes a chapter/task score before marking reviewed.
-    function reviewMany(ids, decision, btn, scoreSave) {
+    function reviewMany(ids, decision, btn) {
       var t = EQAuth.getTeacher();
       if (btn) btn.disabled = true;
       var chain = Promise.resolve();
-      if (scoreSave) {
-        chain = chain.then(function(){
-          return EQApi.get({ action: 'saveChapterScore', username: t.username, password: t.password,
-            className: scoreSave.className, studentNo: scoreSave.studentNo, chapter: scoreSave.chapter,
-            column: scoreSave.column, value: scoreSave.value });
-        }).then(function(res){
-          if (!res || (res.success === false)) throw new Error((res && res.error) || 'score');
-        });
-      }
       ids.forEach(function(id){
         chain = chain.then(function(){
           return EQApi.get({ action: 'reviewTaskSubmission', username: t.username, password: t.password, subId: id, decision: decision });
@@ -414,7 +369,6 @@
       }
       chain.then(function(){
         var note = decision === 'rejected' ? 'Sent back for resubmit'
-          : scoreSave ? ('Approved · ' + scoreSave.column + ' = ' + scoreSave.value + ' · task ticked')
           : ticked > 1 ? ('Approved ' + ticked + ' · tasks ticked')
           : 'Approved · task ticked';
         showToast(note, 'ok');

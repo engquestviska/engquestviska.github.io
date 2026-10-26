@@ -106,8 +106,8 @@
     </div>
     <section class="hero">
       <div class="kicker">Scores Manager</div>
-      <h1>Edit unit and final scores in one table.</h1>
-      <p class="hero-copy">Load any Grade 10 or 11 class, switch between Unit 1, Unit 2, Unit 3, and Final Scores, then update editable score cells directly from the teacher room.</p>
+      <h1>Edit chapter and final scores in one table.</h1>
+      <p class="hero-copy">Load any Grade 10 or 11 class, switch between Chapter 1, Chapter 2, Chapter 3, and Final Scores, then update editable score cells directly from the teacher room.</p>
     </section>
   </header>
 
@@ -150,9 +150,9 @@
 
       <div class="toolbar">
         <div class="tabs" id="tabs">
-          <button class="tab active" type="button" data-mode="4" onclick="setMode('4')">Unit 1</button>
-          <button class="tab" type="button" data-mode="5" onclick="setMode('5')">Unit 2</button>
-          <button class="tab" type="button" id="tabUnit3" data-mode="6" onclick="setMode('6')">Unit 3</button>
+          <button class="tab active" type="button" data-mode="4" onclick="setMode('4')">Chapter 1</button>
+          <button class="tab" type="button" data-mode="5" onclick="setMode('5')">Chapter 2</button>
+          <button class="tab" type="button" id="tabUnit3" data-mode="6" onclick="setMode('6')">Chapter 3</button>
           <button class="tab" type="button" data-mode="final" onclick="setMode('final')">Final Scores</button>
         </div>
       </div>
@@ -187,7 +187,7 @@
       document.getElementById('panelTitle').textContent = grade ? ('Grade ' + grade + ' Score Records') : 'Score Records';
     }
 
-        // Both Grade 10 and Grade 11 have Unit 1, Unit 2 and Unit 3, so the tab is always visible.
+        // Both Grade 10 and Grade 11 have Chapter 1, Chapter 2 and Chapter 3, so the tab is always visible.
     function updateTabsForGrade() {
       var unit3Tab = document.getElementById('tabUnit3');
       if (unit3Tab) unit3Tab.style.display = '';

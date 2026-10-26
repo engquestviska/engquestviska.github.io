@@ -728,15 +728,15 @@
     }).join('');
 
     const ch4Panel = ch4Keys.length
-      ? makeProgress(ch4Keys, 'Current Unit') +
-        (hasSubmitted ? '<div class="task-status-note"><span>&#10003;</span><div>You submitted this unit, so every current-unit task is recorded as done.</div></div>' : '') +
+      ? makeProgress(ch4Keys, 'Current Chapter') +
+        (hasSubmitted ? '<div class="task-status-note"><span>&#10003;</span><div>You submitted this chapter, so every current-chapter task is recorded as done.</div></div>' : '') +
         `<div class="tasks-section"><div class="tasks-grid">${makeChips(ch4Keys)}</div></div>`
-      : '<div class="empty-chapter"><div class="empty-chapter-icon">&#128203;</div><div>No current-unit tasks found.</div></div>';
+      : '<div class="empty-chapter"><div class="empty-chapter-icon">&#128203;</div><div>No current-chapter tasks found.</div></div>';
 
     const ch5Panel = ch5Keys.length
-      ? makeProgress(ch5Keys, 'Upcoming Unit') +
+      ? makeProgress(ch5Keys, 'Upcoming Chapter') +
         `<div class="tasks-section"><div class="tasks-grid">${makeChips(ch5Keys)}</div></div>`
-      : '<div class="empty-chapter"><div class="empty-chapter-icon">&#8635;</div><div style="font-weight:800;margin-bottom:4px;color:#0f172a">Upcoming tasks coming soon</div><div>Check back when the next unit begins.</div></div>';
+      : '<div class="empty-chapter"><div class="empty-chapter-icon">&#8635;</div><div style="font-weight:800;margin-bottom:4px;color:#0f172a">Upcoming tasks coming soon</div><div>Check back when the next chapter begins.</div></div>';
 
     document.getElementById('studentResult').innerHTML = `
       <div class="status-card">
@@ -753,8 +753,8 @@
           </div>
         </div>
         <div class="ch-tabs-inner">
-          <button class="ch-tab-inner active" id="ctab4" onclick="switchChapterTab(4)">Current Unit</button>
-          <button class="ch-tab-inner" id="ctab5" onclick="switchChapterTab(5)">Upcoming Unit</button>
+          <button class="ch-tab-inner active" id="ctab4" onclick="switchChapterTab(4)">Current Chapter</button>
+          <button class="ch-tab-inner" id="ctab5" onclick="switchChapterTab(5)">Upcoming Chapter</button>
         </div>
         <div id="ctabPanel4">${ch4Panel}</div>
         <div id="ctabPanel5" style="display:none">${ch5Panel}</div>
