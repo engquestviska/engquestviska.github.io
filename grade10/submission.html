@@ -22,8 +22,28 @@
     .pill { display:inline-flex; align-items:center; gap:6px; font-size:.76rem; font-weight:700; padding:4px 11px; border-radius:999px; font-family:'IBM Plex Mono',monospace; }
     .pill.none { background:#f1f5f9; color:#64748b; }
     .pill.pending { background:#fef3c7; color:#b45309; }
-    .pill.reviewed { background:#dcfce7; color:#15803d; }
+    .pill.approved { background:#dcfce7; color:#15803d; }
     .pill.rejected { background:#fee2e2; color:#b91c1c; }
+    .pill.score { background:#eff6ff; color:#1d4ed8; }
+    .pill.noscore { background:#f8fafc; color:#94a3b8; }
+    .task-status { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+    .task-actions { display:flex; gap:8px; align-items:center; }
+    .see-btn { border:1.5px solid #e2e8f0; background:#fff; color:#475569; border-radius:11px; padding:8px 12px; font:700 .8rem 'IBM Plex Sans',sans-serif; cursor:pointer; white-space:nowrap; }
+    .see-btn[aria-expanded="true"] { background:#f1f5f9; }
+    .my-photos { display:flex; flex-wrap:wrap; gap:10px; padding:4px 0 12px; }
+    .my-photo { width:92px; }
+    .my-photo .box { width:92px; height:92px; border-radius:12px; overflow:hidden; border:1px solid #e5ecf6; background:#f8fafc; display:grid; place-items:center; font-size:.7rem; color:#94a3b8; cursor:pointer; }
+    .my-photo img { width:100%; height:100%; object-fit:cover; }
+    .my-photo .cap { font-size:.68rem; font-weight:700; margin-top:4px; text-align:center; }
+    .cap.pending { color:#b45309; } .cap.approved { color:#15803d; } .cap.rejected { color:#b91c1c; }
+    .lightbox { position:fixed; inset:0; background:rgba(15,23,42,.85); display:none; align-items:center; justify-content:center; padding:20px; z-index:70; }
+    .lightbox.on { display:flex; }
+    .lightbox img { max-width:100%; max-height:90vh; border-radius:12px; }
+    @media (max-width:560px) {
+      .task-row { flex-wrap:wrap; }
+      .task-status { flex-basis:calc(100% - 100px); }
+      .task-actions { width:100%; justify-content:flex-end; }
+    }
     .task-btn { border:none; border-radius:11px; padding:9px 16px; font:700 .84rem 'IBM Plex Sans',sans-serif; cursor:pointer; background:var(--blue); color:#fff; white-space:nowrap; }
     .task-btn.resubmit { background:#fff; color:var(--blue); border:1.5px solid var(--blue); }
     /* Preview modal */
@@ -74,7 +94,7 @@
   </header>
 
   <main>
-    <p class="sub-intro" id="subIntro" style="display:none">Tap <b>Submit</b> next to a task, choose a photo of your finished work, and send it. Once sent, the task is marked <b>Pending review</b> until your teacher checks it.</p>
+    <p class="sub-intro" id="subIntro" style="display:none">Tap <b>Submit</b> next to a task, choose a photo of your finished work, and send it. Once sent, the task shows <b>Waiting for teacher</b> until your teacher checks it. Tap 📷 to see the photos you sent.</p>
     <div id="chapters"></div>
     <div class="sub-need-login" id="needLogin" style="display:none">Log in on the <a href="index.html">homepage</a> first to submit your tasks.</div>
   </main>
@@ -93,6 +113,8 @@
     </div>
   </div>
 
+  <div class="lightbox" id="lightbox" onclick="this.classList.remove('on')"><img id="lightboxImg" alt="Your submitted photo"/></div>
+
   <input type="file" id="fileInput" accept="image/*" capture="environment" multiple style="display:none"/>
 
   <script>
@@ -104,50 +126,130 @@
     var UNIT_NAMES = ['Descriptive Text', 'Recount', 'Procedure'];
     function unitTitle(ch) { return 'Chapter ' + ch + (UNIT_NAMES[ch - 1] ? ' · ' + UNIT_NAMES[ch - 1] : ''); }
 
-    function chaptersForGrade(g) { return g === '11' ? 2 : 3; }
+    var CHAPTER_COUNT = 3;
+    // Chapter n's scores are stored as backend chapter n+3 (same as the Scores page).
+    var SCORE_CHAPTER_OFFSET = 3;
+
+    // The backend stores an approved photo as 'approved' (older rows said 'reviewed').
+    function normStatus(st) { return (st === 'approved' || st === 'reviewed') ? 'approved' : (st || ''); }
 
     function statusPill(st) {
-      if (st === 'pending')  return '<span class="pill pending">⏳ Pending review</span>';
-      if (st === 'reviewed') return '<span class="pill reviewed">✓ Reviewed</span>';
-      if (st === 'rejected') return '<span class="pill rejected">✕ Please resubmit</span>';
+      if (st === 'pending')  return '<span class="pill pending">⏳ Waiting for teacher</span>';
+      if (st === 'approved') return '<span class="pill approved">✓ Approved</span>';
+      if (st === 'rejected') return '<span class="pill rejected">✕ Sent back, please resubmit</span>';
       return '<span class="pill none">Not submitted</span>';
     }
 
-    function render(statuses) {
+    function scorePill(st, score) {
+      if (score !== '' && score !== undefined && score !== null) return '<span class="pill score">Score: ' + escapeHtml(score) + '</span>';
+      if (st === 'approved') return '<span class="pill noscore">Score not entered yet</span>';
+      return '';
+    }
+
+    function escapeHtml(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+    function render() {
       var wrap = document.getElementById('chapters');
-      var chs = chaptersForGrade(GRADE);
       var html = '';
-      for (var ch = 1; ch <= chs; ch++) {
+      for (var ch = 1; ch <= CHAPTER_COUNT; ch++) {
         html += '<div class="chapter-card"><h2>' + unitTitle(ch) + '</h2>';
         for (var t = 1; t <= 3; t++) {
           var key = 'C' + ch + 'T' + t;
-          var st = statuses[key] || '';
-          var label = (st && st !== 'reviewed') ? 'Re-submit' : (st === 'reviewed' ? 'Re-submit' : 'Submit');
-          var cls = st ? 'task-btn resubmit' : 'task-btn';
+          var st = normStatus(lastStatuses[key]);
+          var score = (lastScores[ch] || {})['Task ' + t];
+          var photos = myItems.filter(function(i){ return i.task === key; });
+          var see = photos.length
+            ? '<button class="see-btn" type="button" aria-expanded="' + (openTask === key) + '" onclick="togglePhotos(\'' + key + '\')">📷 ' + photos.length + '</button>'
+            : '';
           html += '<div class="task-row">' +
             '<span class="task-name">Task ' + t + '</span>' +
-            '<span class="task-status">' + statusPill(st) + '</span>' +
-            '<button class="' + cls + '" onclick="pickFile(\'' + key + '\')">' + label + '</button>' +
+            '<span class="task-status">' + statusPill(st) + scorePill(st, score) + '</span>' +
+            '<span class="task-actions">' + see +
+              '<button class="' + (st ? 'task-btn resubmit' : 'task-btn') + '" onclick="pickFile(\'' + key + '\')">' + (st ? 'Re-submit' : 'Submit') + '</button></span>' +
           '</div>';
+          if (openTask === key) html += '<div class="my-photos">' + photos.map(photoHtml).join('') + '</div>';
         }
         html += '</div>';
       }
       wrap.innerHTML = html;
+      if (openTask) loadPhotos(openTask);
     }
 
     var lastStatuses = {};
+    var myItems = [];        // every photo this student sent: {id, task, status, date}
+    var lastScores = {};     // chapter (1..3) -> {'Task 1': 90, ...}
+    var openTask = null;     // task whose photos are showing
+    var PHOTO_CACHE = {};    // id -> data URL
+    var PHOTO_LOADING = {};  // id -> true while its request is in flight
+
+    function photoHtml(i) {
+      var st = normStatus(i.status);
+      var cap = st === 'approved' ? '✓ Approved' : st === 'rejected' ? '✕ Sent back' : '⏳ Waiting';
+      return '<div class="my-photo"><div class="box" id="myph-' + i.id + '" onclick="showBig(' + i.id + ')">Loading…</div>' +
+        '<div class="cap ' + st + '">' + cap + '</div></div>';
+    }
+
+    function togglePhotos(key) { openTask = openTask === key ? null : key; render(); }
+
+    function setPhoto(id) {
+      var box = document.getElementById('myph-' + id);
+      if (box && PHOTO_CACHE[id]) box.innerHTML = '<img src="' + PHOTO_CACHE[id] + '" alt="Your photo"/>';
+    }
+
+    function loadPhotos(key) {
+      myItems.filter(function(i){ return i.task === key; }).forEach(function(i) {
+        if (PHOTO_CACHE[i.id]) return setPhoto(i.id);
+        if (PHOTO_LOADING[i.id]) return;
+        PHOTO_LOADING[i.id] = true;
+        EQApi.get({ action: 'getMyPhoto', className: STUDENT.classId, studentNo: STUDENT.studentNo, id: i.id }).then(function(res) {
+          if (res && res.success && res.dataBase64) {
+            PHOTO_CACHE[i.id] = 'data:' + (res.mimeType || 'image/jpeg') + ';base64,' + res.dataBase64;
+            setPhoto(i.id);
+          } else {
+            delete PHOTO_LOADING[i.id];
+            var box = document.getElementById('myph-' + i.id); if (box) box.textContent = 'Not available';
+          }
+        }).catch(function() {
+          delete PHOTO_LOADING[i.id];
+          var box = document.getElementById('myph-' + i.id); if (box) box.textContent = 'Network error';
+        });
+      });
+    }
+
+    function showBig(id) {
+      if (!PHOTO_CACHE[id]) return;
+      document.getElementById('lightboxImg').src = PHOTO_CACHE[id];
+      document.getElementById('lightbox').classList.add('on');
+    }
+
+    function applySubmissions(res) {
+      lastStatuses = (res && res.statuses) || {};
+      myItems = (res && res.items) || [];
+    }
+
     function loadStatuses() {
       if (!window.EQApi || !STUDENT) return;
       EQApi.get({ action: 'getMySubmissions', className: STUDENT.classId, studentNo: STUDENT.studentNo })
-        .then(function(res) { lastStatuses = (res && res.statuses) || {}; render(lastStatuses); })
-        .catch(function() { render(lastStatuses); });
+        .then(function(res) { applySubmissions(res); render(); })
+        .catch(function() { render(); });
+    }
+
+    function loadScores() {
+      if (!window.EQApi || !STUDENT) return;
+      for (var ch = 1; ch <= CHAPTER_COUNT; ch++) (function(ch) {
+        EQApi.get({ action: 'getChapterScores', className: STUDENT.classId, chapter: ch + SCORE_CHAPTER_OFFSET }).then(function(res) {
+          var me = res && res.students ? res.students.find(function(s) { return String(s.no) === String(STUDENT.studentNo); }) : null;
+          lastScores[ch] = (me && me.scores) || {};
+          render();
+        }).catch(function() {});
+      })(ch);
     }
 
     // Unit names are set by the teacher (Materials page); the list above is a fallback.
     function loadUnitNames() {
       if (!window.EQApi) return;
       EQApi.get({ action: 'getUnitNames', grade: GRADE }).then(function(res) {
-        if (res && res.names && res.names.length) { UNIT_NAMES = res.names; render(lastStatuses); }
+        if (res && res.names && res.names.length) { UNIT_NAMES = res.names; render(); }
       }).catch(function() {});
     }
 
@@ -245,7 +347,8 @@
         var statuses = (res && res.statuses) || {};
         if (statuses[pendingKey] === 'pending') {
           msg.className = 'modal-msg ok'; msg.textContent = '✓ Submitted! Waiting for your teacher.';
-          render(statuses);
+          applySubmissions(res);
+          render();
           setTimeout(closeModal, 1100);
         } else {
           btn.disabled = false;
@@ -264,6 +367,7 @@
         document.getElementById('subIntro').style.display = '';
         loadUnitNames();
         loadStatuses();
+        loadScores();
       } else {
         document.getElementById('needLogin').style.display = '';
       }
