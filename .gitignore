@@ -30,3 +30,6 @@ build/
 
 # RTK (Rust Token Killer) local cache
 .rtk/
+
+# Brainstorm mockups (local only)
+.superpowers/
