@@ -211,6 +211,7 @@
 
   EQT.logout = function () {
     session.logout();
+    try { ['eq_tu', 'eq_tp', 'eq_teacher_verified_at', 'eq_teacher_verified_user'].forEach(function (k) { sessionStorage.removeItem(k); }); } catch (e) { /* storage off */ }
     showLogin('You are logged out.');
   };
 

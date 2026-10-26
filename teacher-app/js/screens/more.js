@@ -31,6 +31,17 @@
         '<div class="more-head">Account</div>' +
         '<button class="more-item logout" type="button" id="logoutBtn">' + icon('<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>') + 'Log out</button>' +
         '<p class="more-foot">EngQuest Teacher · pilot</p>';
+      // Hand the app's login to the teacher website (shared/js/auth.js reads these
+      // sessionStorage keys), so its pages open without asking for the password again.
+      el.querySelector('.more-list').addEventListener('click', function (e) {
+        if (!e.target.closest('a') || !who) return;
+        try {
+          sessionStorage.setItem('eq_tu', who.username);
+          sessionStorage.setItem('eq_tp', who.password);
+          sessionStorage.setItem('eq_teacher_verified_at', String(Date.now()));
+          sessionStorage.setItem('eq_teacher_verified_user', who.username);
+        } catch (err) { /* the website will ask for the login instead */ }
+      });
       el.querySelector('#logoutBtn').onclick = function () {
         ctx.confirm('Log out?', 'You will need your password to open the app again.', 'Log out', true).then(function (ok) {
           if (ok) EQT.logout();
