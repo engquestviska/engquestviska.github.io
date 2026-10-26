@@ -143,7 +143,8 @@
     }
 
     function scorePill(st, score) {
-      if (score !== '' && score !== undefined && score !== null) return '<span class="pill score">Score: ' + escapeHtml(score) + '</span>';
+      // A 0 in the grid means "not submitted yet", so it is not shown as a score.
+      if (score !== '' && score !== undefined && score !== null && Number(score) !== 0) return '<span class="pill score">Score: ' + escapeHtml(score) + '</span>';
       if (st === 'approved') return '<span class="pill noscore">Score not entered yet</span>';
       return '';
     }
