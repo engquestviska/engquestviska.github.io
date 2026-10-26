@@ -93,6 +93,28 @@ button, input, select { font: inherit; color: inherit; }
 .no { width: 30px; height: 30px; border-radius: 9px; background: var(--brand-soft); color: var(--brand); font-size: .74rem; font-weight: 800; display: grid; place-items: center; flex: 0 0 auto; }
 .nm { flex: 1; min-width: 0; font-size: .88rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+/* Attendance */
+.att-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
+.att-sum { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 8px 4px; text-align: center; }
+.att-sum b { display: block; font-size: 1.15rem; }
+.att-sum span { font-size: .62rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.att-sum.present b { color: var(--ok); } .att-sum.absent b { color: var(--bad); }
+.att-sum.sick b { color: var(--warn); } .att-sum.permit b { color: var(--info); }
+.att-hint { font-size: .74rem; color: var(--muted); margin: 2px 4px 8px; }
+.att-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+.att-row { display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 7px 7px 7px 10px; }
+.seg { display: flex; gap: 4px; flex: 0 0 auto; }
+.seg button { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line); background: #f8fafc; font-size: .8rem; font-weight: 800; color: #94a3b8; cursor: pointer; padding: 0; }
+.seg button.present.on { background: var(--ok); border-color: var(--ok); color: #fff; }
+.seg button.absent.on { background: var(--bad); border-color: var(--bad); color: #fff; }
+.seg button.sick.on { background: var(--warn); border-color: var(--warn); color: #fff; }
+.seg button.permit.on { background: var(--info); border-color: var(--info); color: #fff; }
+.savebar { position: fixed; left: 12px; right: 12px; bottom: calc(var(--tabbar-h) + var(--safe-b) + 10px); z-index: 30; background: var(--ink); color: #fff; border-radius: 16px; padding: 10px 10px 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; box-shadow: 0 10px 24px -8px rgba(15, 23, 42, .5); }
+.savebar b { display: block; font-size: .88rem; }
+.savebar small { display: block; color: #cbd5e1; font-size: .74rem; }
+.savebar.done { background: #14532d; }
+.savebar .btn { padding: 11px 22px; }
+
 /* More */
 .more-list { display: grid; gap: 8px; }
 .more-item { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 13px 14px; text-decoration: none; color: var(--ink); font-weight: 700; font-size: .92rem; }
