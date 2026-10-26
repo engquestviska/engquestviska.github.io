@@ -136,18 +136,26 @@
       return;
     }
     input.value = check.value;
+    // A newer edit while a save is on its way is sent right after it finishes.
+    if (input.classList.contains('saving')) { input.setAttribute('data-again', '1'); return; }
     if (check.value === value(s, col)) { input.classList.remove('bad', 'unsaved'); return; }
-    if (input.classList.contains('saving')) return;
     input.classList.remove('bad', 'saved', 'unsaved'); input.classList.add('saving');
     status('Saving ' + ctx.core.firstName(s.name) + '…');
     var params = { action: chapter === 'final' ? 'saveFinalScore' : 'saveChapterScore', className: ctx.className, studentNo: s.no, column: col, value: check.value };
     if (chapter !== 'final') params.chapter = chapter;
+    function again() {
+      if (!input.hasAttribute('data-again')) return false;
+      input.removeAttribute('data-again');
+      if (token !== st.token || !input.isConnected) return false;
+      save(input);
+      return true;
+    }
     ctx.session.call(params).then(function (res) {
-      if (token !== st.token) return;
       s.scores = s.scores || {};
       s.scores[col] = check.value;
       if (chapter === 'final' && res.calc) s.calc = Object.assign(s.calc || {}, res.calc);
       input.classList.remove('saving');
+      if (token !== st.token || again()) return;
       input.classList.toggle('low', ctx.core.isLowScore(check.value));
       input.classList.add('saved');
       setTimeout(function () { input.classList.remove('saved'); }, 900);
@@ -156,10 +164,11 @@
       if (row) row.querySelector('.avg b').textContent = a === '' ? '–' : a;
       status('Saved ✓ ' + ctx.core.firstName(s.name) + ' · ' + col + (check.value === '' ? ' cleared' : ' = ' + check.value), 'ok');
     }).catch(function (err) {
-      if (token !== st.token) return;
       input.classList.remove('saving'); input.classList.add('bad', 'unsaved');
+      // Warn even if the teacher already moved on: this score did not reach the backend.
+      if (err.message !== 'Session expired') ctx.toast('Not saved: ' + ctx.core.firstName(s.name) + ' · ' + col + ' = ' + check.value, 'err');
+      if (token !== st.token || again()) return;
       status('Not saved: ' + err.message + '. Tap the red box, then Next, to try again.', 'err');
-      if (err.message !== 'Session expired') ctx.toast('Not saved for ' + ctx.core.firstName(s.name), 'err');
     });
   }
 

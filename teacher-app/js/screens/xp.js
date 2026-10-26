@@ -64,59 +64,67 @@
     };
     st.el.querySelector('.xp-grid').onclick = function (e) {
       var t = e.target.closest('.tile'); if (!t) return;
-      give(t.getAttribute('data-no'), reason(), 1);
+      give(t.getAttribute('data-no'), reason());
     };
   }
 
-  function student(no) { return st.students.filter(function (s) { return String(s.no) === String(no); })[0]; }
+  function student(my, no) { return my.students.filter(function (s) { return String(s.no) === String(no); })[0]; }
 
-  function paint(no) {
-    var s = student(no), t = st.el.querySelector('.tile[data-no="' + no + '"]');
-    if (s && t) t.querySelector('small').textContent = Number(s.Total || 0) + ' XP';
-    return t;
+  function paint(my, no) {
+    var s = student(my, no), t = my.el.querySelector('.tile[data-no="' + no + '"]');
+    if (s && t && my === st) t.querySelector('small').textContent = Number(s.Total || 0) + ' XP';
+    return my === st ? t : null;
   }
 
-  // Taps are queued so they reach the backend one at a time, in order.
-  function give(no, r, delta) {
-    var ctx = st.ctx, s = student(no); if (!s) return;
-    var token = st.token;
-    s.Total = Number(s.Total || 0) + r.xp * delta;
-    var t = paint(no);
-    if (t && delta > 0) {
+  // Taps are queued so they reach the backend one at a time, in order. Queued taps are
+  // always sent, even if the class or screen changes; only the display stops updating.
+  function give(no, r) {
+    var my = st, ctx = my.ctx, s = student(my, no); if (!s) return;
+    var cls = ctx.className;
+    var tap = { state: 'pending' };
+    s.Total = Number(s.Total || 0) + r.xp;
+    var t = paint(my, no);
+    if (t) {
       var pop = document.createElement('span');
       pop.className = 'pop'; pop.textContent = '+' + r.xp;
       t.appendChild(pop);
       setTimeout(function () { pop.remove(); }, 800);
     }
     var name = ctx.core.firstName(s.nickname || s.name);
-    if (delta > 0) {
-      ctx.toast('+' + r.xp + ' XP · ' + name + ' · ' + r.label, null, { label: 'Undo', onClick: function () { give(no, r, -1); } });
-    } else {
-      ctx.toast('Undone · ' + name, null);
-    }
-    st.queue = st.queue.then(function () {
-      if (token !== st.token) return;
-      return ctx.session.call({ action: 'incrementActiveness', className: ctx.className, studentNo: no, column: r.key, delta: delta });
-    }).then(function () {
-      scheduleRefresh(token);
-    }, function (err) {
-      if (token !== st.token) return;
-      s.Total = Number(s.Total || 0) - r.xp * delta;
-      paint(no);
-      if (err.message !== 'Session expired') ctx.toast('Not saved for ' + name + ': ' + err.message, 'err');
+    ctx.toast('+' + r.xp + ' XP · ' + name + ' · ' + r.label, null, { label: 'Undo', onClick: function () { undo(my, no, r, tap, name); } });
+    send(my, cls, no, r, 1).then(function () { tap.state = 'ok'; }, function (err) {
+      tap.state = 'failed';
+      if (err.message !== 'Session expired' && my === st) ctx.toast('Not saved for ' + name + ': ' + err.message, 'err');
     });
   }
 
-  // Once the taps settle, re-read the totals so they match the backend.
-  function scheduleRefresh(token) {
-    clearTimeout(st.refreshTimer);
-    st.refreshTimer = setTimeout(function () {
-      st.queue.then(function () {
-        if (token !== st.token) return;
-        return st.ctx.session.read({ action: 'getAllActiveness', className: st.ctx.className }).then(function (data) {
-          if (token !== st.token) return;
+  // Undo runs after the tap in the queue, and only takes XP back if the tap was saved.
+  function undo(my, no, r, tap, name) {
+    var ctx = my.ctx, s = student(my, no);
+    if (tap.state === 'failed') { ctx.toast('That tap was not saved, nothing to undo', null); return; }
+    if (s) { s.Total = Number(s.Total || 0) - r.xp; paint(my, no); }
+    ctx.toast('Undone · ' + name, null);
+    send(my, ctx.className, no, r, -1, function () { return tap.state === 'ok'; }).catch(function () { /* refresh shows the truth */ });
+  }
+
+  function send(my, cls, no, r, delta, onlyIf) {
+    var p = my.queue = my.queue.catch(function () {}).then(function () {
+      if (onlyIf && !onlyIf()) return;
+      return my.ctx.session.call({ action: 'incrementActiveness', className: cls, studentNo: no, column: r.key, delta: delta });
+    });
+    // Whether it worked or not, re-read the real totals once the taps settle.
+    p.then(function () { scheduleRefresh(my); }, function () { scheduleRefresh(my); });
+    return p;
+  }
+
+  function scheduleRefresh(my) {
+    clearTimeout(my.refreshTimer);
+    my.refreshTimer = setTimeout(function () {
+      my.queue.catch(function () {}).then(function () {
+        if (my !== st) return;
+        return my.ctx.session.read({ action: 'getAllActiveness', className: my.ctx.className }).then(function (data) {
           (data.students || []).forEach(function (fresh) {
-            var s = student(fresh.no); if (s) { s.Total = fresh.Total; paint(fresh.no); }
+            var s = student(my, fresh.no); if (s) { s.Total = fresh.Total; paint(my, fresh.no); }
           });
         });
       }).catch(function () { /* keep what we show */ });

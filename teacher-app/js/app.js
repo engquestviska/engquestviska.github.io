@@ -147,6 +147,7 @@
     view.innerHTML = '';
     view.scrollTop = 0;
     hideToast();
+    closeSheet();
     var ctx = makeCtx();
     ctx.setSubtitle('');
     ctx.setAction(null);
@@ -158,6 +159,14 @@
   }
 
   function onHashChange() {
+    // Android back with a sheet or a full-screen photo open closes that first.
+    var viewer = document.querySelector('.photo-viewer');
+    if (!$('sheet').hidden || viewer) {
+      closeSheet();
+      if (viewer) viewer.remove();
+      history.replaceState(null, '', currentHash || '#/' + current);
+      return;
+    }
     var next = routeName();
     if (next === current) return;
     canLeave().then(function (ok) {

@@ -3,13 +3,22 @@
   var STATUSES = ['Present', 'Absent', 'Sick', 'Permit'];
 
   // UI "Chapter n" lives in backend chapter n+3 (same as teacher/scores.html modes 4/5/6).
+  // Only Chapters 1-3 and Tasks 1-3 exist on the backend; anything else gets no score box.
   function taskToChapterCol(code) {
     var s = String(code || '').trim().toUpperCase();
-    var m = /^C(\d+)T(\d+)$/.exec(s);
+    var m = /^C([1-3])T([1-3])$/.exec(s);
     if (m) return { chapter: String(Number(m[1]) + 3), column: 'Task ' + Number(m[2]) };
-    m = /^C(\d+)([FS])$/.exec(s);
+    m = /^C([1-3])([FS])$/.exec(s);
     if (m) return { chapter: String(Number(m[1]) + 3), column: m[2] === 'F' ? 'Formative' : 'Summative' };
     return null;
+  }
+
+  // The mime type comes from a student's upload, so never trust it inside markup.
+  function photoSrc(mimeType, base64) {
+    var b64 = String(base64 || '');
+    if (!b64 || !/^[A-Za-z0-9+/=\s]+$/.test(b64)) return null;
+    var mime = /^image\/(png|jpeg|jpg|webp|gif|heic|heif)$/i.test(String(mimeType || '')) ? String(mimeType).toLowerCase() : 'image/jpeg';
+    return 'data:' + mime + ';base64,' + b64;
   }
 
   function validateScore(value) {
@@ -97,6 +106,7 @@
   var core = {
     STATUSES: STATUSES,
     taskToChapterCol: taskToChapterCol,
+    photoSrc: photoSrc,
     validateScore: validateScore,
     isLowScore: isLowScore,
     attendanceInitial: attendanceInitial,

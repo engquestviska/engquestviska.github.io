@@ -5,6 +5,7 @@
   var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   var st = null; // state for the class on show
+  var draft = null; // unsaved marks kept across a "log in again"
 
   function today() {
     var d = new Date();
@@ -38,7 +39,13 @@
       st.marks = Object.assign({}, init.marks);
       st.loaded = true;
       st.failed = false;
+      var restored = draft && draft.className === ctx.className && draft.date === date;
+      if (restored) {
+        Object.keys(draft.marks).forEach(function (no) { if (no in st.marks) st.marks[no] = draft.marks[no]; });
+      }
+      draft = null;
       draw();
+      if (restored) ctx.toast('Your unsaved marks are back. Tap Save.', null);
     }).catch(function (err) {
       if (token !== st.token) return;
       st.el.innerHTML = '<div class="state"><b>Could not load the class</b>' + ctx.esc(err.message) +
@@ -130,6 +137,9 @@
       subtitle(); refresh();
       ctx.toast('Attendance saved for ' + ctx.classLabel, 'ok');
     }).catch(function (err) {
+      if (err.message === 'Session expired') {
+        draft = { className: ctx.className, date: st.date, marks: Object.assign({}, st.marks) };
+      }
       if (token !== st.token) return;
       st.saving = false; st.failed = true; refresh();
       if (err.message !== 'Session expired') ctx.toast('Not saved: ' + err.message, 'err');

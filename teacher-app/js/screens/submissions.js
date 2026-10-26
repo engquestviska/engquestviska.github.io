@@ -8,9 +8,10 @@
     if (PHOTOS[subId]) return Promise.resolve(PHOTOS[subId]);
     if (!LOADING[subId]) {
       LOADING[subId] = ctx.session.call({ action: 'getSubmissionPhoto', fileId: subId }).then(function (res) {
-        if (!res.dataBase64) throw new Error('No photo');
-        PHOTOS[subId] = 'data:' + (res.mimeType || 'image/jpeg') + ';base64,' + res.dataBase64;
-        return PHOTOS[subId];
+        var src = ctx.core.photoSrc(res.mimeType, res.dataBase64);
+        if (!src) throw new Error('No photo');
+        PHOTOS[subId] = src;
+        return src;
       }).finally(function () { delete LOADING[subId]; });
     }
     return LOADING[subId];
@@ -104,7 +105,12 @@
   function fillSlide(subId) {
     photo(st.ctx, subId).then(function (src) {
       var box = st.el.querySelector('.slide[data-id="' + cssEsc(subId) + '"]');
-      if (box) box.innerHTML = '<img alt="Submitted work" src="' + src + '">';
+      if (!box) return;
+      var img = document.createElement('img');
+      img.alt = 'Submitted work';
+      img.src = src;
+      box.innerHTML = '';
+      box.appendChild(img);
     }).catch(function (err) {
       if (err.message === 'Session expired') return;
       var box = st.el.querySelector('.slide[data-id="' + cssEsc(subId) + '"]');
@@ -179,22 +185,24 @@
       }
     }
     setBusy(true);
-    var token = st.token, done = 0;
+    var my = st, token = st.token, done = 0;
     var chain = Promise.resolve();
+    // Score first: if it fails, the photo stays waiting with the typed score kept for a retry.
     pend.forEach(function (it) {
       chain = chain.then(function () {
-        return ctx.session.call({ action: 'reviewTaskSubmission', subId: it.subId, decision: 'reviewed' });
-      }).then(function () {
-        it.status = 'reviewed';
-        if (!it.task) return;
-        var tasks = {}; tasks[it.task] = true;
-        return ctx.session.call({ action: 'saveTaskStatus', className: it.className, studentNo: it.studentNo, tasks: JSON.stringify(tasks) });
-      }).then(function () {
-        var score = ctx.core.validateScore(st.scores[it.subId] || '').value;
+        var score = ctx.core.validateScore(my.scores[it.subId] || '').value;
         var map = ctx.core.taskToChapterCol(it.task);
         if (score === '' || !map) return;
         return ctx.session.call({ action: 'saveChapterScore', className: it.className, chapter: map.chapter, studentNo: it.studentNo, column: map.column, value: score });
-      }).then(function () { done++; delete st.scores[it.subId]; });
+      }).then(function () {
+        return ctx.session.call({ action: 'reviewTaskSubmission', subId: it.subId, decision: 'reviewed' });
+      }).then(function () {
+        it.status = 'reviewed';
+        delete my.scores[it.subId];
+        if (!it.task) return;
+        var tasks = {}; tasks[it.task] = true;
+        return ctx.session.call({ action: 'saveTaskStatus', className: it.className, studentNo: it.studentNo, tasks: JSON.stringify(tasks) });
+      }).then(function () { done++; });
     });
     chain.then(function () {
       if (token !== st.token) return;
@@ -252,9 +260,12 @@
   function openViewer(src) {
     var v = document.createElement('div');
     v.className = 'photo-viewer';
-    v.innerHTML = '<button type="button" class="pv-close" aria-label="Close">✕</button><div class="pv-scroll"><img alt="Submitted work, full size" src="' + src + '"></div><p class="pv-hint">Tap the photo to zoom</p>';
+    v.innerHTML = '<button type="button" class="pv-close" aria-label="Close">✕</button><div class="pv-scroll"></div><p class="pv-hint">Tap the photo to zoom</p>';
+    var img = document.createElement('img');
+    img.alt = 'Submitted work, full size';
+    img.src = src;
+    v.querySelector('.pv-scroll').appendChild(img);
     document.body.appendChild(v);
-    var img = v.querySelector('img');
     img.onclick = function () { v.classList.toggle('zoom'); };
     v.querySelector('.pv-close').onclick = close;
     function close() { v.remove(); window.removeEventListener('hashchange', close); }

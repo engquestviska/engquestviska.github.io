@@ -17,6 +17,21 @@ test('taskToChapterCol returns null for codes it cannot map', () => {
   assert.equal(core.taskToChapterCol(null), null);
 });
 
+test('taskToChapterCol only maps chapters 1-3 and tasks 1-3 (what the backend accepts)', () => {
+  assert.equal(core.taskToChapterCol('C1T4'), null);
+  assert.equal(core.taskToChapterCol('C4T1'), null);
+  assert.equal(core.taskToChapterCol('C0F'), null);
+  assert.deepEqual(core.taskToChapterCol('C3T3'), { chapter: '6', column: 'Task 3' });
+});
+
+test('photoSrc only builds image data URLs from safe parts', () => {
+  assert.equal(core.photoSrc('image/png', 'iVBOR+/=='), 'data:image/png;base64,iVBOR+/==');
+  assert.equal(core.photoSrc('image/png" onerror="alert(1)', 'AAAA'), 'data:image/jpeg;base64,AAAA');
+  assert.equal(core.photoSrc(undefined, 'AAAA'), 'data:image/jpeg;base64,AAAA');
+  assert.equal(core.photoSrc('image/png', 'AA"><script>'), null);
+  assert.equal(core.photoSrc('image/png', ''), null);
+});
+
 test('validateScore accepts empty or 0-100 and trims', () => {
   assert.equal(core.validateScore('85').ok, true);
   assert.equal(core.validateScore('').ok, true);

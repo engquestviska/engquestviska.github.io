@@ -3,6 +3,8 @@
    Add &fail=1 to make every write fail (to test error handling). */
 (function (global) {
   var FAIL = /[?&]fail=1/.test(location.search);
+  var FAIL_SCORE = /[?&]failscore=1/.test(location.search); // only score saves fail
+  var EXPIRE = /[?&]expire=1/.test(location.search);        // writes say Unauthorized until a re-login
   var calls = global.__mockCalls = [];
   var WRITES = ['saveAttendance', 'removeAttendanceMeeting', 'reviewTaskSubmission', 'saveTaskStatus',
     'saveChapterScore', 'saveFinalScore', 'incrementActiveness'];
@@ -77,7 +79,9 @@
     g.font = '30px cursive, sans-serif';
     for (var i = 0; i < 16; i++) g.fillText((i + 1) + '. ' + 'The quick brown fox jumps over the lazy dog'.slice(0, 18 + (i * 5) % 24), 60, 156 + i * 44);
     var url = c.toDataURL('image/jpeg', .7);
-    return { success: true, mimeType: 'image/jpeg', dataBase64: url.split(',')[1] };
+    // sub2 carries a hostile mime type, the way a crafted student upload could.
+    var mime = sub.subId === 'sub2' ? 'image/jpeg" data-pwned="1' : 'image/jpeg';
+    return { success: true, mimeType: mime, dataBase64: url.split(',')[1] };
   }
 
   function handle(p) {
@@ -138,6 +142,9 @@
     return new Promise(function (resolve, reject) {
       setTimeout(function () {
         if (FAIL && WRITES.indexOf(params.action) > -1) return reject(new Error('Network error'));
+        if (FAIL_SCORE && /Score$/.test(params.action)) return reject(new Error('Network error'));
+        if (EXPIRE && WRITES.indexOf(params.action) > -1 && !global.__mockRelogged) return resolve({ error: 'Unauthorized' });
+        if (EXPIRE && params.action === 'checkLogin') global.__mockRelogged = true;
         resolve(handle(params));
       }, 250);
     });
