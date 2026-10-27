@@ -54,6 +54,15 @@ class Repo(
     /** Emits the saved entry for [key], then the result of [fetch]; re-fetches whenever the key's class drains. */
     fun cached(key: String, fetch: suspend () -> JsonObject): Flow<Cached> = readFlow(key, store = true, fetch)
 
+    /**
+     * Saves [json] as the stored copy for [key] (creating the entry if there is none). Screens use
+     * it to show what the teacher just did before the server has heard of it, so a reopen while
+     * offline shows the same thing.
+     */
+    suspend fun putStored(key: String, json: JsonObject) {
+        db.cacheDao().put(CacheEntry(key, json.toString(), clock()))
+    }
+
     private fun readFlow(key: String, store: Boolean, fetch: suspend () -> JsonObject): Flow<Cached> = channelFlow {
         val className = key.split('|').getOrNull(1).orEmpty()
         val rereads = Channel<Unit>(Channel.CONFLATED)

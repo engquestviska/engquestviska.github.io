@@ -27,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -53,6 +54,7 @@ import androidx.compose.ui.unit.sp
 import com.engquest.teacher.AppGraph
 import com.engquest.teacher.domain.ClassInfo
 import com.engquest.teacher.domain.Classes
+import com.engquest.teacher.ui.attendance.AttendanceScreen
 import com.engquest.teacher.ui.theme.Brand
 import kotlinx.coroutines.launch
 
@@ -73,6 +75,16 @@ enum class Tab(val key: String, val title: String, val label: String, val icon: 
 }
 
 private enum class ShellSheet { CLASS, FAILED }
+
+/**
+ * Lets a tab's screen ask the shell to check before the teacher leaves it (another tab,
+ * another class, logging out). The screen sets [unsaved] to a plain sentence while it holds
+ * changes that would be lost, and back to null when it holds none.
+ */
+@Stable
+class LeaveGuard {
+    var unsaved by mutableStateOf<String?>(null)
+}
 
 /**
  * The whole app: the login screen while nobody is logged in (or the saved password stopped
@@ -111,6 +123,12 @@ private fun AppShell(graph: AppGraph, onLoggedOut: () -> Unit) {
     val online by graph.online.collectAsState()
     var sheet by remember { mutableStateOf<ShellSheet?>(null) }
     var askLogout by remember { mutableStateOf(false) }
+    val guard = remember { LeaveGuard() }
+    var leaving by remember { mutableStateOf<(() -> Unit)?>(null) }
+    /** Runs [go] now, or after the teacher agrees to leave unsaved changes behind. */
+    fun leaveThen(go: () -> Unit) {
+        if (guard.unsaved == null) go() else leaving = go
+    }
     val scope = rememberCoroutineScope()
     val classInfo = Classes.ALL.first { it.id == classId }
 
@@ -125,24 +143,34 @@ private fun AppShell(graph: AppGraph, onLoggedOut: () -> Unit) {
                 title = tab.title,
                 classLabel = classInfo.label,
                 onClassClick = { sheet = ShellSheet.CLASS },
-                onLogOutClick = { askLogout = true },
+                onLogOutClick = { leaveThen { askLogout = true } },
             )
             StatusBar(pending, failed.size, online, onOpenFailed = { sheet = ShellSheet.FAILED })
             Box(Modifier.weight(1f).fillMaxWidth()) {
-                TabContent(tab, graph, classInfo)
+                TabContent(tab, graph, classInfo, guard)
             }
-            TabBar(tab) {
-                tab = it
-                prefs.edit().putString(AppGraph.KEY_TAB, it.key).apply()
+            TabBar(tab) { picked ->
+                if (picked != tab) {
+                    leaveThen {
+                        tab = picked
+                        prefs.edit().putString(AppGraph.KEY_TAB, picked.key).apply()
+                    }
+                }
             }
         }
         when (sheet) {
             ShellSheet.CLASS -> ClassPicker(
                 selectedId = classId,
-                onPick = {
-                    classId = it.id
-                    prefs.edit().putString(AppGraph.KEY_CLASS, it.id).apply()
-                    sheet = null
+                onPick = { picked ->
+                    if (picked.id == classId) {
+                        sheet = null
+                    } else {
+                        leaveThen {
+                            classId = picked.id
+                            prefs.edit().putString(AppGraph.KEY_CLASS, picked.id).apply()
+                            sheet = null
+                        }
+                    }
                 },
                 onDismiss = { sheet = null },
             )
@@ -154,6 +182,21 @@ private fun AppShell(graph: AppGraph, onLoggedOut: () -> Unit) {
             )
             null -> Unit
         }
+    }
+
+    leaving?.let { go ->
+        ConfirmDialog(
+            title = "Leave without saving?",
+            text = guard.unsaved.orEmpty(),
+            confirmLabel = "Leave",
+            confirmTag = "confirmLeave",
+            onConfirm = {
+                leaving = null
+                guard.unsaved = null
+                go()
+            },
+            onDismiss = { leaving = null },
+        )
     }
 
     if (askLogout) {
@@ -193,12 +236,12 @@ private fun AppShell(graph: AppGraph, onLoggedOut: () -> Unit) {
 
 /**
  * The selected tab's screen. Each tab is one slot taking the graph and the selected class;
- * Tasks 9–12 replace the placeholders.
+ * Tasks 10–12 replace the placeholders. [guard] is how a screen holds back leaving it.
  */
 @Composable
-fun TabContent(tab: Tab, graph: AppGraph, classInfo: ClassInfo) {
+fun TabContent(tab: Tab, graph: AppGraph, classInfo: ClassInfo, guard: LeaveGuard) {
     when (tab) {
-        Tab.ATTENDANCE -> AttendanceTab(graph, classInfo)
+        Tab.ATTENDANCE -> AttendanceScreen(graph, classInfo, guard)
         Tab.SUBMISSIONS -> SubmissionsTab(graph, classInfo)
         Tab.XP -> XpTab(graph, classInfo)
         Tab.SCORES -> ScoresTab(graph, classInfo)
@@ -206,10 +249,6 @@ fun TabContent(tab: Tab, graph: AppGraph, classInfo: ClassInfo) {
 }
 
 // ---- Placeholders until Tasks 9–12 ---------------------------------------------------------
-
-@Suppress("UNUSED_PARAMETER")
-@Composable
-fun AttendanceTab(graph: AppGraph, classInfo: ClassInfo) = ComingNext("Attendance", classInfo)
 
 @Suppress("UNUSED_PARAMETER")
 @Composable

@@ -20,14 +20,17 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -80,4 +83,28 @@ fun BottomSheet(title: String, onDismiss: () -> Unit, modifier: Modifier = Modif
             content()
         }
     }
+}
+
+/** A two-button question; [confirmTag] lets tests find the confirming button. */
+@Composable
+fun ConfirmDialog(
+    title: String,
+    text: String,
+    confirmLabel: String,
+    cancelLabel: String = "Cancel",
+    confirmTag: String = "confirmDialog",
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = { Text(text) },
+        confirmButton = {
+            TextButton(onClick = onConfirm, modifier = Modifier.testTag(confirmTag)) {
+                Text(confirmLabel, color = Bad, fontWeight = FontWeight.Bold)
+            }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(cancelLabel) } },
+    )
 }
