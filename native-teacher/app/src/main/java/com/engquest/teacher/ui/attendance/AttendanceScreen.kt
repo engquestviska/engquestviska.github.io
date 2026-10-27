@@ -124,7 +124,7 @@ fun AttendanceScreen(graph: AppGraph, classInfo: ClassInfo, guard: LeaveGuard) {
 }
 
 @Composable
-private fun Message(title: String, detail: String?, action: Pair<String, () -> Unit>?) {
+internal fun Message(title: String, detail: String?, action: Pair<String, () -> Unit>?) {
     Column(
         Modifier
             .padding(12.dp)

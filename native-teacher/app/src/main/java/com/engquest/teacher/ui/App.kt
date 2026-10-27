@@ -55,6 +55,9 @@ import com.engquest.teacher.AppGraph
 import com.engquest.teacher.domain.ClassInfo
 import com.engquest.teacher.domain.Classes
 import com.engquest.teacher.ui.attendance.AttendanceScreen
+import com.engquest.teacher.ui.xp.XpScreen
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import com.engquest.teacher.ui.theme.Brand
 import kotlinx.coroutines.launch
 
@@ -131,6 +134,16 @@ private fun AppShell(graph: AppGraph, onLoggedOut: () -> Unit) {
     }
     val scope = rememberCoroutineScope()
     val classInfo = Classes.ALL.first { it.id == classId }
+
+    // Android Back with unsaved work asks first; with nothing unsaved it behaves as usual.
+    val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    var backConfirmed by remember { mutableStateOf(false) }
+    BackHandler(enabled = guard.unsaved != null && !backConfirmed) {
+        leaving = { backConfirmed = true }
+    }
+    LaunchedEffect(backConfirmed) {
+        if (backConfirmed) backDispatcher?.onBackPressed()
+    }
 
     // Everything retried or discarded: nothing left to show.
     LaunchedEffect(failed.isEmpty()) {
@@ -243,7 +256,7 @@ fun TabContent(tab: Tab, graph: AppGraph, classInfo: ClassInfo, guard: LeaveGuar
     when (tab) {
         Tab.ATTENDANCE -> AttendanceScreen(graph, classInfo, guard)
         Tab.SUBMISSIONS -> SubmissionsTab(graph, classInfo)
-        Tab.XP -> XpTab(graph, classInfo)
+        Tab.XP -> XpScreen(graph, classInfo)
         Tab.SCORES -> ScoresTab(graph, classInfo)
     }
 }
@@ -253,10 +266,6 @@ fun TabContent(tab: Tab, graph: AppGraph, classInfo: ClassInfo, guard: LeaveGuar
 @Suppress("UNUSED_PARAMETER")
 @Composable
 fun SubmissionsTab(graph: AppGraph, classInfo: ClassInfo) = ComingNext("Submissions", classInfo)
-
-@Suppress("UNUSED_PARAMETER")
-@Composable
-fun XpTab(graph: AppGraph, classInfo: ClassInfo) = ComingNext("Give XP", classInfo)
 
 @Suppress("UNUSED_PARAMETER")
 @Composable
