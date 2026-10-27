@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import okhttp3.OkHttpClient
+import java.io.File
 
 /**
  * An [AppGraph] for tests: plain prefs, in-memory database, a test WorkManager (its jobs wait
@@ -39,6 +40,7 @@ fun testGraph(
         WorkManager.getInstance(context)
     },
     scope = scope,
+    photoDir = File(context.cacheDir, "photos-test").apply { deleteRecursively() },
 )
 
 /** Stands in for [TeacherApplication] in activity tests (no Android Keystore under Robolectric). */

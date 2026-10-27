@@ -12,6 +12,7 @@ import com.engquest.teacher.data.Api
 import com.engquest.teacher.data.AppDb
 import com.engquest.teacher.data.Outbox
 import com.engquest.teacher.data.OutboxWorkerFactory
+import com.engquest.teacher.data.Photos
 import com.engquest.teacher.data.Repo
 import com.engquest.teacher.data.Session
 import kotlinx.coroutines.CoroutineScope
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
+import java.io.File
 import java.util.UUID
 
 /** Whatever holds the app's one [AppGraph] (the real app, or a test app). */
@@ -29,7 +31,7 @@ interface GraphOwner {
 }
 
 /**
- * The app's objects, made once: one [Api], [Session], [Repo] and [Outbox].
+ * The app's objects, made once: one [Api], [Session], [Repo], [Outbox] and [Photos].
  * [workManager] gets the worker factory so WorkManager can build [com.engquest.teacher.data.OutboxWorker]
  * with these same objects. [prefs] holds plain screen choices (selected class and tab).
  * Making the [Outbox] here, at app start, lets it re-schedule unsent items after a restart or re-login.
@@ -43,11 +45,14 @@ class AppGraph(
     val online: StateFlow<Boolean>,
     workManager: (WorkerFactory) -> WorkManager,
     val scope: CoroutineScope,
+    /** Where submission photos are kept so ones seen before open offline. */
+    photoDir: File,
 ) {
     val session = Session(sessionPrefs, api)
     val repo = Repo(api, session, db)
     val workerFactory = OutboxWorkerFactory(db, session, api, repo)
     val outbox = Outbox(db, session, workManager(workerFactory), scope)
+    val photos = Photos(api, session, photoDir)
 
     /**
      * Logs out: tells the server to stop notifying this phone (best effort, in the background),
@@ -96,6 +101,7 @@ class AppGraph(
             online = networkStatus(context),
             workManager = workManager,
             scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
+            photoDir = File(context.cacheDir, "photos"),
         )
 
         private fun networkStatus(context: Context): StateFlow<Boolean> {

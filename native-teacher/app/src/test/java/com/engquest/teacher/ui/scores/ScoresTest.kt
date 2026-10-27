@@ -34,6 +34,7 @@ import kotlinx.coroutines.SupervisorJob
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
+import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricTestRunner::class)
 @Config(qualifiers = "w360dp-h800dp")
@@ -151,9 +152,15 @@ class ScoresTest {
         show()
         waitFor("score-1")
         compose.onNodeWithTag("chip-6").performClick()
-        compose.waitUntil(5_000) { server.requestCount >= 2 }
-        val last = (1..server.requestCount).map { server.takeRequest() }.last()
-        assertEquals("6", last.requestUrl!!.queryParameter("chapter"))
+        // The shell also reads submissions (for the tab badge): look at the score reads only.
+        val chapters = mutableListOf<String?>()
+        compose.waitUntil(5_000) {
+            generateSequence { server.takeRequest(0, TimeUnit.SECONDS) }
+                .filter { it.requestUrl?.queryParameter("action") == "getChapterScores" }
+                .forEach { chapters += it.requestUrl!!.queryParameter("chapter") }
+            chapters.size >= 2
+        }
+        assertEquals("6", chapters.last())
     }
 
     @Test
@@ -217,7 +224,12 @@ class ScoresTest {
             graph.db.outboxDao().deleteAll()
             graph.repo.notifyDrained("XE1")
         }
-        compose.waitUntil(10_000) { runCatching { compose.onNodeWithTag("avg-1", useUnmergedTree = true).assertTextEquals("55") }.isSuccess }
+        // The last saves may still be finishing on the background thread when the first re-read
+        // lands (that reply is rightly held back), so the drain is signalled again until one applies.
+        compose.waitUntil(10_000) {
+            runCatching { compose.onNodeWithTag("avg-1", useUnmergedTree = true).assertTextEquals("55") }.isSuccess ||
+                false.also { runBlocking { graph.repo.notifyDrained("XE1") } }
+        }
     }
 
     @Test

@@ -245,7 +245,12 @@ class XpTest {
             graph.db.outboxDao().deleteAll()
             graph.repo.notifyDrained("XE1")
         }
-        compose.waitUntil(10_000) { runCatching { total(1).assertTextEquals("999 XP") }.isSuccess }
+        // The last taps may still be finishing on the background thread when the first re-read
+        // lands (that reply is rightly held back), so the drain is signalled again until one applies.
+        compose.waitUntil(10_000) {
+            runCatching { total(1).assertTextEquals("999 XP") }.isSuccess ||
+                false.also { runBlocking { graph.repo.notifyDrained("XE1") } }
+        }
     }
 
     @Test

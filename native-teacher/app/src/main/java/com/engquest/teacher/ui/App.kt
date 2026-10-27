@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.selection.selectable
@@ -27,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -47,6 +50,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -56,6 +62,9 @@ import com.engquest.teacher.domain.ClassInfo
 import com.engquest.teacher.domain.Classes
 import com.engquest.teacher.ui.attendance.AttendanceScreen
 import com.engquest.teacher.ui.scores.ScoresScreen
+import com.engquest.teacher.ui.submissions.SubmissionLink
+import com.engquest.teacher.ui.submissions.SubmissionsScreen
+import com.engquest.teacher.ui.submissions.SubmissionsViewModel
 import com.engquest.teacher.ui.xp.XpScreen
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -95,7 +104,7 @@ class LeaveGuard {
  * working), otherwise the top bar, status line, the selected tab's screen and the bottom bar.
  */
 @Composable
-fun TeacherApp(graph: AppGraph) {
+fun TeacherApp(graph: AppGraph, link: SubmissionLink? = null, onLinkUsed: () -> Unit = {}) {
     val user by graph.session.user.collectAsState()
     val expired by graph.session.expired.collectAsState()
     var loggedOutHere by rememberSaveable { mutableStateOf(false) }
@@ -108,12 +117,12 @@ fun TeacherApp(graph: AppGraph) {
         }
         key(expired) { LoginScreen(graph.session, note, graph.session.savedUsername().orEmpty()) }
     } else {
-        AppShell(graph, onLoggedOut = { loggedOutHere = true })
+        AppShell(graph, link, onLinkUsed, onLoggedOut = { loggedOutHere = true })
     }
 }
 
 @Composable
-private fun AppShell(graph: AppGraph, onLoggedOut: () -> Unit) {
+private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> Unit, onLoggedOut: () -> Unit) {
     val prefs = graph.prefs
     var classId by rememberSaveable {
         mutableStateOf(
@@ -135,6 +144,35 @@ private fun AppShell(graph: AppGraph, onLoggedOut: () -> Unit) {
     }
     val scope = rememberCoroutineScope()
     val classInfo = Classes.ALL.first { it.id == classId }
+
+    // Submissions load here, not only on their tab, so the tab badge shows what is waiting.
+    val submissions = remember(classId) { SubmissionsViewModel(graph, classInfo, scope) }
+    DisposableEffect(submissions) {
+        submissions.open()
+        onDispose { submissions.close() }
+    }
+
+    // A notification's link: that class, the Submissions tab, that student.
+    var linkedStudent by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(link) {
+        val l = link ?: return@LaunchedEffect
+        onLinkUsed()
+        val target = Classes.ALL.firstOrNull { it.id == l.className } ?: return@LaunchedEffect
+        leaveThen {
+            sheet = null
+            classId = target.id
+            prefs.edit().putString(AppGraph.KEY_CLASS, target.id).apply()
+            tab = Tab.SUBMISSIONS
+            prefs.edit().putString(AppGraph.KEY_TAB, Tab.SUBMISSIONS.key).apply()
+            linkedStudent = l.studentNo
+        }
+    }
+    LaunchedEffect(submissions, linkedStudent) {
+        linkedStudent?.let {
+            submissions.focus(it)
+            linkedStudent = null
+        }
+    }
 
     // Android Back with unsaved work asks first; with nothing unsaved it behaves as usual.
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
@@ -171,9 +209,9 @@ private fun AppShell(graph: AppGraph, onLoggedOut: () -> Unit) {
             )
             StatusBar(pending, failed.size, online, onOpenFailed = { sheet = ShellSheet.FAILED })
             Box(Modifier.weight(1f).fillMaxWidth()) {
-                TabContent(tab, graph, classInfo, guard)
+                TabContent(tab, graph, classInfo, guard, submissions)
             }
-            TabBar(tab) { picked ->
+            TabBar(tab, badges = mapOf(Tab.SUBMISSIONS to submissions.waiting)) { picked ->
                 if (picked != tab) {
                     leaveThen {
                         tab = picked
@@ -260,41 +298,16 @@ private fun AppShell(graph: AppGraph, onLoggedOut: () -> Unit) {
 
 /**
  * The selected tab's screen. Each tab is one slot taking the graph and the selected class;
- * Tasks 10–12 replace the placeholders. [guard] is how a screen holds back leaving it.
+ * [guard] is how a screen holds back leaving it. [submissions] is made by the shell (it feeds
+ * the tab badge too).
  */
 @Composable
-fun TabContent(tab: Tab, graph: AppGraph, classInfo: ClassInfo, guard: LeaveGuard) {
+fun TabContent(tab: Tab, graph: AppGraph, classInfo: ClassInfo, guard: LeaveGuard, submissions: SubmissionsViewModel) {
     when (tab) {
         Tab.ATTENDANCE -> AttendanceScreen(graph, classInfo, guard)
-        Tab.SUBMISSIONS -> SubmissionsTab(graph, classInfo)
+        Tab.SUBMISSIONS -> SubmissionsScreen(submissions, graph.photos, classInfo, guard)
         Tab.XP -> XpScreen(graph, classInfo)
         Tab.SCORES -> ScoresScreen(graph, classInfo)
-    }
-}
-
-// ---- Placeholders until Tasks 9–12 ---------------------------------------------------------
-
-@Suppress("UNUSED_PARAMETER")
-@Composable
-fun SubmissionsTab(graph: AppGraph, classInfo: ClassInfo) = ComingNext("Submissions", classInfo)
-
-@Composable
-private fun ComingNext(screen: String, classInfo: ClassInfo) {
-    Column(
-        Modifier
-            .padding(12.dp)
-            .fillMaxWidth()
-            .background(Color.White, RoundedCornerShape(16.dp))
-            .padding(20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text("Coming next", fontWeight = FontWeight.ExtraBold, fontSize = 17.sp, color = Ink)
-        Text(
-            "$screen for ${classInfo.label} arrives in the next update.",
-            color = Muted,
-            fontSize = 14.sp,
-            modifier = Modifier.padding(top = 4.dp),
-        )
     }
 }
 
@@ -340,7 +353,7 @@ private fun TopBar(title: String, classLabel: String, onClassClick: () -> Unit, 
 }
 
 @Composable
-private fun TabBar(selected: Tab, onSelect: (Tab) -> Unit) {
+private fun TabBar(selected: Tab, badges: Map<Tab, Int>, onSelect: (Tab) -> Unit) {
     Column(Modifier.fillMaxWidth().background(Color.White).windowInsetsPadding(WindowInsets.navigationBars)) {
         HorizontalDivider(color = Line)
         Row(Modifier.fillMaxWidth().height(64.dp).testTag("tabBar")) {
@@ -366,7 +379,28 @@ private fun TabBar(selected: Tab, onSelect: (Tab) -> Unit) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                 ) {
-                    Icon(tab.icon, contentDescription = null, tint = color, modifier = Modifier.size(22.dp))
+                    Box {
+                        Icon(tab.icon, contentDescription = null, tint = color, modifier = Modifier.size(22.dp))
+                        val count = badges[tab] ?: 0
+                        if (count > 0) {
+                            Text(
+                                if (count > 99) "99+" else count.toString(),
+                                color = Color.White,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.ExtraBold,
+                                textAlign = TextAlign.Center,
+                                maxLines = 1,
+                                modifier = Modifier
+                                    .align(Alignment.TopStart)
+                                    .offset(x = 14.dp, y = (-6).dp)
+                                    .background(Bad, RoundedCornerShape(999.dp))
+                                    .widthIn(min = 18.dp)
+                                    .padding(horizontal = 5.dp, vertical = 1.dp)
+                                    .semantics { contentDescription = "$count waiting" }
+                                    .testTag("tabBadge-${tab.key}"),
+                            )
+                        }
+                    }
                     Spacer(Modifier.height(3.dp))
                     Text(tab.label, color = color, fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                 }
