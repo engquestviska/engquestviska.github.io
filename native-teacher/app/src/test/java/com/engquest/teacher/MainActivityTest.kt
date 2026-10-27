@@ -7,9 +7,11 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
-// Proves Compose UI tests run on the JVM under Robolectric (later screens rely on it).
+// The activity starts from the app's graph and, signed out, shows the login screen.
 @RunWith(RobolectricTestRunner::class)
+@Config(application = TestTeacherApp::class)
 class MainActivityTest {
     @get:Rule
     val compose = createAndroidComposeRule<MainActivity>()

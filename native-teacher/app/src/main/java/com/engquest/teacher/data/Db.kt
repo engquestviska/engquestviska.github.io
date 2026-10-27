@@ -87,6 +87,10 @@ interface OutboxDao {
     /** Removes the item unless it is being sent right now; returns the number removed (0 or 1). */
     @Query("DELETE FROM outbox WHERE id = :id AND state != 'SENDING'")
     suspend fun deleteUnlessSending(id: Long): Int
+
+    /** Log out: every unsent and failed item is dropped. */
+    @Query("DELETE FROM outbox")
+    suspend fun deleteAll()
 }
 
 @Database(entities = [CacheEntry::class, OutboxItem::class], version = 1)

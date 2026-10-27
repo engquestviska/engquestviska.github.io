@@ -77,6 +77,12 @@ class Outbox(
     /** Removes the item unless the worker is sending it right now (XP Undo). */
     suspend fun cancelIfPending(id: Long): Boolean = dao.deleteUnlessSending(id) == 1
 
+    /** Log out: stops sending and drops every item, failed ones too. */
+    suspend fun clear() {
+        work.cancelUniqueWork(WORK_NAME)
+        dao.deleteAll()
+    }
+
     private fun schedule() {
         val request = OneTimeWorkRequestBuilder<OutboxWorker>()
             .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
