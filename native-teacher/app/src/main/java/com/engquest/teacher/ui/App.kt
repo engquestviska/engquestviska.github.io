@@ -48,6 +48,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -208,6 +209,10 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
                 onLogOutClick = { leaveThen { askLogout = true } },
             )
             StatusBar(pending, failed.size, online, onOpenFailed = { sheet = ShellSheet.FAILED })
+            graph.updates?.let { checker ->
+                val context = LocalContext.current
+                UpdateBanner(checker) { UpdateInstaller(context).start(it) }
+            }
             Box(Modifier.weight(1f).fillMaxWidth()) {
                 TabContent(tab, graph, classInfo, guard, submissions)
             }

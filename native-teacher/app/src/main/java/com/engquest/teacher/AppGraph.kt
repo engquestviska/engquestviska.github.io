@@ -15,6 +15,7 @@ import com.engquest.teacher.data.OutboxWorkerFactory
 import com.engquest.teacher.data.Photos
 import com.engquest.teacher.data.Repo
 import com.engquest.teacher.data.Session
+import com.engquest.teacher.ui.UpdateChecker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -47,6 +48,8 @@ class AppGraph(
     val scope: CoroutineScope,
     /** Where submission photos are kept so ones seen before open offline. */
     photoDir: File,
+    /** Looks for a newer app build; null (tests) means no update check. */
+    val updates: UpdateChecker? = null,
 ) {
     val session = Session(sessionPrefs, api)
     val repo = Repo(api, session, db)
@@ -102,6 +105,12 @@ class AppGraph(
             workManager = workManager,
             scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
             photoDir = File(context.cacheDir, "photos"),
+            updates = UpdateChecker(
+                UpdateChecker.VERSION_URL,
+                UpdateChecker.SITE_BASE,
+                BuildConfig.VERSION_CODE,
+                OkHttpClient(),
+            ),
         )
 
         private fun networkStatus(context: Context): StateFlow<Boolean> {
