@@ -121,7 +121,7 @@
 - `fun colLabel(col: String): String`; `fun initials(name: String?): String`; `fun firstName(name: String?): String`
 - `fun safeMime(mime: String?): String` (whitelist `image/(png|jpeg|jpg|webp|gif|heic|heif)`, else `image/jpeg`)
 - `fun taskLabel(code: String): String` (`C1T2`→`C1 Task 2`, `C2F`→`C2 Formative`, `C3S`→`C3 Summative`, else code)
-- `fun attendanceInitial(students: List<Student>, meetings: List<Meeting>, date: String): Pair<Meeting?, Map<String,String>>`, `attendanceCounts`, `attendanceDirty`, `groupSubmissions(rows, className, filterAll)` — same rules as core.js; `data class Student(no, name, nickname, attendance: Map<String,String>)`, `Meeting(number: Int, date: String)`, `SubmissionRow(subId, className, studentNo, studentName, task, timestamp, status)` in `domain/Models.kt`.
+- `fun attendanceInitial(students: List<Student>, meetings: List<Meeting>, date: String): Pair<Meeting?, Map<String,String>>`, `attendanceCounts`, `attendanceDirty`, `attendanceRecords(students, marks): List<Pair<String,String>>` (no → status), `groupSubmissions(rows, className, filterAll)` — same rules as core.js; `data class Student(no, name, nickname, attendance: Map<String,String>)`, `Meeting(number: Int, date: String)`, `SubmissionRow(subId, className, studentNo, studentName, task, timestamp, status)` in `domain/Models.kt`.
 - `object Classes { val ALL: List<ClassInfo> }`, `data class ClassInfo(id, label, grade)` with the 8 classes.
 - `build.ps1 [-Release]` sets the env vars from Global Constraints and runs `gradle.bat -p native-teacher testDebugUnitTest` then `assembleDebug`/`assembleRelease`.
 
