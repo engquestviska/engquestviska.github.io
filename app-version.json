@@ -1,9 +1,10 @@
 {
-  "versionCode": 8,
-  "versionName": "1.7",
+  "versionCode": 9,
+  "versionName": "1.8",
   "apk": "EngQuest-app-7fq93kx2.apk",
-  "notes": "A proper Updates page so you can see what's new before installing.",
+  "notes": "Submit photos more easily: take a photo or pick many from your gallery at once.",
   "history": [
+    { "version": "1.8", "date": "2026-10-27", "notes": ["Submit page: choose Take photo (camera) or From gallery", "Pick many photos from your gallery at once (up to 10)"] },
     { "version": "1.7", "date": "2026-07-27", "notes": ["New Updates page — see what's new before you install, instead of a blank download", "The Download button installs the app for you"] },
     { "version": "1.6", "date": "2026-07-27", "notes": ["Smoother updates: the app downloads and opens the installer for you", "No more browser or duplicate downloaded files"] },
     { "version": "1.5", "date": "2026-07-27", "notes": ["Added the menu button (top-left) for the full menu: Assignments, Attendance, Reading, Vocabulary, Strikes, and more"] },

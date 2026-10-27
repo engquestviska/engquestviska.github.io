@@ -60,6 +60,9 @@
     .thumb .rm { position:absolute; top:4px; right:4px; width:22px; height:22px; border:none; border-radius:50%; background:rgba(15,23,42,.72); color:#fff; font-weight:800; cursor:pointer; line-height:20px; padding:0; }
     .add-photo { width:100%; border:1.5px dashed var(--blue); background:#fff; color:var(--blue); border-radius:12px; padding:12px; font:700 .9rem 'IBM Plex Sans',sans-serif; cursor:pointer; }
     .add-photo:disabled { opacity:.5; cursor:not-allowed; }
+    .add-row { display:flex; gap:8px; }
+    .add-row .add-photo { flex:1; padding:12px 8px; }
+    .add-note { font-size:.76rem; color:#64748b; text-align:center; margin-top:6px; }
     .modal-actions { display:flex; gap:10px; margin-top:16px; }
     .modal-actions button { flex:1; border-radius:12px; padding:12px; font:700 .9rem 'IBM Plex Sans',sans-serif; cursor:pointer; border:none; }
     .btn-cancel { background:#f1f5f9; color:#475569; }
@@ -96,7 +99,7 @@
   </header>
 
   <main>
-    <p class="sub-intro" id="subIntro" style="display:none">Tap <b>Submit</b> next to a task, choose photos of your finished work (up to 10, you can select them all at once), and send them. Once sent, the task shows <b>Waiting for teacher</b> until your teacher checks it. Tap 📷 to see the photos you sent, or remove one you sent by mistake. <b>Re-submit</b> replaces your old photos for that task with the new ones.</p>
+    <p class="sub-intro" id="subIntro" style="display:none">Tap <b>Submit</b> next to a task, take photos of your finished work or choose them from your gallery (up to 10, you can select many at once), and send them. Once sent, the task shows <b>Waiting for teacher</b> until your teacher checks it. Tap 📷 to see the photos you sent, or remove one you sent by mistake. <b>Re-submit</b> replaces your old photos for that task with the new ones.</p>
     <div id="chapters"></div>
     <div class="sub-need-login" id="needLogin" style="display:none">Log in on the <a href="index.html">homepage</a> first to submit your tasks.</div>
   </main>
@@ -106,7 +109,11 @@
       <h3 id="modalTitle">Submit photos</h3>
       <div class="msub" id="modalSub"></div>
       <div class="thumb-grid" id="thumbGrid"></div>
-      <button class="add-photo" id="btnAdd" type="button">＋ Add photo</button>
+      <div class="add-row">
+        <button class="add-photo" id="btnCamera" type="button">📷 Take photo</button>
+        <button class="add-photo" id="btnGallery" type="button">🖼️ From gallery</button>
+      </div>
+      <div class="add-note" id="addNote"></div>
       <div class="modal-msg" id="modalMsg"></div>
       <div class="modal-actions">
         <button class="btn-cancel" id="btnCancel" type="button">Cancel</button>
@@ -118,6 +125,7 @@
   <div class="lightbox" id="lightbox" onclick="this.classList.remove('on')"><img id="lightboxImg" alt="Your submitted photo"/></div>
 
   <input type="file" id="fileInput" accept="image/*" multiple style="display:none"/>
+  <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none"/>
 
   <script>
     var GRADE = '11';
@@ -282,15 +290,16 @@
       var msg = document.getElementById('modalMsg'); msg.textContent = ''; msg.className = 'modal-msg';
       renderThumbs();
       document.getElementById('modalBack').classList.add('on');
-      openPicker();
     }
 
-    function openPicker() {
-      var fi = document.getElementById('fileInput');
+    // Camera takes one photo per tap; the gallery lets students tick many at once.
+    function openPicker(id) {
+      var fi = document.getElementById(id);
       fi.value = '';
       fi.click();
     }
-    document.getElementById('btnAdd').onclick = openPicker;
+    document.getElementById('btnCamera').onclick = function() { openPicker('cameraInput'); };
+    document.getElementById('btnGallery').onclick = function() { openPicker('fileInput'); };
 
     function renderThumbs() {
       var grid = document.getElementById('thumbGrid');
@@ -299,10 +308,11 @@
                '<button class="rm" type="button" onclick="removeThumb(' + i + ')">×</button></div>';
       }).join('');
       document.getElementById('btnSend').disabled = pendingImages.length === 0;
-      var add = document.getElementById('btnAdd');
-      add.disabled = pendingImages.length >= MAX_PHOTOS;
-      add.textContent = pendingImages.length >= MAX_PHOTOS ? 'Maximum ' + MAX_PHOTOS + ' photos' :
-        (pendingImages.length ? '＋ Add another photo (' + pendingImages.length + '/' + MAX_PHOTOS + ')' : '＋ Add photo');
+      var full = pendingImages.length >= MAX_PHOTOS;
+      document.getElementById('btnCamera').disabled = full;
+      document.getElementById('btnGallery').disabled = full;
+      document.getElementById('addNote').textContent = full ? 'Maximum ' + MAX_PHOTOS + ' photos' :
+        (pendingImages.length ? pendingImages.length + '/' + MAX_PHOTOS + ' photos. You can add more.' : '');
     }
 
     function removeThumb(i) { pendingImages.splice(i, 1); renderThumbs(); }
@@ -326,7 +336,7 @@
       });
     }
 
-    document.getElementById('fileInput').addEventListener('change', function(e) {
+    function onPicked(e) {
       var files = Array.prototype.slice.call(e.target.files || []);
       if (!files.length) return;
       var msg = document.getElementById('modalMsg');
@@ -340,7 +350,9 @@
           msg.textContent = '';
           renderThumbs();
         });
-    });
+    }
+    document.getElementById('fileInput').addEventListener('change', onPicked);
+    document.getElementById('cameraInput').addEventListener('change', onPicked);
 
     function closeModal() {
       document.getElementById('modalBack').classList.remove('on');
