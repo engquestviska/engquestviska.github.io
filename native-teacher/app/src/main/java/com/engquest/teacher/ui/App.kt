@@ -55,6 +55,7 @@ import com.engquest.teacher.AppGraph
 import com.engquest.teacher.domain.ClassInfo
 import com.engquest.teacher.domain.Classes
 import com.engquest.teacher.ui.attendance.AttendanceScreen
+import com.engquest.teacher.ui.scores.ScoresScreen
 import com.engquest.teacher.ui.xp.XpScreen
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
@@ -267,7 +268,7 @@ fun TabContent(tab: Tab, graph: AppGraph, classInfo: ClassInfo, guard: LeaveGuar
         Tab.ATTENDANCE -> AttendanceScreen(graph, classInfo, guard)
         Tab.SUBMISSIONS -> SubmissionsTab(graph, classInfo)
         Tab.XP -> XpScreen(graph, classInfo)
-        Tab.SCORES -> ScoresTab(graph, classInfo)
+        Tab.SCORES -> ScoresScreen(graph, classInfo)
     }
 }
 
@@ -276,10 +277,6 @@ fun TabContent(tab: Tab, graph: AppGraph, classInfo: ClassInfo, guard: LeaveGuar
 @Suppress("UNUSED_PARAMETER")
 @Composable
 fun SubmissionsTab(graph: AppGraph, classInfo: ClassInfo) = ComingNext("Submissions", classInfo)
-
-@Suppress("UNUSED_PARAMETER")
-@Composable
-fun ScoresTab(graph: AppGraph, classInfo: ClassInfo) = ComingNext("Scores", classInfo)
 
 @Composable
 private fun ComingNext(screen: String, classInfo: ClassInfo) {
