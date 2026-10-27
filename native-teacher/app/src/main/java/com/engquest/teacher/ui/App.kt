@@ -211,7 +211,7 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
             StatusBar(pending, failed.size, online, onOpenFailed = { sheet = ShellSheet.FAILED })
             graph.updates?.let { checker ->
                 val context = LocalContext.current
-                UpdateBanner(checker) { UpdateInstaller(context).start(it) }
+                UpdateBanner(checker) { url, onFailed -> UpdateInstaller(context).start(url, onFailed) }
             }
             Box(Modifier.weight(1f).fillMaxWidth()) {
                 TabContent(tab, graph, classInfo, guard, submissions)

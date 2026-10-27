@@ -76,24 +76,37 @@ class UpdateChecker(
 
 /**
  * Downloads the new APK to one fixed file (so there are never duplicates) and, when the
- * download finishes, opens the system installer on it.
+ * download finishes, opens the system installer on it. Works on the application context, so
+ * a screen rotation during the download neither leaks the activity nor loses the installer.
  */
-class UpdateInstaller(private val context: Context) {
-    fun start(apkUrl: String) {
-        val file = File(context.getExternalFilesDir(null), APK_NAME)
-        file.delete()
-        val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        val id = dm.enqueue(
-            DownloadManager.Request(Uri.parse(apkUrl))
-                .setTitle("EngQuest Teacher update")
-                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
-                .setDestinationInExternalFilesDir(context, null, APK_NAME),
-        )
+class UpdateInstaller(context: Context) {
+    private val context: Context = context.applicationContext ?: context
+
+    /** Starts the download; [onFailed] runs (on the main thread) if it cannot start or does not finish. */
+    fun start(apkUrl: String, onFailed: () -> Unit) {
+        val id = try {
+            val dir = context.getExternalFilesDir(null) ?: return onFailed()
+            File(dir, APK_NAME).delete()
+            val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            dm.enqueue(
+                DownloadManager.Request(Uri.parse(apkUrl))
+                    .setTitle("EngQuest Teacher update")
+                    .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+                    .setDestinationInExternalFilesDir(context, null, APK_NAME),
+            )
+        } catch (e: Exception) {
+            return onFailed()
+        }
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(c: Context, intent: Intent) {
                 if (intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1L) != id) return
                 runCatching { context.unregisterReceiver(this) }
-                install(file)
+                if (succeeded(id)) {
+                    runCatching { install(File(context.getExternalFilesDir(null), APK_NAME)) }
+                        .onFailure { onFailed() }
+                } else {
+                    onFailed()
+                }
             }
         }
         ContextCompat.registerReceiver(
@@ -104,8 +117,17 @@ class UpdateInstaller(private val context: Context) {
         )
     }
 
+    private fun succeeded(id: Long): Boolean {
+        val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        return runCatching {
+            dm.query(DownloadManager.Query().setFilterById(id))?.use { c ->
+                c.moveToFirst() && c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL
+            }
+        }.getOrNull() == true
+    }
+
     private fun install(file: File) {
-        if (!file.exists()) return
+        if (!file.exists()) throw IllegalStateException("no file")
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
         context.startActivity(
             Intent(Intent.ACTION_VIEW)
@@ -121,11 +143,12 @@ class UpdateInstaller(private val context: Context) {
 
 /** A one-line banner when a newer build exists. Shows nothing otherwise, including on any error. */
 @Composable
-fun UpdateBanner(checker: UpdateChecker, onUpdate: (apkUrl: String) -> Unit) {
+fun UpdateBanner(checker: UpdateChecker, onUpdate: (apkUrl: String, onFailed: () -> Unit) -> Unit) {
     var info by remember { mutableStateOf<UpdateInfo?>(null) }
     LaunchedEffect(checker) { info = checker.check() }
     val found = info ?: return
     var started by remember { mutableStateOf(false) }
+    var failed by remember { mutableStateOf(false) }
     Row(
         Modifier
             .fillMaxWidth()
@@ -137,7 +160,7 @@ fun UpdateBanner(checker: UpdateChecker, onUpdate: (apkUrl: String) -> Unit) {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Text(
-            "New version ${found.versionName} — ${found.notes}",
+            if (failed) "The download didn't finish. Please try again." else "New version ${found.versionName} — ${found.notes}",
             color = Brand,
             fontSize = 13.sp,
             fontWeight = FontWeight.Bold,
@@ -146,7 +169,11 @@ fun UpdateBanner(checker: UpdateChecker, onUpdate: (apkUrl: String) -> Unit) {
         TextButton(
             onClick = {
                 started = true
-                onUpdate(found.apkUrl)
+                failed = false
+                onUpdate(found.apkUrl) {
+                    started = false
+                    failed = true
+                }
             },
             enabled = !started,
         ) { Text(if (started) "Downloading…" else "Update", color = Brand, fontWeight = FontWeight.ExtraBold) }
