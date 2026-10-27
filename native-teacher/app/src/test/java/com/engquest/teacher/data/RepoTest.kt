@@ -146,6 +146,59 @@ class RepoTest {
     }
 
     @Test
+    fun `photos are not stored in Room`() = runBlocking {
+        server.enqueue(MockResponse().setBody("""{"v":"photo-12"}"""))
+        server.enqueue(MockResponse().setBody("""{"v":"photo-13"}"""))
+
+        val first = repo.load("getSubmissionPhoto", "XE1", mapOf("fileId" to "12")).take(2).toList()
+        val second = repo.load("getSubmissionPhoto", "XE1", mapOf("fileId" to "13")).take(2).toList()
+
+        assertNull(second[0].json) // never another student's photo first
+        assertEquals("photo-12", first[1].json.v())
+        assertEquals("photo-13", second[1].json.v())
+        assertEquals("12", server.takeRequest().requestUrl!!.queryParameter("fileId"))
+        assertEquals("13", server.takeRequest().requestUrl!!.queryParameter("fileId"))
+        assertNull(db.cacheDao().get(Repo.cacheKey("getSubmissionPhoto", "XE1", params = mapOf("fileId" to "12"))))
+        assertNull(db.cacheDao().get(Repo.cacheKey("getSubmissionPhoto", "XE1", params = mapOf("fileId" to "13"))))
+    }
+
+    @Test
+    fun `reads with different params never share a cache entry`() = runBlocking {
+        server.enqueue(MockResponse().setBody("""{"v":"a"}"""))
+        server.enqueue(MockResponse().setBody("""{"v":"b"}"""))
+
+        repo.load("getQuizAttempt", "XE1", mapOf("studentNo" to "1")).take(2).toList()
+        val other = repo.load("getQuizAttempt", "XE1", mapOf("studentNo" to "2")).take(2).toList()
+
+        assertNull(other[0].json)
+        assertEquals("b", other[1].json.v())
+    }
+
+    @Test
+    fun `cache key ignores credentials`() {
+        val key = Repo.cacheKey(
+            "getTaskSubmissions", "XE1", "4",
+            mapOf("username" to "teacher", "password" to "170403", "className" to "XE1", "b" to "2", "a" to "1"),
+        )
+        assertEquals("getTaskSubmissions|XE1|4|a=1&b=2", key)
+        assertEquals("getSubmissionPhoto|XE1||fileId=12", Repo.cacheKey("getSubmissionPhoto", "XE1", params = mapOf("fileId" to "12")))
+    }
+
+    @Test
+    fun `unauthorized read marks the session expired`() = runBlocking {
+        server.enqueue(MockResponse().setBody("""{"ok":true}"""))
+        session.login("teacher", "old-pass")
+        server.enqueue(MockResponse().setBody("""{"success":false,"error":"Unauthorized"}"""))
+
+        val seen = repo.load("getTaskSubmissions", "XE1").take(2).toList()
+
+        assertEquals(ApiError.Unauthorized().userMessage, seen[1].error)
+        assertTrue(session.expired.value)
+        assertNull(session.creds())
+        assertEquals("teacher", session.savedUsername())
+    }
+
+    @Test
     fun `cache keys follow action, class, chapter`() {
         assertEquals("getClassData|XE1|4", Repo.cacheKey("getClassData", "XE1", "4"))
         assertEquals("getStudents|XE1", Repo.cacheKey("getStudents", "XE1"))

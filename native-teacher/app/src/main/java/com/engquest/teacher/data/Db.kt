@@ -10,7 +10,7 @@ import androidx.room.Query
 import androidx.room.RoomDatabase
 import kotlinx.coroutines.flow.Flow
 
-/** The last good server reply for one screen, keyed `"{action}|{className}|{chapter}"`. */
+/** The last good server reply for one screen, keyed by [Repo.cacheKey]. */
 @Entity(tableName = "cache")
 data class CacheEntry(
     @PrimaryKey val key: String,
