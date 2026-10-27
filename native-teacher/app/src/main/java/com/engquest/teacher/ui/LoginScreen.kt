@@ -57,7 +57,8 @@ fun LoginScreen(session: Session, note: String, initialUsername: String) {
     // Not saveable: the password never goes into saved instance state.
     var password by remember { mutableStateOf("") }
     var error by rememberSaveable { mutableStateOf<String?>(null) }
-    var busy by rememberSaveable { mutableStateOf(false) }
+    // Not saveable: a recreated screen has lost the check in progress, so it must not stay "Checking…".
+    var busy by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     fun submit() {

@@ -5,6 +5,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsEnabled
+import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
@@ -30,6 +32,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import java.util.concurrent.TimeUnit
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -212,5 +215,20 @@ class AppShellTest {
         compose.waitUntil(5_000) { compose.onAllNodes(hasTestTag("loginUser")).fetchSemanticsNodes().isNotEmpty() }
         assertNull(graph.session.creds())
         assertEquals(0, runBlocking { graph.db.outboxDao().countUnsent() })
+    }
+
+    @Test
+    fun `recreating the screen mid-login leaves the button usable`() {
+        graph = testGraph(context, server.url("/exec").toString(), online)
+        val restorer = StateRestorationTester(compose)
+        restorer.setContent { EngQuestTheme { TeacherApp(graph) } }
+        // The reply takes long enough that the screen is recreated while it is being checked.
+        server.enqueue(MockResponse().setBody("""{"ok":false}""").setBodyDelay(3, TimeUnit.SECONDS))
+        logIn("teacher", "pw1")
+        compose.onNodeWithText("Checking…").assertIsDisplayed()
+
+        restorer.emulateSavedInstanceStateRestore()
+
+        compose.onNodeWithText("Log in").assertIsDisplayed().assertIsEnabled()
     }
 }

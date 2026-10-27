@@ -90,7 +90,7 @@ class AppGraph(
         /** The real app's graph: encrypted login, on-disk database, live network status. */
         fun create(context: Context, workManager: (WorkerFactory) -> WorkManager): AppGraph = AppGraph(
             api = Api(BASE_URL, OkHttpClient()),
-            sessionPrefs = Session.securePrefs(context),
+            sessionPrefs = Session.openSecurePrefs(context),
             prefs = context.getSharedPreferences("ui", Context.MODE_PRIVATE),
             db = Room.databaseBuilder(context, AppDb::class.java, "engquest-teacher.db").build(),
             online = networkStatus(context),

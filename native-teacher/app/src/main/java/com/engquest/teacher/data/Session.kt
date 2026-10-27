@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
+import java.security.KeyStore
 
 data class Creds(val username: String, val password: String)
 
@@ -70,10 +71,42 @@ class Session(private val prefs: SharedPreferences, private val api: Api) {
         private const val KEY_PASSWORD = "password"
         private const val KEY_EXPIRED = "expired"
 
+        private const val FILE = "session"
+
+        /**
+         * Opens the store with [create]; if that throws (the phone's key store or the file got
+         * damaged), [reset] wipes it and it is created once more, so the teacher just logs in again.
+         * If it still cannot be opened, the login is kept in memory only — never a crash.
+         */
+        fun openPrefs(create: () -> SharedPreferences, reset: () -> Unit): SharedPreferences =
+            try {
+                create()
+            } catch (e: Exception) {
+                runCatching(reset)
+                try {
+                    create()
+                } catch (stillBroken: Exception) {
+                    MemoryPrefs()
+                }
+            }
+
+        /** The app's login store: [securePrefs], reset or kept in memory when it cannot be opened. */
+        fun openSecurePrefs(context: Context): SharedPreferences =
+            openPrefs(create = { securePrefs(context) }, reset = { resetSecureStore(context) })
+
+        /** Deletes the encrypted file and its master key so both are made fresh. */
+        private fun resetSecureStore(context: Context) {
+            context.deleteSharedPreferences(FILE)
+            runCatching {
+                KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
+                    .deleteEntry(MasterKey.DEFAULT_MASTER_KEY_ALIAS)
+            }
+        }
+
         /** The app's real prefs: encrypted on the phone with a key from the Android Keystore. */
         fun securePrefs(context: Context): SharedPreferences = EncryptedSharedPreferences.create(
             context,
-            "session",
+            FILE,
             MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build(),
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,

@@ -101,4 +101,31 @@ class SessionTest {
         assertFalse(session.expired.value)
         assertNull(session.savedUsername())
     }
+
+    @Test
+    fun `a broken encrypted store is reset instead of crashing`() {
+        var attempts = 0
+        var resets = 0
+        val result = Session.openPrefs(
+            create = {
+                attempts++
+                if (attempts == 1) throw java.security.GeneralSecurityException("bad key") else prefs
+            },
+            reset = { resets++ },
+        )
+        assertTrue(result === prefs)
+        assertEquals(2, attempts)
+        assertEquals(1, resets)
+    }
+
+    @Test
+    fun `a store that stays broken falls back to memory`() = runBlocking {
+        val result = Session.openPrefs(create = { throw java.io.IOException("still broken") }, reset = {})
+        server.enqueue(MockResponse().setBody("""{"ok":true}"""))
+        val session = Session(result, api)
+        assertTrue(session.login("teacher", "170403"))
+        assertEquals(Creds("teacher", "170403"), Session(result, api).creds())
+        session.logout()
+        assertNull(session.savedUsername())
+    }
 }
