@@ -1,5 +1,7 @@
 package com.engquest.teacher.data
 
+import android.content.Context
+import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Database
 import androidx.room.Entity
@@ -7,7 +9,10 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.flow.Flow
 
 /** The last good server reply for one screen, keyed by [Repo.cacheKey]. */
@@ -31,6 +36,8 @@ data class OutboxItem(
     val createdAt: Long,
     val state: OutboxState = OutboxState.PENDING,
     val error: String? = null,
+    /** Busy/error replies from the server in a row; after [OutboxWorker.MAX_SERVER_TRIES] the item fails. */
+    @ColumnInfo(defaultValue = "0") val attempts: Int = 0,
 )
 
 @Dao
@@ -73,8 +80,12 @@ interface OutboxDao {
     @Query("UPDATE outbox SET state = 'SENDING' WHERE id = :id AND state = 'PENDING'")
     suspend fun claim(id: Long): Int
 
-    /** FAILED -> PENDING (Retry); the item keeps its rid. */
-    @Query("UPDATE outbox SET state = 'PENDING', error = NULL WHERE id = :id AND state = 'FAILED'")
+    /** A busy/error reply from the server: back in line, with [attempts] such replies so far. */
+    @Query("UPDATE outbox SET state = 'PENDING', attempts = :attempts WHERE id = :id")
+    suspend fun waitAfterServerTry(id: Long, attempts: Int)
+
+    /** FAILED -> PENDING (Retry); the item keeps its rid and its server tries start again. */
+    @Query("UPDATE outbox SET state = 'PENDING', error = NULL, attempts = 0 WHERE id = :id AND state = 'FAILED'")
     suspend fun requeueFailed(id: Long): Int
 
     /** After the app was killed mid-send, the item goes back in line (same rid, so no double write). */
@@ -93,8 +104,21 @@ interface OutboxDao {
     suspend fun deleteAll()
 }
 
-@Database(entities = [CacheEntry::class, OutboxItem::class], version = 1)
+@Database(entities = [CacheEntry::class, OutboxItem::class], version = 2)
 abstract class AppDb : RoomDatabase() {
     abstract fun cacheDao(): CacheDao
     abstract fun outboxDao(): OutboxDao
+
+    companion object {
+        /** The app's on-disk database. */
+        fun open(context: Context, name: String = "engquest-teacher.db"): AppDb =
+            Room.databaseBuilder(context, AppDb::class.java, name).addMigrations(MIGRATION_1_2).build()
+
+        /** Adds the count of server tries to each waiting write (existing ones start at 0). */
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE outbox ADD COLUMN attempts INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+    }
 }

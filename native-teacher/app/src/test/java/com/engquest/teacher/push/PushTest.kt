@@ -66,7 +66,9 @@ class PushTest {
     fun `a submission message builds a notification with the student and task and the deep-link extras`() {
         SubmissionNotifications.show(context, "Budi (XI F-8)", "sent Chapter 1 task", submission)
 
-        val shown = shadowOf(manager).getNotification("sub-XIF8-3", SubmissionNotifications.ID)
+        // Id 0 under the student's tag: the same slot the phone uses for the server's own
+        // notification while the app is closed, so the two never show twice.
+        val shown = shadowOf(manager).getNotification("sub-XIF8-3", 0)
         assertNotNull(shown)
         assertEquals("Budi (XI F-8)", shown.extras.getString(Notification.EXTRA_TITLE))
         assertEquals("sent Chapter 1 task", shown.extras.getString(Notification.EXTRA_TEXT))

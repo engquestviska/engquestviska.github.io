@@ -2,6 +2,13 @@ package com.engquest.teacher
 
 import android.content.Context
 import android.content.Intent
+import android.os.Looper
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import com.engquest.teacher.data.Outbox
+import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertTrue
+import org.robolectric.Shadows.shadowOf
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -27,6 +34,34 @@ class MainActivityTest {
     @Test
     fun opensWithTheAppName() {
         compose.onNodeWithText("EngQuest Teacher").assertIsDisplayed()
+    }
+}
+
+// Opening the app sends waiting changes at once instead of waiting out a retry delay.
+@RunWith(RobolectricTestRunner::class)
+@Config(application = TestTeacherApp::class)
+class MainActivityForegroundTest {
+    private val app = RuntimeEnvironment.getApplication() as TestTeacherApp
+
+    @Test
+    fun `coming to the front replaces a waiting run`() {
+        val graph = app.graph
+        runBlocking { graph.outbox.enqueue("saveAttendance", "XE1", mapOf("date" to "2026-10-27")) }
+        val work = WorkManager.getInstance(app)
+        val waiting = work.getWorkInfosForUniqueWork(Outbox.WORK_NAME).get().map { it.id }.toSet()
+
+        Robolectric.buildActivity(MainActivity::class.java).setup()
+
+        val deadline = System.currentTimeMillis() + 5_000
+        while (System.currentTimeMillis() < deadline &&
+            work.getWorkInfosForUniqueWork(Outbox.WORK_NAME).get().none { it.id !in waiting }
+        ) {
+            shadowOf(Looper.getMainLooper()).idle()
+            Thread.sleep(20)
+        }
+        val runs = work.getWorkInfosForUniqueWork(Outbox.WORK_NAME).get()
+        assertTrue(runs.filter { it.id in waiting }.all { it.state == WorkInfo.State.CANCELLED })
+        assertTrue(runs.any { it.id !in waiting && it.state == WorkInfo.State.ENQUEUED })
     }
 }
 

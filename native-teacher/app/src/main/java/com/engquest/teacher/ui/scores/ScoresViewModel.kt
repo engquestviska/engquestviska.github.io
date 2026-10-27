@@ -157,7 +157,8 @@ class ScoresViewModel(
     }
 
     init {
-        graph.scope.launch { for (job in work) job() }
+        // After a log out nothing more is queued (the teacher was told unsent changes are lost).
+        graph.scope.launch { for (job in work) if (graph.session.hasLogin()) job() }
         start()
     }
 

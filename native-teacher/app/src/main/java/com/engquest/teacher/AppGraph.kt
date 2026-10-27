@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import androidx.room.Room
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
 import com.engquest.teacher.data.Api
@@ -64,6 +63,11 @@ class AppGraph(
     val photos = Photos(api, session, photoDir)
     private val registering = Mutex()
 
+    init {
+        // Internet back: waiting changes go now, not after the rest of a retry pause.
+        scope.launch { online.collect { if (it) outbox.sendNow() } }
+    }
+
     /**
      * Logs out: tells the server to stop notifying this phone (best effort, in the background),
      * drops unsent changes, and forgets the login.
@@ -90,6 +94,8 @@ class AppGraph(
         // Forgotten so the next login registers this phone again.
         prefs.edit().remove(KEY_DEVICE_TOKEN).apply()
         session.logout()
+        // A screen that queued a change in the moment before the logout took hold.
+        outbox.clear()
     }
 
     /** The notification token last registered with the server (null: none, or logged out since). */
@@ -119,7 +125,7 @@ class AppGraph(
             api = Api(BASE_URL, OkHttpClient()),
             sessionPrefs = Session.openSecurePrefs(context),
             prefs = context.getSharedPreferences("ui", Context.MODE_PRIVATE),
-            db = Room.databaseBuilder(context, AppDb::class.java, "engquest-teacher.db").build(),
+            db = AppDb.open(context),
             online = networkStatus(context),
             workManager = workManager,
             scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),

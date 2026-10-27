@@ -33,6 +33,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /** Back in front: waiting changes go now, not after the rest of a retry pause. */
+    override fun onStart() {
+        super.onStart()
+        (application as GraphOwner).graph.outbox.sendNow()
+    }
+
     /** A notification tapped while the app is already open. */
     public override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)

@@ -5,7 +5,13 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.coroutines.withTimeout
+import okhttp3.MediaType
 import okhttp3.OkHttpClient
+import okhttp3.Protocol
+import okhttp3.Response
+import okhttp3.ResponseBody
+import okio.BufferedSource
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
@@ -126,5 +132,26 @@ class ApiTest {
     fun `a reply that is not JSON throws Server`() {
         reply("<html>Bad gateway</html>")
         assertThrows<ApiError.Server> { runBlocking { api.read("ping", emptyMap()) } }
+    }
+
+    @Test
+    fun `a reply too big for the phone's memory ends the call with a plain message`() {
+        // Stands in for body.string() running out of memory on a huge photo.
+        val huge = object : ResponseBody() {
+            override fun contentType(): MediaType? = null
+            override fun contentLength(): Long = -1
+            override fun source(): BufferedSource = throw OutOfMemoryError("test")
+        }
+        val tooBig = Api(
+            server.url("/exec").toString(),
+            OkHttpClient.Builder().addInterceptor { chain ->
+                Response.Builder().request(chain.request()).protocol(Protocol.HTTP_1_1)
+                    .code(200).message("OK").body(huge).build()
+            }.build(),
+        )
+        val e = assertThrows<ApiError.Server> {
+            runBlocking { withTimeout(5_000) { tooBig.read("getSubmissionPhoto", emptyMap()) } }
+        }
+        assertEquals("This photo is too big to show on this phone.", e.userMessage)
     }
 }

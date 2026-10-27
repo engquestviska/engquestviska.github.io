@@ -78,11 +78,14 @@ class Api(baseUrl: String, client: OkHttpClient) {
                             it.body!!.string()
                         }
                         cont.resume(result)
-                    } catch (e: Exception) {
+                    } catch (e: Throwable) {
+                        // Every outcome must end the call, or the caller waits forever.
                         cont.resumeWithException(
                             when (e) {
                                 is ApiError -> e
                                 is IOException -> ApiError.Offline(e)
+                                // Only a photo reply is big enough to run the phone out of memory.
+                                is OutOfMemoryError -> ApiError.Server("This photo is too big to show on this phone.")
                                 else -> ApiError.Server("The server sent an unreadable reply.")
                             },
                         )

@@ -18,7 +18,8 @@ import com.engquest.teacher.R
  */
 object SubmissionNotifications {
     const val CHANNEL = "submissions"
-    const val ID = 1
+    /** 0, as the phone uses for the server's own notification, so the same tag replaces it. */
+    const val ID = 0
 
     /** Makes the "Submissions" channel (safe to call again). */
     fun ensureChannel(context: Context) {

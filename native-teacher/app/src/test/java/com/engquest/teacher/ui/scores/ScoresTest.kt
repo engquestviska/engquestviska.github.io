@@ -6,7 +6,9 @@ import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performTextReplacement
@@ -135,6 +137,22 @@ class ScoresTest {
         compose.onNodeWithTag("chip-5").performClick() // leaving does not send it a second time
         compose.waitForIdle()
         assertEquals(1, unsent())
+    }
+
+    @Test
+    fun `a score still being typed at log out is not sent after the next login`() {
+        show()
+        waitFor("score-2")
+        compose.onNodeWithTag("col-Task 2").performClick()
+        compose.onNodeWithTag("score-2").performClick()
+        compose.onNodeWithTag("score-2").performTextReplacement("90")
+        compose.onNodeWithContentDescription("More options").performClick()
+        compose.onNodeWithText("Log out").performClick()
+        compose.onNodeWithTag("confirmLogout").performClick()
+        waitFor("loginUser")
+        compose.waitForIdle()
+        Thread.sleep(500) // a save queued while the screen closed would land by now
+        assertEquals(0, unsent())
     }
 
     @Test

@@ -23,6 +23,9 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import com.engquest.teacher.AppGraph
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import com.engquest.teacher.data.Outbox
 import com.engquest.teacher.data.OutboxItem
 import com.engquest.teacher.data.OutboxState
 import com.engquest.teacher.domain.Classes
@@ -36,6 +39,7 @@ import java.util.concurrent.TimeUnit
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -230,5 +234,23 @@ class AppShellTest {
         restorer.emulateSavedInstanceStateRestore()
 
         compose.onNodeWithText("Log in").assertIsDisplayed().assertIsEnabled()
+    }
+
+    @Test
+    fun `coming back online sends a waiting run at once`() {
+        online.value = false
+        start(signedIn = true)
+        runBlocking { graph.outbox.enqueue("saveAttendance", "XE1", mapOf("date" to "2026-10-27")) }
+        val work = WorkManager.getInstance(context)
+        Thread.sleep(200) // the outbox's start-up check may append a run of its own
+        val waiting = work.getWorkInfosForUniqueWork(Outbox.WORK_NAME).get().map { it.id }.toSet()
+
+        online.value = true
+
+        compose.waitUntil(5_000) {
+            work.getWorkInfosForUniqueWork(Outbox.WORK_NAME).get().any { it.id !in waiting && !it.state.isFinished }
+        }
+        val runs = work.getWorkInfosForUniqueWork(Outbox.WORK_NAME).get()
+        assertTrue(runs.filter { it.id in waiting }.all { it.state == WorkInfo.State.CANCELLED })
     }
 }

@@ -5,12 +5,15 @@ import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import java.text.SimpleDateFormat
@@ -77,6 +80,19 @@ class Outbox(
     /** Removes the item unless the worker is sending it right now (XP Undo). */
     suspend fun cancelIfPending(id: Long): Boolean = dao.deleteUnlessSending(id) == 1
 
+    /**
+     * The app came to the front or the internet came back: a run that is only waiting (out a
+     * retry pause, or for a network) is replaced by one that starts as soon as it can. A run
+     * that is sending right now is left alone.
+     */
+    fun sendNow(): Job = scope.launch {
+        if (dao.countUnsent() == 0) return@launch
+        val runs = withContext(Dispatchers.IO) { work.getWorkInfosForUniqueWork(WORK_NAME).get() }
+        if (runs.any { it.state == WorkInfo.State.RUNNING }) return@launch
+        if (runs.none { it.state == WorkInfo.State.ENQUEUED }) return@launch
+        work.enqueueUniqueWork(WORK_NAME, ExistingWorkPolicy.REPLACE, sendRequest())
+    }
+
     /** Log out: stops sending and drops every item, failed ones too. */
     suspend fun clear() {
         work.cancelUniqueWork(WORK_NAME)
@@ -84,15 +100,22 @@ class Outbox(
     }
 
     private fun schedule() {
-        val request = OneTimeWorkRequestBuilder<OutboxWorker>()
-            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
-            .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
-            .build()
         // Append, not keep: a run that is just finishing may already have looked for items, so a
         // new item needs a run of its own after it. A run with nothing left ends at once, and
         // the atomic claim keeps two runs from sending the same item.
-        work.enqueueUniqueWork(WORK_NAME, ExistingWorkPolicy.APPEND_OR_REPLACE, request)
+        work.enqueueUniqueWork(WORK_NAME, ExistingWorkPolicy.APPEND_OR_REPLACE, sendRequest())
     }
+
+    /**
+     * One sending run. Between tries the wait grows by 30 seconds (30 s, 60 s, 90 s…), never
+     * doubling: school wifi can count as "connected" with no real internet, and a doubling wait
+     * would soon leave changes unsent for hours after the internet is back ([sendNow] also
+     * cuts a wait short).
+     */
+    private fun sendRequest() = OneTimeWorkRequestBuilder<OutboxWorker>()
+        .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+        .setBackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS)
+        .build()
 
     private fun localDate(millis: Long): String =
         SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date(millis))

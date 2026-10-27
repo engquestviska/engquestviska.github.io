@@ -13,7 +13,9 @@ import kotlinx.serialization.json.contentOrNull
 /**
  * Sends the outbox, oldest first, one at a time, with the login as it is now and each item's
  * own rid.
- * - No connection / server busy: the item waits, and WorkManager runs this again later.
+ * - No connection: the item waits, and WorkManager runs this again later.
+ * - Server busy or erroring: the same, but after [MAX_SERVER_TRIES] such replies in a row the
+ *   item is marked FAILED so it stops holding up the rest.
  * - Password no longer works: the session is marked expired and everything waits; [Outbox]
  *   schedules again after the next login.
  * - Server refused the item: it is marked FAILED with the server's message; the rest go on.
@@ -47,9 +49,19 @@ class OutboxWorker(
                 dao.delete(item.id)
             } catch (e: ApiError) {
                 when (e) {
-                    is ApiError.Offline, is ApiError.RetryLater -> {
+                    is ApiError.Offline -> {
                         dao.setState(item.id, OutboxState.PENDING)
                         return Result.retry()
+                    }
+                    is ApiError.RetryLater -> {
+                        // The server answered but could not save it. Asking forever would hold up
+                        // every later write, so after a few tries the teacher decides (Retry/Discard).
+                        val tries = item.attempts + 1
+                        if (tries < MAX_SERVER_TRIES) {
+                            dao.waitAfterServerTry(item.id, tries)
+                            return Result.retry()
+                        }
+                        dao.setState(item.id, OutboxState.FAILED, SERVER_GAVE_UP)
                     }
                     is ApiError.Unauthorized -> {
                         dao.setState(item.id, OutboxState.PENDING)
@@ -61,6 +73,11 @@ class OutboxWorker(
             }
             if (dao.countUnsent(item.className) == 0) repo.notifyDrained(item.className)
         }
+    }
+
+    companion object {
+        const val MAX_SERVER_TRIES = 5
+        const val SERVER_GAVE_UP = "The server couldn't save this. Tap Retry to try again."
     }
 
     private fun storedParams(item: OutboxItem): Map<String, String> =

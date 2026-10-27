@@ -51,6 +51,12 @@ class Session(private val prefs: SharedPreferences, private val api: Api) {
 
     fun creds(): Creds? = _user.value
 
+    /**
+     * True unless the teacher logged out. An expired password still counts: changes made then
+     * wait for the next login. After a log out, closing screens must not queue anything.
+     */
+    fun hasLogin(): Boolean = _user.value != null || _expired.value
+
     /** Last username used, kept after [markExpired] to pre-fill the login screen. */
     fun savedUsername(): String? = prefs.getString(KEY_USERNAME, null)
 
