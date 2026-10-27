@@ -1,9 +1,14 @@
 package com.engquest.teacher.data
 
 import android.content.Context
+import android.os.Looper
+import org.robolectric.Shadows.shadowOf
 import androidx.room.Room
 import androidx.work.Configuration
 import androidx.work.ListenableWorker
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.ExistingWorkPolicy
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerFactory
@@ -43,7 +48,9 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import java.util.Calendar
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 
 @RunWith(RobolectricTestRunner::class)
 class OutboxTest {
@@ -109,6 +116,17 @@ class OutboxTest {
     private fun RecordedRequest.json(): JsonObject = Json.parseToJsonElement(body.readUtf8()).jsonObject
     private fun JsonObject.s(key: String) = get(key)?.jsonPrimitive?.content
     private fun sent(n: Int) = List(n) { server.takeRequest(5, TimeUnit.SECONDS)!!.json() }
+
+    /** Lets WorkManager's main-thread callbacks run (Robolectric pauses the main looper) until [done]. */
+    private fun waitFor(done: () -> Boolean): Boolean {
+        val deadline = System.currentTimeMillis() + 10_000
+        while (System.currentTimeMillis() < deadline) {
+            shadowOf(Looper.getMainLooper()).idle()
+            if (done()) return true
+            Thread.sleep(20)
+        }
+        return false
+    }
 
     private suspend fun state(id: Long) = db.outboxDao().get(id)?.state
 
@@ -292,6 +310,60 @@ class OutboxTest {
 
         assertEquals(listOf("1", "2"), sent(2).map { it.s("studentId") })
         assertEquals(0, restarted.pending.first())
+    }
+
+    @Test
+    fun `an item enqueued while the worker is finishing still gets sent`() = runBlocking {
+        // A real WorkManager run: the first run stands for a worker that already found nothing to
+        // send and is just finishing; later runs are the real OutboxWorker.
+        val finishing = CountDownLatch(1)
+        val release = CountDownLatch(1)
+        val created = AtomicInteger(0)
+        val pool = Executors.newFixedThreadPool(2)
+        val real = OutboxWorkerFactory(db, session, api, repo)
+        WorkManagerTestInitHelper.closeWorkDatabase()
+        WorkManagerTestInitHelper.initializeTestWorkManager(
+            context,
+            Configuration.Builder()
+                .setExecutor(pool)
+                .setWorkerFactory(object : WorkerFactory() {
+                    override fun createWorker(c: Context, name: String, p: WorkerParameters): ListenableWorker? =
+                        if (created.getAndIncrement() == 0) {
+                            object : Worker(c, p) {
+                                override fun doWork(): Result {
+                                    finishing.countDown()
+                                    release.await(5, TimeUnit.SECONDS)
+                                    return Result.success()
+                                }
+                            }
+                        } else {
+                            real.createWorker(c, name, p)
+                        }
+                })
+                .build(),
+            WorkManagerTestInitHelper.ExecutorsMode.PRESERVE_EXECUTORS,
+        )
+        val work = WorkManager.getInstance(context)
+        val outbox = Outbox(db, session, work, scope, clock = { now })
+        repeat(2) { server.enqueue(MockResponse().setBody(ok)) }
+
+        work.enqueueUniqueWork(Outbox.WORK_NAME, ExistingWorkPolicy.KEEP, OneTimeWorkRequestBuilder<OutboxWorker>().build())
+        assertTrue(waitFor { finishing.count == 0L })
+        outbox.enqueue("addStrike", "XE1", mapOf("studentId" to "1"))
+        outbox.enqueue("addStrike", "XE1", mapOf("studentId" to "2"))
+        val driver = WorkManagerTestInitHelper.getTestDriver(context)!!
+        work.getWorkInfosForUniqueWork(Outbox.WORK_NAME).get().forEach { driver.setAllConstraintsMet(it.id) }
+        release.countDown()
+
+        // Both appended runs finish; the second finds nothing left and sends nothing twice.
+        waitFor { work.getWorkInfosForUniqueWork(Outbox.WORK_NAME).get().all { it.state.isFinished } }
+        val runs = work.getWorkInfosForUniqueWork(Outbox.WORK_NAME).get()
+        assertEquals(3, runs.size)
+        assertTrue(runs.all { it.state == WorkInfo.State.SUCCEEDED })
+        assertEquals(listOf("1", "2"), sent(2).map { it.s("studentId") })
+        assertEquals(2, server.requestCount)
+        assertEquals(0, outbox.pending.first())
+        pool.shutdown()
     }
 
     @Test

@@ -82,7 +82,10 @@ class Outbox(
             .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 10, TimeUnit.SECONDS)
             .build()
-        work.enqueueUniqueWork(WORK_NAME, ExistingWorkPolicy.KEEP, request)
+        // Append, not keep: a run that is just finishing may already have looked for items, so a
+        // new item needs a run of its own after it. A run with nothing left ends at once, and
+        // the atomic claim keeps two runs from sending the same item.
+        work.enqueueUniqueWork(WORK_NAME, ExistingWorkPolicy.APPEND_OR_REPLACE, request)
     }
 
     private fun localDate(millis: Long): String =
