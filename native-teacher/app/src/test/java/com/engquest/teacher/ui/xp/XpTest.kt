@@ -200,5 +200,42 @@ class XpTest {
         compose.waitForIdle()
         compose.waitUntil(3_000) { compose.onAllNodesWithTag("confirmLeave").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithTag("screenTitle").assertTextEquals("Attendance")
+
+        // Leave: Back goes through, and the next Back with unsaved marks asks again.
+        compose.onNodeWithTag("confirmLeave").performClick()
+        compose.waitForIdle()
+        compose.onNodeWithTag("mark-1-Present").performClick()
+        compose.onNodeWithTag("mark-1-Absent").performClick()
+        compose.waitForIdle()
+        compose.runOnUiThread { back!!.onBackPressed() }
+        compose.waitForIdle()
+        compose.waitUntil(3_000) { compose.onAllNodesWithTag("confirmLeave").fetchSemanticsNodes().isNotEmpty() }
+    }
+
+    @Test
+    fun `take back never drives the total below zero`() {
+        server.dispatcher = object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest) = MockResponse().setBody(
+                """{"ok":true,"students":[{"no":1,"name":"Ayu Lestari","nickname":"Ayu","Total":3}]}""",
+            )
+        }
+        show()
+        waitFor("tile-1")
+        compose.onNodeWithTag("mode-minus").performClick()
+        compose.onNodeWithTag("tile-1").performClick()
+        total(1).assertTextEquals("0 XP")
+    }
+
+    @Test
+    fun `a tap that cannot be queued is rolled back with a message`() {
+        show()
+        waitFor("tile-1")
+        graph.db.close()
+        compose.onNodeWithTag("tile-1").performClick()
+        compose.waitUntil(5_000) {
+            compose.onAllNodesWithTag("toast").fetchSemanticsNodes().isNotEmpty() &&
+                runCatching { compose.onNodeWithTag("toast").assertTextContains("Could not save", substring = true) }.isSuccess
+        }
+        total(1).assertTextEquals("10 XP")
     }
 }
