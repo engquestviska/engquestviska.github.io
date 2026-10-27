@@ -23,6 +23,8 @@ fun testGraph(
     context: Context,
     baseUrl: String,
     online: MutableStateFlow<Boolean> = MutableStateFlow(true),
+    /** Tests of thread safety pass a real background scope, as the app has. */
+    scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined),
 ): AppGraph = AppGraph(
     api = Api(baseUrl, OkHttpClient()),
     sessionPrefs = context.getSharedPreferences("session-test", Context.MODE_PRIVATE),
@@ -36,7 +38,7 @@ fun testGraph(
         )
         WorkManager.getInstance(context)
     },
-    scope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined),
+    scope = scope,
 )
 
 /** Stands in for [TeacherApplication] in activity tests (no Android Keystore under Robolectric). */

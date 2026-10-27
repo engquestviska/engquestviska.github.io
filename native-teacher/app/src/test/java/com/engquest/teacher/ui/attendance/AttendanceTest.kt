@@ -39,6 +39,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
@@ -148,6 +151,27 @@ class AttendanceTest {
         waitForText("Meeting 1")
         compose.onNodeWithTag("saveTitle").assertTextEquals("Saved ✓")
         compose.onNodeWithTag("saveButton").assertIsNotEnabled()
+    }
+
+    @Test
+    fun `save with the work on a background thread ends saved and a later refresh still applies`() {
+        graph = testGraph(context, server.url("/exec").toString(), scope = CoroutineScope(SupervisorJob() + Dispatchers.Default))
+        serve(classData(meetingDate = null))
+        show()
+        waitFor("row-1")
+        mark(2, "Absent").performClick()
+        compose.onNodeWithTag("saveButton").performClick()
+        compose.waitUntil(5_000) { unsent().isNotEmpty() }
+        waitForText("Meeting 1")
+        compose.onNodeWithTag("saveTitle").assertTextEquals("Saved ✓")
+        compose.onNodeWithTag("saveButton").assertIsNotEnabled()
+        // Once the outbox is empty, a newer server copy must be taken in (the save is no longer "in flight").
+        serve(classData(meetingDate = today).replace("\"Sick\"", "\"Permit\""))
+        runBlocking {
+            graph.db.outboxDao().deleteAll()
+            graph.repo.notifyDrained("XE1")
+        }
+        compose.waitUntil(10_000) { runCatching { mark(2, "Permit").assertIsSelected() }.isSuccess }
     }
 
     @Test

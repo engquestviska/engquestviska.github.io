@@ -28,6 +28,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
@@ -193,6 +196,28 @@ class ScoresTest {
         compose.waitForIdle()
         assertEquals("5", context.getSharedPreferences("ui-test", Context.MODE_PRIVATE).getString("scoreChapter", null))
         assertEquals("Task 3", context.getSharedPreferences("ui-test", Context.MODE_PRIVATE).getString("scoreCol_5", null))
+    }
+
+    @Test
+    fun `many rapid edits with the work on a background thread end exact and a later refresh still applies`() {
+        graph = testGraph(context, server.url("/exec").toString(), scope = CoroutineScope(SupervisorJob() + Dispatchers.Default))
+        show()
+        waitFor("score-1")
+        repeat(40) { i ->
+            compose.onNodeWithTag("score-1").performClick()
+            compose.onNodeWithTag("score-1").performTextReplacement((10 + i).toString())
+            compose.onNodeWithTag("score-1").performImeAction()
+        }
+        compose.onNodeWithTag("score-1").assertTextEquals("49")
+        compose.waitUntil(10_000) { unsent() == 40 }
+        server.dispatcher = object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest) = MockResponse().setBody(chapter.replace("\"Task 1\":\"80\"", "\"Task 1\":\"55\""))
+        }
+        runBlocking {
+            graph.db.outboxDao().deleteAll()
+            graph.repo.notifyDrained("XE1")
+        }
+        compose.waitUntil(10_000) { runCatching { compose.onNodeWithTag("avg-1", useUnmergedTree = true).assertTextEquals("55") }.isSuccess }
     }
 
     @Test

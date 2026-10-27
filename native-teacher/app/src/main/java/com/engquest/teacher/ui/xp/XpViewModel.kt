@@ -8,6 +8,7 @@ import com.engquest.teacher.AppGraph
 import com.engquest.teacher.data.Repo
 import com.engquest.teacher.domain.ClassInfo
 import com.engquest.teacher.domain.Core
+import com.engquest.teacher.ui.onMain
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -175,10 +176,12 @@ class XpViewModel(
             } catch (e: Throwable) {
                 // Nothing was queued: take the change off the screen and say so.
                 id.completeExceptionally(e)
-                raw = raw?.let { withXp(it, no, r, -delta) }
-                toast = XpToast("Could not save that for $first. Please try again.", isError = true)
+                scope.onMain {
+                    raw = raw?.let { withXp(it, no, r, -delta) }
+                    toast = XpToast("Could not save that for $first. Please try again.", isError = true)
+                }
             } finally {
-                inFlight--
+                scope.onMain { inFlight-- }
             }
         }
     }
@@ -196,7 +199,7 @@ class XpViewModel(
             } catch (e: Throwable) {
                 // The tap itself never reached the outbox, so there is nothing to reverse.
             } finally {
-                inFlight--
+                scope.onMain { inFlight-- }
             }
         }
     }
@@ -208,7 +211,7 @@ class XpViewModel(
     )
 
     private suspend fun store() {
-        raw?.let { graph.repo.putStored(cacheKey, it) }
+        scope.onMain { raw }?.let { graph.repo.putStored(cacheKey, it) }
     }
 
     private fun showPop(no: String, text: String, negative: Boolean) {

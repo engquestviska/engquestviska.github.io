@@ -32,6 +32,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
@@ -224,6 +227,25 @@ class XpTest {
         compose.onNodeWithTag("mode-minus").performClick()
         compose.onNodeWithTag("tile-1").performClick()
         total(1).assertTextEquals("0 XP")
+    }
+
+    @Test
+    fun `many rapid taps with the work on a background thread end exact and a later refresh still applies`() {
+        graph = testGraph(context, server.url("/exec").toString(), scope = CoroutineScope(SupervisorJob() + Dispatchers.Default))
+        show()
+        waitFor("tile-1")
+        repeat(40) { compose.onNodeWithTag("tile-1").performClick() }
+        total(1).assertTextEquals("210 XP") // 10 + 40 * 5
+        compose.waitUntil(10_000) { unsent() == 40 }
+        // Everything is sent: the server's newer numbers must now be taken in (nothing stuck "in flight").
+        server.dispatcher = object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest) = MockResponse().setBody(data.replace("\"Total\":10", "\"Total\":999"))
+        }
+        runBlocking {
+            graph.db.outboxDao().deleteAll()
+            graph.repo.notifyDrained("XE1")
+        }
+        compose.waitUntil(10_000) { runCatching { total(1).assertTextEquals("999 XP") }.isSuccess }
     }
 
     @Test

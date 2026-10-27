@@ -10,6 +10,7 @@ import com.engquest.teacher.domain.ClassInfo
 import com.engquest.teacher.domain.Core
 import com.engquest.teacher.domain.Meeting
 import com.engquest.teacher.domain.Student
+import com.engquest.teacher.ui.onMain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -190,10 +191,12 @@ class AttendanceViewModel(
                 )
                 val updated = withSavedAttendance(current, atDate, records)
                 graph.repo.putStored(cacheKey, updated)
-                if (date == atDate) edits = emptyMap()
-                raw = updated
+                scope.onMain {
+                    if (date == atDate) edits = emptyMap()
+                    raw = updated
+                }
             } finally {
-                saving = false
+                scope.onMain { saving = false }
             }
         }
     }
@@ -213,10 +216,12 @@ class AttendanceViewModel(
                 )
                 val updated = withoutMeeting(current, atDate)
                 graph.repo.putStored(cacheKey, updated)
-                edits = emptyMap()
-                raw = updated
+                scope.onMain {
+                    edits = emptyMap()
+                    raw = updated
+                }
             } finally {
-                saving = false
+                scope.onMain { saving = false }
             }
         }
     }

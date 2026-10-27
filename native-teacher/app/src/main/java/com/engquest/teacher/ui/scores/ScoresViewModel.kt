@@ -9,6 +9,7 @@ import com.engquest.teacher.AppGraph
 import com.engquest.teacher.data.Repo
 import com.engquest.teacher.domain.ClassInfo
 import com.engquest.teacher.domain.Core
+import com.engquest.teacher.ui.onMain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -252,13 +253,16 @@ class ScoresViewModel(
         work.trySend {
             try {
                 enqueue(id, no, col, check.value)
-                graph.repo.putStored(key, if (cacheKey(chapter) == key) raw ?: updated else updated)
+                val latest = scope.onMain { if (cacheKey(chapter) == key) raw else null }
+                graph.repo.putStored(key, latest ?: updated)
             } catch (e: Throwable) {
                 // Nothing was queued: put the old score back on screen and say so.
-                if (chapter == id) raw = raw?.let { withScore(it, no, col, before, final) }
-                note = ScoreNote("Could not save that for $first. Please try again.", isError = true)
+                scope.onMain {
+                    if (chapter == id) raw = raw?.let { withScore(it, no, col, before, final) }
+                    note = ScoreNote("Could not save that for $first. Please try again.", isError = true)
+                }
             } finally {
-                inFlight--
+                scope.onMain { inFlight-- }
             }
         }
     }
