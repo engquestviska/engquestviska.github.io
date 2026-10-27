@@ -15,6 +15,8 @@ import com.engquest.teacher.data.OutboxWorkerFactory
 import com.engquest.teacher.data.Photos
 import com.engquest.teacher.data.Repo
 import com.engquest.teacher.data.Session
+import com.engquest.teacher.push.FirebasePushTokens
+import com.engquest.teacher.push.PushTokens
 import com.engquest.teacher.ui.UpdateChecker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +24,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import okhttp3.OkHttpClient
 import java.io.File
 import java.util.UUID
@@ -50,12 +54,15 @@ class AppGraph(
     photoDir: File,
     /** Looks for a newer app build; null (tests) means no update check. */
     val updates: UpdateChecker? = null,
+    /** This phone's notification token source; null (most tests) means no notifications. */
+    val push: PushTokens? = null,
 ) {
     val session = Session(sessionPrefs, api)
     val repo = Repo(api, session, db)
     val workerFactory = OutboxWorkerFactory(db, session, api, repo)
     val outbox = Outbox(db, session, workManager(workerFactory), scope)
     val photos = Photos(api, session, photoDir)
+    private val registering = Mutex()
 
     /**
      * Logs out: tells the server to stop notifying this phone (best effort, in the background),
@@ -80,20 +87,32 @@ class AppGraph(
             }
         }
         outbox.clear()
+        // Forgotten so the next login registers this phone again.
+        prefs.edit().remove(KEY_DEVICE_TOKEN).apply()
         session.logout()
     }
 
-    /**
-     * This phone's notification token. Nothing stores one yet: Task 13 (notifications) saves it
-     * under [KEY_DEVICE_TOKEN]; until then log out skips `unregisterDevice`.
-     */
+    /** The notification token last registered with the server (null: none, or logged out since). */
     fun deviceToken(): String? = prefs.getString(KEY_DEVICE_TOKEN, null)
+
+    /**
+     * Tells the server to notify this phone at [token] (through the outbox, so it survives no
+     * signal). Skipped while logged out (the next login registers it) and when [token] is the
+     * one already registered.
+     */
+    suspend fun registerDevice(token: String) = registering.withLock {
+        if (session.creds() == null || token == deviceToken()) return@withLock
+        prefs.edit().putString(KEY_DEVICE_TOKEN, token).apply()
+        outbox.enqueue("registerDevice", "", mapOf("token" to token))
+    }
 
     companion object {
         const val BASE_URL = "https://engquest-api.engquestviska.workers.dev/exec"
         const val KEY_CLASS = "class"
         const val KEY_TAB = "tab"
         const val KEY_DEVICE_TOKEN = "deviceToken"
+        /** Set once the teacher answered "Get a notification…?" (never asked again). */
+        const val KEY_ASKED_NOTIFICATIONS = "askedNotifications"
 
         /** The real app's graph: encrypted login, on-disk database, live network status. */
         fun create(context: Context, workManager: (WorkerFactory) -> WorkManager): AppGraph = AppGraph(
@@ -111,6 +130,7 @@ class AppGraph(
                 BuildConfig.VERSION_CODE,
                 OkHttpClient(),
             ),
+            push = FirebasePushTokens,
         )
 
         private fun networkStatus(context: Context): StateFlow<Boolean> {

@@ -1,5 +1,12 @@
 package com.engquest.teacher.ui
 
+import android.Manifest
+import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -175,6 +182,14 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
         }
     }
 
+    // Notifications: register this phone after login, and ask once to allow them.
+    graph.push?.let { push ->
+        LaunchedEffect(push) {
+            push.current { token -> graph.scope.launch { graph.registerDevice(token) } }
+        }
+        NotificationQuestion(prefs)
+    }
+
     // Android Back with unsaved work asks first; with nothing unsaved it behaves as usual.
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     var backConfirmed by remember { mutableStateOf(false) }
@@ -297,6 +312,37 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
             dismissButton = {
                 TextButton(onClick = { askLogout = false }) { Text("Cancel") }
             },
+        )
+    }
+}
+
+/**
+ * Asks once (Android 13+, where notifications need the teacher's OK) whether to allow them.
+ * Either answer is remembered; "Yes" then shows the phone's own permission question.
+ */
+@Composable
+private fun NotificationQuestion(prefs: SharedPreferences) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+    val context = LocalContext.current
+    var ask by remember {
+        mutableStateOf(
+            !prefs.getBoolean(AppGraph.KEY_ASKED_NOTIFICATIONS, false) &&
+                ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
+                PackageManager.PERMISSION_GRANTED,
+        )
+    }
+    val request = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {}
+    fun answer(yes: Boolean) {
+        ask = false
+        prefs.edit().putBoolean(AppGraph.KEY_ASKED_NOTIFICATIONS, true).apply()
+        if (yes) request.launch(Manifest.permission.POST_NOTIFICATIONS)
+    }
+    if (ask) {
+        AlertDialog(
+            onDismissRequest = { answer(false) },
+            text = { Text("Get a notification when a student sends a submission?") },
+            confirmButton = { TextButton(onClick = { answer(true) }) { Text("Yes", fontWeight = FontWeight.Bold) } },
+            dismissButton = { TextButton(onClick = { answer(false) }) { Text("Not now") } },
         )
     }
 }

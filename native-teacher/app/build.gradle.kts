@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
+    // Reads app/google-services.json (Firebase project settings; git-ignored, see FIREBASE-SETUP.md).
+    alias(libs.plugins.google.services)
 }
 
 // Signing passwords live outside the repo. Without this file (CI, other machines)
@@ -98,6 +100,8 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.security.crypto)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
 
     testImplementation(libs.junit)
     testImplementation(libs.robolectric)

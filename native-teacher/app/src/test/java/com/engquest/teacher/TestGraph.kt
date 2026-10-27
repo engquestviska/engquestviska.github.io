@@ -9,6 +9,7 @@ import androidx.work.testing.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.engquest.teacher.data.Api
 import com.engquest.teacher.data.AppDb
+import com.engquest.teacher.push.PushTokens
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -26,6 +27,8 @@ fun testGraph(
     online: MutableStateFlow<Boolean> = MutableStateFlow(true),
     /** Tests of thread safety pass a real background scope, as the app has. */
     scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined),
+    /** Stands in for Firebase; null (most tests) means no notifications and no permission question. */
+    push: PushTokens? = null,
 ): AppGraph = AppGraph(
     api = Api(baseUrl, OkHttpClient()),
     sessionPrefs = context.getSharedPreferences("session-test", Context.MODE_PRIVATE),
@@ -41,6 +44,7 @@ fun testGraph(
     },
     scope = scope,
     photoDir = File(context.cacheDir, "photos-test").apply { deleteRecursively() },
+    push = push,
 )
 
 /** Stands in for [TeacherApplication] in activity tests (no Android Keystore under Robolectric). */
