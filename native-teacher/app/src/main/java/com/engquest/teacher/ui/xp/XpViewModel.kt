@@ -69,7 +69,7 @@ internal fun withXp(raw: JsonObject, no: String, reason: Reason, delta: Int): Js
     val students = (raw["students"] as? JsonArray).orEmpty().map { el ->
         val o = el as? JsonObject ?: return@map el
         if (o["no"].text() != no) return@map el
-        val changed = mutableMapOf<String, JsonElement>("Total" to JsonPrimitive((o["Total"].number() ?: 0) + reason.xp * delta))
+        val changed = mutableMapOf<String, JsonElement>("Total" to JsonPrimitive(maxOf(0, (o["Total"].number() ?: 0) + reason.xp * delta)))
         o[reason.prop].number()?.let { changed[reason.prop] = JsonPrimitive(maxOf(0, it + delta)) }
         JsonObject(o + changed)
     }
@@ -173,7 +173,10 @@ class XpViewModel(
                 id.complete(send(no, r, delta))
                 store()
             } catch (e: Throwable) {
+                // Nothing was queued: take the change off the screen and say so.
                 id.completeExceptionally(e)
+                raw = raw?.let { withXp(it, no, r, -delta) }
+                toast = XpToast("Could not save that for $first. Please try again.", isError = true)
             } finally {
                 inFlight--
             }

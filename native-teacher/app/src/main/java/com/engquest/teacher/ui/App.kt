@@ -138,11 +138,21 @@ private fun AppShell(graph: AppGraph, onLoggedOut: () -> Unit) {
     // Android Back with unsaved work asks first; with nothing unsaved it behaves as usual.
     val backDispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     var backConfirmed by remember { mutableStateOf(false) }
+    var keptNote by remember { mutableStateOf<String?>(null) }
     BackHandler(enabled = guard.unsaved != null && !backConfirmed) {
-        leaving = { backConfirmed = true }
+        val note = guard.unsaved
+        leaving = {
+            keptNote = note
+            backConfirmed = true
+        }
     }
     LaunchedEffect(backConfirmed) {
-        if (backConfirmed) backDispatcher?.onBackPressed()
+        if (backConfirmed) {
+            backDispatcher?.onBackPressed()
+            // Back may only send the app to the background: the work is still unsaved, so ask again next time.
+            guard.unsaved = keptNote
+            backConfirmed = false
+        }
     }
 
     // Everything retried or discarded: nothing left to show.
