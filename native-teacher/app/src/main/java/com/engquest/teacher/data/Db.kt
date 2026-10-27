@@ -69,6 +69,14 @@ interface OutboxDao {
     @Query("UPDATE outbox SET state = :state, error = :error WHERE id = :id")
     suspend fun setState(id: Long, state: OutboxState, error: String? = null)
 
+    /** PENDING -> SENDING in one step; returns 0 when the item was cancelled meanwhile. */
+    @Query("UPDATE outbox SET state = 'SENDING' WHERE id = :id AND state = 'PENDING'")
+    suspend fun claim(id: Long): Int
+
+    /** FAILED -> PENDING (Retry); the item keeps its rid. */
+    @Query("UPDATE outbox SET state = 'PENDING', error = NULL WHERE id = :id AND state = 'FAILED'")
+    suspend fun requeueFailed(id: Long): Int
+
     /** After the app was killed mid-send, the item goes back in line (same rid, so no double write). */
     @Query("UPDATE outbox SET state = 'PENDING' WHERE state = 'SENDING'")
     suspend fun resetSending()
