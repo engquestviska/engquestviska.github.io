@@ -96,7 +96,7 @@
   </header>
 
   <main>
-    <p class="sub-intro" id="subIntro" style="display:none">Tap <b>Submit</b> next to a task, choose a photo of your finished work, and send it. Once sent, the task shows <b>Waiting for teacher</b> until your teacher checks it. Tap 📷 to see the photos you sent, or remove one you sent by mistake.</p>
+    <p class="sub-intro" id="subIntro" style="display:none">Tap <b>Submit</b> next to a task, choose photos of your finished work (up to 10, you can select them all at once), and send them. Once sent, the task shows <b>Waiting for teacher</b> until your teacher checks it. Tap 📷 to see the photos you sent, or remove one you sent by mistake. <b>Re-submit</b> replaces your old photos for that task with the new ones.</p>
     <div id="chapters"></div>
     <div class="sub-need-login" id="needLogin" style="display:none">Log in on the <a href="index.html">homepage</a> first to submit your tasks.</div>
   </main>
@@ -117,14 +117,14 @@
 
   <div class="lightbox" id="lightbox" onclick="this.classList.remove('on')"><img id="lightboxImg" alt="Your submitted photo"/></div>
 
-  <input type="file" id="fileInput" accept="image/*" capture="environment" multiple style="display:none"/>
+  <input type="file" id="fileInput" accept="image/*" multiple style="display:none"/>
 
   <script>
     var GRADE = '10';
     var STUDENT = null;      // { classId, studentNo }
     var pendingKey = null;   // task key being submitted
     var pendingImages = [];  // array of base64 strings (no prefix)
-    var MAX_PHOTOS = 6;
+    var MAX_PHOTOS = 10;
     var UNIT_NAMES = ['Descriptive Text', 'Recount', 'Procedure'];
     function unitTitle(ch) { return 'Chapter ' + ch + (UNIT_NAMES[ch - 1] ? ' · ' + UNIT_NAMES[ch - 1] : ''); }
 
@@ -277,7 +277,8 @@
       pendingKey = key;
       pendingImages = [];
       var parts = key.match(/C(\d)T(\d)/);
-      document.getElementById('modalSub').textContent = unitTitle(parts[1]) + ' · Task ' + parts[2] + ' — add one or more photos';
+      document.getElementById('modalSub').textContent = unitTitle(parts[1]) + ' · Task ' + parts[2] + ' — choose up to ' + MAX_PHOTOS + ' photos' +
+        (lastStatuses[key] ? '. These replace the photos you sent before.' : '');
       var msg = document.getElementById('modalMsg'); msg.textContent = ''; msg.className = 'modal-msg';
       renderThumbs();
       document.getElementById('modalBack').classList.add('on');
