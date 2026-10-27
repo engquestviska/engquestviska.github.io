@@ -30,7 +30,7 @@ sealed class ApiError(message: String, val userMessage: String, cause: Throwable
     /** The saved username/password no longer works (e.g. changed on the website). */
     class Unauthorized : ApiError("Unauthorized", "Please log in again.")
 
-    /** The server is still handling an earlier copy of this request (`retry: true`). Treat like [Offline]. */
+    /** `retry: true` reply, or HTTP 5xx/408/429: the server is busy or briefly down. Treat like [Offline]. */
     class RetryLater(message: String) : ApiError(message, "The server is busy. Trying again soon.")
 
     /** The server refused the request or sent something unreadable. */
@@ -70,6 +70,10 @@ class Api(baseUrl: String, client: OkHttpClient) {
                 override fun onResponse(call: Call, response: Response) {
                     try {
                         val result = response.use {
+                            // Busy or briefly down: resend later (the rid keeps a resend from doubling).
+                            if (it.code >= 500 || it.code == 408 || it.code == 429) {
+                                throw ApiError.RetryLater("Server error ${it.code}.")
+                            }
                             if (!it.isSuccessful) throw ApiError.Server("Server error ${it.code}.")
                             it.body!!.string()
                         }

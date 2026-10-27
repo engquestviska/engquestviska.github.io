@@ -111,6 +111,18 @@ class ApiTest {
     }
 
     @Test
+    fun `503 reply throws RetryLater`() {
+        server.enqueue(MockResponse().setResponseCode(503).setBody("busy"))
+        assertThrows<ApiError.RetryLater> { runBlocking { api.write("addStrike", emptyMap()) } }
+    }
+
+    @Test
+    fun `404 reply throws Server`() {
+        server.enqueue(MockResponse().setResponseCode(404).setBody("nope"))
+        assertThrows<ApiError.Server> { runBlocking { api.read("ping", emptyMap()) } }
+    }
+
+    @Test
     fun `a reply that is not JSON throws Server`() {
         reply("<html>Bad gateway</html>")
         assertThrows<ApiError.Server> { runBlocking { api.read("ping", emptyMap()) } }
