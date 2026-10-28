@@ -392,7 +392,11 @@
       }
       body.scores-page .identity-controls,
       body.scores-page .final-summary {
-        grid-template-columns: 1fr !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+      body.scores-page .identity-controls .filter-select {
+        width: 100% !important;
+        min-width: 0 !important;
       }
       body.scores-page .score-card-header,
       body.scores-page .identity-head {
@@ -400,7 +404,7 @@
       }
     }
   </style>
-  <script src="../shared/js/sidebar.js?v=20260711"></script>
+  <script src="../shared/js/sidebar.js?v=20261028"></script>
 </head>
 <body class="grade11-subpage grade11-page scores-page" data-page="scores">
 

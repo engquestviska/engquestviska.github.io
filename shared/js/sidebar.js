@@ -2,6 +2,20 @@
 (function () {
   var grade = document.body && document.body.classList.contains('grade11-page') ? '11' : '';
 
+  // Inside the Android app the native top bar already frames the page,
+  // so shrink the big page banners to a compact title strip.
+  if (/EngQuestApp\//.test(navigator.userAgent) && !document.getElementById('eq-app-compact')) {
+    document.documentElement.classList.add('eq-app');
+    var compact = document.createElement('style');
+    compact.id = 'eq-app-compact';
+    compact.textContent =
+      'html.eq-app body .subpage-header{padding:14px 16px 16px!important;min-height:0!important;}' +
+      'html.eq-app body .subpage-hero{padding:0!important;}' +
+      'html.eq-app body .subpage-hero h1{font-size:1.3rem!important;line-height:1.2!important;margin:4px 0 0!important;}' +
+      'html.eq-app body .subpage-hero .hero-copy,html.eq-app body .subpage-hero > p{display:none!important;}';
+    document.head.appendChild(compact);
+  }
+
   function detectGrade() {
     if (grade) return grade;
     if (location.pathname.indexOf('/grade11/') !== -1) return '11';
