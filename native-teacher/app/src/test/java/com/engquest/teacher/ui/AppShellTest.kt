@@ -61,7 +61,7 @@ class AppShellTest {
     fun setUp() {
         server.start()
         context.getSharedPreferences("session-test", Context.MODE_PRIVATE).edit().clear().commit()
-        context.getSharedPreferences("ui-test", Context.MODE_PRIVATE).edit().clear().commit()
+        context.getSharedPreferences("ui-test", Context.MODE_PRIVATE).edit().clear().putString("tab", "attendance").commit()
     }
 
     @After
@@ -131,13 +131,18 @@ class AppShellTest {
     }
 
     @Test
-    fun `after login the Attendance tab is shown`() {
-        start()
-        server.enqueue(MockResponse().setBody("""{"ok":true}"""))
+    fun `after login the Home tab is shown`() {
+        // Every read answers at once, so Home's lists finish loading before the test ends.
+        server.dispatcher = object : okhttp3.mockwebserver.Dispatcher() {
+            override fun dispatch(request: okhttp3.mockwebserver.RecordedRequest) =
+                MockResponse().setBody("""{"ok":true,"success":true,"submissions":[],"top":[]}""")
+        }
+        start { it.getSharedPreferences("ui-test", Context.MODE_PRIVATE).edit().remove("tab").commit() }
         logIn("teacher", "pw1")
         compose.waitUntil(5_000) { compose.onAllNodes(hasTestTag("screenTitle")).fetchSemanticsNodes().isNotEmpty() }
-        compose.onNodeWithTag("screenTitle").assertTextEquals("Attendance")
-        compose.onNode(hasText("Attendance") and hasAnyAncestor(hasTestTag("tabBar"))).assertIsSelected()
+        compose.waitForText("No submissions yet")
+        compose.onNodeWithTag("screenTitle").assertTextEquals("Home")
+        compose.onNode(hasText("Home") and hasAnyAncestor(hasTestTag("tabBar"))).assertIsSelected()
         listOf("Submissions", "XP", "Scores").forEach {
             compose.onNode(hasText(it) and hasAnyAncestor(hasTestTag("tabBar"))).assertIsDisplayed()
         }
@@ -162,14 +167,14 @@ class AppShellTest {
         compose.onNodeWithTag("classChip").assertTextContains("XI F-8")
         assertEquals("XIF8", graph.prefs.getString("class", null))
 
-        // Also the tab: pick Scores, then reopen the app.
+        // The tab is not remembered: pick Scores, reopen the app, and it starts on its first screen again.
         compose.onNode(hasText("Scores") and hasAnyAncestor(hasTestTag("tabBar"))).performClick()
         shown = false
         compose.waitForIdle()
         shown = true
         compose.waitForIdle()
         compose.onNodeWithTag("classChip").assertTextContains("XI F-8")
-        compose.onNodeWithTag("screenTitle").assertTextEquals("Scores")
+        compose.onNodeWithTag("screenTitle").assertTextEquals("Attendance")
     }
 
     @Test

@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 
 /** The pilot's line icons (24×24 SVG paths), drawn in the current content colour. */
 object AppIcons {
+    val Home = stroke("Home", "M3 11 12 3l9 8", "M5 10v10h5v-6h4v6h5V10")
     val Attendance = stroke(
         "Attendance",
         "M6 4h12a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3z",

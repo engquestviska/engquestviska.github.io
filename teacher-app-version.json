@@ -1,6 +1,6 @@
 {
-  "versionCode": 3,
-  "versionName": "3.0",
+  "versionCode": 4,
+  "versionName": "3.1",
   "apk": "EngQuestTeacher-k4m8q2zt.apk",
-  "notes": "The real app: Attendance, Submissions, Give XP and Scores built in, works offline, notifies you of new submissions."
+  "notes": "New Home screen: your top students and a list of the latest student submissions from every class."
 }

@@ -79,7 +79,7 @@ class AttendanceTest {
         server.start()
         context.getSharedPreferences("session-test", Context.MODE_PRIVATE).edit().clear()
             .putString("username", "teacher").putString("password", "pw1").commit()
-        context.getSharedPreferences("ui-test", Context.MODE_PRIVATE).edit().clear().commit()
+        context.getSharedPreferences("ui-test", Context.MODE_PRIVATE).edit().clear().putString("tab", "attendance").commit()
         graph = testGraph(context, server.url("/exec").toString())
     }
 

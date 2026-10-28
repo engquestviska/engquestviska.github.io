@@ -69,6 +69,7 @@ import com.engquest.teacher.AppGraph
 import com.engquest.teacher.domain.ClassInfo
 import com.engquest.teacher.domain.Classes
 import com.engquest.teacher.ui.attendance.AttendanceScreen
+import com.engquest.teacher.ui.home.HomeScreen
 import com.engquest.teacher.ui.scores.ScoresScreen
 import com.engquest.teacher.ui.submissions.SubmissionLink
 import com.engquest.teacher.ui.submissions.SubmissionsScreen
@@ -82,8 +83,12 @@ import kotlinx.coroutines.launch
 private val PageBackground = Color(0xFFF4F5FB)
 private val TabOff = Color(0xFF94A3B8)
 
-/** The four bottom-bar tabs; [key] is what the `tab` pref stores. */
+/**
+ * The bottom-bar tabs; [key] is what the `tab` pref holds. The app opens on Home each time it
+ * starts (nothing saves the pref; only tests set it to open a given tab).
+ */
 enum class Tab(val key: String, val title: String, val label: String, val icon: ImageVector) {
+    HOME("home", "Home", "Home", AppIcons.Home),
     ATTENDANCE("attendance", "Attendance", "Attendance", AppIcons.Attendance),
     SUBMISSIONS("submissions", "Submissions", "Submissions", AppIcons.Submissions),
     XP("xp", "Give XP", "XP", AppIcons.Xp),
@@ -91,7 +96,7 @@ enum class Tab(val key: String, val title: String, val label: String, val icon: 
     ;
 
     companion object {
-        fun fromKey(key: String?): Tab = entries.firstOrNull { it.key == key } ?: ATTENDANCE
+        fun fromKey(key: String?): Tab = entries.firstOrNull { it.key == key } ?: HOME
     }
 }
 
@@ -160,20 +165,22 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
         onDispose { submissions.close() }
     }
 
-    // A notification's link: that class, the Submissions tab, that student.
+    // A notification's link (or a tap on Home's activity list): that class, the Submissions tab, that student.
     var linkedStudent by remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(link) {
-        val l = link ?: return@LaunchedEffect
-        onLinkUsed()
-        val target = Classes.ALL.firstOrNull { it.id == l.className } ?: return@LaunchedEffect
+    fun openSubmission(className: String, studentNo: String) {
+        val target = Classes.ALL.firstOrNull { it.id == className } ?: return
         leaveThen {
             sheet = null
             classId = target.id
             prefs.edit().putString(AppGraph.KEY_CLASS, target.id).apply()
             tab = Tab.SUBMISSIONS
-            prefs.edit().putString(AppGraph.KEY_TAB, Tab.SUBMISSIONS.key).apply()
-            linkedStudent = l.studentNo
+            linkedStudent = studentNo
         }
+    }
+    LaunchedEffect(link) {
+        val l = link ?: return@LaunchedEffect
+        onLinkUsed()
+        openSubmission(l.className, l.studentNo)
     }
     LaunchedEffect(submissions, linkedStudent) {
         linkedStudent?.let {
@@ -229,15 +236,10 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
                 UpdateBanner(checker) { url, onFailed -> UpdateInstaller(context).start(url, onFailed) }
             }
             Box(Modifier.weight(1f).fillMaxWidth()) {
-                TabContent(tab, graph, classInfo, guard, submissions)
+                TabContent(tab, graph, classInfo, guard, submissions, ::openSubmission)
             }
             TabBar(tab, badges = mapOf(Tab.SUBMISSIONS to submissions.waiting)) { picked ->
-                if (picked != tab) {
-                    leaveThen {
-                        tab = picked
-                        prefs.edit().putString(AppGraph.KEY_TAB, picked.key).apply()
-                    }
-                }
+                if (picked != tab) leaveThen { tab = picked }
             }
         }
         when (sheet) {
@@ -353,8 +355,16 @@ private fun NotificationQuestion(prefs: SharedPreferences) {
  * the tab badge too).
  */
 @Composable
-fun TabContent(tab: Tab, graph: AppGraph, classInfo: ClassInfo, guard: LeaveGuard, submissions: SubmissionsViewModel) {
+fun TabContent(
+    tab: Tab,
+    graph: AppGraph,
+    classInfo: ClassInfo,
+    guard: LeaveGuard,
+    submissions: SubmissionsViewModel,
+    openSubmission: (className: String, studentNo: String) -> Unit,
+) {
     when (tab) {
+        Tab.HOME -> HomeScreen(graph, openSubmission)
         Tab.ATTENDANCE -> AttendanceScreen(graph, classInfo, guard)
         Tab.SUBMISSIONS -> SubmissionsScreen(submissions, graph.photos, classInfo, guard)
         Tab.XP -> XpScreen(graph, classInfo)

@@ -98,7 +98,7 @@ class MainActivityLinkTest {
         signIn()
         // (Built directly: ActivityScenario.close() never returns under Robolectric here.)
         val activity = Robolectric.buildActivity(MainActivity::class.java).setup().get()
-        compose.onNodeWithTag("screenTitle").assertTextEquals("Attendance")
+        compose.onNodeWithTag("screenTitle").assertTextEquals("Home")
         activity.onNewIntent(link("XE4", "9"))
         compose.waitUntil(5_000) {
             runCatching { compose.onNodeWithTag("screenTitle").assertTextEquals("Submissions") }.isSuccess
