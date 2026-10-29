@@ -72,6 +72,8 @@ import com.engquest.teacher.domain.ClassInfo
 import com.engquest.teacher.domain.Classes
 import com.engquest.teacher.ui.attendance.AttendanceScreen
 import com.engquest.teacher.ui.home.HomeScreen
+import com.engquest.teacher.ui.strikes.StrikesScreen
+import com.engquest.teacher.ui.tasks.TasksScreen
 import com.engquest.teacher.ui.scores.ScoresScreen
 import com.engquest.teacher.ui.submissions.SubmissionLink
 import com.engquest.teacher.ui.submissions.SubmissionsScreen
@@ -100,6 +102,12 @@ enum class Tab(val key: String, val title: String, val label: String, val icon: 
     companion object {
         fun fromKey(key: String?): Tab = entries.firstOrNull { it.key == key } ?: HOME
     }
+}
+
+/** Screens opened from Home's shortcuts; they cover the tab content and have a back arrow. */
+enum class Page(val title: String, val icon: ImageVector) {
+    STRIKES("Strikes", AppIcons.Strikes),
+    TASKS("Tasks", AppIcons.Tasks),
 }
 
 private enum class ShellSheet { CLASS, FAILED }
@@ -146,6 +154,8 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
         )
     }
     var tab by rememberSaveable { mutableStateOf(Tab.fromKey(prefs.getString(AppGraph.KEY_TAB, null))) }
+    var page by rememberSaveable { mutableStateOf<Page?>(null) }
+    BackHandler(enabled = page != null) { page = null }
     val pending by graph.outbox.pending.collectAsState(initial = 0)
     val failed by graph.outbox.failed.collectAsState(initial = emptyList())
     val online by graph.online.collectAsState()
@@ -175,6 +185,7 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
             sheet = null
             classId = target.id
             prefs.edit().putString(AppGraph.KEY_CLASS, target.id).apply()
+            page = null
             tab = Tab.SUBMISSIONS
             linkedStudent = studentNo
         }
@@ -229,10 +240,11 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
     Box(Modifier.fillMaxSize().background(PageBackground)) {
         Column(Modifier.fillMaxSize().imePadding()) {
             TopBar(
-                title = tab.title,
+                title = page?.title ?: tab.title,
                 classLabel = classInfo.label,
                 onClassClick = { sheet = ShellSheet.CLASS },
                 onLogOutClick = { leaveThen { askLogout = true } },
+                onBack = if (page != null) ({ page = null }) else null,
             )
             StatusBar(pending, failed.size, online, onOpenFailed = { sheet = ShellSheet.FAILED })
             graph.updates?.let { checker ->
@@ -240,10 +252,17 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
                 UpdateBanner(checker) { url, onFailed -> UpdateInstaller(context).start(url, onFailed) }
             }
             Box(Modifier.weight(1f).fillMaxWidth()) {
-                TabContent(tab, graph, classInfo, guard, submissions, ::openSubmission)
+                when (page) {
+                    Page.STRIKES -> StrikesScreen(graph, classInfo)
+                    Page.TASKS -> TasksScreen(graph, classInfo)
+                    null -> TabContent(tab, graph, classInfo, guard, submissions, ::openSubmission) { page = it }
+                }
             }
             TabBar(tab, badges = mapOf(Tab.SUBMISSIONS to submissions.waiting)) { picked ->
-                if (picked != tab) leaveThen { tab = picked }
+                if (picked != tab || page != null) leaveThen {
+                    page = null
+                    tab = picked
+                }
             }
         }
         when (sheet) {
@@ -366,9 +385,10 @@ fun TabContent(
     guard: LeaveGuard,
     submissions: SubmissionsViewModel,
     openSubmission: (className: String, studentNo: String) -> Unit,
+    openPage: (Page) -> Unit = {},
 ) {
     when (tab) {
-        Tab.HOME -> HomeScreen(graph, openSubmission)
+        Tab.HOME -> HomeScreen(graph, openSubmission, openPage)
         Tab.ATTENDANCE -> AttendanceScreen(graph, classInfo, guard)
         Tab.SUBMISSIONS -> SubmissionsScreen(submissions, graph.photos, classInfo, guard)
         Tab.XP -> XpScreen(graph, classInfo)
@@ -379,17 +399,28 @@ fun TabContent(
 // ---- Frame ---------------------------------------------------------------------------------
 
 @Composable
-private fun TopBar(title: String, classLabel: String, onClassClick: () -> Unit, onLogOutClick: () -> Unit) {
+private fun TopBar(
+    title: String,
+    classLabel: String,
+    onClassClick: () -> Unit,
+    onLogOutClick: () -> Unit,
+    onBack: (() -> Unit)? = null,
+) {
     var menuOpen by remember { mutableStateOf(false) }
     Row(
         Modifier
             .fillMaxWidth()
             .background(Brand)
             .windowInsetsPadding(WindowInsets.statusBars)
-            .padding(start = 16.dp, end = 4.dp, top = 10.dp, bottom = 12.dp),
+            .padding(start = if (onBack != null) 4.dp else 16.dp, end = 4.dp, top = 10.dp, bottom = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
+        if (onBack != null) {
+            IconButton(onClick = onBack, modifier = Modifier.testTag("pageBack")) {
+                Icon(AppIcons.Back, contentDescription = "Back", tint = Color.White)
+            }
+        }
         Text(
             title,
             color = Color.White,

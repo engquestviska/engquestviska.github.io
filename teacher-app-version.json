@@ -1,6 +1,6 @@
 {
-  "versionCode": 6,
-  "versionName": "3.3",
+  "versionCode": 7,
+  "versionName": "3.4",
   "apk": "EngQuestTeacher-k4m8q2zt.apk",
-  "notes": "Always opens on Home; the keyboard no longer hides the last students on Scores; neater spacing under the header."
+  "notes": "New: Strikes and Tasks, opened from the shortcuts on Home."
 }
