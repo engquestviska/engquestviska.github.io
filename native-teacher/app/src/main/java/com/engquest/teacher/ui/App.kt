@@ -17,7 +17,9 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.offset
@@ -222,8 +224,10 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
         if (failed.isEmpty() && sheet == ShellSheet.FAILED) sheet = null
     }
 
+    // The app draws edge to edge, so the keyboard would cover the screen: leave room for it, so the
+    // box being typed in scrolls into view above the keyboard.
     Box(Modifier.fillMaxSize().background(PageBackground)) {
-        Column(Modifier.fillMaxSize()) {
+        Column(Modifier.fillMaxSize().imePadding()) {
             TopBar(
                 title = tab.title,
                 classLabel = classInfo.label,

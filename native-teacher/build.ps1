@@ -1,7 +1,8 @@
 # Builds the EngQuest Teacher native app: runs the unit tests, then builds the APK.
 #   pwsh -File native-teacher/build.ps1            -> tests + debug APK
 #   pwsh -File native-teacher/build.ps1 -Release   -> tests + signed release APK
-param([switch]$Release)
+#   ... -Tests HomeTest,ScoresTest                 -> only those test classes (faster)
+param([switch]$Release, [string]$Tests)
 
 $ErrorActionPreference = 'Stop'
 
@@ -25,7 +26,8 @@ foreach ($name in @('root', 'app')) {
 $gradlew = Join-Path $PSScriptRoot 'gradlew.bat'
 $assemble = if ($Release) { 'assembleRelease' } else { 'assembleDebug' }
 
-& $gradlew -p $PSScriptRoot testDebugUnitTest $assemble
+$filters = @("$Tests".Split(',') | ForEach-Object { $_.Trim(" '*") } | Where-Object { $_ } | ForEach-Object { '--tests'; "*$_" })
+& $gradlew -p $PSScriptRoot testDebugUnitTest @filters $assemble
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
 $variant = if ($Release) { 'release' } else { 'debug' }

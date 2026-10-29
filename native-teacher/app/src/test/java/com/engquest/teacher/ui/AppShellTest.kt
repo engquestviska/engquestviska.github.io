@@ -61,7 +61,7 @@ class AppShellTest {
     fun setUp() {
         server.start()
         context.getSharedPreferences("session-test", Context.MODE_PRIVATE).edit().clear().commit()
-        context.getSharedPreferences("ui-test", Context.MODE_PRIVATE).edit().clear().putString("tab", "attendance").commit()
+        context.getSharedPreferences("ui-test", Context.MODE_PRIVATE).edit().clear().putString("startTab", "attendance").commit()
     }
 
     @After
@@ -137,7 +137,7 @@ class AppShellTest {
             override fun dispatch(request: okhttp3.mockwebserver.RecordedRequest) =
                 MockResponse().setBody("""{"ok":true,"success":true,"submissions":[],"top":[]}""")
         }
-        start { it.getSharedPreferences("ui-test", Context.MODE_PRIVATE).edit().remove("tab").commit() }
+        start { it.getSharedPreferences("ui-test", Context.MODE_PRIVATE).edit().remove("startTab").commit() }
         logIn("teacher", "pw1")
         compose.waitUntil(5_000) { compose.onAllNodes(hasTestTag("screenTitle")).fetchSemanticsNodes().isNotEmpty() }
         compose.waitForText("No submissions yet")

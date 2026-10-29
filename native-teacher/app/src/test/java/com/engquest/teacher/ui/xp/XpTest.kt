@@ -62,7 +62,7 @@ class XpTest {
         }
         context.getSharedPreferences("session-test", Context.MODE_PRIVATE).edit().clear()
             .putString("username", "teacher").putString("password", "pw1").commit()
-        context.getSharedPreferences("ui-test", Context.MODE_PRIVATE).edit().clear().putString("tab", "xp").commit()
+        context.getSharedPreferences("ui-test", Context.MODE_PRIVATE).edit().clear().putString("startTab", "xp").commit()
         graph = testGraph(context, server.url("/exec").toString())
     }
 
@@ -184,7 +184,7 @@ class XpTest {
 
     @Test
     fun `back with unsaved attendance marks asks first`() {
-        context.getSharedPreferences("ui-test", Context.MODE_PRIVATE).edit().putString("tab", "attendance").commit()
+        context.getSharedPreferences("ui-test", Context.MODE_PRIVATE).edit().putString("startTab", "attendance").commit()
         server.dispatcher = object : Dispatcher() {
             override fun dispatch(request: RecordedRequest) = MockResponse().setBody(
                 """{"ok":true,"students":[{"no":1,"name":"Ayu Lestari","nickname":"Ayu","attendance":{}}],"meetings":[]}""",

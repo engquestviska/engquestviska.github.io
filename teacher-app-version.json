@@ -1,6 +1,6 @@
 {
-  "versionCode": 5,
-  "versionName": "3.2",
+  "versionCode": 6,
+  "versionName": "3.3",
   "apk": "EngQuestTeacher-k4m8q2zt.apk",
-  "notes": "The indigo graduation-cap app icon is back."
+  "notes": "Always opens on Home; the keyboard no longer hides the last students on Scores; neater spacing under the header."
 }

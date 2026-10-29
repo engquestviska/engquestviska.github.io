@@ -104,7 +104,7 @@ fun SubmissionsScreen(vm: SubmissionsViewModel, photos: Photos, classInfo: Class
             vm.forgetTyped()
         }
     }
-    Column(Modifier.fillMaxSize().padding(horizontal = 12.dp)) {
+    Column(Modifier.fillMaxSize().padding(start = 12.dp, end = 12.dp, top = 12.dp)) {
         FilterToggle(vm)
         val current = vm.current
         when {

@@ -84,7 +84,7 @@ private fun XpBody(vm: XpViewModel) {
     val r = vm.reason
     val sign = if (vm.takeBack) MINUS else "+"
     Box(Modifier.fillMaxSize()) {
-        Column(Modifier.fillMaxSize().padding(horizontal = 12.dp)) {
+        Column(Modifier.fillMaxSize().padding(start = 12.dp, end = 12.dp, top = 12.dp)) {
             ModeToggle(vm.takeBack, vm::chooseTakeBack)
             Text(
                 if (vm.takeBack) "Tap a student to take back ${r.xp} XP for ${r.label}" else "Tap a student to give +${r.xp} XP for ${r.label}",

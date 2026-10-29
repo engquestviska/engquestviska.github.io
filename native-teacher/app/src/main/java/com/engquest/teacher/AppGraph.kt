@@ -115,7 +115,7 @@ class AppGraph(
     companion object {
         const val BASE_URL = "https://engquest-api.engquestviska.workers.dev/exec"
         const val KEY_CLASS = "class"
-        const val KEY_TAB = "tab"
+        const val KEY_TAB = "startTab" // only tests set it; old builds saved "tab", which is now ignored
         const val KEY_DEVICE_TOKEN = "deviceToken"
         /** Set once the teacher answered "Get a notification…?" (never asked again). */
         const val KEY_ASKED_NOTIFICATIONS = "askedNotifications"

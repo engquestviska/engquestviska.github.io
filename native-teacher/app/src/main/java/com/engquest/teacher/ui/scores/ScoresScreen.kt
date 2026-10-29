@@ -70,7 +70,7 @@ fun ScoresScreen(graph: AppGraph, classInfo: ClassInfo) {
     val vm = remember(classInfo.id) { ScoresViewModel(graph, classInfo, scope) }
     DisposableEffect(vm) { onDispose { vm.close() } }
 
-    Column(Modifier.fillMaxSize().padding(horizontal = 12.dp)) {
+    Column(Modifier.fillMaxSize().padding(start = 12.dp, end = 12.dp, top = 12.dp)) {
         ChapterChips(vm)
         when {
             !vm.loaded && vm.loading -> Message("Loading scores…", null, null)

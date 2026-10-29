@@ -86,7 +86,7 @@ class SubmissionsTest {
         }
         context.getSharedPreferences("session-test", Context.MODE_PRIVATE).edit().clear()
             .putString("username", "teacher").putString("password", "pw1").commit()
-        context.getSharedPreferences("ui-test", Context.MODE_PRIVATE).edit().clear().putString("tab", "submissions").commit()
+        context.getSharedPreferences("ui-test", Context.MODE_PRIVATE).edit().clear().putString("startTab", "submissions").commit()
         graph = testGraph(context, server.url("/exec").toString())
     }
 
@@ -217,7 +217,7 @@ class SubmissionsTest {
 
     @Test
     fun `deep link opens that student`() {
-        context.getSharedPreferences("ui-test", Context.MODE_PRIVATE).edit().putString("tab", "attendance").commit()
+        context.getSharedPreferences("ui-test", Context.MODE_PRIVATE).edit().putString("startTab", "attendance").commit()
         show(SubmissionLink("XE2", "2"))
         waitFor("subWho")
         compose.onNodeWithTag("screenTitle").assertTextEquals("Submissions")
