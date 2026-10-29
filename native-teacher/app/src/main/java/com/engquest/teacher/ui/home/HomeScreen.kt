@@ -16,8 +16,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import com.engquest.teacher.ui.Page
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -56,11 +54,7 @@ private val MONTHS = listOf("January", "February", "March", "April", "May", "Jun
  * from every class. Tapping a submission opens it ([onOpen] gets the class and student).
  */
 @Composable
-fun HomeScreen(
-    graph: AppGraph,
-    onOpen: (className: String, studentNo: String) -> Unit,
-    onOpenPage: (Page) -> Unit = {},
-) {
+fun HomeScreen(graph: AppGraph, onOpen: (className: String, studentNo: String) -> Unit) {
     val scope = rememberCoroutineScope()
     val vm = remember { HomeViewModel(graph, scope) }
     LaunchedEffect(vm) { vm.start() }
@@ -68,7 +62,6 @@ fun HomeScreen(
 
     LazyColumn(Modifier.fillMaxSize().testTag("home"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         item { Welcome(name, vm.waiting) }
-        item { QuickAccess(onOpenPage) }
         if (vm.champions.isNotEmpty()) {
             item { Heading("🏆 Champions of the semester") }
             item { Champions(vm.champions) }
@@ -115,28 +108,6 @@ private fun Welcome(name: String, waiting: Int) {
             },
             color = Color.White, fontSize = 14.sp, modifier = Modifier.padding(top = 8.dp).testTag("homeWaiting"),
         )
-    }
-}
-
-/** Shortcuts to the screens that don't fit in the bottom bar. */
-@Composable
-private fun QuickAccess(onOpenPage: (Page) -> Unit) {
-    Row(Modifier.padding(horizontal = 12.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Page.entries.forEach { p ->
-            Row(
-                Modifier
-                    .weight(1f)
-                    .background(Color.White, RoundedCornerShape(14.dp))
-                    .clickable { onOpenPage(p) }
-                    .padding(horizontal = 14.dp, vertical = 14.dp)
-                    .testTag("quick-${p.name.lowercase()}"),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                Icon(p.icon, contentDescription = null, tint = Brand, modifier = Modifier.size(22.dp))
-                Text(p.title, color = Ink, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
-            }
-        }
     }
 }
 

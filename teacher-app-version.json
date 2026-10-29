@@ -1,6 +1,6 @@
 {
-  "versionCode": 7,
-  "versionName": "3.4",
+  "versionCode": 8,
+  "versionName": "3.5",
   "apk": "EngQuestTeacher-k4m8q2zt.apk",
-  "notes": "New: Strikes and Tasks, opened from the shortcuts on Home."
+  "notes": "Simpler: just Home, Attendance, Submissions, XP and Scores."
 }
