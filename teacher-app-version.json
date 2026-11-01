@@ -1,6 +1,6 @@
 {
-  "versionCode": 8,
-  "versionName": "3.5",
+  "versionCode": 9,
+  "versionName": "3.6",
   "apk": "EngQuestTeacher-k4m8q2zt.apk",
-  "notes": "Simpler: just Home, Attendance, Submissions, XP and Scores."
+  "notes": "Bell for recent uploads with the exact time; empty scores count as 0; a green tick when a score saves."
 }

@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.statusBars
@@ -71,7 +72,9 @@ import com.engquest.teacher.AppGraph
 import com.engquest.teacher.domain.ClassInfo
 import com.engquest.teacher.domain.Classes
 import com.engquest.teacher.ui.attendance.AttendanceScreen
+import com.engquest.teacher.ui.home.ActivityScreen
 import com.engquest.teacher.ui.home.HomeScreen
+import com.engquest.teacher.ui.home.HomeViewModel
 import com.engquest.teacher.ui.scores.ScoresScreen
 import com.engquest.teacher.ui.submissions.SubmissionLink
 import com.engquest.teacher.ui.submissions.SubmissionsScreen
@@ -167,12 +170,35 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
         onDispose { submissions.close() }
     }
 
-    // A notification's link (or a tap on Home's activity list): that class, the Submissions tab, that student.
+    // Home's numbers and the bell's list of uploads (every class), loaded once for the whole shell.
+    val feed = remember { HomeViewModel(graph, scope) }
+    LaunchedEffect(feed) { feed.start() }
+    var showUploads by rememberSaveable { mutableStateOf(false) }
+    var seenUpload by remember { mutableStateOf(prefs.getLong(AppGraph.KEY_SEEN_UPLOAD, 0L)) }
+    val newUploads = feed.newSince(seenUpload)
+    fun openUploads() {
+        leaveThen {
+            showUploads = true
+            seenUpload = feed.newestId
+            prefs.edit().putLong(AppGraph.KEY_SEEN_UPLOAD, feed.newestId).apply()
+        }
+    }
+    BackHandler(enabled = showUploads) { showUploads = false }
+    // The very first time, start counting from now instead of calling the whole list "new".
+    LaunchedEffect(feed.newestId) {
+        if (seenUpload == 0L && feed.newestId > 0L) {
+            seenUpload = feed.newestId
+            prefs.edit().putLong(AppGraph.KEY_SEEN_UPLOAD, feed.newestId).apply()
+        }
+    }
+
+    // A notification's link (or a tap in the uploads list): that class, the Submissions tab, that student.
     var linkedStudent by remember { mutableStateOf<String?>(null) }
     fun openSubmission(className: String, studentNo: String) {
         val target = Classes.ALL.firstOrNull { it.id == className } ?: return
         leaveThen {
             sheet = null
+            showUploads = false
             classId = target.id
             prefs.edit().putString(AppGraph.KEY_CLASS, target.id).apply()
             tab = Tab.SUBMISSIONS
@@ -229,10 +255,13 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
     Box(Modifier.fillMaxSize().background(PageBackground)) {
         Column(Modifier.fillMaxSize().imePadding()) {
             TopBar(
-                title = tab.title,
+                title = if (showUploads) "Recent uploads" else tab.title,
                 classLabel = classInfo.label,
                 onClassClick = { sheet = ShellSheet.CLASS },
                 onLogOutClick = { leaveThen { askLogout = true } },
+                newUploads = newUploads,
+                onBell = ::openUploads,
+                onBack = if (showUploads) ({ showUploads = false }) else null,
             )
             StatusBar(pending, failed.size, online, onOpenFailed = { sheet = ShellSheet.FAILED })
             graph.updates?.let { checker ->
@@ -240,10 +269,17 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
                 UpdateBanner(checker) { url, onFailed -> UpdateInstaller(context).start(url, onFailed) }
             }
             Box(Modifier.weight(1f).fillMaxWidth()) {
-                TabContent(tab, graph, classInfo, guard, submissions, ::openSubmission)
+                if (showUploads) {
+                    ActivityScreen(feed, ::openSubmission)
+                } else {
+                    TabContent(tab, graph, classInfo, guard, submissions, feed)
+                }
             }
             TabBar(tab, badges = mapOf(Tab.SUBMISSIONS to submissions.waiting)) { picked ->
-                if (picked != tab) leaveThen { tab = picked }
+                if (picked != tab || showUploads) leaveThen {
+                    showUploads = false
+                    tab = picked
+                }
             }
         }
         when (sheet) {
@@ -365,10 +401,10 @@ fun TabContent(
     classInfo: ClassInfo,
     guard: LeaveGuard,
     submissions: SubmissionsViewModel,
-    openSubmission: (className: String, studentNo: String) -> Unit,
+    feed: HomeViewModel,
 ) {
     when (tab) {
-        Tab.HOME -> HomeScreen(graph, openSubmission)
+        Tab.HOME -> HomeScreen(feed, graph.session.savedUsername().orEmpty())
         Tab.ATTENDANCE -> AttendanceScreen(graph, classInfo, guard)
         Tab.SUBMISSIONS -> SubmissionsScreen(submissions, graph.photos, classInfo, guard)
         Tab.XP -> XpScreen(graph, classInfo)
@@ -379,17 +415,30 @@ fun TabContent(
 // ---- Frame ---------------------------------------------------------------------------------
 
 @Composable
-private fun TopBar(title: String, classLabel: String, onClassClick: () -> Unit, onLogOutClick: () -> Unit) {
+private fun TopBar(
+    title: String,
+    classLabel: String,
+    onClassClick: () -> Unit,
+    onLogOutClick: () -> Unit,
+    newUploads: Int = 0,
+    onBell: () -> Unit = {},
+    onBack: (() -> Unit)? = null,
+) {
     var menuOpen by remember { mutableStateOf(false) }
     Row(
         Modifier
             .fillMaxWidth()
             .background(Brand)
             .windowInsetsPadding(WindowInsets.statusBars)
-            .padding(start = 16.dp, end = 4.dp, top = 10.dp, bottom = 12.dp),
+            .padding(start = if (onBack != null) 4.dp else 16.dp, end = 4.dp, top = 10.dp, bottom = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
+        if (onBack != null) {
+            IconButton(onClick = onBack, modifier = Modifier.testTag("pageBack")) {
+                Icon(AppIcons.Back, contentDescription = "Back", tint = Color.White)
+            }
+        }
         Text(
             title,
             color = Color.White,
@@ -399,7 +448,8 @@ private fun TopBar(title: String, classLabel: String, onClassClick: () -> Unit, 
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f).testTag("screenTitle"),
         )
-        ClassChip(classLabel, onClassClick)
+        if (onBack == null) ClassChip(classLabel, onClassClick)
+        Bell(newUploads, onBell)
         Box {
             IconButton(onClick = { menuOpen = true }) {
                 Icon(AppIcons.MoreVertical, contentDescription = "More options", tint = Color.White)
@@ -469,6 +519,29 @@ private fun TabBar(selected: Tab, badges: Map<Tab, Int>, onSelect: (Tab) -> Unit
                     Spacer(Modifier.height(3.dp))
                     Text(tab.label, color = color, fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                 }
+            }
+        }
+    }
+}
+
+/** The bell: opens the list of recent uploads; the red number is uploads not seen yet. */
+@Composable
+private fun Bell(count: Int, onClick: () -> Unit) {
+    Box {
+        IconButton(onClick = onClick, modifier = Modifier.testTag("bell")) {
+            Icon(AppIcons.Bell, contentDescription = "Recent uploads", tint = Color.White)
+        }
+        if (count > 0) {
+            Box(
+                Modifier
+                    .align(Alignment.TopEnd)
+                    .offset(x = (-4).dp, y = 4.dp)
+                    .size(18.dp)
+                    .background(Bad, CircleShape)
+                    .testTag("bellCount"),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(if (count > 9) "9+" else "$count", color = Color.White, fontSize = 10.sp, fontWeight = FontWeight.ExtraBold)
             }
         }
     }

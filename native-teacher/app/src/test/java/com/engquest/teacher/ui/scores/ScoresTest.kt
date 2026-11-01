@@ -245,7 +245,7 @@ class ScoresTest {
         // The last saves may still be finishing on the background thread when the first re-read
         // lands (that reply is rightly held back), so the drain is signalled again until one applies.
         compose.waitUntil(10_000) {
-            runCatching { compose.onNodeWithTag("avg-1", useUnmergedTree = true).assertTextEquals("55") }.isSuccess ||
+            runCatching { compose.onNodeWithTag("score-1").assertTextEquals("55") }.isSuccess ||
                 false.also { runBlocking { graph.repo.notifyDrained("XE1") } }
         }
     }
@@ -262,6 +262,6 @@ class ScoresTest {
             compose.onAllNodesWithTag("scStatus").fetchSemanticsNodes().isNotEmpty() &&
                 runCatching { compose.onNodeWithTag("scStatus").assertTextContains("Could not save", substring = true) }.isSuccess
         }
-        compose.onNodeWithTag("avg-1", useUnmergedTree = true).assertTextEquals("80")
+        compose.onNodeWithTag("avg-1", useUnmergedTree = true).assertTextEquals("16") // 80 in one box; the 4 empty boxes count as 0
     }
 }

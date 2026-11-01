@@ -57,11 +57,19 @@ import com.engquest.teacher.ui.Line
 import com.engquest.teacher.ui.Muted
 import com.engquest.teacher.ui.Warn
 import com.engquest.teacher.ui.attendance.Message
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.ime
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.testTag
 import com.engquest.teacher.ui.theme.Brand
+import kotlinx.coroutines.delay
 
 private val Ok = Color(0xFF16A34A)
 private val TrackColor = Color(0xFFE2E8F0)
 private val BoxFill = Color(0xFFF8FAFC)
+private val OkSoft = Color(0xFFDCFCE7)
 
 /** The Scores tab: pick a chapter and a column, then type scores down the list. */
 @Composable
@@ -69,6 +77,12 @@ fun ScoresScreen(graph: AppGraph, classInfo: ClassInfo) {
     val scope = rememberCoroutineScope()
     val vm = remember(classInfo.id) { ScoresViewModel(graph, classInfo, scope) }
     DisposableEffect(vm) { onDispose { vm.close() } }
+
+    // When the keyboard goes away (Back, or its own close key), leave the box: the score saves and
+    // the typing line disappears.
+    val focusManager = LocalFocusManager.current
+    val keyboardOpen = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+    LaunchedEffect(keyboardOpen) { if (!keyboardOpen) focusManager.clearFocus() }
 
     Column(Modifier.fillMaxSize().padding(start = 12.dp, end = 12.dp, top = 12.dp)) {
         ChapterChips(vm)
@@ -145,7 +159,7 @@ private fun ColumnScope.ScoresBody(vm: ScoresViewModel) {
     val status = vm.status
     Text(
         status.text,
-        color = if (status.isError) Bad else Muted,
+        color = if (status.isError) Bad else if (status.ok) Ok else Muted,
         fontSize = 12.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(start = 4.dp, bottom = 8.dp).testTag("scStatus"),
@@ -214,15 +228,33 @@ private fun ScoreRow(vm: ScoresViewModel, s: ScoreStudent, label: String, isLast
                 .semantics { contentDescription = "$label for ${s.name}" }
                 .testTag("score-${s.no}"),
             decorationBox = { inner ->
+                val savedSeq = vm.justSaved[s.no]
+                val saved = savedSeq != null
+                if (savedSeq != null) {
+                    LaunchedEffect(savedSeq) {
+                        delay(1500)
+                        vm.clearSaved(s.no, savedSeq)
+                    }
+                }
                 Box(
                     Modifier
                         .fillMaxSize()
-                        .background(if (invalid) BadSoft else BoxFill, shape)
-                        .border(BorderStroke(1.5.dp, if (invalid) Bad else Line), shape),
+                        .background(if (invalid) BadSoft else if (saved) OkSoft else BoxFill, shape)
+                        .border(BorderStroke(if (saved) 2.dp else 1.5.dp, if (invalid) Bad else if (saved) Ok else Line), shape),
                     contentAlignment = Alignment.Center,
                 ) {
-                    if (vm.shown(s.no).isEmpty()) Text("–", color = Color(0xFF94A3B8), fontSize = 17.sp, fontWeight = FontWeight.ExtraBold)
+                    // An empty box counts as 0 (except the exam on Final), so it shows a grey 0.
+                    if (vm.shown(s.no).isEmpty()) {
+                        Text(if (vm.isFinal) "–" else "0", color = Color(0xFFCBD5E1), fontSize = 17.sp, fontWeight = FontWeight.ExtraBold)
+                    }
                     inner()
+                    if (saved) {
+                        Text(
+                            "✓", color = Ok, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold,
+                            // Drawn only: kept out of the box's text so the score itself still reads as just the number.
+                            modifier = Modifier.align(Alignment.TopEnd).padding(end = 4.dp).clearAndSetSemantics { testTag = "saved-${s.no}" },
+                        )
+                    }
                 }
             },
         )

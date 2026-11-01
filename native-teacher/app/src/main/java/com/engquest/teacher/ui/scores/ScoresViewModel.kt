@@ -2,6 +2,7 @@ package com.engquest.teacher.ui.scores
 
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -65,9 +66,10 @@ internal fun plainNumber(v: String?): String {
 
 /** Plain average of the entered scores, one decimal; blank when nothing is entered. */
 internal fun chapterAverage(scores: Map<String, String>, columns: List<String>): String {
-    val nums = columns.mapNotNull { scores[it]?.trim()?.takeIf { s -> s.isNotEmpty() }?.toDoubleOrNull() }
-    if (nums.isEmpty()) return ""
-    return plainNumber((floor(nums.sum() / nums.size * 10 + 0.5) / 10).toString())
+    val nums = columns.map { scores[it]?.trim()?.takeIf { s -> s.isNotEmpty() }?.toDoubleOrNull() }
+    if (nums.all { it == null } || columns.isEmpty()) return ""
+    // An empty box counts as 0, like the server (owner's rule: skipped work must not raise the average).
+    return plainNumber((floor(nums.sumOf { it ?: 0.0 } / columns.size * 10 + 0.5) / 10).toString())
 }
 
 /** [raw] as if the server had saved [value] in [column] for student [no] (the Final tab also refreshes the totals). */
@@ -114,6 +116,20 @@ class ScoresViewModel(
     /** What the teacher typed and has not saved yet, by student number (this chapter and column only). */
     private val drafts = mutableStateMapOf<String, String>()
     private var note by mutableStateOf<ScoreNote?>(null)
+
+    /** Scores saved since this screen opened (the "✓ 12 saved" count). */
+    var savedCount by mutableIntStateOf(0)
+        private set
+
+    /** Students whose box just saved (shown green with a ✓ for a moment), by the save's number. */
+    var justSaved by mutableStateOf<Map<String, Int>>(emptyMap())
+        private set
+    private var saveSeq = 0
+
+    /** The screen calls this a moment after showing a save, unless a newer save replaced it. */
+    fun clearSaved(no: String, seq: Int) {
+        if (justSaved[no] == seq) justSaved = justSaved - no
+    }
 
     var loading by mutableStateOf(true)
         private set
@@ -249,7 +265,12 @@ class ScoresViewModel(
         val key = cacheKey(id)
         val updated = withScore(current, no, col, check.value, final)
         raw = updated
-        note = ScoreNote("Saved · $first · ${Core.colLabel(col)}" + if (check.value.isEmpty()) " cleared" else " = ${check.value}", isError = false)
+        savedCount++
+        val seq = ++saveSeq
+        justSaved = justSaved + (no to seq)
+        val what = "$first · ${Core.colLabel(col)}" + if (check.value.isEmpty()) " cleared" else " = ${check.value}"
+        val count = if (savedCount == 1) "1 score saved" else "$savedCount scores saved"
+        note = ScoreNote("✓ Saved $what  ·  $count", isError = false, ok = true)
         inFlight++
         work.trySend {
             try {
@@ -299,4 +320,4 @@ class ScoresViewModel(
 }
 
 /** The line above the score list. */
-data class ScoreNote(val text: String, val isError: Boolean)
+data class ScoreNote(val text: String, val isError: Boolean, val ok: Boolean = false)

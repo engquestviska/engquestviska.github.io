@@ -49,24 +49,26 @@ private val MedalColors = listOf(Color(0xFFF59E0B), Color(0xFF94A3B8), Color(0xF
 private val DAYS = listOf("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
 private val MONTHS = listOf("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
 
-/**
- * The first screen: a welcome, the top students of the semester and the latest submissions
- * from every class. Tapping a submission opens it ([onOpen] gets the class and student).
- */
+/** The first screen: a welcome with what's waiting, and the top students of the semester. */
 @Composable
-fun HomeScreen(graph: AppGraph, onOpen: (className: String, studentNo: String) -> Unit) {
-    val scope = rememberCoroutineScope()
-    val vm = remember { HomeViewModel(graph, scope) }
-    LaunchedEffect(vm) { vm.start() }
-    val name = graph.session.savedUsername().orEmpty()
-
+fun HomeScreen(vm: HomeViewModel, name: String) {
     LazyColumn(Modifier.fillMaxSize().testTag("home"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         item { Welcome(name, vm.waiting) }
         if (vm.champions.isNotEmpty()) {
             item { Heading("🏆 Champions of the semester") }
             item { Champions(vm.champions) }
         }
-        item { Heading("Recent activity") }
+        item { Box(Modifier.padding(8.dp)) }
+    }
+}
+
+/**
+ * Every recent upload from every class, newest first, with the time it arrived (opened from
+ * the bell). Tapping one opens that student's submissions ([onOpen] gets class and student).
+ */
+@Composable
+fun ActivityScreen(vm: HomeViewModel, onOpen: (className: String, studentNo: String) -> Unit) {
+    LazyColumn(Modifier.fillMaxSize().padding(top = 4.dp).testTag("activityList"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         when {
             vm.loading -> item {
                 Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
@@ -167,7 +169,7 @@ private fun ActivityRow(a: Activity, onClick: () -> Unit) {
             )
         }
         Column(horizontalAlignment = Alignment.End) {
-            Text(dayLabel(a.day), color = Muted, fontSize = 12.sp)
+            Text(timeLabel(a.time), color = Muted, fontSize = 12.sp, modifier = Modifier.testTag("activityTime"))
             val (label, fg, bg) = when (a.status) {
                 PENDING -> Triple("Waiting", Warn, WarnSoft)
                 REJECTED -> Triple("Sent back", Bad, BadSoft)

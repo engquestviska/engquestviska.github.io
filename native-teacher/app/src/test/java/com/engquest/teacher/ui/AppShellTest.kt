@@ -140,7 +140,7 @@ class AppShellTest {
         start { it.getSharedPreferences("ui-test", Context.MODE_PRIVATE).edit().remove("startTab").commit() }
         logIn("teacher", "pw1")
         compose.waitUntil(5_000) { compose.onAllNodes(hasTestTag("screenTitle")).fetchSemanticsNodes().isNotEmpty() }
-        compose.waitForText("No submissions yet")
+        compose.waitForText("No submissions waiting for you")
         compose.onNodeWithTag("screenTitle").assertTextEquals("Home")
         compose.onNode(hasText("Home") and hasAnyAncestor(hasTestTag("tabBar"))).assertIsSelected()
         listOf("Submissions", "XP", "Scores").forEach {

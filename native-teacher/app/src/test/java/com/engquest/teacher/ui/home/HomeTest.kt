@@ -52,7 +52,7 @@ class HomeTest {
                             """{"success":true,"top":[{"name":"Bella Kusuma","className":"XE1","xp":1240},{"name":"Fajar Saputra","className":"XIF7","xp":1180}]}"""
                         "getTaskSubmissions" in path ->
                             """{"success":true,"submissions":[
-                              {"subId":"9","className":"XE2","studentNo":"4","studentName":"Dewi Lestari","task":"C1T2","timestamp":"2026-10-28","status":"pending"},
+                              {"subId":"9","className":"XE2","studentNo":"4","studentName":"Dewi Lestari","task":"C1T2","timestamp":"2026-10-28 19:42","status":"pending"},
                               {"subId":"8","className":"XE2","studentNo":"4","studentName":"Dewi Lestari","task":"C1T2","timestamp":"2026-10-28","status":"pending"},
                               {"subId":"7","className":"XE1","studentNo":"2","studentName":"Bima Andika","task":"C2F","timestamp":"2026-10-27","status":"reviewed"}
                             ]}"""
@@ -73,12 +73,11 @@ class HomeTest {
     private fun ComposeContentTestRule.waitForText(text: String) =
         waitUntil(15_000) { onAllNodesWithText(text, substring = true).fetchSemanticsNodes().isNotEmpty() }
 
-    /** Waits for the lists to load, then scrolls Home down to the first activity line. */
+    /** Waits for the lists to load, then opens the uploads list from the bell. */
     private fun showActivity() {
         compose.waitForText("Bella")
-        compose.waitUntil(15_000) {
-            runCatching { compose.onNodeWithTag("home").performScrollToNode(hasText("Dewi Lestari")) }.isSuccess
-        }
+        compose.onNodeWithTag("bell").performClick()
+        compose.waitForText("Dewi Lestari")
     }
 
     private fun open() {
@@ -111,14 +110,25 @@ class HomeTest {
     }
 
     @Test
-    fun `the app opens on Home with champions and recent activity`() {
+    fun `upload times show the hour and minute when the server has them`() {
+        val today = Calendar.getInstance().apply { clear(); set(2026, Calendar.OCTOBER, 28) }
+        assertEquals("Today, 19:42", timeLabel("2026-10-28 19:42", today))
+        assertEquals("21 Oct, 08:05", timeLabel("2026-10-21 08:05", today))
+        assertEquals("Yesterday", timeLabel("2026-10-27", today))
+    }
+
+    @Test
+    fun `the app opens on Home and the bell opens the uploads with their time`() {
         open()
         compose.onNodeWithTag("screenTitle").assertTextEquals("Home")
         compose.waitForText("2 photos are waiting")
         compose.onNodeWithTag("homeWaiting").assertTextEquals("2 photos are waiting for you to check.")
         showActivity()
+        compose.onNodeWithTag("screenTitle").assertTextEquals("Recent uploads")
         compose.onNodeWithText("X E-2 · sent C1 Task 2 · 2 photos").assertExists()
-        compose.onNodeWithTag("home").performScrollToNode(hasText("Approved"))
+        compose.onAllNodesWithText(", 19:42", substring = true).onFirst().assertExists()
+        compose.onNodeWithTag("pageBack").performClick()
+        compose.onNodeWithTag("screenTitle").assertTextEquals("Home")
     }
 
     @Test

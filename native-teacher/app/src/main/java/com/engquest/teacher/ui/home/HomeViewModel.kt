@@ -27,6 +27,10 @@ data class Activity(
     val studentName: String,
     val task: String,
     val day: String,
+    /** When the newest photo arrived: "yyyy-MM-dd HH:mm", or just the day for older uploads. */
+    val time: String,
+    /** The newest photo's id; higher ids arrived later (used for the bell's "new" count). */
+    val newestId: Long,
     val photos: Int,
     val status: String,
 )
@@ -53,6 +57,8 @@ internal fun recentActivity(rows: List<SubmissionRow>, limit: Int = 30): List<Ac
             studentName = first.studentName,
             task = first.task,
             day = first.timestamp.take(10),
+            time = first.timestamp,
+            newestId = photos.maxOf { it.subId.toLongOrNull() ?: 0L },
             photos = photos.size,
             status = when {
                 photos.any { it.status == PENDING } -> PENDING
@@ -79,6 +85,13 @@ internal fun dayLabel(day: String, today: Calendar = Calendar.getInstance()): St
         sameDay(then, yesterday) -> "Yesterday"
         else -> "${parts[2]} ${MONTHS[parts[1] - 1]}"
     }
+}
+
+/** "Today, 19:42", "Yesterday, 08:05" or "30 Oct, 19:42"; older uploads without a time show the day only. */
+internal fun timeLabel(stamp: String, today: Calendar = Calendar.getInstance()): String {
+    val day = dayLabel(stamp.take(10), today)
+    val hm = Regex("""\d{2}:\d{2}""").find(stamp.drop(10))?.value
+    return if (hm != null) "$day, $hm" else day
 }
 
 private val MONTHS = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
@@ -109,6 +122,12 @@ class HomeViewModel(private val graph: AppGraph, private val scope: CoroutineSco
     val activity: List<Activity> by derivedStateOf { subs?.let { recentActivity(parseSubmissions(it)) }.orEmpty() }
     val champions: List<Champion> by derivedStateOf { top?.let(::parseChampions).orEmpty() }
     val waiting: Int by derivedStateOf { subs?.let { parseSubmissions(it).count { r -> r.status == PENDING } } ?: 0 }
+
+    /** Lines that arrived after [seenId] (the newest id the teacher has already looked at). */
+    fun newSince(seenId: Long): Int = activity.count { it.newestId > seenId }
+
+    /** The newest upload id in the list, to remember as seen. */
+    val newestId: Long by derivedStateOf { activity.maxOfOrNull { it.newestId } ?: 0L }
 
     /** (Re)loads both lists; also what "Try again" does. */
     fun start() {
