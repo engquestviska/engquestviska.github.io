@@ -72,14 +72,32 @@
       <div class="content-section-head">
         <div class="content-title-row">
           <div class="content-badge">Semester 1</div>
-          <h2 class="content-title" id="chapter2Title">Chapter 2 · Analytical &amp; Hortatory Exposition Text</h2>
+          <h2 class="content-title" id="chapter2Title">Chapter 2 · Analytical Exposition Text</h2>
         </div>
       </div>
       <div class="material-grid" id="grid-ch2"></div>
       <div class="empty-material-card" id="ch2-empty">
         <div class="empty-material-icon">📋</div>
         <div>
-          <div class="empty-material-title">Analytical &amp; Hortatory Exposition Text Assignments</div>
+          <div class="empty-material-title">Analytical Exposition Text Assignments</div>
+          <div class="empty-material-copy">Will be added soon. Stay tuned!</div>
+        </div>
+        <div class="empty-material-badge">Coming Soon</div>
+      </div>
+    </section>
+
+    <section class="content-section" aria-labelledby="chapter3Title">
+      <div class="content-section-head">
+        <div class="content-title-row">
+          <div class="content-badge">Semester 1</div>
+          <h2 class="content-title" id="chapter3Title">Chapter 3 · Hortatory Exposition Text</h2>
+        </div>
+      </div>
+      <div class="material-grid" id="grid-ch3"></div>
+      <div class="empty-material-card" id="ch3-empty">
+        <div class="empty-material-icon">📋</div>
+        <div>
+          <div class="empty-material-title">Hortatory Exposition Text Assignments</div>
           <div class="empty-material-copy">Will be added soon. Stay tuned!</div>
         </div>
         <div class="empty-material-badge">Coming Soon</div>
@@ -160,7 +178,7 @@
     }
 
     function loadSaved() {
-      [1, 2].forEach(function(ch) {
+      [1, 2, 3].forEach(function(ch) {
         EQApi.get({ action: 'getMaterials', chapter: 'assign' + ch, grade: '11' }).then(function(res) {
           if (res.materials && res.materials.length) {
             var empty = document.getElementById('ch' + ch + '-empty');

@@ -73,14 +73,33 @@
       <div class="content-section-head">
         <div class="content-title-row">
           <div class="content-badge">Semester 1</div>
-          <h2 class="content-title" id="chapter2Title">Chapter 2 · Analytical &amp; Hortatory Exposition Text</h2>
+          <h2 class="content-title" id="chapter2Title">Chapter 2 · Analytical Exposition Text</h2>
         </div>
       </div>
       <div class="material-grid" id="grid-ch2">
         <div class="empty-material-card" id="ch2-empty">
           <div class="empty-material-icon">📘</div>
           <div>
-            <div class="empty-material-title">Analytical &amp; Hortatory Exposition Text Materials</div>
+            <div class="empty-material-title">Analytical Exposition Text Materials</div>
+            <div class="empty-material-copy">Will be uploaded soon. Stay tuned!</div>
+          </div>
+          <div class="empty-material-badge">Coming Soon</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="content-section" aria-labelledby="chapter3Title">
+      <div class="content-section-head">
+        <div class="content-title-row">
+          <div class="content-badge">Semester 1</div>
+          <h2 class="content-title" id="chapter3Title">Chapter 3 · Hortatory Exposition Text</h2>
+        </div>
+      </div>
+      <div class="material-grid" id="grid-ch3">
+        <div class="empty-material-card" id="ch3-empty">
+          <div class="empty-material-icon">📘</div>
+          <div>
+            <div class="empty-material-title">Hortatory Exposition Text Materials</div>
             <div class="empty-material-copy">Will be uploaded soon. Stay tuned!</div>
           </div>
           <div class="empty-material-badge">Coming Soon</div>
@@ -117,7 +136,7 @@
     });
 
     function loadSavedMaterials() {
-      [1, 2].forEach(function(ch) {
+      [1, 2, 3].forEach(function(ch) {
         EQApi.get({ action: 'getMaterials', chapter: ch, grade: '11' }).then(function(res) {
           if (res.materials && res.materials.length > 0) {
             res.materials.forEach(function(m) {
@@ -128,7 +147,7 @@
       });
     }
 
-    var UNIT_NAMES = ['Narrative Text', 'Analytical & Hortatory Exposition Text'];
+    var UNIT_NAMES = ['Narrative Text', 'Analytical Exposition Text', 'Hortatory Exposition Text'];
     function unitName(ch) { return UNIT_NAMES[ch - 1] || ('Chapter ' + ch); }
 
     function appendCard(ch, name, fileId, fileType) {
