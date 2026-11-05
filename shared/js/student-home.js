@@ -47,7 +47,7 @@
       setText('nextNote', 'We couldn\'t load your tasks right now.');
       return;
     }
-    var tasks = taskData.tasks;
+    var tasks = EQStudent.fullTasks(taskData.tasks);
     var keys = Object.keys(tasks);
     var done = keys.filter(function(key) { return tasks[key]; }).length;
     var waiting = {};

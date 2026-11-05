@@ -71,6 +71,21 @@
     }).join('').toUpperCase();
   }
 
+  // The server only lists tasks a student has started, so add the ones not started yet.
+  // Every chapter has three tasks, the same as the Submission page.
+  function fullTasks(tasks) {
+    var saved = tasks || {};
+    var full = {};
+    for (var chapter = 1; chapter <= 3; chapter++) {
+      for (var task = 1; task <= 3; task++) {
+        var key = 'C' + chapter + 'T' + task;
+        full[key] = !!saved[key];
+      }
+    }
+    Object.keys(saved).forEach(function(key) { full[key] = !!saved[key]; });
+    return full;
+  }
+
   function escapeHtml(value) {
     return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch) {
       return {
@@ -90,6 +105,7 @@
     clear: clear,
     classLabel: classLabel,
     initials: initials,
+    fullTasks: fullTasks,
     escapeHtml: escapeHtml
   };
 })(window);

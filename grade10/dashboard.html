@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="../shared/css/system.css?v=20260702"/>
   <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260702"/>
   <script src="../shared/js/classes-20260617.js?v=20260712"></script>
-  <script src="../shared/js/student.js"></script>
+  <script src="../shared/js/student.js?v=20261112"></script>
   <script src="../shared/js/api.js"></script>
   <script src="../shared/js/attendance.js?v=20260712"></script>
   <script src="../shared/js/sidebar.js?v=20261110"></script>
@@ -402,7 +402,7 @@
             <p class="stat-sub" id="taskSub">Loading your task status...</p>
             <div class="mini-grid">
               <div class="mini-stat"><div class="mini-label">Done</div><div class="mini-value" id="taskDone">--</div></div>
-              <div class="mini-stat"><div class="mini-label">Missing</div><div class="mini-value" id="taskMissing">--</div></div>
+              <div class="mini-stat"><div class="mini-label">To do</div><div class="mini-value" id="taskMissing">--</div></div>
               <div class="mini-stat"><div class="mini-label">Total</div><div class="mini-value" id="taskTotal">--</div></div>
             </div>
             <div class="link-row"><a class="btn ghost" href="tasks.html">Open Task Status</a></div>
@@ -607,7 +607,7 @@
     async function loadTasks() {
       try {
         var data = await mainApiGet({ action: 'getTaskStatus', className: studentProfile.cls, studentNo: studentProfile.no });
-        var tasks = data.tasks || {};
+        var tasks = EQStudent.fullTasks(data.tasks);
         var keys = Object.keys(tasks);
         var done = keys.filter(function(key) { return !!tasks[key]; }).length;
         var total = keys.length;
