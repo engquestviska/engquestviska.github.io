@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="../shared/css/system.css?v=20260702"/>
   <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260702"/>
   <script src="../shared/js/classes-20260617.js?v=20260712"></script>
-  <script src="../shared/js/student.js?v=20261112"></script>
+  <script src="../shared/js/student.js?v=20261113"></script>
   <script src="../shared/js/api.js"></script>
   <script src="../shared/js/attendance.js?v=20260712"></script>
   <script src="../shared/js/sidebar.js?v=20261110"></script>
@@ -606,8 +606,12 @@
 
     async function loadTasks() {
       try {
-        var data = await mainApiGet({ action: 'getTaskStatus', className: studentProfile.cls, studentNo: studentProfile.no });
-        var tasks = EQStudent.fullTasks(data.tasks);
+        var results = await Promise.all([
+          mainApiGet({ action: 'getTaskStatus', className: studentProfile.cls, studentNo: studentProfile.no }),
+          mainApiGet({ action: 'getMySubmissions', className: studentProfile.cls, studentNo: studentProfile.no }).catch(function() { return null; })
+        ]);
+        var data = results[0];
+        var tasks = EQStudent.fullTasks(data.tasks, results[1] && results[1].statuses);
         var keys = Object.keys(tasks);
         var done = keys.filter(function(key) { return !!tasks[key]; }).length;
         var total = keys.length;

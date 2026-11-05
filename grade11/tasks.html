@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="../shared/css/system.css?v=20260702"/>
   <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260702"/>
   <script src="../shared/js/classes-20260617.js?v=20260712"></script>
-  <script src="../shared/js/student.js?v=20261112"></script>
+  <script src="../shared/js/student.js?v=20261113"></script>
   <script src="../shared/js/api.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -655,7 +655,7 @@
     try {
       // Load task status and submission status in parallel
       const [data, subData] = await Promise.all([
-        cachedApiGet({ action: 'getTaskStatus', className: cls, studentNo: no }),
+        EQApi.get({ action: 'getTaskStatus', className: cls, studentNo: no }),
         EQApi.get({ action: 'getMySubmissions', className: cls, studentNo: no }).catch(function() { return null; })
       ]);
       if (data && data.error) throw new Error(data.error);
@@ -665,15 +665,16 @@
         if (item.status === 'pending') waiting[item.task] = true;
       });
 
-      renderStudentTasks(data, clsLabel, waiting);
+      renderStudentTasks(data, clsLabel, waiting, (subData && subData.statuses) || {});
     } catch(e) {
       document.getElementById('studentResult').innerHTML = '<div class="empty-chapter"><div class="empty-chapter-icon">&#8635;</div><div style="font-weight:800;margin-bottom:4px;color:#0f172a">Task status is temporarily unavailable</div><div>Your saved task records are safe. Please try again later.</div></div>';
     }
     finally { document.getElementById('sViewBtn').disabled = false; document.getElementById('sViewBtn').textContent = 'View My Tasks'; }
   }
 
-  function renderStudentTasks(data, clsLabel, waiting) {
-    const tasks   = EQStudent.fullTasks(data.tasks);
+  function renderStudentTasks(data, clsLabel, waiting, statuses) {
+    const tasks   = EQStudent.fullTasks(data.tasks, statuses);
+    const sentBack = k => statuses[k] === 'rejected';
     const keys    = Object.keys(tasks);
     const displayName = data.nickname || data.name || 'Student';
     const fullName = data.name || displayName;
@@ -685,8 +686,8 @@
 
     const chapterOf = k => { const m = k.match(/^C(\d+)T/i); return m ? Number(m[1]) : 0; };
     const chapters = [...new Set(keys.map(chapterOf))].filter(Boolean).sort((a, b) => a - b);
-    const isWaiting = k => !tasks[k] && !!waiting[k];
-    const todoKeys = keys.filter(k => !tasks[k] && !waiting[k]);
+    const isWaiting = k => !tasks[k] && !!waiting[k] && !sentBack(k);
+    const todoKeys = keys.filter(k => !tasks[k] && !isWaiting(k));
     const allDone = keys.filter(k => tasks[k]).length;
     const allTotal = keys.length;
     const allMissing = todoKeys.length;
@@ -715,18 +716,18 @@
       return `<div class="task-chip ${isDone ? 'done' : pending ? 'waiting' : 'missing'}">
         <div class="task-chip-top">
           <div class="task-chip-icon">${isDone ? '&#10003;' : pending ? '&hellip;' : '!'}</div>
-          <div class="task-chip-badge">${isDone ? 'Done' : pending ? 'Waiting' : 'To do'}</div>
+          <div class="task-chip-badge">${isDone ? 'Done' : pending ? 'Waiting' : sentBack(k) ? 'Sent back' : 'To do'}</div>
         </div>
         <div>
           <div class="task-chip-name">${escapeHtml(taskName)}</div>
-          <div class="task-chip-label">${isDone ? 'Recorded as complete' : pending ? 'Your teacher is checking it' : 'Submit a photo'}</div>
+          <div class="task-chip-label">${isDone ? 'Recorded as complete' : pending ? 'Your teacher is checking it' : sentBack(k) ? 'Send new photos' : 'Submit a photo'}</div>
         </div>
       </div>`;
     }).join('');
 
     const taskLabel = k => { const m = k.match(/^C(\d+)T(\d+)$/i); return m ? 'Chapter ' + m[1] + ' Task ' + m[2] : k; };
     const todoHtml = todoKeys.length
-      ? '<div class="todo-box"><div class="todo-title">Still to do</div>' + todoKeys.map(k => '<a class="todo-row" href="submission.html"><span>' + escapeHtml(taskLabel(k)) + '</span><strong>Submit</strong></a>').join('') + '</div>'
+      ? '<div class="todo-box"><div class="todo-title">Still to do</div>' + todoKeys.map(k => '<a class="todo-row" href="submission.html"><span>' + escapeHtml(taskLabel(k)) + (sentBack(k) ? ' (sent back)' : '') + '</span><strong>' + (sentBack(k) ? 'Resubmit' : 'Submit') + '</strong></a>').join('') + '</div>'
       : '<div class="todo-box clear">You have nothing left to submit.</div>';
     const openChapter = chapters.find(c => todoKeys.some(k => chapterOf(k) === c)) || chapters[chapters.length - 1];
     const chapterTabs = chapters.map(c => '<button class="ch-tab-inner' + (c === openChapter ? ' active' : '') + '" data-ch="' + c + '" onclick="switchChapterTab(' + c + ')">Chapter ' + c + '</button>').join('');

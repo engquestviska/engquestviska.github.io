@@ -25,11 +25,13 @@
     return count + ' ' + word + (count === 1 ? '' : 's');
   }
 
-  function renderNext(todo, waitingCount) {
+  function renderNext(todo, waitingCount, sentBackCount) {
     var button = document.getElementById('nextBtn');
     if (todo.length) {
-      setText('nextLabel', 'Submit ' + taskName(todo[0]));
-      setText('nextNote', 'You have ' + plural(todo.length, 'task') + ' left to submit.');
+      setText('nextLabel', (sentBackCount ? 'Resubmit ' : 'Submit ') + taskName(todo[0]));
+      setText('nextNote', sentBackCount
+        ? 'Your teacher sent back ' + plural(sentBackCount, 'task') + '. You have ' + todo.length + ' left in total.'
+        : 'You have ' + plural(todo.length, 'task') + ' left to submit.');
       if (button) button.href = 'submission.html';
     } else if (waitingCount) {
       setText('nextLabel', 'See my tasks');
@@ -47,7 +49,8 @@
       setText('nextNote', 'We couldn\'t load your tasks right now.');
       return;
     }
-    var tasks = EQStudent.fullTasks(taskData.tasks);
+    var statuses = (submissionData && submissionData.statuses) || {};
+    var tasks = EQStudent.fullTasks(taskData.tasks, statuses);
     var keys = Object.keys(tasks);
     var done = keys.filter(function(key) { return tasks[key]; }).length;
     var waiting = {};
@@ -55,9 +58,11 @@
       if (item.status === 'pending' && !tasks[item.task]) waiting[item.task] = true;
     });
     var todo = keys.filter(function(key) { return !tasks[key] && !waiting[key]; });
+    var sentBack = todo.filter(function(key) { return statuses[key] === 'rejected'; });
+    todo = sentBack.concat(todo.filter(function(key) { return statuses[key] !== 'rejected'; }));
     var waitingCount = Object.keys(waiting).length;
     setCard('statTasks', done + '/' + keys.length, todo.length ? todo.length + ' to do' : 'None to do');
-    renderNext(todo, waitingCount);
+    renderNext(todo, waitingCount, sentBack.length);
   }
 
   function renderSubmissions(data) {

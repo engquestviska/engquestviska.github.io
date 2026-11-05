@@ -73,8 +73,10 @@
 
   // The server only lists tasks a student has started, so add the ones not started yet.
   // Every chapter has three tasks, the same as the Submission page.
-  function fullTasks(tasks) {
+  // A task the teacher sent back still has to be done again.
+  function fullTasks(tasks, statuses) {
     var saved = tasks || {};
+    var reviewed = statuses || {};
     var full = {};
     for (var chapter = 1; chapter <= 3; chapter++) {
       for (var task = 1; task <= 3; task++) {
@@ -83,6 +85,9 @@
       }
     }
     Object.keys(saved).forEach(function(key) { full[key] = !!saved[key]; });
+    Object.keys(reviewed).forEach(function(key) {
+      if (reviewed[key] === 'rejected') full[key] = false;
+    });
     return full;
   }
 
