@@ -471,3 +471,38 @@ body[data-student-shell-page="submission"] .btn-send { min-height: 48px; }
 body[data-student-shell-page="submission"] .add-photo { border-style: solid; }
 body[data-student-shell-page="submission"] .btn-cancel:disabled { opacity: 0.5; cursor: not-allowed; }
 body[data-student-shell-page="submission"] .lightbox-close { position: fixed; top: 16px; right: 16px; min-height: 44px; padding: 0 16px; border: 0; border-radius: 999px; background: #fff; color: var(--eq-ink); font: 700 0.9rem 'IBM Plex Sans', sans-serif; cursor: pointer; }
+
+/* ---- Grade 11 uses one teal everywhere, and the same page layout as Grade 10 ---- */
+body[data-eq-grade="11"] {
+  --primary: #0f766e;
+  --primary-dark: #115e59;
+  --primary-soft: #ccfbf1;
+  --line: #d5efe9;
+  --blue: #0f766e;
+  --purple: #0f766e;
+  --purple-soft: #e5f7f3;
+  --muted: #475569;
+  --shadow: 0 12px 34px rgba(15, 118, 110, 0.08);
+}
+body.student-shell-enabled.grade11-subpage > main { width: auto; max-width: none; padding: 22px 28px 48px; }
+
+/* File lists: View is the main action on both grades */
+body[data-eq-grade] .material-actions .btn:not(.primary) { background: var(--eq-accent); color: #fff; }
+body[data-eq-grade] .material-actions .btn.primary { border: 1px solid #cbd5e1; background: #fff; color: #334155; }
+body[data-eq-grade] .empty-material-card { padding: 14px 16px; border: 1px dashed #cbd5e1; border-radius: 16px; }
+body[data-eq-grade] .empty-material-icon { display: none; }
+body[data-eq-grade] .empty-material-title { font-family: 'IBM Plex Sans', sans-serif; font-size: 1rem; font-weight: 700; }
+body[data-eq-grade] .empty-material-copy { color: #475569; }
+body[data-eq-grade] .empty-material-badge { background: #f1f5f9; color: #475569; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.8rem; font-weight: 600; }
+
+/* Submission scores follow the grade colour */
+body[data-student-shell-page="submission"] .pill.score { background: var(--eq-accent-soft); color: var(--eq-accent); }
+
+@media (max-width: 760px) {
+  body.student-shell-enabled.grade11-subpage > main { padding: 14px 16px 36px; }
+}
+body.student-shell-enabled.grade11-subpage > header { padding: 20px 28px 0; }
+@media (max-width: 760px) {
+  body.student-shell-enabled.grade11-subpage > header { padding: 14px 14px 0; }
+  body.student-shell-enabled.grade11-subpage > main { padding: 14px 14px 36px; }
+}
