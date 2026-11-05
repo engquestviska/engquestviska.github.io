@@ -74,8 +74,8 @@
   <script src="../shared/js/classes-20260617.js?v=20260712"></script>
   <script src="../shared/js/student.js"></script>
   <script src="../shared/js/api.js"></script>
-  <script src="../shared/js/sidebar.js?v=20261105"></script>
-  <link rel="stylesheet" href="../shared/css/student-shell.css?v=20261109"/>
+  <script src="../shared/js/sidebar.js?v=20261110"></script>
+  <link rel="stylesheet" href="../shared/css/student-shell.css?v=20261111"/>
 </head>
 <body class="grade10-subpage" data-page="submission">
   <header class="subpage-header">
@@ -95,35 +95,36 @@
     <section class="subpage-hero">
       <div class="kicker">Submit Task</div>
       <h1>Submission</h1>
-      <p class="hero-copy">Send a photo of your finished work.</p>
+      <p class="hero-copy">Send photos of your finished work, up to 10 for each task.</p>
     </section>
   </header>
 
   <main>
-    <p class="sub-intro" id="subIntro" style="display:none">Tap <b>Submit</b> next to a task, take photos of your finished work or choose them from your gallery (up to 10, you can select many at once), and send them. Once sent, the task shows <b>Waiting for teacher</b> until your teacher checks it. Tap 📷 to see the photos you sent, or remove one you sent by mistake. <b>Re-submit</b> replaces your old photos for that task with the new ones.</p>
+    <p class="sub-intro" id="subSummary" style="display:none" aria-live="polite">Loading your tasks…</p>
     <div id="chapters"></div>
     <div class="sub-need-login" id="needLogin" style="display:none">Log in on the <a href="index.html">homepage</a> first to submit your tasks.</div>
   </main>
 
   <div class="modal-back" id="modalBack">
-    <div class="modal">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <h3 id="modalTitle">Submit photos</h3>
       <div class="msub" id="modalSub"></div>
+      <div class="modal-warn" id="modalWarn" hidden></div>
       <div class="thumb-grid" id="thumbGrid"></div>
       <div class="add-row">
-        <button class="add-photo" id="btnCamera" type="button">📷 Take photo</button>
-        <button class="add-photo" id="btnGallery" type="button">🖼️ From gallery</button>
+        <button class="add-photo" id="btnCamera" type="button">Take photo</button>
+        <button class="add-photo" id="btnGallery" type="button">From gallery</button>
       </div>
       <div class="add-note" id="addNote"></div>
       <div class="modal-msg" id="modalMsg"></div>
       <div class="modal-actions">
         <button class="btn-cancel" id="btnCancel" type="button">Cancel</button>
-        <button class="btn-send" id="btnSend" type="button">Submit</button>
+        <button class="btn-send" id="btnSend" type="button">Send</button>
       </div>
     </div>
   </div>
 
-  <div class="lightbox" id="lightbox" onclick="this.classList.remove('on')"><img id="lightboxImg" alt="Your submitted photo"/></div>
+  <div class="lightbox" id="lightbox" onclick="this.classList.remove('on')"><button class="lightbox-close" type="button">Close</button><img id="lightboxImg" alt="Your submitted photo"/></div>
 
   <input type="file" id="fileInput" accept="image/*" multiple style="display:none"/>
   <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none"/>
@@ -145,10 +146,10 @@
     function normStatus(st) { return (st === 'approved' || st === 'reviewed') ? 'approved' : (st || ''); }
 
     function statusPill(st) {
-      if (st === 'pending')  return '<span class="pill pending">⏳ Waiting for teacher</span>';
-      if (st === 'approved') return '<span class="pill approved">✓ Approved</span>';
-      if (st === 'rejected') return '<span class="pill rejected">✕ Sent back, please resubmit</span>';
-      return '<span class="pill none">Not submitted</span>';
+      if (st === 'pending')  return '<span class="pill pending">Waiting for teacher</span>';
+      if (st === 'approved') return '<span class="pill approved">Approved</span>';
+      if (st === 'rejected') return '<span class="pill rejected">Sent back</span>';
+      return '<span class="pill none">Not sent</span>';
     }
 
     function scorePill(st, score) {
@@ -160,52 +161,108 @@
 
     function escapeHtml(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 
+    function taskStatus(ch, t) { return normStatus(lastStatuses['C' + ch + 'T' + t]); }
+
+    function photoCount(n) { return n + (n === 1 ? ' photo' : ' photos'); }
+
+    function actionButton(key, st) {
+      if (st === 'approved') return '';
+      if (st === 'pending') return '<button class="task-btn resubmit" type="button" onclick="pickFile(\'' + key + '\')">Replace</button>';
+      return '<button class="task-btn" type="button" onclick="pickFile(\'' + key + '\')">' + (st ? 'Resubmit' : 'Submit') + '</button>';
+    }
+
+    function taskRow(ch, t) {
+      var key = 'C' + ch + 'T' + t;
+      var st = taskStatus(ch, t);
+      var score = (lastScores[ch] || {})['Task ' + t];
+      var photos = myItems.filter(function(i){ return i.task === key; });
+      var see = photos.length
+        ? '<button class="see-btn" type="button" aria-expanded="' + (openTask === key) + '" onclick="togglePhotos(\'' + key + '\')">' + photoCount(photos.length) + '</button>'
+        : '';
+      var row = '<div class="task-row">' +
+        '<span class="task-name">Task ' + t + '</span>' +
+        '<span class="task-status">' + statusPill(st) + scorePill(st, score) + '</span>' +
+        '<span class="task-actions">' + see + actionButton(key, st) + '</span>' +
+      '</div>';
+      if (openTask !== key) return row;
+      row += '<div class="my-photos">' + photos.map(photoHtml).join('') + '</div>';
+      if (st === 'approved') row += '<div class="approved-note"><span>Need to send new photos? This deletes your approved photos, and your teacher has to check again.</span>' +
+        '<button class="replace-link" type="button" onclick="pickFile(\'' + key + '\')">Send new photos</button></div>';
+      return row;
+    }
+
+    function chapterSummary(ch) {
+      var approved = 0;
+      for (var t = 1; t <= 3; t++) if (taskStatus(ch, t) === 'approved') approved++;
+      return approved === 3 ? 'All approved' : approved + ' of 3 approved';
+    }
+
+    // Finished chapters fold away, so the work still to do comes first.
+    function chapterIsOpen(ch) {
+      if (chapterOpen[ch] !== undefined) return chapterOpen[ch];
+      return chapterSummary(ch) !== 'All approved';
+    }
+
+    function renderSummary() {
+      var counts = { approved: 0, pending: 0, todo: 0 };
+      for (var ch = 1; ch <= CHAPTER_COUNT; ch++) for (var t = 1; t <= 3; t++) {
+        var st = taskStatus(ch, t);
+        if (st === 'approved') counts.approved++;
+        else if (st === 'pending') counts.pending++;
+        else counts.todo++;
+      }
+      var line = document.getElementById('subSummary');
+      line.textContent = counts.approved + ' approved · ' + counts.pending + ' waiting · ' + counts.todo + ' not sent';
+    }
+
     function render() {
+      if (!statusesLoaded) return;
+      renderSummary();
       var wrap = document.getElementById('chapters');
       var html = '';
       for (var ch = 1; ch <= CHAPTER_COUNT; ch++) {
-        html += '<div class="chapter-card"><h2>' + unitTitle(ch) + '</h2>';
-        for (var t = 1; t <= 3; t++) {
-          var key = 'C' + ch + 'T' + t;
-          var st = normStatus(lastStatuses[key]);
-          var score = (lastScores[ch] || {})['Task ' + t];
-          var photos = myItems.filter(function(i){ return i.task === key; });
-          var see = photos.length
-            ? '<button class="see-btn" type="button" aria-expanded="' + (openTask === key) + '" onclick="togglePhotos(\'' + key + '\')">📷 ' + photos.length + '</button>'
-            : '';
-          html += '<div class="task-row">' +
-            '<span class="task-name">Task ' + t + '</span>' +
-            '<span class="task-status">' + statusPill(st) + scorePill(st, score) + '</span>' +
-            '<span class="task-actions">' + see +
-              '<button class="' + (st ? 'task-btn resubmit' : 'task-btn') + '" onclick="pickFile(\'' + key + '\')">' + (st ? 'Re-submit' : 'Submit') + '</button></span>' +
-          '</div>';
-          if (openTask === key) html += '<div class="my-photos">' + photos.map(photoHtml).join('') + '</div>';
-        }
-        html += '</div>';
+        html += '<details class="chapter-card" data-ch="' + ch + '"' + (chapterIsOpen(ch) ? ' open' : '') + '>' +
+          '<summary><h2>' + escapeHtml(unitTitle(ch)) + '</h2><span class="chapter-count">' + chapterSummary(ch) + '</span></summary>';
+        for (var t = 1; t <= 3; t++) html += taskRow(ch, t);
+        html += '</details>';
       }
       wrap.innerHTML = html;
+      wrap.querySelectorAll('details').forEach(function(card) {
+        card.addEventListener('toggle', function() { chapterOpen[card.getAttribute('data-ch')] = card.open; });
+      });
       if (openTask) loadPhotos(openTask);
+    }
+
+    function showLoadError() {
+      document.getElementById('subSummary').textContent = 'We could not load your tasks.';
+      document.getElementById('chapters').innerHTML = '<div class="sub-need-login">Check your connection, then try again.<br/>' +
+        '<button class="task-btn sub-retry" type="button" onclick="loadStatuses()">Try again</button></div>';
     }
 
     var lastStatuses = {};
     var myItems = [];        // every photo this student sent: {id, task, status, date}
     var lastScores = {};     // chapter (1..3) -> {'Task 1': 90, ...}
     var openTask = null;     // task whose photos are showing
+    var statusesLoaded = false;
+    var chapterOpen = {};    // chapter -> open or closed, once the student has chosen
     var PHOTO_CACHE = {};    // id -> data URL
     var PHOTO_LOADING = {};  // id -> true while its request is in flight
 
     function photoHtml(i) {
       var st = normStatus(i.status);
-      var cap = st === 'approved' ? '✓ Approved' : st === 'rejected' ? '✕ Sent back' : '⏳ Waiting';
+      var cap = st === 'approved' ? 'Approved' : st === 'rejected' ? 'Sent back' : 'Waiting';
       return '<div class="my-photo"><div class="box" id="myph-' + i.id + '" onclick="showBig(' + i.id + ')">Loading…</div>' +
         '<div class="cap ' + st + '">' + cap + '</div>' +
         // Approved photos are graded work, so only unapproved ones can be removed.
-        (st === 'approved' ? '' : '<button class="rm-photo" type="button" onclick="removePhoto(' + i.id + ', this)">Remove</button>') +
+        (st === 'approved' ? '' : '<button class="rm-photo" type="button" onclick="askRemovePhoto(' + i.id + ', this)">Remove</button>') +
         '</div>';
     }
 
+    function askRemovePhoto(id, btn) {
+      EQStudentShell.confirmTap(btn, function() { removePhoto(id, btn); }, 'Tap again');
+    }
+
     function removePhoto(id, btn) {
-      if (!confirm('Remove this photo? Your teacher will not see it anymore.')) return;
       btn.disabled = true; btn.textContent = 'Removing…';
       EQApi.get({ action: 'deleteMySubmission', className: STUDENT.classId, studentNo: STUDENT.studentNo, id: id }).then(function(res) {
         if (!res || !res.success) {
@@ -259,8 +316,8 @@
     function loadStatuses() {
       if (!window.EQApi || !STUDENT) return;
       EQApi.get({ action: 'getMySubmissions', className: STUDENT.classId, studentNo: STUDENT.studentNo })
-        .then(function(res) { applySubmissions(res); render(); })
-        .catch(function() { render(); });
+        .then(function(res) { statusesLoaded = true; applySubmissions(res); render(); })
+        .catch(function() { if (!statusesLoaded) showLoadError(); });
     }
 
     function loadScores() {
@@ -286,8 +343,14 @@
       pendingKey = key;
       pendingImages = [];
       var parts = key.match(/C(\d)T(\d)/);
-      document.getElementById('modalSub').textContent = unitTitle(parts[1]) + ' · Task ' + parts[2] + ' — choose up to ' + MAX_PHOTOS + ' photos' +
-        (lastStatuses[key] ? '. These replace the photos you sent before.' : '');
+      document.getElementById('modalTitle').textContent = 'Chapter ' + parts[1] + ' · Task ' + parts[2];
+      document.getElementById('modalSub').textContent = 'Add clear photos of your work. You can send up to ' + MAX_PHOTOS + '.';
+      var warn = document.getElementById('modalWarn');
+      var st = normStatus(lastStatuses[key]);
+      warn.hidden = !st;
+      warn.textContent = st === 'approved'
+        ? 'Your approved photos will be deleted, and your teacher will have to check this task again.'
+        : 'These photos will replace the ones you sent before.';
       var msg = document.getElementById('modalMsg'); msg.textContent = ''; msg.className = 'modal-msg';
       renderThumbs();
       document.getElementById('modalBack').classList.add('on');
@@ -305,10 +368,12 @@
     function renderThumbs() {
       var grid = document.getElementById('thumbGrid');
       grid.innerHTML = pendingImages.map(function(b64, i) {
-        return '<div class="thumb"><img src="data:image/jpeg;base64,' + b64 + '"/>' +
-               '<button class="rm" type="button" onclick="removeThumb(' + i + ')">×</button></div>';
+        return '<div class="thumb"><img alt="Photo ' + (i + 1) + '" src="data:image/jpeg;base64,' + b64 + '"/>' +
+               '<button class="rm" type="button" aria-label="Remove photo ' + (i + 1) + '" onclick="removeThumb(' + i + ')">×</button></div>';
       }).join('');
-      document.getElementById('btnSend').disabled = pendingImages.length === 0;
+      var send = document.getElementById('btnSend');
+      send.disabled = pendingImages.length === 0;
+      send.textContent = pendingImages.length ? 'Send ' + photoCount(pendingImages.length) : 'Send';
       var full = pendingImages.length >= MAX_PHOTOS;
       document.getElementById('btnCamera').disabled = full;
       document.getElementById('btnGallery').disabled = full;
@@ -343,12 +408,18 @@
       var msg = document.getElementById('modalMsg');
       msg.className = 'modal-msg'; msg.textContent = 'Processing…';
       var room = MAX_PHOTOS - pendingImages.length;
+      var skipped = Math.max(files.length - room, 0);
       files = files.slice(0, room);
       // Smaller output: 1000px longest side, JPEG quality 0.5.
       Promise.all(files.map(function(f) { return compressImage(f, 1000, 0.5).then(function(d) { return d.split(',')[1]; }).catch(function() { return null; }); }))
         .then(function(results) {
+          var unread = results.filter(function(b64) { return !b64; }).length;
           results.forEach(function(b64) { if (b64 && pendingImages.length < MAX_PHOTOS) pendingImages.push(b64); });
-          msg.textContent = '';
+          var notes = [];
+          if (skipped) notes.push(photoCount(skipped) + ' left out because the limit is ' + MAX_PHOTOS + '.');
+          if (unread) notes.push(photoCount(unread) + ' could not be opened.');
+          msg.className = notes.length ? 'modal-msg err' : 'modal-msg';
+          msg.textContent = notes.join(' ');
           renderThumbs();
         });
     }
@@ -359,38 +430,68 @@
       document.getElementById('modalBack').classList.remove('on');
       pendingImages = [];
     }
-    document.getElementById('btnCancel').onclick = closeModal;
+    function setSending(on) {
+      document.querySelector('.modal').classList.toggle('sending', on);
+      document.getElementById('btnCancel').disabled = on;
+      if (on) {
+        document.getElementById('btnCamera').disabled = true;
+        document.getElementById('btnGallery').disabled = true;
+      }
+    }
+
+    document.getElementById('btnCancel').onclick = function() {
+      if (!pendingImages.length) { closeModal(); return; }
+      EQStudentShell.confirmTap(this, closeModal, 'Tap again');
+    };
+    document.addEventListener('keydown', function(event) {
+      if (event.key !== 'Escape') return;
+      document.getElementById('lightbox').classList.remove('on');
+      if (!document.getElementById('btnCancel').disabled && !pendingImages.length) closeModal();
+    });
 
     document.getElementById('btnSend').onclick = function() {
       if (!pendingImages.length || !STUDENT) return;
       var btn = document.getElementById('btnSend'), msg = document.getElementById('modalMsg');
-      btn.disabled = true; msg.className = 'modal-msg'; msg.textContent = 'Sending ' + pendingImages.length + ' photo' + (pendingImages.length > 1 ? 's' : '') + '…';
+      var key = pendingKey;
+      var oldIds = myItems.filter(function(i) { return i.task === key; }).map(function(i) { return i.id; });
+      function failed(text) {
+        setSending(false);
+        renderThumbs();
+        msg.className = 'modal-msg err';
+        msg.textContent = text;
+      }
+      // The upload takes longer with more photos, so check a few times.
+      function confirmSaved(triesLeft) {
+        return new Promise(function(r) { setTimeout(r, 2200); }).then(function() {
+          return EQApi.get({ action: 'getMySubmissions', className: STUDENT.classId, studentNo: STUDENT.studentNo });
+        }).then(function(res) {
+          var arrived = ((res && res.items) || []).some(function(i) { return i.task === key && oldIds.indexOf(i.id) === -1; });
+          if (arrived) return res;
+          return triesLeft > 1 ? confirmSaved(triesLeft - 1) : null;
+        });
+      }
+      btn.disabled = true;
+      setSending(true);
+      msg.className = 'modal-msg';
+      msg.textContent = 'Sending ' + photoCount(pendingImages.length) + '. Please keep this page open…';
       EQApi.post({
         action: 'submitTaskPhoto',
         className: STUDENT.classId,
         studentNo: STUDENT.studentNo,
-        taskKey: pendingKey,
+        taskKey: key,
         images: pendingImages,
         mimeType: 'image/jpeg'
       }).then(function() {
-        // no-cors: response is opaque, so confirm by re-reading statuses.
-        return new Promise(function(r) { setTimeout(r, 2200); });
-      }).then(function() {
-        return EQApi.get({ action: 'getMySubmissions', className: STUDENT.classId, studentNo: STUDENT.studentNo });
+        return confirmSaved(4);
       }).then(function(res) {
-        var statuses = (res && res.statuses) || {};
-        if (statuses[pendingKey] === 'pending') {
-          msg.className = 'modal-msg ok'; msg.textContent = '✓ Submitted! Waiting for your teacher.';
-          applySubmissions(res);
-          render();
-          setTimeout(closeModal, 1100);
-        } else {
-          btn.disabled = false;
-          msg.className = 'modal-msg err'; msg.textContent = 'Hmm, it may not have saved. Please try again.';
-        }
+        if (!res) { failed('Your photos did not arrive. Please try again.'); return; }
+        msg.className = 'modal-msg ok';
+        msg.textContent = 'Sent! Your teacher will check it soon.';
+        applySubmissions(res);
+        render();
+        setTimeout(function() { setSending(false); closeModal(); }, 1200);
       }).catch(function() {
-        btn.disabled = false;
-        msg.className = 'modal-msg err'; msg.textContent = 'Network error. Please try again.';
+        failed('Could not send. Check your connection, then try again.');
       });
     };
 
@@ -398,7 +499,7 @@
       var p = EQStudent.read(GRADE);
       if (p.hasProfile) {
         STUDENT = { classId: p.classId, studentNo: p.studentNo };
-        document.getElementById('subIntro').style.display = '';
+        document.getElementById('subSummary').style.display = '';
         loadUnitNames();
         loadStatuses();
         loadScores();

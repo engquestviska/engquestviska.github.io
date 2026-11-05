@@ -187,12 +187,12 @@
   };
 
   // Asks for a second tap, because logging out by accident is too easy.
-  function confirmTap(button, action) {
+  function confirmTap(button, action, prompt) {
     if (button.getAttribute('data-armed')) { action(); return; }
     var label = button.querySelector('span') || button;
     var original = label.textContent;
     button.setAttribute('data-armed', '1');
-    label.textContent = 'Tap again to log out';
+    label.textContent = prompt || 'Tap again to log out';
     setTimeout(function () {
       button.removeAttribute('data-armed');
       label.textContent = original;
