@@ -12,7 +12,11 @@ import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextClearance
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTouchInput
 import com.engquest.teacher.AppGraph
 import com.engquest.teacher.data.OutboxState
 import com.engquest.teacher.testGraph
@@ -180,6 +184,104 @@ class XpTest {
         shown = true
         waitFor("tile-1")
         total(1).assertTextEquals("15 XP")
+    }
+
+    private fun typeCustom(reason: String, points: String) {
+        compose.onNodeWithTag("reason-new").performClick()
+        compose.onNodeWithTag("customReason").performTextInput(reason)
+        compose.onNodeWithTag("customPoints").performTextInput(points)
+    }
+
+    private fun params() = Json.parseToJsonElement(oldest()!!.paramsJson) as JsonObject
+
+    @Test
+    fun `a typed amount is kept as a button and given to a student`() {
+        show()
+        waitFor("tile-1")
+        typeCustom("Speech contest", "100")
+        compose.onNodeWithTag("customDone").performClick()
+        compose.waitUntil(5_000) { oldest()?.action == "saveXpCategory" }
+        assertEquals("Speech contest", params()["name"]!!.jsonPrimitive.content)
+        assertEquals("100", params()["points"]!!.jsonPrimitive.content)
+        compose.onNodeWithTag("xpHint").assertTextContains("+100 XP for Speech contest", substring = true)
+        compose.onNodeWithTag("tile-1").performClick()
+        total(1).assertTextEquals("110 XP")
+        compose.waitUntil(5_000) { unsent() == 2 }
+        runBlocking { graph.db.outboxDao().delete(oldest()!!.id) }
+        assertEquals("awardXp", oldest()!!.action)
+        assertEquals("Speech contest", params()["reason"]!!.jsonPrimitive.content)
+        assertEquals("100", params()["points"]!!.jsonPrimitive.content)
+        assertEquals("1", params()["delta"]!!.jsonPrimitive.content)
+    }
+
+    @Test
+    fun `a one-time amount makes no button but can be taken back`() {
+        show()
+        waitFor("tile-1")
+        typeCustom("Lucky day", "7")
+        compose.onNodeWithTag("customKeep").performClick()
+        compose.onNodeWithTag("customDone").performClick()
+        compose.onNodeWithTag("tile-1").performClick()
+        total(1).assertTextEquals("17 XP")
+        compose.waitUntil(5_000) { oldest() != null }
+        assertEquals("awardXp", oldest()!!.action)
+        assertEquals(1, unsent())
+        compose.onNodeWithTag("mode-minus").performClick()
+        compose.onNodeWithTag("tile-1").performClick()
+        total(1).assertTextEquals("10 XP")
+        compose.onNodeWithTag("tile-1").performClick()
+        compose.onNodeWithTag("toast").assertTextEquals("Ayu has no Lucky day XP to take back")
+        total(1).assertTextEquals("10 XP")
+    }
+
+    @Test
+    fun `a bad amount is explained and nothing is saved`() {
+        show()
+        waitFor("tile-1")
+        typeCustom("Oops", "1001")
+        compose.onNodeWithTag("customDone").performClick()
+        compose.onNodeWithTag("customProblem").assertTextEquals("Points must be a whole number from 1 to 1,000")
+        compose.waitForIdle()
+        assertEquals(0, unsent())
+    }
+
+    @Test
+    fun `holding a saved button changes or deletes it`() {
+        server.dispatcher = object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest) = MockResponse().setBody(data.replace("{\"ok\":true,", "{\"ok\":true,\"categories\":[{\"name\":\"Debate\",\"points\":50}],"))
+        }
+        show()
+        waitFor("reason-custom:Debate")
+        compose.onNodeWithTag("reason-custom:Debate").performTouchInput { longClick() }
+        compose.onNodeWithTag("customPoints").performTextClearance()
+        compose.onNodeWithTag("customPoints").performTextInput("75")
+        compose.onNodeWithTag("customDone").performClick()
+        compose.waitUntil(5_000) { oldest()?.action == "saveXpCategory" }
+        assertEquals("Debate", params()["oldName"]!!.jsonPrimitive.content)
+        assertEquals("75", params()["points"]!!.jsonPrimitive.content)
+        compose.onNodeWithTag("xpHint").assertTextContains("+75 XP", substring = true)
+
+        compose.onNodeWithTag("reason-custom:Debate").performTouchInput { longClick() }
+        compose.onNodeWithTag("customDelete").performClick()
+        compose.onNodeWithTag("confirmDeleteCategory").performClick()
+        compose.waitUntil(5_000) { unsent() == 2 }
+        compose.waitUntil(3_000) { compose.onAllNodesWithTag("reason-custom:Debate").fetchSemanticsNodes().isEmpty() }
+    }
+
+    @Test
+    fun `a saved button stays picked after the screen reopens`() {
+        server.dispatcher = object : Dispatcher() {
+            override fun dispatch(request: RecordedRequest) = MockResponse().setBody(data.replace("{\"ok\":true,", "{\"ok\":true,\"categories\":[{\"name\":\"Debate\",\"points\":50}],"))
+        }
+        var shown by mutableStateOf(true)
+        compose.setContent { EngQuestTheme { if (shown) TeacherApp(graph) } }
+        waitFor("reason-custom:Debate")
+        compose.onNodeWithTag("reason-custom:Debate").performClick()
+        shown = false
+        compose.waitForIdle()
+        shown = true
+        waitFor("tile-1")
+        compose.onNodeWithTag("xpHint").assertTextContains("+50 XP for Debate", substring = true)
     }
 
     @Test

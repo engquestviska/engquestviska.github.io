@@ -736,6 +736,16 @@
       </article>`;
     }).join('');
 
+    // Exact-amount XP from the teacher, one card per reason.
+    const customCards = (Array.isArray(student.CustomAwards) ? student.CustomAwards : []).map(a => {
+      const times = safeNumber(a.count);
+      return `<article class="lvx-act">
+        <div class="ic" style="background:#ffedd5;color:#c2410c">🏅</div>
+        <div class="lbl">${escapeHtml(a.reason)}</div>
+        <div class="st"><span class="xp" style="color:#c2410c">+${safeNumber(a.points) * times} XP</span><span class="tm">${times} times</span></div>
+      </article>`;
+    }).join('');
+
     document.getElementById('activenessResult').innerHTML = `
       <section>
         <div class="lvx-hero">
@@ -757,7 +767,7 @@
         </div>
 
         <h2 class="lvx-sec">How you earn XP</h2>
-        <div class="lvx-grid">${activityCards}</div>
+        <div class="lvx-grid">${activityCards}${customCards}</div>
         <div class="lvx-info">📖 <b>How XP works:</b> Vocabulary +2 each, Answering +5, Doing Task / Presenting / Helping Hand +20, Quiz +10 per answer. Your points are your XP — the more you join in, the faster you level up.</div>
       </section>`;
   }

@@ -126,6 +126,13 @@ fun describeChange(item: OutboxItem): String {
             val reason = p["column"]?.takeIf { it.isNotBlank() }?.let { " ($it)" }.orEmpty()
             (if (taking) "Taking back XP$reason" else "XP$reason") + " for $student$cls"
         }
+        "awardXp" -> {
+            val taking = p["delta"]?.startsWith("-") == true
+            val reason = p["reason"]?.takeIf { it.isNotBlank() }?.let { " (${p["points"]} for $it)" }.orEmpty()
+            (if (taking) "Taking back XP$reason" else "XP$reason") + " for $student$cls"
+        }
+        "saveXpCategory" -> "Saving the XP button ${p["name"].orEmpty()}"
+        "deleteXpCategory" -> "Deleting the XP button ${p["name"].orEmpty()}"
         "saveChapterScore", "saveFinalScore" -> "Score for $student$cls"
         "reviewTaskSubmission" -> "Reviewing a submission for $student$cls"
         "registerDevice" -> "Turning on notifications for this phone"

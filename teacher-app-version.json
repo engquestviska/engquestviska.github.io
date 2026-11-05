@@ -1,6 +1,6 @@
 {
-  "versionCode": 9,
-  "versionName": "3.6",
+  "versionCode": 10,
+  "versionName": "3.7",
   "apk": "EngQuestTeacher-k4m8q2zt.apk",
-  "notes": "Bell for recent uploads with the exact time; empty scores count as 0; a green tick when a score saves."
+  "notes": "Give exact XP: tap + New for any reason and amount, keep your favourites as buttons."
 }

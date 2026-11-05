@@ -1,9 +1,11 @@
 package com.engquest.teacher.ui.xp
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -21,18 +24,32 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -42,7 +59,9 @@ import com.engquest.teacher.domain.ClassInfo
 import com.engquest.teacher.domain.Core
 import com.engquest.teacher.ui.Bad
 import com.engquest.teacher.ui.BadSoft
+import com.engquest.teacher.ui.BottomSheet
 import com.engquest.teacher.ui.BrandSoft
+import com.engquest.teacher.ui.ConfirmDialog
 import com.engquest.teacher.ui.Ink
 import com.engquest.teacher.ui.Line
 import com.engquest.teacher.ui.Muted
@@ -79,10 +98,17 @@ fun XpScreen(graph: AppGraph, classInfo: ClassInfo) {
     }
 }
 
+/** The "+ New" sheet is open with nothing to change, or open on the saved button being changed. */
+private sealed interface Sheet {
+    data object New : Sheet
+    data class Edit(val reason: Reason) : Sheet
+}
+
 @Composable
 private fun XpBody(vm: XpViewModel) {
     val r = vm.reason
     val sign = if (vm.takeBack) MINUS else "+"
+    var sheet by remember { mutableStateOf<Sheet?>(null) }
     Box(Modifier.fillMaxSize()) {
         Column(Modifier.fillMaxSize().padding(start = 12.dp, end = 12.dp, top = 12.dp)) {
             ModeToggle(vm.takeBack, vm::chooseTakeBack)
@@ -97,7 +123,11 @@ private fun XpBody(vm: XpViewModel) {
                 Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(bottom = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                XpReasons.ALL.forEach { x -> ReasonChip(x, x.key == r.key, sign) { vm.pickReason(x) } }
+                NewChip { sheet = Sheet.New }
+                vm.reasons.forEach { x ->
+                    val onHold = if (x.key.startsWith("custom:")) ({ sheet = Sheet.Edit(x) }) else null
+                    ReasonChip(x, x.key == r.key, sign, onHold) { vm.pickReason(x) }
+                }
             }
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
@@ -114,6 +144,90 @@ private fun XpBody(vm: XpViewModel) {
         Box(Modifier.align(Alignment.BottomCenter).padding(12.dp)) {
             vm.toast?.let { Toast(it, onGone = { vm.clearToast(it) }) }
         }
+        sheet?.let { open -> CustomSheet((open as? Sheet.Edit)?.reason, vm) { sheet = null } }
+    }
+}
+
+/** Type a reason and exact points: new when [editing] is null, otherwise changes that saved button. */
+@Composable
+private fun CustomSheet(editing: Reason?, vm: XpViewModel, onClose: () -> Unit) {
+    var label by remember { mutableStateOf(editing?.label.orEmpty()) }
+    var points by remember { mutableStateOf(editing?.xp?.toString().orEmpty()) }
+    var keep by remember { mutableStateOf(true) }
+    var problem by remember { mutableStateOf<String?>(null) }
+    var deleting by remember { mutableStateOf(false) }
+
+    fun done() {
+        problem = customXpProblem(label, points)
+        if (problem != null) return
+        val reason = label.trim()
+        val xp = points.trim().toInt()
+        if (keep || editing != null) vm.saveCategory(reason, xp, editing) else vm.useOnce(reason, xp)
+        onClose()
+    }
+
+    Box(Modifier.fillMaxSize().imePadding()) {
+        BottomSheet(if (editing == null) "New XP reason" else "Change this button", onClose) {
+            OutlinedTextField(
+                value = label,
+                onValueChange = { label = it; problem = null },
+                label = { Text("Reason") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences, imeAction = ImeAction.Next),
+                modifier = Modifier.fillMaxWidth().testTag("customReason"),
+            )
+            OutlinedTextField(
+                value = points,
+                onValueChange = { typed -> points = typed.filter(Char::isDigit); problem = null },
+                label = { Text("Points") },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { done() }),
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp).testTag("customPoints"),
+            )
+            if (editing == null) {
+                Row(Modifier.fillMaxWidth().padding(top = 10.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text("Keep this as a button", color = Ink, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                    Switch(checked = keep, onCheckedChange = { keep = it }, modifier = Modifier.testTag("customKeep"))
+                }
+            }
+            problem?.let { Text(it, color = Bad, fontSize = 13.sp, modifier = Modifier.padding(top = 8.dp).testTag("customProblem")) }
+            Button(onClick = ::done, modifier = Modifier.fillMaxWidth().padding(top = 12.dp).testTag("customDone")) {
+                Text(if (editing == null) "Use these points" else "Save changes")
+            }
+            if (editing != null) {
+                TextButton(onClick = { deleting = true }, modifier = Modifier.fillMaxWidth().testTag("customDelete")) {
+                    Text("Delete this button", color = Bad)
+                }
+            }
+        }
+    }
+    if (deleting && editing != null) {
+        ConfirmDialog(
+            title = "Delete ${editing.label}?",
+            text = "Students keep the points they already earned.",
+            confirmLabel = "Delete",
+            confirmTag = "confirmDeleteCategory",
+            onConfirm = {
+                vm.deleteCategory(editing)
+                onClose()
+            },
+            onDismiss = { deleting = false },
+        )
+    }
+}
+
+@Composable
+private fun NewChip(onClick: () -> Unit) {
+    Box(
+        Modifier
+            .background(BrandSoft, RoundedCornerShape(12.dp))
+            .border(BorderStroke(1.5.dp, Brand), RoundedCornerShape(12.dp))
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 9.dp)
+            .testTag("reason-new"),
+    ) {
+        Text("+ New", color = Brand, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp, maxLines = 1)
     }
 }
 
@@ -142,13 +256,15 @@ private fun ModeButton(label: String, on: Boolean, onColor: Color, fill: Color, 
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun ReasonChip(reason: Reason, on: Boolean, sign: String, onClick: () -> Unit) {
+private fun ReasonChip(reason: Reason, on: Boolean, sign: String, onHold: (() -> Unit)?, onClick: () -> Unit) {
     Row(
         Modifier
             .background(if (on) Brand else Color.White, RoundedCornerShape(12.dp))
             .border(BorderStroke(1.5.dp, if (on) Brand else Line), RoundedCornerShape(12.dp))
-            .selectable(selected = on, role = Role.RadioButton, onClick = onClick)
+            .semantics { selected = on }
+            .combinedClickable(role = Role.RadioButton, onLongClickLabel = "Change", onLongClick = onHold, onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 9.dp)
             .testTag("reason-${reason.key}"),
         verticalAlignment = Alignment.CenterVertically,

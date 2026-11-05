@@ -21,8 +21,11 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
 
-/** One reason XP can be given for: [key] is what the server takes, [prop] the counter it returns. */
-data class Reason(val key: String, val prop: String, val label: String, val xp: Int)
+/**
+ * One reason XP can be given for: [key] is what the server takes, [prop] the counter it returns.
+ * A [custom] reason is an exact amount with its own label, saved as a button or used once.
+ */
+data class Reason(val key: String, val prop: String, val label: String, val xp: Int, val custom: Boolean = false)
 
 object XpReasons {
     val ALL = listOf(
@@ -35,6 +38,25 @@ object XpReasons {
     )
 
     fun byKey(key: String?): Reason = ALL.firstOrNull { it.key == key } ?: ALL.first()
+
+    fun saved(label: String, xp: Int) = Reason("custom:$label", "", label, xp, custom = true)
+
+    fun once(label: String, xp: Int) = Reason("once:$xp:$label", "", label, xp, custom = true)
+}
+
+const val CUSTOM_XP_MAX = 1000
+const val CUSTOM_REASON_MAX = 40
+
+/** What is wrong with a typed custom reason and amount, or null when they can be used. */
+fun customXpProblem(label: String, points: String): String? {
+    val reason = label.trim()
+    val xp = points.trim().toIntOrNull()
+    return when {
+        reason.isEmpty() -> "Type a reason"
+        reason.length > CUSTOM_REASON_MAX -> "Keep the reason to $CUSTOM_REASON_MAX letters"
+        xp == null || xp !in 1..CUSTOM_XP_MAX -> "Points must be a whole number from 1 to 1,000"
+        else -> null
+    }
 }
 
 /** A student as the XP grid shows them. */
@@ -59,11 +81,37 @@ internal fun parseXpStudents(raw: JsonObject): List<XpStudent> =
         XpStudent(no, name, o["Total"].number() ?: 0)
     }
 
+internal fun parseCategories(raw: JsonObject): List<Reason> =
+    (raw["categories"] as? JsonArray).orEmpty().mapNotNull { el ->
+        val o = el as? JsonObject ?: return@mapNotNull null
+        XpReasons.saved(o["name"].text() ?: return@mapNotNull null, o["points"].number() ?: return@mapNotNull null)
+    }
+
+internal fun withCategories(raw: JsonObject, list: List<Reason>): JsonObject = JsonObject(
+    raw + ("categories" to JsonArray(list.map { JsonObject(mapOf("name" to JsonPrimitive(it.label), "points" to JsonPrimitive(it.xp))) })),
+)
+
+private fun isAward(el: JsonElement, reason: Reason): Boolean =
+    (el as? JsonObject)?.let { it["reason"].text() == reason.label && it["points"].number() == reason.xp } == true
+
 /** The student's count for [reason], or null when the server did not send one. */
-internal fun reasonCount(raw: JsonObject, no: String, reason: Reason): Int? =
-    (raw["students"] as? JsonArray).orEmpty()
-        .firstOrNull { (it as? JsonObject)?.get("no").text() == no }
-        .let { (it as? JsonObject)?.get(reason.prop).number() }
+internal fun reasonCount(raw: JsonObject, no: String, reason: Reason): Int? {
+    val student = (raw["students"] as? JsonArray).orEmpty()
+        .firstOrNull { (it as? JsonObject)?.get("no").text() == no } as? JsonObject
+    if (!reason.custom) return student?.get(reason.prop).number()
+    val award = (student?.get("CustomAwards") as? JsonArray).orEmpty().firstOrNull { isAward(it, reason) }
+    return (award as? JsonObject)?.get("count").number() ?: 0
+}
+
+/** [o]'s list of custom awards with [reason] changed by [delta]; an award at zero leaves the list. */
+private fun changedAwards(o: JsonObject, reason: Reason, delta: Int): JsonArray {
+    val awards = (o["CustomAwards"] as? JsonArray).orEmpty()
+    val count = maxOf(0, (awards.firstOrNull { isAward(it, reason) } as? JsonObject)?.get("count").number().let { it ?: 0 } + delta)
+    val others = awards.filterNot { isAward(it, reason) }
+    if (count == 0) return JsonArray(others)
+    val award = mapOf("reason" to JsonPrimitive(reason.label), "points" to JsonPrimitive(reason.xp), "count" to JsonPrimitive(count))
+    return JsonArray(listOf(JsonObject(award)) + others)
+}
 
 /** [raw] as if the server had changed [reason] by [delta] for student [no]. */
 internal fun withXp(raw: JsonObject, no: String, reason: Reason, delta: Int): JsonObject {
@@ -71,7 +119,12 @@ internal fun withXp(raw: JsonObject, no: String, reason: Reason, delta: Int): Js
         val o = el as? JsonObject ?: return@map el
         if (o["no"].text() != no) return@map el
         val changed = mutableMapOf<String, JsonElement>("Total" to JsonPrimitive(maxOf(0, (o["Total"].number() ?: 0) + reason.xp * delta)))
-        o[reason.prop].number()?.let { changed[reason.prop] = JsonPrimitive(maxOf(0, it + delta)) }
+        if (reason.custom) {
+            changed["Custom"] = JsonPrimitive(maxOf(0, (o["Custom"].number() ?: 0) + reason.xp * delta))
+            changed["CustomAwards"] = changedAwards(o, reason, delta)
+        } else {
+            o[reason.prop].number()?.let { changed[reason.prop] = JsonPrimitive(maxOf(0, it + delta)) }
+        }
         JsonObject(o + changed)
     }
     return JsonObject(raw + ("students" to JsonArray(students)))
@@ -103,8 +156,10 @@ class XpViewModel(
         private set
     var takeBack by mutableStateOf(false)
         private set
-    var reason by mutableStateOf(XpReasons.byKey(graph.prefs.getString(KEY_REASON, null)))
-        private set
+    private var reasonKey by mutableStateOf(graph.prefs.getString(KEY_REASON, null))
+
+    /** A custom reason used without saving it: it stays until this screen closes. */
+    private var once by mutableStateOf<Reason?>(null)
     var toast by mutableStateOf<XpToast?>(null)
         private set
     var pops by mutableStateOf<Map<String, XpPop>>(emptyMap())
@@ -114,6 +169,15 @@ class XpViewModel(
 
     val students: List<XpStudent> by derivedStateOf {
         raw?.let(::parseXpStudents).orEmpty().sortedBy { it.no.toIntOrNull() ?: Int.MAX_VALUE }
+    }
+
+    /** Every button in the reason row, built-in ones first. */
+    val reasons: List<Reason> by derivedStateOf {
+        XpReasons.ALL + raw?.let(::parseCategories).orEmpty() + listOfNotNull(once)
+    }
+
+    val reason: Reason by derivedStateOf {
+        reasons.firstOrNull { it.key == reasonKey } ?: XpReasons.byKey(reasonKey)
     }
 
     init {
@@ -146,8 +210,51 @@ class XpViewModel(
     }
 
     fun pickReason(r: Reason) {
-        reason = r
+        reasonKey = r.key
         graph.prefs.edit().putString(KEY_REASON, r.key).apply()
+    }
+
+    /** Picks a typed reason and amount for now; a one-time reason is not kept for next time. */
+    fun useOnce(label: String, xp: Int) {
+        val r = XpReasons.once(label, xp)
+        once = r
+        reasonKey = r.key
+    }
+
+    /** Adds a button, or changes [editing]; the same name replaces the older button. */
+    fun saveCategory(label: String, xp: Int, editing: Reason? = null) {
+        val saved = XpReasons.saved(label, xp)
+        val params = mapOf("name" to label, "points" to xp.toString()) + (editing?.let { mapOf("oldName" to it.label) } ?: emptyMap())
+        changeCategories("saveXpCategory", params) { list ->
+            val replaced = list.filterNot { it.label.equals(label, ignoreCase = true) || it.key == editing?.key }
+            replaced + saved
+        }
+        pickReason(saved)
+    }
+
+    fun deleteCategory(r: Reason) {
+        changeCategories("deleteXpCategory", mapOf("name" to r.label)) { list -> list.filterNot { it.key == r.key } }
+    }
+
+    /** Shows the new buttons at once and queues the change; if it cannot be queued they go back. */
+    private fun changeCategories(action: String, params: Map<String, String>, change: (List<Reason>) -> List<Reason>) {
+        val current = raw ?: return
+        val before = parseCategories(current)
+        raw = withCategories(current, change(before))
+        inFlight++
+        work.trySend {
+            try {
+                graph.outbox.enqueue(action, classInfo.id, params)
+                store()
+            } catch (e: Throwable) {
+                scope.onMain {
+                    raw = raw?.let { withCategories(it, before) }
+                    toast = XpToast("Could not save that button. Please try again.", isError = true)
+                }
+            } finally {
+                scope.onMain { inFlight-- }
+            }
+        }
     }
 
     fun clearToast(shown: XpToast) {
@@ -205,11 +312,14 @@ class XpViewModel(
         }
     }
 
-    private suspend fun send(no: String, r: Reason, delta: Int): Long = graph.outbox.enqueue(
-        "incrementActiveness",
-        classInfo.id,
-        mapOf("className" to classInfo.id, "studentNo" to no, "column" to r.key, "delta" to delta.toString()),
-    )
+    private suspend fun send(no: String, r: Reason, delta: Int): Long {
+        val student = mapOf("className" to classInfo.id, "studentNo" to no, "delta" to delta.toString())
+        return if (r.custom) {
+            graph.outbox.enqueue("awardXp", classInfo.id, student + mapOf("reason" to r.label, "points" to r.xp.toString()))
+        } else {
+            graph.outbox.enqueue("incrementActiveness", classInfo.id, student + ("column" to r.key))
+        }
+    }
 
     private suspend fun store() {
         scope.onMain { raw }?.let { graph.repo.putStored(cacheKey, it) }
