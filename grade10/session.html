@@ -12,7 +12,7 @@
   <script src="../shared/js/student.js"></script>
   <script src="../shared/js/api.js"></script>
   <script src="../shared/js/sidebar.js?v=20261105"></script>
-  <link rel="stylesheet" href="../shared/css/student-shell.css?v=20261105"/>
+  <link rel="stylesheet" href="../shared/css/student-shell.css?v=20261109"/>
 </head>
 <body class="grade10-subpage" data-page="session">
   <div class="viewer-overlay hidden" id="pdfModal">
@@ -59,7 +59,7 @@
     <section class="subpage-hero">
       <div class="kicker">Reading</div>
       <h1>Reading</h1>
-      <p class="hero-copy">Reading materials and lesson videos stay organized for Grade 10 students.</p>
+      <p class="hero-copy">Class texts and lesson videos.</p>
     </section>
   </header>
 
@@ -203,7 +203,6 @@
       overlayText.textContent = 'Read';
       overlay.appendChild(overlayText);
       preview.appendChild(icon);
-      preview.appendChild(frame);
       preview.appendChild(overlay);
       preview.onclick = function() { openPdf(title, fileId); };
 

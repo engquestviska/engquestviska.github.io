@@ -202,12 +202,220 @@ body.has-student-profile .card:has(#sClassSelect) { display: none !important; }
 
 /* ---- Readable text on coloured panels ---- */
 body[data-eq-grade] .eqh-hero,
-body[data-eq-grade] .eqh-appbar,
-body[data-eq-grade] .profile-strip { background: linear-gradient(125deg, #1d4ed8, #1e3a8a) !important; }
+body[data-eq-grade] .eqh-appbar { background: linear-gradient(125deg, #1d4ed8, #1e3a8a) !important; }
 body[data-eq-grade="11"] .eqh-hero,
-body[data-eq-grade="11"] .eqh-appbar,
-body[data-eq-grade="11"] .profile-strip { background: linear-gradient(125deg, #0f766e, #115e59) !important; }
+body[data-eq-grade="11"] .eqh-appbar { background: linear-gradient(125deg, #0f766e, #115e59) !important; }
 body[data-eq-grade] .rate-note { color: #475569; }
 
 /* The open menu needs the whole screen, including its Log out button. */
 .dashboard-sidebar.open ~ .student-bottom-nav { display: none; }
+
+/* ==== Inner pages: one set of cards, labels, numbers and tabs ==== */
+
+/* Cards */
+body[data-eq-grade] .stat-card,
+body[data-eq-grade] .status-card,
+body[data-eq-grade] .student-score-card,
+body[data-eq-grade] .strike-panel,
+body[data-eq-grade] .profile-card:not(#profile),
+body[data-eq-grade] .record-card,
+body[data-eq-grade] .leaderboard,
+body[data-eq-grade] .chapter-card,
+body[data-eq-grade] .material-card,
+body[data-eq-grade] .lvx-hero,
+body[data-eq-grade] .lvx-act,
+body[data-eq-grade] .vocab-wrap,
+body[data-eq-grade] .vocab-almanac {
+  border: 1px solid #e5ebf5;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: none;
+}
+
+/* Small labels: plain words instead of spaced capitals */
+body[data-eq-grade] .card-label,
+body[data-eq-grade] .mini-label,
+body[data-eq-grade] .stat-label,
+body[data-eq-grade] .rate-label,
+body[data-eq-grade] .count-label,
+body[data-eq-grade] .section-label,
+body[data-eq-grade] .score-tile-label,
+body[data-eq-grade] .summary-label,
+body[data-eq-grade] .progress-title,
+body[data-eq-grade] .summary-pill span,
+body[data-eq-grade] .lvx-mini,
+body[data-eq-grade] .lvx-mini *,
+body[data-eq-grade] .lvx-act .tm {
+  color: #475569;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Numbers: the same clear figures everywhere */
+body[data-eq-grade] .stat-value,
+body[data-eq-grade] .mini-value,
+body[data-eq-grade] .stat-number,
+body[data-eq-grade] .rate-value,
+body[data-eq-grade] .count-value,
+body[data-eq-grade] .score-tile-val,
+body[data-eq-grade] .summary-val,
+body[data-eq-grade] .summary-pill strong,
+body[data-eq-grade] .progress-count,
+body[data-eq-grade] .lvx-ring .num,
+body[data-eq-grade] .lvx-mini strong,
+body[data-eq-grade] .lvx-act .xp {
+  color: var(--eq-ink);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-variant-numeric: lining-nums tabular-nums;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+body[data-eq-grade] .stat-value { font-size: 2rem; line-height: 1.1; }
+body[data-eq-grade] .mini-value { font-size: 1.25rem; }
+body[data-eq-grade] .stat-title { font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; font-weight: 700; }
+
+/* Tabs */
+body[data-eq-grade] .ch-tabs-inner,
+body[data-eq-grade] .chapter-tabs,
+body[data-eq-grade] .lb-filters { display: flex !important; flex-wrap: wrap !important; gap: 8px !important; margin: 16px !important; padding: 0 !important; border: 0 !important; background: none !important; }
+body[data-eq-grade] .chapter-tabs,
+body[data-eq-grade] .lb-filters { margin: 0 0 14px !important; }
+body[data-eq-grade] .ch-tab-inner,
+body[data-eq-grade] .ch-tab,
+body[data-eq-grade] .lb-filter-btn { flex: 0 0 auto !important; min-height: 44px !important; padding: 0 16px !important; border: 1px solid #cbd5e1 !important; border-radius: 999px !important; background: #fff !important; box-shadow: none !important; color: #334155 !important; font: 600 0.9rem 'IBM Plex Sans', sans-serif !important; cursor: pointer !important; }
+body[data-eq-grade] .ch-tab-inner.active,
+body[data-eq-grade] .ch-tab.active,
+body[data-eq-grade] .lb-filter-btn.active { border-color: var(--eq-accent) !important; background: var(--eq-accent) !important; color: #fff !important; }
+
+/* My Statistics */
+body[data-student-shell-page="dashboard"] .card-label { display: none; }
+body[data-student-shell-page="dashboard"] .stat-card { gap: 10px; padding: 16px; }
+body[data-student-shell-page="dashboard"] .mini-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+body[data-student-shell-page="dashboard"] .mini-stat { min-width: 0; padding: 10px; border-radius: 12px; box-shadow: none; }
+body[data-student-shell-page="dashboard"] .link-row .btn { min-height: 44px; }
+
+/* Task Status */
+body[data-student-shell-page="tasks"] .status-card { overflow: hidden; }
+body[data-student-shell-page="tasks"] .profile-strip { display: block !important; padding: 16px 16px 0 !important; background: #fff !important; color: var(--eq-ink) !important; }
+body[data-student-shell-page="tasks"] .profile-strip > .avatar,
+body[data-student-shell-page="tasks"] .profile-strip > div:not(.profile-summary) { display: none; }
+body[data-student-shell-page="tasks"] .profile-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; }
+body[data-student-shell-page="tasks"] .summary-pill { padding: 12px !important; border: 1px solid #e5ebf5 !important; border-radius: 12px !important; background: #f8faff !important; box-shadow: none !important; text-align: left !important; backdrop-filter: none !important; }
+body[data-student-shell-page="tasks"] .summary-pill strong { display: block; font-size: 1.4rem; }
+body[data-student-shell-page="tasks"] .progress-section { padding: 0 16px 12px !important; border: 0 !important; background: none !important; }
+body[data-student-shell-page="tasks"] .progress-count { font-size: 0.9rem; }
+body[data-student-shell-page="tasks"] .tasks-section { padding: 0 16px 16px; }
+body[data-student-shell-page="tasks"] .tasks-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
+body[data-student-shell-page="tasks"] .task-chip { display: flex !important; align-items: center !important; gap: 12px !important; min-height: 56px !important; padding: 8px 12px !important; border-radius: 12px !important; box-shadow: none !important; }
+body[data-student-shell-page="tasks"] .task-chip-top { display: contents; }
+body[data-student-shell-page="tasks"] .task-chip-icon { flex: none; order: 0; }
+body[data-student-shell-page="tasks"] .task-chip > div:last-child { flex: 1; order: 1; min-width: 0; }
+body[data-student-shell-page="tasks"] .task-chip-badge { flex: none; order: 2; margin: 0; }
+
+/* Scores */
+body[data-student-shell-page="scores"] .score-card-header { display: none; }
+body[data-student-shell-page="scores"] .score-card-body { padding: 16px; }
+body[data-student-shell-page="scores"] .score-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 8px !important; }
+body[data-student-shell-page="scores"] .score-tile { padding: 12px; border: 1px solid #e5ebf5; border-radius: 12px; background: #f8faff; box-shadow: none; text-align: left; }
+body[data-student-shell-page="scores"] .score-tile.highlight { border-color: var(--eq-accent-soft); background: var(--eq-accent-soft); }
+body[data-student-shell-page="scores"] .score-tile-val { font-size: 1.35rem; }
+body[data-student-shell-page="scores"] .final-summary { margin-top: 10px; padding: 12px; border-radius: 12px; background: var(--eq-accent-soft); box-shadow: none; }
+body[data-student-shell-page="scores"] .final-summary .summary-label { color: #334155; }
+body[data-student-shell-page="scores"] .leaderboard-header { padding: 16px 16px 0; background: #fff; color: var(--eq-ink); }
+body[data-student-shell-page="scores"] .leaderboard-header h3 { color: var(--eq-ink); font-size: 1.1rem; }
+body[data-student-shell-page="scores"] .leaderboard-header .lb-sub { color: #475569; }
+body[data-student-shell-page="scores"] .leaderboard-body { padding: 12px 16px 16px; }
+
+/* Level / XP */
+body[data-student-shell-page="activeness"] .lvx-nm,
+body[data-student-shell-page="activeness"] .lvx-cls { display: none; }
+body[data-student-shell-page="activeness"] .lvx-hero { padding: 18px; }
+body[data-student-shell-page="activeness"] .lvx-ring .num { font-size: 2rem; }
+body[data-student-shell-page="activeness"] .lvx-act { padding: 12px; }
+body[data-student-shell-page="activeness"] .lvx-act .ic { width: 36px; height: 36px; font-size: 1rem; }
+
+/* Attendance */
+body[data-student-shell-page="attendance"] .profile-card > .avatar,
+body[data-student-shell-page="attendance"] .profile-card > .student-name,
+body[data-student-shell-page="attendance"] .profile-card > .student-meta { display: none; }
+body[data-student-shell-page="attendance"] .profile-card { padding: 16px; }
+body[data-student-shell-page="attendance"] .rate-box { margin: 0; padding: 0; border: 0; background: none; }
+body[data-student-shell-page="attendance"] .rate-value { font-size: 2.4rem; }
+body[data-student-shell-page="attendance"] .stat-card { padding: 12px; }
+body[data-student-shell-page="attendance"] .stat-number { font-size: 1.4rem; }
+
+/* My Strikes */
+body[data-student-shell-page="strikes"] .student-strip { display: none; }
+body[data-student-shell-page="strikes"] .strike-panel { padding: 16px; }
+body[data-student-shell-page="strikes"] .strike-count {
+  min-height: 0;
+  padding: 14px;
+  border: 1px solid #e5ebf5;
+  border-radius: 12px;
+  background: #f8faff;
+  box-shadow: none;
+  color: var(--eq-ink);
+}
+body[data-student-shell-page="strikes"] .count-value { font-size: 2.4rem; line-height: 1.1; }
+body[data-student-shell-page="strikes"] .count-copy { color: #475569; }
+body[data-student-shell-page="strikes"] .rule-card { padding: 12px; border: 1px solid #e5ebf5; border-radius: 12px; background: #fff; box-shadow: none; }
+
+/* Materials, Assignments and Reading: a tidy list of files */
+body[data-eq-grade] .content-badge { display: none; }
+body[data-eq-grade] .content-title { font-size: 1.3rem; }
+body[data-eq-grade] .content-section { margin-bottom: 24px; }
+body[data-eq-grade] .material-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+body[data-eq-grade] .material-card { overflow: hidden; }
+body[data-eq-grade] .material-preview:not(.video-preview) { display: none; }
+body[data-eq-grade] .video-preview { height: auto; aspect-ratio: 16 / 9; }
+body[data-eq-grade] .material-info { padding: 14px; }
+body[data-eq-grade] .material-name { font-weight: 700; }
+body[data-eq-grade] .material-meta { color: #475569; font-family: 'IBM Plex Sans', sans-serif; font-size: 0.8rem; }
+body[data-eq-grade] .material-actions { display: flex; gap: 8px; margin-top: 10px; }
+body[data-eq-grade] .material-actions .btn { flex: 1; justify-content: center; min-height: 44px; font-size: 0.9rem; }
+body[data-eq-grade] .material-actions .icon-btn { width: auto; font-size: 0; }
+body[data-eq-grade] .material-actions .icon-btn::after { content: "Download"; font-size: 0.9rem; }
+
+/* Submission and vocabulary */
+body[data-student-shell-page="submission"] .sub-intro { color: #475569; font-size: 0.95rem; }
+body[data-student-shell-page="submission"] .chapter-card { padding: 16px; }
+body[data-student-shell-page="submission"] .task-btn,
+body[data-student-shell-page="submission"] .see-btn { min-height: 44px; }
+body[data-student-shell-page="vocabulary"] .vocab-intro { color: #475569; }
+
+/* Level / XP pop-up on Student List */
+body[data-eq-grade] .act-sheet { box-shadow: 0 -12px 40px rgba(15, 23, 42, 0.18); }
+body[data-eq-grade] .act-stat-pts-val,
+body[data-eq-grade] .act-stat-times { color: var(--eq-ink) !important; font-family: 'IBM Plex Sans', sans-serif; font-variant-numeric: tabular-nums; }
+body[data-eq-grade] .act-bar-fill { background: var(--eq-accent); }
+body[data-eq-grade] .act-close { min-width: 44px; min-height: 44px; }
+
+@media (max-width: 760px) {
+  body[data-student-shell-page="tasks"] .task-chip-label { font-size: 0.8rem; }
+  body[data-eq-grade] .material-grid { grid-template-columns: 1fr; }
+  body[data-student-shell-page="attendance"] .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  body[data-student-shell-page="strikes"] .strike-grid,
+  body[data-student-shell-page="strikes"] .rule-grid { grid-template-columns: 1fr; gap: 8px; }
+}
+
+/* Final touches */
+body[data-student-shell-page="tasks"] .task-chip-top { display: contents !important; }
+body[data-student-shell-page="tasks"] .task-chip-icon { order: 0 !important; }
+body[data-student-shell-page="tasks"] .task-chip > div:last-child { order: 1 !important; flex: 1 !important; }
+body[data-student-shell-page="tasks"] .task-chip-badge { order: 2 !important; margin-left: auto !important; }
+body[data-student-shell-page="tasks"] .task-chip-name,
+body[data-student-shell-page="tasks"] .task-chip-label,
+body[data-student-shell-page="tasks"] .task-chip-badge { font-family: 'IBM Plex Sans', sans-serif !important; letter-spacing: 0 !important; text-transform: none !important; }
+body[data-student-shell-page="tasks"] .task-chip-name { font-size: 1rem !important; font-weight: 700 !important; }
+body[data-student-shell-page="scores"] .leaderboard-header { background: #fff !important; color: var(--eq-ink) !important; }
+body[data-student-shell-page="scores"] .leaderboard-header h3 { color: var(--eq-ink) !important; }
+body[data-student-shell-page="scores"] .leaderboard-header .lb-sub { color: #475569 !important; }
+body[data-student-shell-page="scores"] .final-summary { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; padding: 0 !important; background: none !important; }
+body[data-student-shell-page="scores"] .summary-item { padding: 12px !important; border: 1px solid #e5ebf5 !important; border-radius: 12px !important; background: var(--eq-accent-soft) !important; box-shadow: none !important; text-align: left !important; }
+body[data-student-shell-page="scores"] .summary-val { font-size: 1.35rem !important; }
+body[data-student-shell-page="scores"] .grade-badge { font-family: 'IBM Plex Sans', sans-serif !important; }
+body[data-student-shell-page="dashboard"] #scoresCard .mini-stat { padding: 8px; }
+body[data-student-shell-page="dashboard"] #scoresCard .mini-label { font-size: 0.75rem; white-space: nowrap; }

@@ -12,7 +12,7 @@
   <script src="../shared/js/student.js"></script>
   <script src="../shared/js/api.js"></script>
   <script src="../shared/js/sidebar.js?v=20261105"></script>
-  <link rel="stylesheet" href="../shared/css/student-shell.css?v=20261105"/>
+  <link rel="stylesheet" href="../shared/css/student-shell.css?v=20261109"/>
 </head>
 <body class="grade11-subpage grade11-page" data-page="lessons">
   <div class="viewer-overlay hidden" id="pdfModal">
@@ -46,7 +46,7 @@
     <section class="subpage-hero">
       <div class="kicker">Lesson Materials</div>
       <h1>Materials</h1>
-      <p class="hero-copy">Grade 11 lesson files stay here for students to view, preview, or download by chapter.</p>
+      <p class="hero-copy">Slides, files, and links for each chapter.</p>
     </section>
   </header>
 
@@ -180,7 +180,6 @@
       overlayText.textContent = 'View';
       overlay.appendChild(overlayText);
       preview.appendChild(icon);
-      preview.appendChild(frame);
       preview.appendChild(overlay);
       preview.onclick = function() { openPDF(name, previewUrl, downloadUrl); };
 

@@ -405,7 +405,7 @@
     }
   </style>
   <script src="../shared/js/sidebar.js?v=20261105"></script>
-  <link rel="stylesheet" href="../shared/css/student-shell.css?v=20261105"/>
+  <link rel="stylesheet" href="../shared/css/student-shell.css?v=20261109"/>
 </head>
 <body class="grade10-subpage scores-page" data-page="scores">
 
@@ -596,7 +596,7 @@ function buildScoreCardHTML(name, cls, nickname, responses, no) {
         tabsHtml += '<button class="ch-tab' + (i === 0 ? ' active' : '') + '" id="stab' + ch + '" onclick="switchStudentTab(' + ch + ')">Chapter ' + (i + 1) + '</button>';
     blocksHtml += '<div id="sScoreCh' + ch + '"' + (i === 0 ? '' : ' style="display:none"') + '>' + buildStudentChapterHTML(stu, res.inputCols, ch) + '</div>';
   });
-  tabsHtml += '<button class="ch-tab" id="stabF" onclick="switchStudentTab(&apos;F&apos;)">&#127942; Final Score</button>';
+  tabsHtml += '<button class="ch-tab" id="stabF" onclick="switchStudentTab(&apos;F&apos;)">Final Score</button>';
   var finRes = responses[CHAPTERS.length] || {};
   var finStu = finRes.students ? finRes.students.find(function(s) { return String(s.no) === String(no); }) : null;
   var finHtml = buildStudentFinalHTML(finStu, finRes.inputCols, finRes.calcCols);
@@ -766,7 +766,7 @@ function renderLeaderboard(cls) {
     '<div class="leaderboard">' +
       '<div class="leaderboard-header">' +
         '<div>' +
-          '<h3>&#127942; Class Leaderboard</h3>' +
+          '<h3>Class Leaderboard</h3>' +
           '<div class="lb-sub">' + escapeHtml(clsLabel) + ' &mdash; Top 5 by Average Score</div>' +
         '</div>' +
       '</div>' +
