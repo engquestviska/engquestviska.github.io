@@ -202,7 +202,7 @@
               <input id="titleInput" type="text" placeholder="e.g. Fact vs Opinion"/>
             </div>
             <div>
-              <label for="driveInput">Google Drive URL or File ID</label>
+              <label for="driveInput">Google Drive link, or YouTube link for videos</label>
               <input id="driveInput" type="text" placeholder="Paste Drive link or file ID"/>
               <div class="field-help">Use a shareable Drive file link. The page converts it to preview and download links.</div>
             </div>
@@ -255,6 +255,12 @@
 
     function teacherLogout() {
       EQAuth.logoutTeacher('index.html');
+    }
+
+    function extractYouTubeId(value) {
+      var input = String(value || '').trim();
+      var match = input.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([a-zA-Z0-9_-]{6,})/) || input.match(/^([a-zA-Z0-9_-]{6,})$/);
+      return match ? match[1] : '';
     }
 
     function extractDriveId(value) {
@@ -327,6 +333,8 @@
         }).catch(function() { btn.disabled = false; msg.style.color = '#dc2626'; msg.textContent = 'Network error.'; });
     }
     function unitLabel(value) {
+      if (value === 'reading') return 'Reading Material';
+      if (value === 'video') return 'Video Lesson';
       var names = currentUnitNames();
       var idx = parseInt(value, 10) - 1;
       return 'Chapter ' + value + (names[idx] ? ' · ' + names[idx] : '');
@@ -337,8 +345,9 @@
       var list = document.getElementById('listChapterSelect');
       var prevAdd = add.value, prevList = list.value;
       var mk = function(n, i) { return '<option value="' + (i + 1) + '">Chapter ' + (i + 1) + (n ? ' · ' + escapeHtml(n) : '') + '</option>'; };
-      add.innerHTML = names.map(mk).join('');
-      list.innerHTML = names.map(mk).join('');
+      var extras = '<option value="reading">Reading page · Reading Material</option><option value="video">Reading page · Video Lesson</option>';
+      add.innerHTML = names.map(mk).join('') + extras;
+      list.innerHTML = names.map(mk).join('') + extras;
       if (prevAdd && add.querySelector('option[value="' + prevAdd + '"]')) add.value = prevAdd;
       if (prevList && list.querySelector('option[value="' + prevList + '"]')) list.value = prevList;
     }
@@ -390,7 +399,7 @@
             '<div class="material-meta">' + unitLabel(chapter) + ' · ' + escapeHtml(fileId) + '</div>' +
           '</div>' +
           '<div class="material-row-actions">' +
-            '<a class="btn ghost" href="' + previewUrl(fileId) + '" target="_blank" rel="noopener">Preview</a>' +
+            '<a class="btn ghost" href="' + (fileType === 'yt' ? 'https://www.youtube.com/watch?v=' + encodeURIComponent(fileId) : previewUrl(fileId)) + '" target="_blank" rel="noopener">Preview</a>' +
             '<button class="btn danger" type="button" onclick="deleteMaterial(&quot;' + escapeHtml(fileId) + '&quot;)">Remove</button>' +
           '</div>' +
         '</article>';
@@ -402,8 +411,9 @@
       var chapter = document.getElementById('chapterSelect').value;
       var grade = document.getElementById('gradeSelect').value;
       var title = document.getElementById('titleInput').value.trim();
-      var fileId = extractDriveId(document.getElementById('driveInput').value);
-      var fileType = document.getElementById('typeSelect').value;
+      var isVideo = chapter === 'video';
+      var fileId = isVideo ? extractYouTubeId(document.getElementById('driveInput').value) : extractDriveId(document.getElementById('driveInput').value);
+      var fileType = isVideo ? 'yt' : document.getElementById('typeSelect').value;
       var btn = document.getElementById('addBtn');
 
       if (!teacher.username || !teacher.password) {
@@ -415,7 +425,7 @@
         return;
       }
       if (!fileId) {
-        showToast('Paste a valid Google Drive file link or ID', 'err');
+        showToast(isVideo ? 'Paste a valid YouTube link' : 'Paste a valid Google Drive file link or ID', 'err');
         return;
       }
 
@@ -435,8 +445,7 @@
         document.getElementById('titleInput').value = '';
         document.getElementById('driveInput').value = '';
         document.getElementById('listChapterSelect').value = chapter;
-        currentMaterials = data.materials || [];
-        renderMaterials();
+        loadMaterials();
         showToast('Material added', 'ok');
       }).catch(function(err) {
         showToast(err.message, 'err');

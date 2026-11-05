@@ -159,7 +159,7 @@
     });
 
     function loadAll() {
-      EQApi.get({ action: 'getMaterials', chapter: 'reading' }).then(function(res) {
+      EQApi.get({ action: 'getMaterials', chapter: 'reading', grade: '10' }).then(function(res) {
         if (res.materials && res.materials.length > 0) {
           res.materials.forEach(function(m) {
             appendReadingCard(m.title, m.fileId);
@@ -167,7 +167,7 @@
         }
       }).catch(function() {});
 
-      EQApi.get({ action: 'getMaterials', chapter: 'video' }).then(function(res) {
+      EQApi.get({ action: 'getMaterials', chapter: 'video', grade: '10' }).then(function(res) {
         if (res.materials && res.materials.length > 0) {
           res.materials.forEach(function(m) {
             appendVideoCard(m.title, m.fileId);
