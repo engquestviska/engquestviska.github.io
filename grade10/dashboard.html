@@ -12,7 +12,7 @@
   <script src="../shared/js/student.js"></script>
   <script src="../shared/js/api.js"></script>
   <script src="../shared/js/attendance.js?v=20260712"></script>
-  <script src="../shared/js/sidebar.js?v=20261028"></script>
+  <script src="../shared/js/sidebar.js?v=20261105"></script>
   <style>
     .student-dashboard-page {
       --primary: #2563eb;
@@ -62,7 +62,7 @@
     .card-label,
     .mini-label {
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       font-weight: 800;
       letter-spacing: 0.1em;
       text-transform: uppercase;
@@ -296,6 +296,7 @@
         grid-template-columns: 1fr;
       }
     }</style>
+  <link rel="stylesheet" href="../shared/css/student-shell.css?v=20261105"/>
 </head>
 <body class="student-dashboard-page" data-page="dashboard">
   <div class="dashboard-shell">
@@ -326,8 +327,8 @@
         <section class="dashboard-hero">
           <div>
             <div class="kicker">My Statistics</div>
-            <h1>Your personal English Quest dashboard.</h1>
-            <p class="hero-copy">A student-only view of your scores, attendance, task progress, submissions, and class activeness.</p>
+            <h1>My Statistics</h1>
+            <p class="hero-copy">Your scores, attendance, tasks, and XP in one place.</p>
           </div>
           <aside class="student-chip">
             <div class="student-chip-label">Logged in as</div>
@@ -367,18 +368,18 @@
 
           <article class="stat-card" id="activenessCard">
             <div>
-              <div class="card-label">Activeness</div>
+              <div class="card-label">Level / XP</div>
               <div class="stat-title">Participation</div>
             </div>
             <div class="stat-value" id="activeValue">--</div>
             <p class="stat-sub" id="activeSub">Loading your activeness...</p>
-            <div class="link-row"><a class="btn ghost" href="activeness.html">Open Activeness</a></div>
+            <div class="link-row"><a class="btn ghost" href="activeness.html">Open Level / XP</a></div>
           </article>
 
           <article class="stat-card" id="strikesCard">
             <div>
               <div class="card-label">Strikes</div>
-              <div class="stat-title">Eligibility warning</div>
+              <div class="stat-title">Strike status</div>
             </div>
             <div class="stat-value" id="strikeValue">--</div>
             <div class="strike-dots" id="strikeDots">
@@ -511,7 +512,7 @@
         { title: 'Attendance', meta: 'Meeting presence summary', status: summary.attendance, href: 'attendance.html' },
         { title: 'Tasks', meta: 'Done and missing task count', status: summary.tasks, href: 'tasks.html' },
         { title: 'Submissions', meta: 'Chapter upload status', status: summary.submission, href: 'submission.html' },
-        { title: 'Activeness', meta: 'Participation point summary', status: summary.activeness, href: 'activeness.html' },
+        { title: 'Level / XP', meta: 'Participation point summary', status: summary.activeness, href: 'activeness.html' },
         { title: 'Strikes', meta: 'Summative and class eligibility', status: summary.strikes, href: 'strikes.html' }
       ];
       document.getElementById('quickList').innerHTML = items.map(function(item) {
@@ -531,32 +532,35 @@
       document.getElementById('guardCard').hidden = true;
       document.getElementById('dashboardView').hidden = false;
       setText('studentName', studentProfile.name);
-      setText('studentMeta', studentProfile.cls.replace(/^XE/, 'XE-') + ' · No. ' + studentProfile.no);
+      setText('studentMeta', EQStudent.classLabel(studentProfile.cls) + ' · No. ' + studentProfile.no);
       renderQuickList();
     }
 
     async function loadScores() {
       try {
         var responses = await Promise.all([
-          mainApiGet({ action: 'getChapterScores', className: studentProfile.cls, chapter: 1 }),
-          mainApiGet({ action: 'getChapterScores', className: studentProfile.cls, chapter: 2 }),
-          mainApiGet({ action: 'getChapterScores', className: studentProfile.cls, chapter: 3 })
+          mainApiGet({ action: 'getChapterScores', className: studentProfile.cls, chapter: 4 }),
+          mainApiGet({ action: 'getChapterScores', className: studentProfile.cls, chapter: 5 }),
+          mainApiGet({ action: 'getChapterScores', className: studentProfile.cls, chapter: 6 }),
+          mainApiGet({ action: 'getFinalScores', className: studentProfile.cls })
         ]);
         var ch1 = findStudent(responses[0].students);
         var ch2 = findStudent(responses[1].students);
         var ch3 = findStudent(responses[2].students);
         var values = [ch1 && ch1.finalScore, ch2 && ch2.finalScore, ch3 && ch3.finalScore];
-        var numeric = values.map(Number).filter(Number.isFinite);
-        var avg = numeric.length ? Math.round((numeric.reduce(function(a, b) { return a + b; }, 0) / numeric.length) * 10) / 10 : null;
+        var numeric = values.filter(function(v) { return v !== '' && v !== null && v !== undefined; }).map(Number).filter(Number.isFinite);
+        var finalRow = findStudent(responses[3].students);
+        var finalScore = finalRow && finalRow.calc ? finalRow.calc['Final Score'] : '';
+        var avg = finalScore !== '' && finalScore !== null && finalScore !== undefined ? finalScore : null;
 
         setText('scoreValue', avg === null ? '--' : String(avg));
         setText('scoreCh1', fmtScore(ch1 && ch1.finalScore));
         setText('scoreCh2', fmtScore(ch2 && ch2.finalScore));
         setText('scoreCh3', fmtScore(ch3 && ch3.finalScore));
         setText('scoreSub', numeric.length
-          ? 'Showing your available chapter score records.'
+          ? 'Your final score so far, with each chapter below.'
           : 'No score records have been published for your profile yet.');
-        summary.scores = avg === null ? 'No data' : avg + ' avg';
+        summary.scores = avg === null ? 'No data' : String(avg);
       } catch(e) {
         setText('scoreSub', statusError('scores'));
       }

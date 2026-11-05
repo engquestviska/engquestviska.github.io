@@ -16,7 +16,7 @@
     .vocab-wrap { background:#fff; border:1px solid #e5ecf6; border-radius:20px; padding:22px 24px; box-shadow:0 16px 40px rgba(15,23,42,.05); }
     .vocab-head { display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap; }
     .vocab-head h2 { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:800; }
-    .vocab-head .rem { font-size:.78rem; font-weight:700; color:#b45309; background:#fef3c7; padding:4px 12px; border-radius:999px; font-family:'IBM Plex Mono',monospace; }
+    .vocab-head .rem { font-size: 0.75rem; font-weight:700; color:#b45309; background:#fef3c7; padding:4px 12px; border-radius:999px; font-family:'IBM Plex Mono',monospace; }
     .vocab-intro { color:#64748b; font-size:.86rem; margin:6px 0 16px; line-height:1.5; }
     .vocab-rows { display:flex; flex-direction:column; gap:8px; }
     .vocab-row { display:grid; grid-template-columns:20px 1fr 1fr 66px 20px; gap:6px; align-items:center; }
@@ -45,16 +45,16 @@
     .vocab-chip.ok .vc-mark { color:#15803d; } .vocab-chip.bad .vc-mark { color:#b91c1c; } .vocab-chip.pending .vc-mark { color:#cbd5e1; }
     .vc-rm { border:none; background:transparent; color:#94a3b8; font-weight:800; cursor:pointer; font-size:1.05rem; line-height:1; padding:0 3px; }
     .vc-rm:hover { color:#dc2626; }
-    .vocab-legend { margin-top:10px; font-size:.76rem; color:#64748b; display:flex; gap:14px; flex-wrap:wrap; }
+    .vocab-legend { margin-top:10px; font-size: 0.75rem; color:#64748b; display:flex; gap:14px; flex-wrap:wrap; }
     .vocab-legend b { font-weight:800; } .vocab-legend .g { color:#15803d; } .vocab-legend .r { color:#b91c1c; }
-    .vc-type { background:#eef2ff; color:#4f46e5; border-radius:999px; padding:1px 8px; font-size:.68rem; font-weight:800; font-family:'IBM Plex Mono',monospace; }
+    .vc-type { background:#eef2ff; color:#4f46e5; border-radius:999px; padding:1px 8px; font-size: 0.75rem; font-weight:800; font-family:'IBM Plex Mono',monospace; }
     .vocab-almanac { margin-top:16px; }
     .almanac-title { font-family:'Playfair Display',serif; font-weight:800; font-size:1.2rem; color:#4c1d95; display:flex; align-items:baseline; gap:10px; }
-    .almanac-title span { font-size:.78rem; font-weight:700; color:#a78bca; font-family:'IBM Plex Mono',monospace; }
+    .almanac-title span { font-size: 0.75rem; font-weight:700; color:#a78bca; font-family:'IBM Plex Mono',monospace; }
     .almanac-empty { margin-top:12px; color:#94a3b8; background:#faf5ff; border:1px dashed #e9d5ff; border-radius:14px; padding:22px; text-align:center; }
     .almanac-sec { margin-top:12px; background:#faf7ff; border:1px solid #ede0ff; border-radius:16px; padding:12px 16px; }
     .almanac-sec h4 { font-weight:800; color:#6b21a8; font-size:.94rem; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
-    .almanac-sec h4 em { font-style:normal; color:#a78bca; font-family:'IBM Plex Mono',monospace; font-size:.76rem; font-weight:700; }
+    .almanac-sec h4 em { font-style:normal; color:#a78bca; font-family:'IBM Plex Mono',monospace; font-size: 0.75rem; font-weight:700; }
     .almanac-entries { display:flex; flex-direction:column; }
     .alm-entry { display:grid; grid-template-columns:18px 1fr auto 22px; gap:8px; align-items:center; padding:7px 2px; border-bottom:1px solid #f1e9fb; }
     .alm-entry:last-child { border-bottom:none; }
@@ -70,7 +70,8 @@
   <script src="../shared/js/classes-20260617.js?v=20260712"></script>
   <script src="../shared/js/student.js"></script>
   <script src="../shared/js/api.js"></script>
-  <script src="../shared/js/sidebar.js?v=20261028"></script>
+  <script src="../shared/js/sidebar.js?v=20261105"></script>
+  <link rel="stylesheet" href="../shared/css/student-shell.css?v=20261105"/>
 </head>
 <body class="grade11-subpage grade11-page" data-page="vocabulary">
   <header class="subpage-header">
@@ -90,7 +91,7 @@
 
     <section class="subpage-hero">
       <div class="kicker">My Vocabulary</div>
-      <h1>Build your Vocabulary Box and earn XP.</h1>
+      <h1>My Vocabulary</h1>
       <p class="hero-copy">Add new English words with their Indonesian meaning. Each new word gives you +2 XP — and your teacher can test you on them with flashcards.</p>
     </section>
   </header>

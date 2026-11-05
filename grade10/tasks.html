@@ -38,7 +38,7 @@
     .card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; padding: 24px 20px; margin-bottom: 20px; }
     .card-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 18px; }
     .field { margin-bottom: 14px; }
-    .field label { display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+    .field label { display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
     .field select { width: 100%; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: 12px; font-family: 'IBM Plex Sans', sans-serif; font-size: 1rem; background: var(--off-white); color: var(--text-dark); outline: none; }
     .field select:focus { border-color: var(--purple-light); }
     .btn-primary { width: 100%; padding: 15px; background: linear-gradient(135deg, var(--purple), #1D4ED8); color: #fff; font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; font-size: 1rem; border: none; border-radius: 12px; cursor: pointer; margin-top: 4px; }
@@ -65,7 +65,7 @@
 
     /* Task grid */
     .tasks-section { padding: 20px 24px; }
-    .tasks-chapter-label { font-size: 0.72rem; font-weight: 700; color: var(--purple-light); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'IBM Plex Mono', monospace; margin-bottom: 14px; }
+    .tasks-chapter-label { font-size: 0.75rem; font-weight: 700; color: var(--purple-light); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'IBM Plex Mono', monospace; margin-bottom: 14px; }
     .tasks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
     .task-chip { border-radius: 14px; padding: 14px 10px; text-align: center; border: 1.5px solid; transition: transform 0.15s; }
     .task-chip:hover { transform: translateY(-2px); }
@@ -73,7 +73,7 @@
     .task-chip.missing { background: var(--red-soft);   border-color: #FCA5A5; }
     .task-chip-icon { font-size: 1.3rem; margin-bottom: 6px; }
     .task-chip-name { font-size: 0.75rem; font-weight: 700; font-family: 'IBM Plex Mono', monospace; color: var(--text-dark); margin-bottom: 4px; }
-    .task-chip-label { font-size: 0.72rem; font-weight: 700; }
+    .task-chip-label { font-size: 0.75rem; font-weight: 700; }
     .task-chip.done    .task-chip-label { color: #065F46; }
     .task-chip.missing .task-chip-label { color: #991B1B; }
 
@@ -117,21 +117,21 @@
     .sidebar-logo { width:36px; height:36px; border-radius:10px; object-fit:cover; }
     .sidebar-head-text { flex:1; }
     .sidebar-head-title { font-family:'Playfair Display',serif; font-size:1rem; font-weight:800; color:#fff; }
-    .sidebar-head-sub { font-size:0.7rem; color:rgba(255,255,255,0.45); margin-top:1px; }
+    .sidebar-head-sub { font-size: 0.75rem; color:rgba(255,255,255,0.45); margin-top:1px; }
     .sidebar-close { width:38px; min-width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.08); border:none; color:rgba(255,255,255,0.5); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
     .sidebar-section { padding:14px 16px 4px; }
-    .sidebar-section-label { font-size:0.65rem; font-weight:700; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.12em; font-family:'IBM Plex Mono',monospace; padding:0 4px; margin-bottom:6px; }
+    .sidebar-section-label { font-size: 0.75rem; font-weight:700; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.12em; font-family:'IBM Plex Mono',monospace; padding:0 4px; margin-bottom:6px; }
     .sidebar-item { display:flex; align-items:center; gap:12px; padding:11px 12px; border-radius:12px; text-decoration:none; transition:background 0.15s; margin-bottom:2px; }
     .sidebar-item:hover, .sidebar-item:active { background:rgba(255,255,255,0.08); }
     .sidebar-item.active { background:rgba(255,255,255,0.12); border-left:3px solid #60A5FA; padding-left:9px; }
     .sidebar-item-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0; }
     .sidebar-item-name { font-size:0.88rem; font-weight:600; color:#fff; flex:1; }
-    .sidebar-item-badge { font-size:0.6rem; font-weight:800; padding:2px 7px; border-radius:999px; font-family:'IBM Plex Mono',monospace; background:#F59E0B; color:#fff; }
+    .sidebar-item-badge { font-size: 0.75rem; font-weight:800; padding:2px 7px; border-radius:999px; font-family:'IBM Plex Mono',monospace; background:#F59E0B; color:#fff; }
     .sidebar-divider { height:1px; background:rgba(255,255,255,0.07); margin:8px 16px; }
     .sidebar-home-btn { display:flex; align-items:center; gap:10px; margin:12px 16px 4px; padding:11px 14px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:12px; text-decoration:none; }
     .sidebar-home-btn:hover { background:rgba(255,255,255,0.1); }
     .sidebar-home-btn-text { font-size:0.85rem; font-weight:700; color:#fff; }
-    .sidebar-home-btn-sub { font-size:0.7rem; color:rgba(255,255,255,0.4); }
+    .sidebar-home-btn-sub { font-size: 0.75rem; color:rgba(255,255,255,0.4); }
 
     /* TASKS REVAMP */
     body.tasks-page {
@@ -302,7 +302,7 @@
       line-height: 1 !important;
     }
     body.tasks-page .summary-pill span {
-      font-size: 0.66rem !important;
+      font-size: 0.75rem !important;
       opacity: 0.78 !important;
       text-transform: uppercase !important;
       letter-spacing: 0.08em !important;
@@ -412,7 +412,7 @@
       border-radius: 999px !important;
       padding: 5px 9px !important;
       font-family: 'IBM Plex Mono', monospace !important;
-      font-size: 0.64rem !important;
+      font-size: 0.75rem !important;
       font-weight: 800 !important;
       text-transform: uppercase !important;
       letter-spacing: 0.08em !important;
@@ -432,7 +432,7 @@
     }
     body.tasks-page .task-chip-label {
       color: #64748b !important;
-      font-size: 0.78rem !important;
+      font-size: 0.75rem !important;
     }
     body.tasks-page .empty-chapter {
       margin: 0 !important;
@@ -478,7 +478,8 @@
       }
     }
   </style>
-  <script src="../shared/js/sidebar.js?v=20261028"></script>
+  <script src="../shared/js/sidebar.js?v=20261105"></script>
+  <link rel="stylesheet" href="../shared/css/student-shell.css?v=20261105"/>
 </head>
 <body class="grade10-subpage tasks-page" data-page="tasks">
 
@@ -499,8 +500,8 @@
 
   <section class="subpage-hero">
     <div class="kicker">Task Status</div>
-    <h1>See which tasks are done and what still needs attention.</h1>
-    <p class="hero-copy">Check your task progress from a clean, read-only status view.</p>
+    <h1>Task Status</h1>
+    <p class="hero-copy">What is done and what you still need to submit.</p>
   </section>
 </header>
 
@@ -655,30 +656,23 @@
       // Load task status and submission status in parallel
       const [data, subData] = await Promise.all([
         cachedApiGet({ action: 'getTaskStatus', className: cls, studentNo: no }),
-        cachedApiGet({ action: 'getSubmissions' }).catch(function() { return null; })
+        EQApi.get({ action: 'getMySubmissions', className: cls, studentNo: no }).catch(function() { return null; })
       ]);
       if (data && data.error) throw new Error(data.error);
 
-      // Check whether the current unit submission has been received.
-      var hasSubmitted = false;
-      if (subData && subData.students && subData.students[cls]) {
-        var studentName = data.name || '';
-        var match = subData.students[cls].find(function(s) {
-          return s.name.toLowerCase() === studentName.toLowerCase() && s.submitted;
-        });
-        if (match) {
-          hasSubmitted = true;
-        }
-      }
+      var waiting = {};
+      ((subData && subData.items) || []).forEach(function(item) {
+        if (item.status === 'pending') waiting[item.task] = true;
+      });
 
-      renderStudentTasks(data, clsLabel, hasSubmitted);
+      renderStudentTasks(data, clsLabel, waiting);
     } catch(e) {
       document.getElementById('studentResult').innerHTML = '<div class="empty-chapter"><div class="empty-chapter-icon">&#8635;</div><div style="font-weight:800;margin-bottom:4px;color:#0f172a">Task status is temporarily unavailable</div><div>Your saved task records are safe. Please try again later.</div></div>';
     }
     finally { document.getElementById('sViewBtn').disabled = false; document.getElementById('sViewBtn').textContent = 'View My Tasks'; }
   }
 
-  function renderStudentTasks(data, clsLabel, hasSubmitted) {
+  function renderStudentTasks(data, clsLabel, waiting) {
     const tasks   = data.tasks || {};
     const keys    = Object.keys(tasks);
     const displayName = data.nickname || data.name || 'Student';
@@ -689,11 +683,13 @@
     const safeClassLabel = escapeHtml(clsLabel);
     const safeInitial = escapeHtml(initial);
 
-    const ch4Keys = keys.filter(k => /^C4T/i.test(k));
-    const ch5Keys = keys.filter(k => /^C5T/i.test(k));
+    const chapterOf = k => { const m = k.match(/^C(\d+)T/i); return m ? Number(m[1]) : 0; };
+    const chapters = [...new Set(keys.map(chapterOf))].filter(Boolean).sort((a, b) => a - b);
+    const isWaiting = k => !tasks[k] && !!waiting[k];
+    const todoKeys = keys.filter(k => !tasks[k] && !waiting[k]);
     const allDone = keys.filter(k => tasks[k]).length;
     const allTotal = keys.length;
-    const allMissing = Math.max(allTotal - allDone, 0);
+    const allMissing = todoKeys.length;
     const overallPct = allTotal > 0 ? Math.round((allDone / allTotal) * 100) : 0;
 
     const makeProgress = (ckeys, label) => {
@@ -713,31 +709,32 @@
 
     const makeChips = ckeys => ckeys.map(k => {
       const isDone = tasks[k];
+      const pending = isWaiting(k);
       const m = k.match(/^C\d+T(\d+)$/i);
       const taskName = m ? 'Task ' + m[1] : k;
-      return `<div class="task-chip ${isDone ? 'done' : 'missing'}">
+      return `<div class="task-chip ${isDone ? 'done' : pending ? 'waiting' : 'missing'}">
         <div class="task-chip-top">
-          <div class="task-chip-icon">${isDone ? '&#10003;' : '!'}</div>
-          <div class="task-chip-badge">${isDone ? 'Done' : 'Missing'}</div>
+          <div class="task-chip-icon">${isDone ? '&#10003;' : pending ? '&hellip;' : '!'}</div>
+          <div class="task-chip-badge">${isDone ? 'Done' : pending ? 'Waiting' : 'To do'}</div>
         </div>
         <div>
           <div class="task-chip-name">${escapeHtml(taskName)}</div>
-          <div class="task-chip-label">${isDone ? 'Recorded as complete' : 'Needs attention'}</div>
+          <div class="task-chip-label">${isDone ? 'Recorded as complete' : pending ? 'Your teacher is checking it' : 'Submit a photo'}</div>
         </div>
       </div>`;
     }).join('');
 
-    const ch4Panel = ch4Keys.length
-      ? makeProgress(ch4Keys, 'Current Chapter') +
-        (hasSubmitted ? '<div class="task-status-note"><span>&#10003;</span><div>You submitted this chapter, so every current-chapter task is recorded as done.</div></div>' : '') +
-        `<div class="tasks-section"><div class="tasks-grid">${makeChips(ch4Keys)}</div></div>`
-      : '<div class="empty-chapter"><div class="empty-chapter-icon">&#128203;</div><div>No current-chapter tasks found.</div></div>';
-
-    const ch5Panel = ch5Keys.length
-      ? makeProgress(ch5Keys, 'Upcoming Chapter') +
-        `<div class="tasks-section"><div class="tasks-grid">${makeChips(ch5Keys)}</div></div>`
-      : '<div class="empty-chapter"><div class="empty-chapter-icon">&#8635;</div><div style="font-weight:800;margin-bottom:4px;color:#0f172a">Upcoming tasks coming soon</div><div>Check back when the next chapter begins.</div></div>';
-
+    const taskLabel = k => { const m = k.match(/^C(\d+)T(\d+)$/i); return m ? 'Chapter ' + m[1] + ' Task ' + m[2] : k; };
+    const todoHtml = todoKeys.length
+      ? '<div class="todo-box"><div class="todo-title">Still to do</div>' + todoKeys.map(k => '<a class="todo-row" href="submission.html"><span>' + escapeHtml(taskLabel(k)) + '</span><strong>Submit</strong></a>').join('') + '</div>'
+      : '<div class="todo-box clear">You have nothing left to submit.</div>';
+    const openChapter = chapters.find(c => todoKeys.some(k => chapterOf(k) === c)) || chapters[chapters.length - 1];
+    const chapterTabs = chapters.map(c => '<button class="ch-tab-inner' + (c === openChapter ? ' active' : '') + '" data-ch="' + c + '" onclick="switchChapterTab(' + c + ')">Chapter ' + c + '</button>').join('');
+    const chapterPanels = chapters.map(c => {
+      const ckeys = keys.filter(k => chapterOf(k) === c);
+      return '<div class="ch-panel" data-ch="' + c + '"' + (c === openChapter ? '' : ' style="display:none"') + '>' + makeProgress(ckeys, 'Chapter ' + c) + '<div class="tasks-section"><div class="tasks-grid">' + makeChips(ckeys) + '</div></div></div>';
+    }).join('');
+    const emptyPanel = '<div class="empty-chapter"><div class="empty-chapter-icon">&#128203;</div><div>No tasks have been added yet.</div></div>';
     document.getElementById('studentResult').innerHTML = `
       <div class="status-card">
         <div class="profile-strip">
@@ -749,23 +746,22 @@
           <div class="profile-summary">
             <div class="summary-pill"><strong>${overallPct}%</strong><span>Overall</span></div>
             <div class="summary-pill"><strong>${allDone}</strong><span>Done</span></div>
-            <div class="summary-pill"><strong>${allMissing}</strong><span>Missing</span></div>
+            <div class="summary-pill"><strong>${allMissing}</strong><span>To do</span></div>
           </div>
         </div>
-        <div class="ch-tabs-inner">
-          <button class="ch-tab-inner active" id="ctab4" onclick="switchChapterTab(4)">Current Chapter</button>
-          <button class="ch-tab-inner" id="ctab5" onclick="switchChapterTab(5)">Upcoming Chapter</button>
-        </div>
-        <div id="ctabPanel4">${ch4Panel}</div>
-        <div id="ctabPanel5" style="display:none">${ch5Panel}</div>
+        ${keys.length ? todoHtml : ''}
+        <div class="ch-tabs-inner">${chapterTabs}</div>
+        ${chapters.length ? chapterPanels : emptyPanel}
       </div>`;
   }
 
   function switchChapterTab(ch) {
-    document.getElementById('ctab4').className = 'ch-tab-inner' + (ch === 4 ? ' active' : '');
-    document.getElementById('ctab5').className = 'ch-tab-inner' + (ch === 5 ? ' active' : '');
-    document.getElementById('ctabPanel4').style.display = ch === 4 ? '' : 'none';
-    document.getElementById('ctabPanel5').style.display = ch === 5 ? '' : 'none';
+    document.querySelectorAll('.ch-tab-inner').forEach(function(tab) {
+      tab.className = 'ch-tab-inner' + (Number(tab.dataset.ch) === ch ? ' active' : '');
+    });
+    document.querySelectorAll('.ch-panel').forEach(function(panel) {
+      panel.style.display = Number(panel.dataset.ch) === ch ? '' : 'none';
+    });
   }
 
   // ── TOAST ─────────────────────────────────────────────────────

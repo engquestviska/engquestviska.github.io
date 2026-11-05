@@ -101,7 +101,7 @@
     .field label {
       color: #0b6f60;
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.72rem;
+      font-size: 0.75rem;
       font-weight: 800;
       letter-spacing: 0.1em;
       text-transform: uppercase;
@@ -170,7 +170,7 @@
       color: #0b6f60;
       padding: 0 11px;
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.72rem;
+      font-size: 0.75rem;
       font-weight: 800;
     }
     .rate-box {
@@ -182,7 +182,7 @@
     .rate-label {
       color: #64748b;
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.72rem;
+      font-size: 0.75rem;
       font-weight: 800;
       letter-spacing: 0.08em;
       text-transform: uppercase;
@@ -218,7 +218,7 @@
     .stat-label {
       color: #475569;
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       font-weight: 800;
       letter-spacing: 0.07em;
       text-transform: uppercase;
@@ -261,7 +261,7 @@
     .meeting-no {
       color: #0b6f60;
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       font-weight: 800;
       text-transform: uppercase;
     }
@@ -277,7 +277,7 @@
       padding: 8px 12px;
       text-align: center;
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.72rem;
+      font-size: 0.75rem;
       font-weight: 800;
     }
     .status-Present { background: #dcfce7; color: #166534; }
@@ -351,7 +351,8 @@
   <script src="../shared/js/classes-20260617.js?v=20260712"></script>
   <script src="../shared/js/student.js"></script>
   <script src="../shared/js/attendance.js?v=20260712"></script>
-  <script src="../shared/js/sidebar.js?v=20261028"></script>
+  <script src="../shared/js/sidebar.js?v=20261105"></script>
+  <link rel="stylesheet" href="../shared/css/student-shell.css?v=20261105"/>
 </head>
 <body class="grade11-subpage grade11-page attendance-page" data-page="attendance">
   <header class="subpage-header">
@@ -371,8 +372,8 @@
 
     <section class="subpage-hero">
       <div class="kicker">Attendance</div>
-      <h1>Check your attendance record.</h1>
-      <p class="hero-copy">Choose your class and name to see attendance percentage, totals, and meeting history after official records are published.</p>
+      <h1>Attendance</h1>
+      <p class="hero-copy">Your attendance for each class meeting.</p>
     </section>
   </header>
 
@@ -530,7 +531,7 @@
       if (status === 'Present') return 'Present';
       if (status === 'Absent') return 'Absent';
       if (status === 'Sick') return 'Sick';
-      if (status === 'Permission') return 'Permission';
+      if (status === 'Permission' || status === 'Permit') return 'Permission';
       if (status === 'Dispen') return 'Dispen';
       return 'Present';
     }

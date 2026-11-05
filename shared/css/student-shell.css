@@ -1,0 +1,213 @@
+/* Shared student look. Loaded last on every Grade 10 and Grade 11 page so one
+   page template, readable text and the phone navigation live in one place. */
+
+body[data-eq-grade] {
+  --eq-accent: #1d4ed8;
+  --eq-accent-soft: #dbeafe;
+  --eq-ink: #101936;
+  --eq-text: #475569;
+}
+body[data-eq-grade="11"] {
+  --eq-accent: #0f766e;
+  --eq-accent-soft: #ccfbf1;
+}
+
+/* ---- Browser details ---- */
+body[data-eq-grade] ::selection { background: var(--eq-accent-soft); color: var(--eq-ink); }
+body[data-eq-grade] a:focus-visible,
+body[data-eq-grade] button:focus-visible,
+body[data-eq-grade] select:focus-visible,
+body[data-eq-grade] input:focus-visible,
+body[data-eq-grade] textarea:focus-visible {
+  outline: 3px solid var(--eq-accent);
+  outline-offset: 2px;
+}
+
+/* ---- One page header for every section ---- */
+body.student-shell-enabled .subpage-header {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: var(--eq-ink) !important;
+}
+body.student-shell-enabled .subpage-header::before,
+body.student-shell-enabled .subpage-header::after,
+body.student-shell-enabled .dashboard-hero::before,
+body.student-shell-enabled .dashboard-hero::after,
+body.student-shell-enabled .strike-hero::before,
+body.student-shell-enabled .strike-hero::after { display: none !important; }
+body.student-shell-enabled .subpage-header .brand-title { color: var(--eq-ink) !important; }
+body.student-shell-enabled .subpage-header .brand-sub { color: #64748b !important; }
+body.student-shell-enabled .subpage-hero,
+body.student-shell-enabled .dashboard-hero,
+body.student-shell-enabled .strike-hero {
+  display: block !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 18px 0 8px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--eq-ink) !important;
+}
+body.student-shell-enabled .subpage-hero .kicker,
+body.student-shell-enabled .subpage-hero .eyebrow,
+body.student-shell-enabled .dashboard-hero .kicker,
+body.student-shell-enabled .strike-hero .kicker { display: none !important; }
+body.student-shell-enabled .subpage-hero h1,
+body.student-shell-enabled .dashboard-hero h1,
+body.student-shell-enabled .strike-hero h1 {
+  max-width: none !important;
+  margin: 0 !important;
+  color: var(--eq-ink) !important;
+  font-family: 'Playfair Display', serif !important;
+  font-size: 2.1rem !important;
+  font-weight: 800 !important;
+  line-height: 1.15 !important;
+  letter-spacing: 0 !important;
+}
+body.student-shell-enabled .subpage-hero .hero-copy,
+body.student-shell-enabled .dashboard-hero .hero-copy,
+body.student-shell-enabled .strike-hero .hero-copy {
+  max-width: 62ch !important;
+  margin: 6px 0 0 !important;
+  color: var(--eq-text) !important;
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+  opacity: 1 !important;
+}
+body.student-shell-enabled .dashboard-hero .student-chip { display: none !important; }
+
+/* ---- Logged in: the saved profile opens the page, so skip the name form ---- */
+body.has-student-profile .attendance-picker,
+body.has-student-profile .picker-card,
+body.has-student-profile .card:has(#sClassSelect) { display: none !important; }
+
+/* ---- Homepage ---- */
+.eqh-main.is-guest > .eqh-hero,
+.eqh-main.is-guest > .eqh-cards,
+.eqh-main.is-guest > .eqh-sec-head,
+.eqh-main.is-guest > .eqh-next { display: none; }
+.eqh-hero h1 { margin-top: 0 !important; }
+.eqh-hero-top { margin-bottom: 14px; }
+.eqh-note { min-height: 1.5em; margin: 0; font-weight: 600; }
+.eqh-cards { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
+.eqh-stat .lab {
+  color: #475569;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.eqh-stat .sub { color: #64748b; font-size: 0.8rem; }
+.eqh-annc { border-left-width: 1px !important; }
+.eqh-appbar { order: 10; }
+
+/* ---- Task Status: to-do list and chapter tabs ---- */
+.todo-box {
+  margin: 16px 16px 0;
+  padding: 14px 16px;
+  border: 1px solid #fde68a;
+  border-radius: 16px;
+  background: #fffbeb;
+}
+.todo-box.clear { border-color: #bbf7d0; background: #f0fdf4; color: #166534; font-weight: 700; }
+.todo-title { margin-bottom: 8px; color: #92400e; font-weight: 800; }
+.todo-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  border-top: 1px solid #fde68a;
+  color: var(--eq-ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+.todo-row strong { color: var(--eq-accent); font-size: 0.9rem; }
+.task-chip.waiting { border-color: #fde68a; background: #fffbeb; }
+.task-chip.waiting .task-chip-icon { background: #fef3c7; color: #92400e; }
+.task-chip.waiting .task-chip-badge { background: #fef3c7; color: #92400e; }
+.ch-tabs-inner { flex-wrap: wrap; }
+
+/* ---- Grouped menu ---- */
+.student-app-sidebar .nav-group-label {
+  margin: 12px 12px 4px;
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.student-app-sidebar .sidebar-footer button[data-armed] { color: #be123c; font-weight: 700; }
+
+/* ---- Phone navigation ---- */
+.student-bottom-nav { display: none; }
+
+@media (max-width: 760px) {
+  body.student-shell-enabled .subpage-hero h1,
+  body.student-shell-enabled .dashboard-hero h1,
+  body.student-shell-enabled .strike-hero h1 { font-size: 1.7rem !important; }
+  body.student-shell-enabled .subpage-hero .hero-copy,
+  body.student-shell-enabled .dashboard-hero .hero-copy,
+  body.student-shell-enabled .strike-hero .hero-copy { font-size: 0.95rem !important; }
+
+  .eqh-hero { padding: 22px !important; }
+  .eqh-hero h1 { font-size: 2rem !important; }
+  .eqh-cta .eqh-btn { justify-content: center; min-height: 46px; width: 100%; }
+  .eqh-stat { padding: 14px; }
+  .eqh-stat .ic { display: none; }
+  .eqh-cards { grid-template-columns: 1fr 1fr !important; }
+  .eqh-ncard { padding: 14px 44px 14px 14px; }
+  .eqh-ncard > .ic, .eqh-ncard p { display: none; }
+
+  body[data-eq-grade]:not(.eq-no-bottom-nav) { padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
+  .student-bottom-nav {
+    position: fixed;
+    z-index: 40;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    padding-bottom: env(safe-area-inset-bottom);
+    border-top: 1px solid #e5ebf5;
+    background: #fff;
+  }
+  .student-bottom-nav a,
+  .student-bottom-nav button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 60px;
+    border: 0;
+    background: none;
+    color: #475569;
+    font: 600 0.75rem 'IBM Plex Sans', sans-serif;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .student-bottom-nav svg { width: 21px; height: 21px; }
+  .student-bottom-nav a.active { color: var(--eq-accent); font-weight: 700; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[data-eq-grade] *, body[data-eq-grade] *::before, body[data-eq-grade] *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---- Readable text on coloured panels ---- */
+body[data-eq-grade] .eqh-hero,
+body[data-eq-grade] .eqh-appbar,
+body[data-eq-grade] .profile-strip { background: linear-gradient(125deg, #1d4ed8, #1e3a8a) !important; }
+body[data-eq-grade="11"] .eqh-hero,
+body[data-eq-grade="11"] .eqh-appbar,
+body[data-eq-grade="11"] .profile-strip { background: linear-gradient(125deg, #0f766e, #115e59) !important; }
+body[data-eq-grade] .rate-note { color: #475569; }
+
+/* The open menu needs the whole screen, including its Log out button. */
+.dashboard-sidebar.open ~ .student-bottom-nav { display: none; }

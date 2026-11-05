@@ -112,23 +112,40 @@
     ].join('');
   }
 
+  function bottomNavMarkup(current) {
+    // The Android app has its own bottom tabs.
+    if (document.documentElement.classList.contains('eq-app')) return '';
+    return [
+      '<nav class="student-bottom-nav" aria-label="Quick navigation">',
+      navItem('home', 'index.html', 'house', 'Home', current),
+      navItem('lessons', 'lessons.html', 'book-open', 'Materials', current),
+      navItem('submission', 'submission.html', 'file-up', 'Submit', current),
+      navItem('scores', 'scores.html', 'trophy', 'Scores', current),
+      '<button type="button" onclick="toggleSidebar()">' + icon('menu') + '<span>More</span></button>',
+      '</nav>'
+    ].join('');
+  }
+
   function shellMarkup() {
     var current = document.body.getAttribute('data-page') || currentPageFromPath();
     var currentGrade = detectGrade();
     var nav = [
       navItem('home', 'index.html', 'house', 'Homepage', current),
-      navItem('dashboard', 'dashboard.html', 'chart-no-axes-column-increasing', 'My Statistics', current),
+      navItem('submission', 'submission.html', 'file-up', 'Submission', current),
+      navItem('tasks', 'tasks.html', 'list-checks', 'Task Status', current),
+      '<div class="nav-group-label">Learn</div>',
       navItem('lessons', 'lessons.html', 'book-open', 'Materials', current),
       navItem('assignments', 'assignments.html', 'clipboard-list', 'Assignments', current),
-      navItem('submission', 'submission.html', 'file-up', 'Submission', current),
       navItem('session', 'session.html', 'book-marked', 'Reading', current),
-      navItem('attendance', 'attendance.html', 'calendar-check', 'Attendance', current),
-      navItem('scores', 'scores.html', 'trophy', 'Student Scores', current),
-      navItem('tasks', 'tasks.html', 'list-checks', 'Task Status', current),
-      navItem('students', 'students.html', 'users-round', 'Student List', current),
-      navItem('activeness', 'activeness.html', 'zap', 'Level / XP', current),
       navItem('vocabulary', 'vocabulary.html', 'book-a', 'My Vocabulary', current),
-      navItem('strikes', 'strikes.html', 'shield-alert', 'My Strikes', current)
+      '<div class="nav-group-label">My progress</div>',
+      navItem('dashboard', 'dashboard.html', 'chart-no-axes-column-increasing', 'My Statistics', current),
+      navItem('scores', 'scores.html', 'trophy', 'Scores', current),
+      navItem('activeness', 'activeness.html', 'zap', 'Level / XP', current),
+      navItem('attendance', 'attendance.html', 'calendar-check', 'Attendance', current),
+      navItem('strikes', 'strikes.html', 'shield-alert', 'My Strikes', current),
+      '<div class="nav-group-label">Class</div>',
+      navItem('students', 'students.html', 'users-round', 'Student List', current)
     ].join('');
 
     return [
@@ -139,10 +156,11 @@
       '  ' + profileMarkup(currentGrade),
       '  <div class="sidebar-footer">',
       '    <a href="../index.html">' + icon('layers') + '<span>Choose Grade</span></a>',
-      '    <button type="button" onclick="studentShellLogout()">' + icon('log-out') + '<span>Logout / Change Name</span></button>',
+      '    <button type="button" onclick="studentShellLogout(this)">' + icon('log-out') + '<span>Log out</span></button>',
       '  </div>',
       '</aside>',
-      '<div class="mobile-backdrop" id="mobileBackdrop" onclick="closeSidebar()"></div>'
+      '<div class="mobile-backdrop" id="mobileBackdrop" onclick="closeSidebar()"></div>',
+      bottomNavMarkup(current)
     ].join('');
   }
 
@@ -168,23 +186,46 @@
     document.getElementById('mobileBackdrop').classList.remove('open');
   };
 
-  window.studentShellLogout = function () {
+  // Asks for a second tap, because logging out by accident is too easy.
+  function confirmTap(button, action) {
+    if (button.getAttribute('data-armed')) { action(); return; }
+    var label = button.querySelector('span') || button;
+    var original = label.textContent;
+    button.setAttribute('data-armed', '1');
+    label.textContent = 'Tap again to log out';
+    setTimeout(function () {
+      button.removeAttribute('data-armed');
+      label.textContent = original;
+    }, 4000);
+  }
+
+  function logoutNow() {
     if (window.EQStudent) window.EQStudent.clear();
     else ['eq_student_class', 'eq_student_no', 'eq_student_name'].forEach(function (key) {
       localStorage.removeItem(key);
     });
     location.href = 'index.html';
+  }
+
+  window.studentShellLogout = function (button) {
+    if (button) confirmTap(button, logoutNow);
+    else logoutNow();
   };
 
   window.EQStudentShell = Object.assign(window.EQStudentShell || {}, {
     currentGrade: detectGrade,
     currentPage: currentPageFromPath,
-    refreshProfile: refreshProfile
+    refreshProfile: refreshProfile,
+    confirmTap: confirmTap
   });
 
   function initStudentShell() {
     localStorage.setItem('eq_grade', detectGrade());
     document.body.classList.add('student-shell-enabled');
+    document.body.setAttribute('data-eq-grade', detectGrade());
+    var savedProfile = getStudentProfile(detectGrade());
+    document.body.classList.toggle('has-student-profile', !!(savedProfile.classId && savedProfile.studentNo));
+    if (document.documentElement.classList.contains('eq-app')) document.body.classList.add('eq-no-bottom-nav');
     document.body.setAttribute('data-student-shell-page', document.body.getAttribute('data-page') || currentPageFromPath());
     if (!document.getElementById('dashboardSidebar')) {
       document.body.insertAdjacentHTML('afterbegin', shellMarkup());
