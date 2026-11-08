@@ -6,7 +6,7 @@
   <title>Teacher Homepage · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="../shared/css/app-shell.css?v=20260702"/>
+  <link rel="stylesheet" href="../shared/css/app-shell.css?v=20261108"/>
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
   <script src="../shared/js/classes-20260617.js?v=20260712"></script>
   <script src="../shared/js/api.js"></script>
@@ -27,10 +27,10 @@
       </div>
 
       <div class="teacher-account">
-        <button class="icon-button" type="button" aria-label="Notifications">
+        <a class="icon-button" href="submissions.html" aria-label="Submissions waiting to be checked">
           <i data-lucide="bell"></i>
-          <span class="notification-dot">0</span>
-        </button>
+          <span class="notification-dot" style="display:none">0</span>
+        </a>
         <div class="teacher-avatar" id="teacherAvatar">T</div>
         <div class="teacher-identity">
           <strong id="teacherName">Teacher</strong>
@@ -39,32 +39,47 @@
       </div>
     </header>
 
-    <a class="submission-alert" id="submissionAlert" href="submissions.html" hidden style="display:flex;align-items:center;gap:12px;margin:0 0 18px;padding:14px 18px;border-radius:16px;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1.5px solid #fde68a;color:#92400e;text-decoration:none;font-weight:700;">
+    <a class="submission-alert" id="submissionAlert" href="submissions.html" style="display:none;align-items:center;gap:12px;margin:0 0 18px;padding:14px 18px;border-radius:16px;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1.5px solid #fde68a;color:#92400e;text-decoration:none;font-weight:700;">
       <i data-lucide="inbox"></i>
       <span id="submissionAlertText">You have task submissions to check.</span>
       <span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;color:#b45309;white-space:nowrap;">Review now <i data-lucide="arrow-right"></i></span>
     </a>
 
     <div class="dashboard-toolbar">
-      <span class="data-note"><i data-lucide="database"></i> Live totals appear when class data is connected.</span>
       <div class="student-site-actions" aria-label="Student site previews">
         <a href="../grade10/"><i data-lucide="monitor"></i> Grade 10 Site</a>
         <a href="../grade11/"><i data-lucide="monitor"></i> Grade 11 Site</a>
       </div>
-      <label class="semester-select">
-        <i data-lucide="calendar-days"></i>
-        <select aria-label="Semester">
-          <option>Semester 1</option>
-          <option>Semester 2</option>
-        </select>
-      </label>
     </div>
+
+    <section class="metric-grid" aria-label="Teacher overview">
+      <a class="metric-card amber" href="submissions.html">
+        <span class="metric-icon"><i data-lucide="folder-open"></i></span>
+        <div><span>Submissions</span><strong>--</strong><small>Loading…</small></div>
+      </a>
+      <article class="metric-card blue">
+        <span class="metric-icon"><i data-lucide="users-round"></i></span>
+        <div><span>Total Classes</span><strong>8</strong><small>5 Grade 10 · 3 Grade 11</small></div>
+      </article>
+      <article class="metric-card green">
+        <span class="metric-icon"><i data-lucide="user-round"></i></span>
+        <div><span>Total Students</span><strong>--</strong><small>Loading…</small></div>
+      </article>
+      <article class="metric-card purple">
+        <span class="metric-icon"><i data-lucide="trophy"></i></span>
+        <div><span>Top Level</span><strong>--</strong><small>Loading…</small></div>
+      </article>
+      <article class="metric-card cyan">
+        <span class="metric-icon"><i data-lucide="shield-check"></i></span>
+        <div><span>Tasks Completed</span><strong>--</strong><small>Loading…</small></div>
+      </article>
+    </section>
 
     <section class="champion-panel" id="overview">
       <div class="champion-heading">
         <span class="trophy-icon"><i data-lucide="trophy"></i></span>
-        <h2>Champions of the Semester</h2>
-        <p>Top students will appear here when final-score data is available.</p>
+        <h2>Top Students by Level</h2>
+        <p>Your highest-level students across all classes right now.</p>
       </div>
 
       <div class="podium" aria-label="Leaderboard awaiting score data">
@@ -105,30 +120,7 @@
         </article>
       </div>
 
-      <a class="leaderboard-link" href="scores.html"><i data-lucide="trophy"></i> View Score Manager <i data-lucide="arrow-right"></i></a>
-    </section>
-
-    <section class="metric-grid" aria-label="Teacher overview">
-      <article class="metric-card blue">
-        <span class="metric-icon"><i data-lucide="users-round"></i></span>
-        <div><span>Total Classes</span><strong>8</strong><small>5 Grade 10 · 3 Grade 11</small></div>
-      </article>
-      <article class="metric-card green">
-        <span class="metric-icon"><i data-lucide="user-round"></i></span>
-        <div><span>Total Students</span><strong>--</strong><small>Waiting for confirmed rosters</small></div>
-      </article>
-      <article class="metric-card purple">
-        <span class="metric-icon"><i data-lucide="clipboard-list"></i></span>
-        <div><span>Tasks Assigned</span><strong>--</strong><small>Connect task data to summarize</small></div>
-      </article>
-      <article class="metric-card amber">
-        <span class="metric-icon"><i data-lucide="folder-open"></i></span>
-        <div><span>Submissions</span><strong>--</strong><small>Connect submission records</small></div>
-      </article>
-      <article class="metric-card cyan">
-        <span class="metric-icon"><i data-lucide="shield-check"></i></span>
-        <div><span>Tasks Completed</span><strong>--</strong><small>Calculated after task data exists</small></div>
-      </article>
+      <a class="leaderboard-link" href="activeness.html"><i data-lucide="zap"></i> Open Level / XP <i data-lucide="arrow-right"></i></a>
     </section>
 
     <section class="dashboard-lower-grid">
@@ -147,30 +139,13 @@
           <a href="tasks.html"><span class="quick-icon purple"><i data-lucide="clipboard-list"></i></span><div><strong>Tasks</strong><p>Create and manage class tasks.</p><b>Open tasks <i data-lucide="arrow-right"></i></b></div></a>
           <a href="submissions.html"><span class="quick-icon amber"><i data-lucide="inbox"></i></span><div><strong>Submissions</strong><p>Review student work and status.</p><b>Open submissions <i data-lucide="arrow-right"></i></b></div></a>
           <a href="attendance.html"><span class="quick-icon red"><i data-lucide="chart-no-axes-column-increasing"></i></span><div><strong>Attendance</strong><p>Review class attendance records.</p><b>Open attendance <i data-lucide="arrow-right"></i></b></div></a>
-          <a href="activeness.html"><span class="quick-icon cyan"><i data-lucide="zap"></i></span><div><strong>Level / XP</strong><p>Manage participation points before the RPG model lands.</p><b>Open Level / XP <i data-lucide="arrow-right"></i></b></div></a>
+          <a href="activeness.html"><span class="quick-icon cyan"><i data-lucide="zap"></i></span><div><strong>Level / XP</strong><p>Give XP and see each student's level.</p><b>Open Level / XP <i data-lucide="arrow-right"></i></b></div></a>
           <a href="announcements.html"><span class="quick-icon purple"><i data-lucide="megaphone"></i></span><div><strong>Announcements</strong><p>Publish the latest student-facing update.</p><b>Open announcements <i data-lucide="arrow-right"></i></b></div></a>
           <a href="strikes.html"><span class="quick-icon red"><i data-lucide="shield-alert"></i></span><div><strong>Strikes</strong><p>Manage warning status and eligibility.</p><b>Open strikes <i data-lucide="arrow-right"></i></b></div></a>
-          <a href="settings.html"><span class="quick-icon slate"><i data-lucide="settings"></i></span><div><strong>Settings</strong><p>Review session, data readiness, and rules.</p><b>Open settings <i data-lucide="arrow-right"></i></b></div></a>
+          <a href="settings.html"><span class="quick-icon slate"><i data-lucide="settings"></i></span><div><strong>Settings</strong><p>Your teacher account and options.</p><b>Open settings <i data-lucide="arrow-right"></i></b></div></a>
         </div>
       </article>
 
-      <article class="dashboard-panel activity-panel">
-        <div class="panel-heading">
-          <div>
-            <span class="eyebrow">Latest updates</span>
-            <h2>Recent Activities</h2>
-          </div>
-        </div>
-        <div class="empty-activity">
-          <span><i data-lucide="clock-3"></i></span>
-          <strong>No activity feed yet</strong>
-          <p>Recent publishing, submissions, scoring, and announcements will appear here after a shared activity log is connected.</p>
-        </div>
-        <div class="teacher-quote">
-          <i data-lucide="lightbulb"></i>
-          <p>Great teachers inspire, motivate, and change lives. Keep up the amazing work.</p>
-        </div>
-      </article>
     </section>
 
     <section class="dashboard-panel class-overview">
@@ -297,10 +272,9 @@
           var b = card.querySelector('b'); if (b) b.textContent = 'Level ' + dashLevelFromXP(s.xp);
         });
         if (top.length) {
-          var h = document.querySelector('.champion-heading h2'); if (h) h.textContent = 'Top Students by Level';
-          var p = document.querySelector('.champion-heading p'); if (p) p.textContent = 'Your highest-level students across all classes right now.';
-          // Repurpose the last placeholder metric into a real "Top Level" stat.
           setMetricFull('purple', 'Top Level', 'Level ' + dashLevelFromXP(top[0].xp), shortName(top[0].name) + ' · ' + top[0].xp + ' XP');
+        } else {
+          setMetric('purple', '--', 'No XP given yet');
         }
         if (window.lucide) lucide.createIcons();
       }).catch(function() {});
@@ -314,14 +288,14 @@
         var n = res.pending || 0;
         setMetric('amber', (res.submissions || []).length, n + ' pending review');
         var dot = document.querySelector('.notification-dot');
-        if (dot) dot.textContent = n;
+        if (dot) { dot.textContent = n; dot.style.display = n ? '' : 'none'; }
         var alertEl = document.getElementById('submissionAlert');
         if (alertEl) {
           if (n > 0) {
             document.getElementById('submissionAlertText').textContent =
               n + (n === 1 ? ' task submission is' : ' task submissions are') + ' waiting to be checked.';
-            alertEl.hidden = false;
-          } else { alertEl.hidden = true; }
+            alertEl.style.display = 'flex';
+          } else { alertEl.style.display = 'none'; }
         }
         if (window.lucide) lucide.createIcons();
       }).catch(function() {});

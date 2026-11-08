@@ -316,7 +316,7 @@ body.sidebar-collapsed .dashboard-main {
   border-radius: 999px;
   background: #ef4444;
   color: #fff;
-  font-size: 0.52rem;
+  font-size: 0.68rem;
   font-weight: 800;
 }
 
@@ -334,7 +334,7 @@ body.sidebar-collapsed .dashboard-main {
 
 .teacher-identity { display: grid; gap: 3px; }
 .teacher-identity strong { font-size: 0.85rem; }
-.teacher-identity span { color: var(--muted); font-size: 0.7rem; }
+.teacher-identity span { color: var(--muted); font-size: 0.75rem; }
 
 .dashboard-toolbar {
   display: flex;
@@ -415,7 +415,6 @@ body.sidebar-collapsed .dashboard-main {
 .champion-panel {
   position: relative;
   overflow: hidden;
-  min-height: 420px;
   padding: 25px 28px 0;
   background:
     radial-gradient(circle at 50% 8%, rgba(255, 255, 255, 0.9), transparent 35%),
@@ -465,7 +464,7 @@ body.sidebar-collapsed .dashboard-main {
 .podium {
   position: relative;
   z-index: 1;
-  min-height: 248px;
+  min-height: 220px;
   display: grid;
   grid-template-columns: repeat(5, minmax(115px, 1fr));
   align-items: end;
@@ -504,16 +503,16 @@ body.sidebar-collapsed .dashboard-main {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: #6f99e3;
+  background: #2f5fb8;
   color: #fff;
   font-size: 0.8rem;
   font-weight: 800;
   box-shadow: 0 5px 12px rgba(30, 64, 175, 0.18);
 }
 
-.first .rank-badge { background: #d7a500; }
-.second .rank-badge { background: #8d939c; }
-.third .rank-badge { background: #c16d24; }
+.first .rank-badge { background: #8a6800; }
+.second .rank-badge { background: #5f6670; }
+.third .rank-badge { background: #9a4f12; }
 .fifth .rank-badge { background: #1853ae; }
 
 .podium-avatar {
@@ -528,8 +527,8 @@ body.sidebar-collapsed .dashboard-main {
 }
 
 .first .podium-avatar { width: 66px; height: 66px; }
-.podium-card strong { font-size: 0.76rem; }
-.podium-card span:not(.rank-badge) { color: var(--muted); font-size: 0.66rem; }
+.podium-card strong { font-size: 0.85rem; }
+.podium-card span:not(.rank-badge) { color: var(--muted); font-size: 0.75rem; }
 .podium-card b { color: var(--blue); font-size: 1.1rem; }
 
 .leaderboard-link {
@@ -547,7 +546,7 @@ body.sidebar-collapsed .dashboard-main {
   color: var(--blue);
   padding: 0 14px;
   text-decoration: none;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 700;
 }
 
@@ -583,9 +582,11 @@ body.sidebar-collapsed .dashboard-main {
 
 .metric-icon { width: 44px; height: 44px; }
 .metric-card > div { min-width: 0; display: grid; gap: 2px; }
-.metric-card span:not(.metric-icon) { font-size: 0.69rem; font-weight: 600; }
+.metric-card span:not(.metric-icon) { font-size: 0.78rem; font-weight: 600; }
 .metric-card strong { font-size: 1.12rem; }
-.metric-card small { overflow: hidden; color: var(--muted); font-size: 0.62rem; text-overflow: ellipsis; white-space: nowrap; }
+.metric-card small { overflow: hidden; color: var(--muted); font-size: 0.72rem; text-overflow: ellipsis; white-space: nowrap; }
+a.metric-card { color: inherit; text-decoration: none; }
+a.metric-card:hover { border-color: #b9d4ff; }
 .metric-card.blue { background: #f7faff; }
 .metric-card.green { background: #f5fcf7; }
 .metric-card.purple { background: #fbf7ff; }
@@ -601,7 +602,7 @@ body.sidebar-collapsed .dashboard-main {
 
 .dashboard-lower-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(310px, 0.75fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 18px;
 }
 
@@ -611,7 +612,7 @@ body.sidebar-collapsed .dashboard-main {
 
 .eyebrow {
   color: var(--blue);
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.07em;
   text-transform: uppercase;
@@ -638,9 +639,9 @@ body.sidebar-collapsed .dashboard-main {
 .quick-icon { width: 38px; height: 38px; }
 .quick-icon svg { width: 18px; height: 18px; }
 .quick-grid div { min-width: 0; }
-.quick-grid strong { font-size: 0.76rem; }
-.quick-grid p { min-height: 32px; margin: 5px 0 8px; color: var(--muted); font-size: 0.65rem; line-height: 1.5; }
-.quick-grid b { display: inline-flex; align-items: center; gap: 3px; color: var(--blue); font-size: 0.64rem; }
+.quick-grid strong { font-size: 0.88rem; }
+.quick-grid p { min-height: 32px; margin: 5px 0 8px; color: var(--muted); font-size: 0.78rem; line-height: 1.5; }
+.quick-grid b { display: inline-flex; align-items: center; gap: 3px; color: var(--blue); font-size: 0.75rem; }
 .quick-grid b svg { width: 13px; height: 13px; }
 
 .activity-panel {
@@ -712,7 +713,7 @@ body.sidebar-collapsed .dashboard-main {
 
 .class-grid a:hover { border-color: #9fc4ff; background: #eef5ff; }
 .class-grid strong { color: var(--blue); font-size: 0.85rem; }
-.class-grid span { color: var(--muted); font-size: 0.61rem; }
+.class-grid span { color: var(--muted); font-size: 0.75rem; }
 
 .login-gate {
   position: fixed;
@@ -830,7 +831,7 @@ body.sidebar-collapsed.teacher-shell-enabled > footer {
   background: #fff;
   color: #41516f;
   padding: 0 12px;
-  font-size: 0.72rem;
+  font-size: 0.78rem;
 }
 
 .teacher-shell-enabled header .nav-actions a:hover,
@@ -848,7 +849,7 @@ body.sidebar-collapsed.teacher-shell-enabled > footer {
 
 .teacher-shell-enabled header .kicker {
   color: var(--blue);
-  font-size: 0.66rem;
+  font-size: 0.72rem;
   letter-spacing: 0.08em;
 }
 
