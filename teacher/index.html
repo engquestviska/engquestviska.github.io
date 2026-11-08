@@ -6,12 +6,12 @@
   <title>Teacher Homepage · English Quest</title>
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="../shared/css/app-shell.css?v=20261109"/>
+  <link rel="stylesheet" href="../shared/css/app-shell.css?v=20261110"/>
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
   <script src="../shared/js/classes-20260617.js?v=20260712"></script>
   <script src="../shared/js/api.js"></script>
   <script src="../shared/js/auth.js?v=20261108"></script>
-  <script src="../shared/js/teacher-sidebar.js?v=20260723"></script>
+  <script src="../shared/js/teacher-sidebar.js?v=20261110"></script>
 </head>
 <body class="teacher-tool-page teacher-dashboard-page" data-page="teacher-home">
   <main class="dashboard-main">
@@ -39,7 +39,7 @@
       </div>
     </header>
 
-    <a class="submission-alert" id="submissionAlert" href="submissions.html" style="display:none;align-items:center;gap:12px;margin:0 0 18px;padding:14px 18px;border-radius:16px;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1.5px solid #fde68a;color:#92400e;text-decoration:none;font-weight:700;">
+    <a class="submission-alert" id="submissionAlert" href="submissions.html" style="display:none;align-items:center;gap:12px;margin:0 0 18px;padding:14px 18px;border-radius:16px;background:#fef6dc;border:1.5px solid #fde68a;color:#92400e;text-decoration:none;font-weight:700;">
       <i data-lucide="inbox"></i>
       <span id="submissionAlertText">You have task submissions to check.</span>
       <span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;color:#b45309;white-space:nowrap;">Review now <i data-lucide="arrow-right"></i></span>
@@ -285,15 +285,25 @@
       if (!teacher.username || !teacher.password) return;
       EQApi.get({ action: 'getTaskSubmissions', username: teacher.username, password: teacher.password }).then(function(res) {
         if (!res || !res.success) return;
-        var n = res.pending || 0;
-        setMetric('amber', (res.submissions || []).length, n + ' pending review');
+        // Each uploaded photo is its own record, so count students instead of photos.
+        var subs = res.submissions || [];
+        var who = {}, waiting = {};
+        subs.forEach(function(s) {
+          var id = s.className + '|' + s.studentNo;
+          who[id] = true;
+          if (s.status === 'pending') waiting[id] = true;
+        });
+        var students = Object.keys(who).length;
+        var n = Object.keys(waiting).length;
+        setMetricFull('amber', 'Students Submitted', students,
+          n ? n + ' waiting for review' : 'All checked');
         var dot = document.querySelector('.notification-dot');
         if (dot) { dot.textContent = n; dot.style.display = n ? '' : 'none'; }
         var alertEl = document.getElementById('submissionAlert');
         if (alertEl) {
           if (n > 0) {
             document.getElementById('submissionAlertText').textContent =
-              n + (n === 1 ? ' task submission is' : ' task submissions are') + ' waiting to be checked.';
+              n + (n === 1 ? ' student has' : ' students have') + ' work waiting to be checked.';
             alertEl.style.display = 'flex';
           } else { alertEl.style.display = 'none'; }
         }

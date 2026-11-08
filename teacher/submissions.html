@@ -7,7 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css?v=20260702"/>
-  <link rel="stylesheet" href="../shared/css/app-shell.css?v=20261109"/>
+  <link rel="stylesheet" href="../shared/css/app-shell.css?v=20261110"/>
   <style>
     .sub-toolbar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:18px; }
     .sub-count { font-weight:800; font-size:1.05rem; }
@@ -69,7 +69,7 @@
   <script src="../shared/js/api.js"></script>
   <script src="../shared/js/dom-utils.js"></script>
   <script src="../shared/js/auth.js?v=20261108"></script>
-  <script src="../shared/js/teacher-sidebar.js?v=20260723"></script>
+  <script src="../shared/js/teacher-sidebar.js?v=20261110"></script>
 </head>
 <body class="teacher-tool-page" data-page="submissions">
   <header>
@@ -112,7 +112,7 @@
         </div>
 
         <div class="sub-toolbar">
-          <div class="sub-count"><span class="n" id="pendCount">0</span> waiting to check</div>
+          <div class="sub-count"><span class="n" id="pendCount">0</span> students waiting to check</div>
           <div class="seg">
             <button id="segPending" class="on" onclick="setFilter('pending')">Pending</button>
             <button id="segAll" onclick="setFilter('all')">All</button>
@@ -391,7 +391,10 @@
         }
         if (!res || !res.success) { list.innerHTML = '<div class="sub-empty">Could not load submissions. Please Refresh, or log in again.</div>'; return; }
         ALL = res.submissions || [];
-        document.getElementById('pendCount').textContent = res.pending || 0;
+        // Count students with work waiting, not photos.
+        var waiting = {};
+        ALL.forEach(function(s) { if (s.status === 'pending') waiting[s.className + '|' + s.studentNo] = true; });
+        document.getElementById('pendCount').textContent = Object.keys(waiting).length;
         renderList();
       }).catch(function() { list.innerHTML = '<div class="sub-empty">Network error. Try Refresh.</div>'; });
     }

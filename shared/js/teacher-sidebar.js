@@ -1,20 +1,21 @@
 /* Shared teacher app shell for manager pages. */
 (function () {
   var NAV_ITEMS = [
+    // Grouped so the long list is easy to scan: everyday class work first.
     { page: 'teacher-home', href: 'index.html', icon: 'house', name: 'Homepage' },
-    { page: 'classes', href: 'classes.html', icon: 'users-round', name: 'Classes' },
-    { page: 'scores', href: 'scores.html', icon: 'user-round', name: 'Students & Scores' },
-    { page: 'materials', href: 'materials.html', icon: 'book-open', name: 'Materials' },
-    { page: 'assignments', href: 'assignments.html', icon: 'clipboard-list', name: 'Assignments' },
-    { page: 'tasks', href: 'tasks.html', icon: 'list-checks', name: 'Task Status' },
-    { page: 'submissions', href: 'submissions.html', icon: 'inbox', name: 'Submissions' },
-    { page: 'attendance', href: 'attendance.html', icon: 'calendar-check', name: 'Attendance' },
-    { page: 'activeness', href: 'activeness.html', icon: 'zap', name: 'Level / XP' },
-    { page: 'flashcards', href: 'flashcards.html', icon: 'square-stack', name: 'Flashcards' },
-    { page: 'vocabulary', href: 'vocabulary.html', icon: 'book-a', name: 'Vocabulary' },
-    { page: 'announcements', href: 'announcements.html', icon: 'megaphone', name: 'Announcements' },
-    { page: 'strikes', href: 'strikes.html', icon: 'shield-alert', name: 'Strikes' },
-    { page: 'settings', href: 'settings.html', icon: 'settings', name: 'Settings' }
+    { group: 'In class', page: 'submissions', href: 'submissions.html', icon: 'inbox', name: 'Submissions' },
+    { group: 'In class', page: 'activeness', href: 'activeness.html', icon: 'zap', name: 'Level / XP' },
+    { group: 'In class', page: 'attendance', href: 'attendance.html', icon: 'calendar-check', name: 'Attendance' },
+    { group: 'In class', page: 'scores', href: 'scores.html', icon: 'user-round', name: 'Students & Scores' },
+    { group: 'In class', page: 'tasks', href: 'tasks.html', icon: 'list-checks', name: 'Task Status' },
+    { group: 'Lessons', page: 'materials', href: 'materials.html', icon: 'book-open', name: 'Materials' },
+    { group: 'Lessons', page: 'assignments', href: 'assignments.html', icon: 'clipboard-list', name: 'Assignments' },
+    { group: 'Lessons', page: 'flashcards', href: 'flashcards.html', icon: 'square-stack', name: 'Flashcards' },
+    { group: 'Lessons', page: 'vocabulary', href: 'vocabulary.html', icon: 'book-a', name: 'Vocabulary' },
+    { group: 'Lessons', page: 'announcements', href: 'announcements.html', icon: 'megaphone', name: 'Announcements' },
+    { group: 'Manage', page: 'classes', href: 'classes.html', icon: 'users-round', name: 'Classes' },
+    { group: 'Manage', page: 'strikes', href: 'strikes.html', icon: 'shield-alert', name: 'Strikes' },
+    { group: 'Manage', page: 'settings', href: 'settings.html', icon: 'settings', name: 'Settings' }
   ];
 
   var CLASSES = (window.EQClasses ? window.EQClasses.all : [
@@ -115,9 +116,15 @@
 
   function navMarkup() {
     var current = document.body.getAttribute('data-page') || currentPageFromPath();
+    var lastGroup = '';
     return NAV_ITEMS.map(function (item) {
       var active = item.page === current ? ' class="active"' : '';
-      return '<a' + active + ' href="' + item.href + '">' + icon(item.icon) + '<span>' + item.name + '</span></a>';
+      var label = '';
+      if (item.group && item.group !== lastGroup) {
+        label = '<div class="sidebar-label nav-group-label">' + item.group + '</div>';
+        lastGroup = item.group;
+      }
+      return label + '<a' + active + ' href="' + item.href + '">' + icon(item.icon) + '<span>' + item.name + '</span></a>';
     }).join('');
   }
 

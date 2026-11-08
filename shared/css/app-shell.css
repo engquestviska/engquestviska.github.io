@@ -186,6 +186,7 @@ svg { width: 19px; height: 19px; stroke-width: 1.9; }
 }
 
 .sidebar-label span { color: var(--muted); }
+.primary-nav .nav-group-label { margin: 14px 13px 4px; }
 .class-nav a { min-height: 38px; }
 .class-nav svg { width: 17px; height: 17px; }
 .student-profile-link {
@@ -416,25 +417,8 @@ body.sidebar-collapsed .dashboard-main {
   position: relative;
   overflow: hidden;
   padding: 25px 28px 0;
-  background:
-    radial-gradient(circle at 50% 8%, rgba(255, 255, 255, 0.9), transparent 35%),
-    linear-gradient(180deg, #eef4ff 0%, #f8fbff 100%);
+  background: #f5f8fd;
 }
-
-.champion-panel::before,
-.champion-panel::after {
-  content: '';
-  position: absolute;
-  width: 130px;
-  height: 240px;
-  bottom: 18px;
-  opacity: 0.38;
-  background: repeating-linear-gradient(150deg, #bcd0fa 0 8px, transparent 8px 22px);
-  pointer-events: none;
-}
-
-.champion-panel::before { left: -55px; transform: rotate(-15deg); }
-.champion-panel::after { right: -55px; transform: rotate(15deg); }
 
 .champion-heading {
   position: relative;
@@ -485,7 +469,6 @@ body.sidebar-collapsed .dashboard-main {
   background: #fff;
   padding: 28px 10px 15px;
   text-align: center;
-  box-shadow: 0 8px 20px rgba(30, 64, 175, 0.08);
 }
 
 .podium-card.first { min-height: 230px; border-bottom: 15px solid #ffc31f; }
@@ -507,7 +490,6 @@ body.sidebar-collapsed .dashboard-main {
   color: #fff;
   font-size: 0.8rem;
   font-weight: 800;
-  box-shadow: 0 5px 12px rgba(30, 64, 175, 0.18);
 }
 
 .first .rank-badge { background: #8a6800; }
@@ -568,7 +550,6 @@ body.sidebar-collapsed .dashboard-main {
   border-radius: 13px;
   padding: 13px;
   background: #fff;
-  box-shadow: 0 8px 22px rgba(30, 64, 175, 0.04);
 }
 
 .metric-icon,
@@ -587,18 +568,10 @@ body.sidebar-collapsed .dashboard-main {
 .metric-card small { overflow: hidden; color: var(--muted); font-size: 0.72rem; text-overflow: ellipsis; white-space: nowrap; }
 a.metric-card { color: inherit; text-decoration: none; }
 a.metric-card:hover { border-color: #b9d4ff; }
-.metric-card.blue { background: #f7faff; }
-.metric-card.green { background: #f5fcf7; }
-.metric-card.purple { background: #fbf7ff; }
-.metric-card.amber { background: #fffbf3; }
-.metric-card.cyan { background: #f2fcfd; }
-.metric-card.blue .metric-icon, .quick-icon.blue { background: #e3efff; color: var(--blue); }
-.metric-card.green .metric-icon, .quick-icon.green { background: #e0f8e8; color: #08a842; }
-.metric-card.purple .metric-icon, .quick-icon.purple { background: #f0e5ff; color: #8b32e3; }
-.metric-card.amber .metric-icon, .quick-icon.amber { background: #fff0c8; color: #e4a000; }
-.metric-card.cyan .metric-icon, .quick-icon.cyan { background: #dff7fa; color: #03a8b5; }
-.quick-icon.red { background: #ffe7eb; color: #ef4362; }
-.quick-icon.slate { background: #e2e8f0; color: #334155; }
+/* One calm icon colour; amber only marks Submissions, the one card that needs action. */
+.metric-icon, .quick-icon { background: #eaf1ff; color: var(--blue); }
+.metric-card.amber { background: #fffbf3; border-color: #f6dfa8; }
+.metric-card.amber .metric-icon { background: #fff0c8; color: #a16207; }
 
 .dashboard-lower-grid {
   display: grid;
