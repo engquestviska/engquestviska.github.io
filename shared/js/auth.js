@@ -10,19 +10,36 @@
   // live backend. Password is set via Script Property TEACHER_PASSWORD_SHA256.
   var GATE_DISABLED = false;
 
-  // Security: teacher credentials live in sessionStorage (cleared when the
-  // browser/tab closes) so a login no longer persists forever. Proactively
-  // remove any long-lived credentials left over in localStorage.
-  try {
-    localStorage.removeItem('eq_tu');
-    localStorage.removeItem('eq_tp');
-  } catch (e) {}
+  // The login is remembered in localStorage (owner's choice, 2026-11-08), so every tab and
+  // a reopened browser stay logged in until Logout. A login handed over in sessionStorage
+  // (the old teacher app's "More" links) is moved here on first use.
+  function store(key, value) {
+    try { localStorage.setItem(key, value); } catch (e) {}
+  }
+
+  function read(key) {
+    try {
+      var kept = localStorage.getItem(key);
+      if (kept) return kept;
+      var handed = sessionStorage.getItem(key);
+      if (handed) { store(key, handed); sessionStorage.removeItem(key); }
+      return handed || '';
+    } catch (e) {
+      return '';
+    }
+  }
 
   function getTeacher() {
     return {
-      username: sessionStorage.getItem('eq_tu') || '',
-      password: sessionStorage.getItem('eq_tp') || ''
+      username: read('eq_tu'),
+      password: read('eq_tp')
     };
+  }
+
+  function saveTeacher(username, password) {
+    store('eq_tu', username);
+    store('eq_tp', password);
+    markTeacherVerified(username);
   }
 
   function hasTeacher() {
@@ -31,28 +48,40 @@
   }
 
   function clearVerification() {
-    sessionStorage.removeItem(VERIFY_KEY);
-    sessionStorage.removeItem(VERIFY_USER_KEY);
+    [localStorage, sessionStorage].forEach(function(s) {
+      try { s.removeItem(VERIFY_KEY); s.removeItem(VERIFY_USER_KEY); } catch (e) {}
+    });
   }
 
   function markTeacherVerified(username) {
-    sessionStorage.setItem(VERIFY_KEY, String(Date.now()));
-    sessionStorage.setItem(VERIFY_USER_KEY, username || '');
+    store(VERIFY_KEY, String(Date.now()));
+    store(VERIFY_USER_KEY, username || '');
   }
 
   function hasFreshVerification(username) {
-    var verifiedAt = Number(sessionStorage.getItem(VERIFY_KEY) || 0);
-    var verifiedUser = sessionStorage.getItem(VERIFY_USER_KEY) || '';
+    var verifiedAt = Number(read(VERIFY_KEY) || 0);
+    var verifiedUser = read(VERIFY_USER_KEY);
     return !!(verifiedAt && verifiedUser === username && Date.now() - verifiedAt < VERIFY_MAX_AGE);
   }
 
   function logoutTeacher(redirectTo) {
-    sessionStorage.removeItem('eq_tu');
-    sessionStorage.removeItem('eq_tp');
-    localStorage.removeItem('eq_tu');
-    localStorage.removeItem('eq_tp');
+    [localStorage, sessionStorage].forEach(function(s) {
+      try { s.removeItem('eq_tu'); s.removeItem('eq_tp'); } catch (e) {}
+    });
     clearVerification();
     if (redirectTo) location.href = redirectTo;
+  }
+
+  // The dashboard's login link with this page as the place to come back to.
+  function loginLink() {
+    var page = location.pathname.split('/').pop() || 'index.html';
+    return 'index.html?next=' + encodeURIComponent(page + location.search);
+  }
+
+  // Only a page in the teacher folder is a safe place to send the teacher after login.
+  function nextPage() {
+    var next = new URLSearchParams(location.search).get('next') || '';
+    return /^[a-z0-9-]+\.html(\?[^#]*)?$/i.test(next) && next.indexOf('index.html') !== 0 ? next : '';
   }
 
   function setGateMessage(options, message) {
@@ -76,7 +105,10 @@
   function hideTeacherApp(options) {
     var access = document.getElementById(options.accessId);
     var app = document.getElementById(options.appId);
-    if (access) access.hidden = false;
+    if (access) {
+      access.hidden = false;
+      access.querySelectorAll('a[href="index.html"]').forEach(function(a) { a.href = loginLink(); });
+    }
     if (app) app.hidden = true;
   }
 
@@ -139,6 +171,9 @@
   global.EQAuth = {
     getTeacher: getTeacher,
     hasTeacher: hasTeacher,
+    saveTeacher: saveTeacher,
+    loginLink: loginLink,
+    nextPage: nextPage,
     gateDisabled: GATE_DISABLED,
     markTeacherVerified: markTeacherVerified,
     clearVerification: clearVerification,

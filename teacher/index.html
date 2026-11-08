@@ -10,7 +10,7 @@
   <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
   <script src="../shared/js/classes-20260617.js?v=20260712"></script>
   <script src="../shared/js/api.js"></script>
-  <script src="../shared/js/auth.js"></script>
+  <script src="../shared/js/auth.js?v=20261108"></script>
   <script src="../shared/js/teacher-sidebar.js?v=20260723"></script>
 </head>
 <body class="teacher-tool-page teacher-dashboard-page" data-page="teacher-home">
@@ -239,11 +239,14 @@
         // per-account salt) on every call, so it must receive the plain password
         // — NOT a pre-hashed one. (The old Apps Script backend also accepted a
         // pre-hashed value; the Turso/Cloudflare backend does not.)
-        sessionStorage.setItem('eq_tu', username);
-        sessionStorage.setItem('eq_tp', password);
-        EQAuth.markTeacherVerified(username);
+        EQAuth.saveTeacher(username, password);
+        // Came from another teacher page: go back there instead of staying on the dashboard.
+        var next = EQAuth.nextPage();
+        if (next) { location.replace(next); return; }
         displayTeacher(username);
         hideLogin();
+        loadPendingSubmissions();
+        loadDashboardStats();
       }).catch(function(error) {
         resetBtn();
         showLogin(error.message || 'Connection error. Try again.');
@@ -336,6 +339,8 @@
       EQApi.get({ action: 'checkLogin', username: teacher.username, password: teacher.password }).then(function(data) {
         if (data && data.ok) {
           EQAuth.markTeacherVerified(teacher.username);
+          var next = EQAuth.nextPage();
+          if (next) { location.replace(next); return; }
           hideLogin();
           loadPendingSubmissions();
           loadDashboardStats();

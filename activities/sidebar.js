@@ -81,7 +81,8 @@
   ].join('\n');
 
   function hasTeacher() {
-    return !!(sessionStorage.getItem('eq_tu') && sessionStorage.getItem('eq_tp'));
+    if (window.EQAuth) return EQAuth.hasTeacher();
+    return !!((localStorage.getItem('eq_tu') || sessionStorage.getItem('eq_tu')) && (localStorage.getItem('eq_tp') || sessionStorage.getItem('eq_tp')));
   }
 
   function setActiveItem() {
@@ -103,7 +104,7 @@
         '<div class="sidebar-teacher-label">Teacher Session</div>' +
         '<div class="sidebar-teacher-logged">' +
           '<span style="cursor:default;color:#60A5FA;font-size:0.82rem;margin:0;">' +
-            (sessionStorage.getItem('eq_tu') || 'Teacher') +
+            (localStorage.getItem('eq_tu') || sessionStorage.getItem('eq_tu') || 'Teacher') +
           '</span>' +
           '<a href="../teacher/" style="margin-left:auto;color:rgba(255,255,255,0.65);font-size:0.75rem;text-decoration:none;">Open</a>' +
         '</div>';
