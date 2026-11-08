@@ -7,7 +7,7 @@
   <link rel="icon" type="image/svg+xml" href="../favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="../shared/css/system.css?v=20260702"/>
-  <link rel="stylesheet" href="../shared/css/app-shell.css?v=20261108"/>
+  <link rel="stylesheet" href="../shared/css/app-shell.css?v=20261109"/>
   <style>
     .activeness-list {
       display: grid;
@@ -20,23 +20,23 @@
 
     .student-row {
       display: grid;
-      grid-template-columns: 54px minmax(180px, 1fr) auto;
-      gap: 14px;
+      grid-template-columns: 48px minmax(0, 1fr) auto;
+      gap: 12px;
       align-items: center;
-      padding: 18px;
-      border-bottom: 1.5px solid #dbeafe;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
     }
 
     .avatar {
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
       display: grid;
       place-items: center;
-      border-radius: 16px;
-      background: #2563eb;
+      border-radius: 12px;
+      background: var(--blue);
       color: #fff;
       font-family: 'IBM Plex Mono', monospace;
-      font-weight: 900;
+      font-weight: 700;
     }
 
     .student-name {
@@ -45,89 +45,109 @@
     }
 
     .student-meta {
-      margin-top: 5px;
+      margin-top: 3px;
       color: var(--muted);
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       font-weight: 600;
     }
 
     .student-stats {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
       justify-content: flex-end;
     }
 
-    .score-pill,
-    .indicator-pill {
-      border-radius: 999px;
-      padding: 8px 12px;
-      background: var(--blue-soft);
-      color: #1d4ed8;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.76rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
+    .level-pill,
+    .score-pill {
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      white-space: nowrap;
     }
 
-    .indicator-pill.low {
-      background: #fee2e2;
-      color: #b91c1c;
+    .level-pill {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .score-pill {
+      background: var(--blue-soft);
+      color: #1d4ed8;
     }
 
     .activity-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
-      padding: 16px 18px 18px;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 8px;
+      padding: 12px 16px;
       background: #f8fbff;
     }
 
     .activity-control {
       display: grid;
-      gap: 8px;
-      border: 1.5px solid #dbeafe;
-      border-radius: 16px;
+      gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
       background: #fff;
-      padding: 13px;
+      padding: 10px;
+    }
+
+    .activity-control.custom {
+      border-color: #fcd9a8;
+      background: #fffaf2;
     }
 
     .activity-label {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      color: #33415c;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .activity-label span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .activity-label small {
+      flex: 0 0 auto;
       color: var(--muted);
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.7rem;
-      font-weight: 900;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      font-size: 0.75rem;
+      font-weight: 700;
     }
 
     .activity-actions {
       display: grid;
       grid-template-columns: 42px 1fr 42px;
-      gap: 8px;
+      gap: 6px;
       align-items: center;
     }
 
     .activity-value {
-      min-height: 38px;
+      min-height: 40px;
       display: grid;
       place-items: center;
-      border-radius: 12px;
+      border-radius: 8px;
       background: #eff6ff;
       color: #0f172a;
       font-family: 'IBM Plex Mono', monospace;
-      font-weight: 900;
+      font-weight: 700;
     }
 
     .step-btn {
-      min-height: 38px;
-      border: 1.5px solid #dbeafe;
-      border-radius: 12px;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
       background: #fff;
       color: #1d4ed8;
       font: inherit;
-      font-weight: 900;
+      font-size: 1.05rem;
+      font-weight: 800;
       cursor: pointer;
     }
 
@@ -140,13 +160,191 @@
       cursor: not-allowed;
     }
 
-    @media (max-width: 760px) {
+    .give-area {
+      padding: 0 16px 14px;
+      background: #f8fbff;
+    }
+
+    .give-toggle {
+      min-height: 40px;
+      border: 1px dashed #93b4f5;
+      border-radius: 10px;
+      background: #fff;
+      color: #1d4ed8;
+      padding: 0 14px;
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .give-form {
+      display: grid;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      padding: 12px;
+    }
+
+    .give-hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .xp-chip {
+      min-height: 38px;
+      border: 1px solid #cfe0ff;
+      border-radius: 999px;
+      background: var(--blue-soft);
+      color: #1d4ed8;
+      padding: 0 12px;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .xp-chip:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .give-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 110px auto;
+      gap: 8px;
+    }
+
+    .give-row input {
+      min-height: 42px;
+      width: 100%;
+      padding: 0 12px;
+      font: inherit;
+      font-size: 0.9rem;
+    }
+
+    .keep-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      color: #33415c;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0;
+      text-transform: none;
+      cursor: pointer;
+    }
+
+    .keep-line input {
+      width: 18px;
+      height: 18px;
+      min-height: 0;
+    }
+
+    .give-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .link-btn {
+      border: 0;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .saved-buttons {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+
+    .saved-buttons h3 {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    .saved-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      padding: 0 4px 0 12px;
+      color: #33415c;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .saved-chip button {
+      width: 30px;
+      height: 30px;
+      border: 0;
+      border-radius: 50%;
+      background: none;
+      color: #b91c1c;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .saved-chip button:hover {
+      background: #fee2e2;
+    }
+
+    @media (max-width: 680px) {
       .student-row {
-        grid-template-columns: 1fr;
+        grid-template-columns: 44px minmax(0, 1fr);
       }
 
       .student-stats {
+        grid-column: 1 / -1;
         justify-content: flex-start;
+      }
+
+      .activity-grid {
+        grid-template-columns: 1fr 1fr;
+        padding: 10px;
+      }
+
+      .give-area {
+        padding: 0 10px 12px;
+      }
+
+      .give-row {
+        grid-template-columns: 1fr 100px;
+      }
+
+      .give-row .btn {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 340px) {
+      .activity-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -173,16 +371,16 @@
       </nav>
     </div>
     <section class="hero">
-      <div class="kicker">Level / XP Manager</div>
-      <h1>Update participation points from the teacher side.</h1>
-      <p class="hero-copy">Load any class (Grade 10 or 11), adjust participation categories, and keep the student page as a read-only Level / XP dashboard.</p>
+      <div class="kicker">Level / XP</div>
+      <h1>Give students XP</h1>
+      <p class="hero-copy">Tap + or − on a reason, or give an exact amount with "Give exact XP". Every change saves straight away and shows on the student's Level page.</p>
     </section>
   </header>
 
   <main>
     <section class="access-card" id="accessCard" hidden>
       <h2 class="access-title">Teacher login required.</h2>
-      <p class="access-copy">Open the teacher dashboard and log in first. This page uses the saved teacher session to update participation points.</p>
+      <p class="access-copy">Log in on the teacher dashboard first. You'll come back to this page after logging in.</p>
       <a class="btn" href="index.html" style="display:inline-flex;align-items:center;text-decoration:none;">Open Teacher Login</a>
     </section>
 
@@ -190,8 +388,8 @@
       <div class="panel">
         <div class="panel-head">
           <div>
-            <h2 class="panel-title">Level / XP Records</h2>
-            <p class="panel-copy">Use plus and minus controls for each category. Each click saves immediately to the class data source.</p>
+            <h2 class="panel-title">Class XP</h2>
+            <p class="panel-copy">Answering +5 · Presenting +20 · Helping Hand +20 · Doing Task +20 · Quiz +10 · Vocabulary Box +2</p>
           </div>
           <div class="status-pill" id="loginPill">Teacher</div>
         </div>
@@ -203,40 +401,55 @@
           </div>
           <div>
             <label for="searchInput">Search student</label>
-            <input id="searchInput" type="search" placeholder="Type name, nickname, or number"/>
+            <input id="searchInput" type="search" placeholder="Name, nickname, or number"/>
           </div>
-          <button class="btn" type="button" id="loadBtn" onclick="loadActiveness()">Load Level / XP</button>
+          <button class="btn" type="button" id="loadBtn" onclick="loadActiveness()">Reload</button>
         </div>
 
         <div class="summary-grid" id="summaryGrid">
           <div class="summary-card"><strong>0</strong><span>Students</span></div>
-          <div class="summary-card"><strong>0</strong><span>Total Points</span></div>
-          <div class="summary-card"><strong>0</strong><span>Average</span></div>
-          <div class="summary-card"><strong>0</strong><span>Low Records</span></div>
+          <div class="summary-card"><strong>0</strong><span>Total XP</span></div>
+          <div class="summary-card"><strong>0</strong><span>Average XP</span></div>
+          <div class="summary-card"><strong>0</strong><span>Top Level</span></div>
         </div>
+
+        <div class="saved-buttons" id="savedButtons" hidden></div>
       </div>
 
       <div id="activenessList" class="activeness-list"></div>
     </section>
   </main>
 
-  <footer>© 2026 English Quest · Teacher Level / XP Manager</footer>
+  <footer>© 2026 English Quest · Teacher Level / XP</footer>
   <div class="toast" id="toast"></div>
 
   <script>
+    // Same reasons and XP as the teacher app and the student Level page.
     var ACTS = [
-      { key: 'Vocabulary Box', prop: 'VocabularyBox', label: 'Vocabulary Box' },
-      { key: 'Answering', prop: 'Answering', label: 'Answering' },
-      { key: 'Presenting', prop: 'Presenting', label: 'Presenting' },
-      { key: 'Doing Task On Time', prop: 'DoingTaskOnTime', label: 'Doing Task On Time' },
-      { key: 'Helping Hand', prop: 'HelpingHand', label: 'Helping Hand' },
-      { key: 'Quiz', prop: 'Quiz', label: 'Quiz' }
+      { key: 'Answering', prop: 'Answering', label: 'Answering', xp: 5 },
+      { key: 'Presenting', prop: 'Presenting', label: 'Presenting', xp: 20 },
+      { key: 'Helping Hand', prop: 'HelpingHand', label: 'Helping Hand', xp: 20 },
+      { key: 'Doing Task On Time', prop: 'DoingTaskOnTime', label: 'Doing Task', xp: 20 },
+      { key: 'Quiz', prop: 'Quiz', label: 'Quiz', xp: 10 },
+      { key: 'Vocabulary Box', prop: 'VocabularyBox', label: 'Vocabulary Box', xp: 2 }
     ];
+    var MAX_XP = 1000;
     var activenessData = [];
+    var categories = [];
     var saving = {};
+    var openNo = null;
+    var draft = { reason: '', points: '', keep: false };
 
     function teacherLogout() {
       EQAuth.logoutTeacher('index.html');
+    }
+
+    // Level N -> N+1 needs (5 + 5*N) XP, same as the student page.
+    function levelFromXP(xp) {
+      xp = Math.max(0, Number(xp) || 0);
+      var level = 1, need = 10, floor = 0;
+      while (xp >= floor + need) { floor += need; level++; need += 5; }
+      return level;
     }
 
     function initials(student) {
@@ -246,26 +459,56 @@
       }).join('') || 'EQ';
     }
 
+    function currentClass() {
+      return document.getElementById('classSelect').value;
+    }
+
+    function findStudent(no) {
+      for (var i = 0; i < activenessData.length; i++) {
+        if (String(activenessData[i].no) === String(no)) return activenessData[i];
+      }
+      return null;
+    }
+
+    function applyData(data) {
+      if (data.error) throw new Error(data.error);
+      activenessData = data.students || [];
+      categories = data.categories || [];
+    }
+
+    function refresh() {
+      return EQApi.get({ action: 'getAllActiveness', className: currentClass() }).then(applyData);
+    }
+
+    // Teacher write. The rid stops a retried request from giving the XP twice.
+    function teacherWrite(params) {
+      var teacher = EQAuth.getTeacher();
+      params.username = teacher.username;
+      params.password = teacher.password;
+      params.rid = 'web-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+      return EQApi.get(params).then(function(data) {
+        if (!data || data.success === false || data.error) throw new Error((data && data.error) || 'Could not save');
+        return data;
+      });
+    }
+
     function loadActiveness() {
       if (!EQAuth.showTeacherGate({ accessId: 'accessCard', appId: 'appPanel', pillId: 'loginPill' })) return;
-      var cls = document.getElementById('classSelect').value;
       var btn = document.getElementById('loadBtn');
       btn.disabled = true;
       btn.textContent = 'Loading...';
       saving = {};
-      document.getElementById('activenessList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading Level / XP...</h2><p class="empty-copy">Fetching ' + escapeHtml(cls) + ' participation records.</p></div>';
+      openNo = null;
+      document.getElementById('activenessList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Loading...</h2><p class="empty-copy">Getting XP for ' + escapeHtml(currentClass()) + '.</p></div>';
 
-      EQApi.get({ action: 'getAllActiveness', className: cls }).then(function(data) {
-        if (data.error) throw new Error(data.error);
-        activenessData = data.students || [];
+      refresh().then(function() {
         renderActiveness();
-        showToast('Level / XP loaded', 'ok');
       }).catch(function(err) {
-        document.getElementById('activenessList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Could not load Level / XP.</h2><p class="empty-copy">' + escapeHtml(err.message) + '</p></div>';
+        document.getElementById('activenessList').innerHTML = '<div class="empty-card"><h2 class="empty-title">Could not load XP.</h2><p class="empty-copy">' + escapeHtml(err.message) + '</p></div>';
         showToast(err.message, 'err');
       }).finally(function() {
         btn.disabled = false;
-        btn.textContent = 'Load Level / XP';
+        btn.textContent = 'Reload';
         updateSummary();
       });
     }
@@ -278,11 +521,47 @@
       });
     }
 
+    function stepper(no, label, xp, value, dataAttrs, busy, custom) {
+      var disabled = busy ? ' disabled' : '';
+      return '<div class="activity-control' + (custom ? ' custom' : '') + '">' +
+        '<div class="activity-label"><span title="' + escapeHtml(label) + '">' + escapeHtml(label) + '</span><small>+' + xp + ' XP</small></div>' +
+        '<div class="activity-actions">' +
+          '<button class="step-btn minus" type="button" data-delta="-1" ' + dataAttrs + disabled + ' aria-label="Remove one ' + escapeHtml(label) + '"' + (value ? '' : ' disabled') + '>−</button>' +
+          '<div class="activity-value">' + value + '</div>' +
+          '<button class="step-btn" type="button" data-delta="1" ' + dataAttrs + disabled + ' aria-label="Add one ' + escapeHtml(label) + '">+</button>' +
+        '</div>' +
+      '</div>';
+    }
+
+    function giveForm(student) {
+      var no = escapeHtml(student.no);
+      var busy = saving[String(student.no) + '|give'];
+      if (String(openNo) !== String(student.no)) {
+        return '<div class="give-area"><button class="give-toggle" type="button" data-act="open" data-no="' + no + '">+ Give exact XP</button></div>';
+      }
+      var chips = categories.map(function(cat, i) {
+        return '<button class="xp-chip" type="button" data-act="chip" data-no="' + no + '" data-i="' + i + '"' + (busy ? ' disabled' : '') + '>' + escapeHtml(cat.name) + ' +' + escapeHtml(cat.points) + '</button>';
+      }).join('');
+      return '<div class="give-area"><div class="give-form">' +
+        (chips ? '<p class="give-hint">Tap a saved reason:</p><div class="chip-row">' + chips + '</div><p class="give-hint">Or type a new one:</p>' : '<p class="give-hint">Type a reason and how many XP:</p>') +
+        '<div class="give-row">' +
+          '<input type="text" maxlength="40" placeholder="Reason" aria-label="Reason" data-draft="reason" value="' + escapeHtml(draft.reason) + '"/>' +
+          '<input type="number" min="1" max="' + MAX_XP + '" step="1" inputmode="numeric" placeholder="XP" aria-label="XP amount" data-draft="points" value="' + escapeHtml(draft.points) + '"/>' +
+          '<button class="btn" type="button" data-act="give" data-no="' + no + '"' + (busy ? ' disabled' : '') + '>' + (busy ? 'Saving...' : 'Give') + '</button>' +
+        '</div>' +
+        '<div class="give-actions">' +
+          '<label class="keep-line"><input type="checkbox" data-draft="keep"' + (draft.keep ? ' checked' : '') + '/> Keep as a saved reason for next time</label>' +
+          '<button class="link-btn" type="button" data-act="close">Close</button>' +
+        '</div>' +
+      '</div></div>';
+    }
+
     function renderActiveness() {
       var list = document.getElementById('activenessList');
       var students = visibleStudents();
+      renderSavedButtons();
       if (!activenessData.length) {
-        list.innerHTML = '<div class="empty-card"><h2 class="empty-title">No Level / XP data loaded yet.</h2><p class="empty-copy">Choose a class and load its participation records.</p></div>';
+        list.innerHTML = '<div class="empty-card"><h2 class="empty-title">No students yet.</h2><p class="empty-copy">Choose a class to see its XP.</p></div>';
         updateSummary();
         return;
       }
@@ -293,71 +572,160 @@
       }
 
       list.innerHTML = students.map(function(student) {
-        var indicator = student.Indicator || 'No indicator';
-        var low = Number(student.Total || 0) < 5;
-        return '<article class="activeness-card student-card" data-no="' + escapeHtml(student.no) + '">' +
+        var no = escapeHtml(student.no);
+        var total = Number(student.Total || 0);
+        var base = ACTS.map(function(activity) {
+          var busy = saving[String(student.no) + '|' + activity.key];
+          return stepper(student.no, activity.label, activity.xp, Number(student[activity.prop] || 0),
+            'data-act="step" data-no="' + no + '" data-key="' + escapeHtml(activity.key) + '"', busy, false);
+        }).join('');
+        var custom = (student.CustomAwards || []).map(function(award, i) {
+          var busy = saving[String(student.no) + '|award|' + award.reason + '|' + award.points];
+          return stepper(student.no, award.reason, award.points, Number(award.count || 0),
+            'data-act="award" data-no="' + no + '" data-i="' + i + '"', busy, true);
+        }).join('');
+        return '<article class="activeness-card student-card" data-no="' + no + '">' +
           '<div class="student-row">' +
             '<div class="avatar">' + escapeHtml(initials(student)) + '</div>' +
-            '<div><div class="student-name">' + escapeHtml(student.nickname || student.name) + '</div><div class="student-meta">No. ' + escapeHtml(student.no) + (student.nickname ? ' · ' + escapeHtml(student.name) : '') + '</div></div>' +
-            '<div class="student-stats"><span class="score-pill">' + escapeHtml(student.Total || 0) + ' pts</span><span class="indicator-pill ' + (low ? 'low' : '') + '">' + escapeHtml(indicator) + '</span></div>' +
+            '<div><div class="student-name">' + escapeHtml(student.nickname || student.name) + '</div><div class="student-meta">No. ' + no + (student.nickname ? ' · ' + escapeHtml(student.name) : '') + '</div></div>' +
+            '<div class="student-stats"><span class="level-pill">Level ' + levelFromXP(total) + '</span><span class="score-pill">' + total.toLocaleString() + ' XP</span></div>' +
           '</div>' +
-          '<div class="activity-grid">' + ACTS.map(function(activity) {
-            var value = Number(student[activity.prop] || 0);
-            var key = String(student.no) + '|' + activity.key;
-            var disabled = saving[key] ? 'disabled' : '';
-            return '<div class="activity-control">' +
-              '<div class="activity-label">' + escapeHtml(activity.label) + '</div>' +
-              '<div class="activity-actions">' +
-                '<button class="step-btn minus" type="button" onclick="changeActiveness(&quot;' + escapeHtml(student.no) + '&quot;,&quot;' + escapeHtml(activity.key) + '&quot;,-1)" ' + disabled + '>-</button>' +
-                '<div class="activity-value">' + value + '</div>' +
-                '<button class="step-btn" type="button" onclick="changeActiveness(&quot;' + escapeHtml(student.no) + '&quot;,&quot;' + escapeHtml(activity.key) + '&quot;,1)" ' + disabled + '>+</button>' +
-              '</div>' +
-            '</div>';
-          }).join('') + '</div>' +
+          '<div class="activity-grid">' + base + custom + '</div>' +
+          giveForm(student) +
         '</article>';
       }).join('');
       updateSummary();
     }
 
-    function changeActiveness(studentNo, column, delta) {
-      var teacher = EQAuth.getTeacher();
-      var cls = document.getElementById('classSelect').value;
-      var key = String(studentNo) + '|' + column;
+    function renderSavedButtons() {
+      var box = document.getElementById('savedButtons');
+      if (!categories.length) { box.hidden = true; box.innerHTML = ''; return; }
+      box.hidden = false;
+      box.innerHTML = '<h3>Saved reasons</h3><div class="chip-row">' + categories.map(function(cat, i) {
+        return '<span class="saved-chip">' + escapeHtml(cat.name) + ' +' + escapeHtml(cat.points) +
+          '<button type="button" data-act="delcat" data-i="' + i + '" aria-label="Delete saved reason ' + escapeHtml(cat.name) + '">×</button></span>';
+      }).join('') + '</div>';
+    }
+
+    function save(key, write, okMessage) {
       saving[key] = true;
       renderActiveness();
-      EQApi.get({
-        action: 'incrementActiveness',
-        username: teacher.username,
-        password: teacher.password,
-        className: cls,
-        studentNo: studentNo,
-        column: column,
-        delta: delta
-      }).then(function(data) {
-        if (!data.success) throw new Error(data.error || 'Could not update activeness');
-        return EQApi.get({ action: 'getAllActiveness', className: cls });
-      }).then(function(data) {
-        if (data.error) throw new Error(data.error);
-        activenessData = data.students || [];
-        showToast('Level / XP updated', 'ok');
+      return write().then(refresh).then(function() {
+        showToast(okMessage, 'ok');
+        return true;
       }).catch(function(err) {
         showToast(err.message, 'err');
+        return false;
       }).finally(function() {
         delete saving[key];
         renderActiveness();
       });
     }
 
+    function changeActiveness(studentNo, column, delta) {
+      save(String(studentNo) + '|' + column, function() {
+        return teacherWrite({ action: 'incrementActiveness', className: currentClass(), studentNo: studentNo, column: column, delta: delta });
+      }, 'XP updated');
+    }
+
+    function awardXp(studentNo, reason, points, delta, key) {
+      var student = findStudent(studentNo);
+      var who = student ? (student.nickname || student.name) : 'student';
+      return save(key, function() {
+        return teacherWrite({ action: 'awardXp', className: currentClass(), studentNo: studentNo, reason: reason, points: points, delta: delta });
+      }, delta < 0 ? 'Removed ' + points + ' XP from ' + who : '+' + points + ' XP for ' + who);
+    }
+
+    function giveTyped(studentNo) {
+      var reason = String(draft.reason || '').trim();
+      var points = Number(draft.points);
+      if (!reason) { showToast('Type a reason first', 'err'); return; }
+      if (reason.length > 40) { showToast('Reason is too long (40 letters max)', 'err'); return; }
+      if (!Number.isInteger(points) || points < 1 || points > MAX_XP) { showToast('XP must be a whole number from 1 to 1,000', 'err'); return; }
+      var key = String(studentNo) + '|give';
+      var keep = draft.keep;
+      var first = keep
+        ? teacherWrite({ action: 'saveXpCategory', name: reason, points: points }).catch(function(err) {
+            showToast('Could not keep the reason: ' + err.message, 'err');
+          })
+        : Promise.resolve();
+      first.then(function() {
+        return awardXp(studentNo, reason, points, 1, key);
+      }).then(function(ok) {
+        if (ok) { draft = { reason: '', points: '', keep: false }; openNo = null; renderActiveness(); }
+      });
+    }
+
+    function deleteCategory(i) {
+      var cat = categories[i];
+      if (!cat) return;
+      if (!confirm('Delete the saved reason "' + cat.name + '"? XP already given stays.')) return;
+      teacherWrite({ action: 'deleteXpCategory', name: cat.name }).then(refresh).then(function() {
+        showToast('Saved reason deleted', 'ok');
+      }).catch(function(err) {
+        showToast(err.message, 'err');
+      }).finally(renderActiveness);
+    }
+
+    document.getElementById('activenessList').addEventListener('click', function(e) {
+      var btn = e.target.closest('button[data-act]');
+      if (!btn || btn.disabled) return;
+      var act = btn.getAttribute('data-act');
+      var no = btn.getAttribute('data-no');
+      var student = no != null ? findStudent(no) : null;
+      if (act === 'step') {
+        changeActiveness(no, btn.getAttribute('data-key'), Number(btn.getAttribute('data-delta')));
+      } else if (act === 'award' && student) {
+        var award = (student.CustomAwards || [])[Number(btn.getAttribute('data-i'))];
+        if (award) awardXp(no, award.reason, award.points, Number(btn.getAttribute('data-delta')), String(no) + '|award|' + award.reason + '|' + award.points);
+      } else if (act === 'open') {
+        if (String(openNo) !== String(no)) draft = { reason: '', points: '', keep: false };
+        openNo = no;
+        renderActiveness();
+        var input = document.querySelector('.student-card[data-no="' + CSS.escape(no) + '"] [data-draft="reason"]');
+        if (input) input.focus();
+      } else if (act === 'close') {
+        openNo = null;
+        renderActiveness();
+      } else if (act === 'chip') {
+        var cat = categories[Number(btn.getAttribute('data-i'))];
+        if (cat) awardXp(no, cat.name, Number(cat.points), 1, String(no) + '|give');
+      } else if (act === 'give') {
+        giveTyped(no);
+      }
+    });
+
+    document.getElementById('activenessList').addEventListener('input', function(e) {
+      var field = e.target.getAttribute('data-draft');
+      if (!field) return;
+      draft[field] = field === 'keep' ? e.target.checked : e.target.value;
+    });
+
+    document.getElementById('activenessList').addEventListener('change', function(e) {
+      if (e.target.getAttribute('data-draft') === 'keep') draft.keep = e.target.checked;
+    });
+
+    document.getElementById('activenessList').addEventListener('keydown', function(e) {
+      if (e.key !== 'Enter' || !e.target.getAttribute('data-draft')) return;
+      var card = e.target.closest('.student-card');
+      if (card) giveTyped(card.getAttribute('data-no'));
+    });
+
+    document.getElementById('savedButtons').addEventListener('click', function(e) {
+      var btn = e.target.closest('button[data-act="delcat"]');
+      if (btn) deleteCategory(Number(btn.getAttribute('data-i')));
+    });
+
     function updateSummary() {
       var totalStudents = activenessData.length;
       var totalPoints = activenessData.reduce(function(sum, student) { return sum + Number(student.Total || 0); }, 0);
-      var average = totalStudents ? Math.round(totalPoints / totalStudents * 10) / 10 : 0;
-      var low = activenessData.filter(function(student) { return Number(student.Total || 0) < 5; }).length;
+      var average = totalStudents ? Math.round(totalPoints / totalStudents) : 0;
+      var top = activenessData.reduce(function(best, student) { return Math.max(best, levelFromXP(student.Total)); }, 0);
       document.getElementById('summaryGrid').innerHTML =
         '<div class="summary-card"><strong>' + totalStudents + '</strong><span>Students</span></div>' +
-        '<div class="summary-card"><strong>' + totalPoints + '</strong><span>Total Points</span></div>' +
-        '<div class="summary-card"><strong>' + average + '</strong><span>Average</span></div>' +
-        '<div class="summary-card"><strong>' + low + '</strong><span>Low Records</span></div>';
+        '<div class="summary-card"><strong>' + totalPoints.toLocaleString() + '</strong><span>Total XP</span></div>' +
+        '<div class="summary-card"><strong>' + average.toLocaleString() + '</strong><span>Average XP</span></div>' +
+        '<div class="summary-card"><strong>' + (top ? 'Level ' + top : '–') + '</strong><span>Top Level</span></div>';
     }
 
     function showToast(message, type) {

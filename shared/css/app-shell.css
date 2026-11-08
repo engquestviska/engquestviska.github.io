@@ -789,7 +789,7 @@ body.sidebar-collapsed.teacher-shell-enabled > footer {
 
 .teacher-shell-enabled > header {
   min-height: 0;
-  padding: 20px 28px 24px;
+  padding: 14px 28px 16px;
   color: var(--ink);
   background: #fff;
   border-bottom: 1px solid var(--line);
@@ -798,7 +798,7 @@ body.sidebar-collapsed.teacher-shell-enabled > footer {
 .teacher-shell-enabled header .topbar {
   width: 100%;
   min-height: 50px;
-  margin: 0 0 22px;
+  margin: 0 0 12px;
 }
 
 .teacher-shell-enabled header .brand img {
@@ -855,11 +855,11 @@ body.sidebar-collapsed.teacher-shell-enabled > footer {
 
 .teacher-shell-enabled header h1 {
   max-width: 900px;
-  margin: 7px 0 9px;
+  margin: 4px 0 6px;
   color: var(--ink);
   font-family: 'IBM Plex Sans', sans-serif;
-  font-size: clamp(1.65rem, 3vw, 2.55rem);
-  line-height: 1.08;
+  font-size: clamp(1.2rem, 2vw, 1.6rem);
+  line-height: 1.2;
 }
 
 .teacher-shell-enabled header .hero-copy {
@@ -1222,7 +1222,10 @@ body.sidebar-collapsed.teacher-shell-enabled > footer {
   .student-shell-enabled .hero {
     grid-template-columns: 1fr;
   }
-  .teacher-shell-enabled header .topbar { margin-bottom: 16px; }
+  .teacher-shell-enabled header .topbar { margin-bottom: 8px; }
+  .teacher-shell-enabled header .hero-copy,
+  .teacher-shell-enabled .panel-copy { display: none; }
+  .teacher-shell-enabled .panel { padding: 16px; }
   .teacher-shell-enabled header .nav-actions a { display: none; }
   .teacher-shell-enabled header .nav-actions button {
     min-width: 42px;
@@ -1240,10 +1243,16 @@ body.sidebar-collapsed.teacher-shell-enabled > footer {
     align-items: flex-start;
     flex-direction: column;
   }
-  .teacher-shell-enabled .controls,
-  .teacher-shell-enabled .summary-grid {
+  .teacher-shell-enabled .controls {
     grid-template-columns: 1fr;
   }
+  .teacher-shell-enabled .summary-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .teacher-shell-enabled .summary-card { padding: 10px 12px; }
+  .teacher-shell-enabled .summary-card strong { font-size: 1.15rem; }
+  .teacher-shell-enabled .panel-head .status-pill { display: none; }
 }
 
 /* Grade X student homepage fallback for cached preview HTML */
