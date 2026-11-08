@@ -41,12 +41,45 @@
     });
   }
 
+  // Requests that carry the teacher login go in the request body, never in the link, so the
+  // password does not end up in browser history or server logs. Values are sent as text, the
+  // same as they would be in a link, so the server reads them exactly as before.
+  function attemptPost(params) {
+    var body = {};
+    Object.keys(params).forEach(function(k) { body[k] = String(params[k]); });
+    var ctrl = typeof AbortController === 'function' ? new AbortController() : null;
+    var timer = setTimeout(function() { if (ctrl) ctrl.abort(); }, 20000);
+    return fetch(API_URL, {
+      method: 'POST',
+      // text/plain keeps this a "simple" request (no extra preflight round trip).
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(body),
+      signal: ctrl ? ctrl.signal : undefined
+    }).then(function(res) {
+      if (!res.ok && res.status !== 500) throw new Error('Network error (' + res.status + ')');
+      return res.json();
+    }).catch(function(err) {
+      throw new Error(err && err.name === 'AbortError' ? 'Connection timed out' : 'Network error');
+    }).finally(function() { clearTimeout(timer); });
+  }
+
+  // A teacher save gets a one-time request id. If the connection drops and the request is
+  // sent again, the server sees the same id and does not apply the save a second time.
+  function needsRequestId(params) {
+    var action = String(params.action || '');
+    return !!params.password && !params.rid && action !== 'checkLogin' && !/^get/i.test(action);
+  }
+
   // Retry transient transport failures (e.g. a 429 "too many requests" rate-limit)
   // with exponential backoff. A real response — including an {error:...} payload —
   // resolves and is NOT retried; only network/rate-limit failures back off.
   function apiGet(params, _attempt) {
     _attempt = _attempt || 0;
-    return attemptGet(params).catch(function(err) {
+    if (!_attempt && needsRequestId(params)) {
+      params = Object.assign({}, params, { rid: 'web-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10) });
+    }
+    var attempt = params.password ? attemptPost : attemptGet;
+    return attempt(params).catch(function(err) {
       if (_attempt < 3) {
         var delay = 800 * Math.pow(2, _attempt); // 0.8s → 1.6s → 3.2s
         return new Promise(function(resolve) { setTimeout(resolve, delay); })
