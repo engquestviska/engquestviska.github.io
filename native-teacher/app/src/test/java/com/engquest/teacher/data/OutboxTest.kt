@@ -285,6 +285,20 @@ class OutboxTest {
     }
 
     @Test
+    fun `a new change replaces a run that is waiting, so it goes now`() = runBlocking {
+        outbox.enqueue("addStrike", "XE1", mapOf("studentId" to "1"))
+        val waiting = waitingRuns(work)
+        assertTrue(waiting.isNotEmpty())
+
+        outbox.enqueue("addStrike", "XE1", mapOf("studentId" to "2"))
+
+        val fresh = waitingRuns(work)
+        assertTrue(fresh.none { it in waiting })
+        assertEquals(1, fresh.size)
+        assertEquals(2, outbox.pending.first())
+    }
+
+    @Test
     fun `sendNow leaves a run that is sending alone`() = runBlocking {
         val started = CountDownLatch(1)
         val release = CountDownLatch(1)

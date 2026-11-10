@@ -83,7 +83,10 @@ import com.engquest.teacher.ui.xp.XpScreen
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import com.engquest.teacher.ui.theme.Brand
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
+private const val SEND_NUDGE_MS = 15_000L
 
 private val PageBackground = Color(0xFFF4F5FB)
 private val TabOff = Color(0xFF94A3B8)
@@ -152,6 +155,14 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
     val pending by graph.outbox.pending.collectAsState(initial = 0)
     val failed by graph.outbox.failed.collectAsState(initial = emptyList())
     val online by graph.online.collectAsState()
+    // While the app is open with changes waiting, try again every 15 seconds instead of sitting
+    // out a growing retry pause (what turning the internet off and on used to do by hand).
+    LaunchedEffect(pending > 0 && online) {
+        while (pending > 0 && online) {
+            delay(SEND_NUDGE_MS)
+            graph.outbox.sendNow()
+        }
+    }
     var sheet by remember { mutableStateOf<ShellSheet?>(null) }
     var askLogout by remember { mutableStateOf(false) }
     val guard = remember { LeaveGuard() }
@@ -273,11 +284,12 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
                 } else {
                     TabContent(tab, graph, classInfo, guard, submissions, feed)
                 }
-                // Floats above the page, so the page doesn't jump when it appears or goes away.
+                // Floats at the top of the page (not in it), so the page doesn't jump when it
+                // appears or goes away, and it never covers the buttons at the bottom.
                 StatusBar(
                     pending, failed.size, online,
                     onOpenFailed = { sheet = ShellSheet.FAILED },
-                    modifier = Modifier.align(Alignment.BottomCenter),
+                    modifier = Modifier.align(Alignment.TopCenter),
                 )
             }
             TabBar(tab, badges = mapOf(Tab.SUBMISSIONS to submissions.waiting)) { picked ->

@@ -1,6 +1,6 @@
 {
-  "versionCode": 11,
-  "versionName": "3.8",
+  "versionCode": 12,
+  "versionName": "3.9",
   "apk": "EngQuestTeacher-k4m8q2zt.apk",
-  "notes": "\"Changes waiting to send\" now floats above the tabs, so the page no longer jumps."
+  "notes": "Changes send faster on slow wifi, and \"waiting to send\" now floats at the top so it never covers Approve."
 }

@@ -65,7 +65,15 @@ class Outbox(
                 createdAt = now,
             ),
         )
-        schedule()
+        // The teacher is working right now: a run sitting out a retry pause (a single slow
+        // request on school wifi) is replaced, so this change goes now instead of queueing
+        // behind that pause. A run that is sending right now is left alone and appended to.
+        val runs = withContext(Dispatchers.IO) { work.getWorkInfosForUniqueWork(WORK_NAME).get() }
+        if (runs.none { it.state == WorkInfo.State.RUNNING } && runs.any { it.state == WorkInfo.State.ENQUEUED }) {
+            work.enqueueUniqueWork(WORK_NAME, ExistingWorkPolicy.REPLACE, sendRequest())
+        } else {
+            schedule()
+        }
         return id
     }
 
