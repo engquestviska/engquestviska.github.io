@@ -54,7 +54,7 @@ class SubmissionsTest {
 
     // Ayu (3) has two photos waiting; Budi (5) one with a task code that has no score column;
     // Citra (7) is already approved; one row belongs to another class.
-    private val submissions = """{"success":true,"pending":4,"submissions":[
+    private var submissions = """{"success":true,"pending":4,"submissions":[
         {"subId":"s1","fileId":"s1","className":"XE1","studentNo":"3","studentName":"Ayu Lestari","task":"C1T1","timestamp":"2026-10-20","status":"pending"},
         {"subId":"s2","fileId":"s2","className":"XE1","studentNo":"3","studentName":"Ayu Lestari","task":"C1T2","timestamp":"2026-10-21","status":"pending"},
         {"subId":"s3","fileId":"s3","className":"XE1","studentNo":"5","studentName":"Budi Santoso","task":"C9X","timestamp":"2026-10-21","status":"pending"},
@@ -121,9 +121,9 @@ class SubmissionsTest {
     @Test
     fun `approve with a score enqueues score, review, status in that order`() {
         show()
-        waitFor("scoreBox")
+        waitFor("scoreBox-C1T1")
         compose.onNodeWithTag("subWho").assertTextContains("Ayu Lestari", substring = true)
-        compose.onNodeWithTag("scoreBox").performTextReplacement("85")
+        compose.onNodeWithTag("scoreBox-C1T1").performTextReplacement("85")
         compose.onNodeWithTag("approve").performClick()
         compose.waitUntil(WAIT) { unsent() == 5 }
 
@@ -155,7 +155,7 @@ class SubmissionsTest {
     @Test
     fun `approving updates the badge and the saved list at once`() {
         show()
-        waitFor("scoreBox")
+        waitFor("scoreBox-C1T1")
         compose.onNodeWithTag("tabBadge-submissions", useUnmergedTree = true).assertTextEquals("3")
         compose.onNodeWithTag("approve").performClick()
         compose.onNodeWithTag("tabBadge-submissions", useUnmergedTree = true).assertTextEquals("1")
@@ -168,13 +168,48 @@ class SubmissionsTest {
     }
 
     @Test
+    fun `three photos of one task get one score box, one score and one tick`() {
+        submissions = """{"success":true,"pending":3,"submissions":[
+            {"subId":"s1","fileId":"s1","className":"XE1","studentNo":"3","studentName":"Ayu Lestari","task":"C1T1","timestamp":"2026-10-20","status":"pending"},
+            {"subId":"s1b","fileId":"s1b","className":"XE1","studentNo":"3","studentName":"Ayu Lestari","task":"c1t1","timestamp":"2026-10-20","status":"pending"},
+            {"subId":"s1c","fileId":"s1c","className":"XE1","studentNo":"3","studentName":"Ayu Lestari","task":"C1T1","timestamp":"2026-10-20","status":"pending"}]}"""
+        // Scores already saved a copy of Chapter 1, without Ayu's Task 1.
+        val chapterKey = Repo.cacheKey("getChapterScores", "XE1", "4")
+        runBlocking {
+            graph.repo.putStored(
+                chapterKey,
+                Json.parseToJsonElement(
+                    """{"ok":true,"inputCols":["Task 1"],"students":[{"no":3,"name":"Ayu Lestari","scores":{"Task 1":""}}]}""",
+                ) as JsonObject,
+            )
+        }
+        show()
+        waitFor("scoreBox-C1T1")
+        assertEquals(1, compose.onAllNodesWithTag("scoreBox-C1T1").fetchSemanticsNodes().size)
+        compose.onNodeWithTag("scoreBox-C1T1").performTextReplacement("85")
+        compose.onNodeWithTag("approve").performClick()
+        compose.waitUntil(WAIT) { unsent() == 5 }
+
+        assertEquals("saveChapterScore", item(1).action)
+        assertEquals("85", params(1).str("value"))
+        assertEquals(listOf("s1", "s1b", "s1c"), (2L..4L).map { assertEquals("reviewTaskSubmission", item(it).action); params(it).str("subId") })
+        assertEquals("saveTaskStatus", item(5).action)
+
+        // Scores' saved copy already has the 85, so it shows before the server has it.
+        compose.waitUntil(WAIT) {
+            val saved = runBlocking { graph.repo.storedJson(chapterKey) }
+            saved.toString().contains("\"Task 1\":\"85\"")
+        }
+    }
+
+    @Test
     fun `no score box for a task code it can't map`() {
         show()
         waitFor("queue-5")
         pick("5")
         waitForText("no score column")
         compose.onNodeWithTag("subWho").assertTextContains("Budi Santoso", substring = true)
-        assertTrue(compose.onAllNodesWithTag("scoreBox").fetchSemanticsNodes().isEmpty())
+        assertTrue(compose.onAllNodesWithTag("scoreBox-C9X").fetchSemanticsNodes().isEmpty())
     }
 
     @Test
@@ -209,8 +244,8 @@ class SubmissionsTest {
     @Test
     fun `a typed score is kept back by the leave check`() {
         show()
-        waitFor("scoreBox")
-        compose.onNodeWithTag("scoreBox").performTextReplacement("90")
+        waitFor("scoreBox-C1T1")
+        compose.onNodeWithTag("scoreBox-C1T1").performTextReplacement("90")
         compose.onAllNodesWithText("XP")[0].performClick()
         waitFor("confirmLeave")
     }

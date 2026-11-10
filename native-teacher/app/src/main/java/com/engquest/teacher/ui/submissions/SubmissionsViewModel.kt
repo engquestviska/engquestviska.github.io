@@ -13,6 +13,7 @@ import com.engquest.teacher.domain.Core
 import com.engquest.teacher.domain.SubmissionGroup
 import com.engquest.teacher.domain.SubmissionRow
 import com.engquest.teacher.ui.onMain
+import com.engquest.teacher.ui.scores.withScore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -25,6 +26,15 @@ import kotlinx.serialization.json.contentOrNull
 
 /** Where a notification points: one student's submissions in one class. */
 data class SubmissionLink(val className: String, val studentNo: String)
+
+/**
+ * One task of the current student still waiting, however many photos it has: one score box each.
+ * [place] is the score column ("Chapter 1 Task 1"), or null when the task code has none.
+ */
+data class TaskScore(val key: String, val task: String, val place: String?, val photos: Int)
+
+/** Typed scores belong to a student's task, not to a photo ("c1t1 " and "C1T1" are the same task). */
+internal fun taskKey(studentNo: String, task: String): String = studentNo + "|" + task.trim().uppercase()
 
 /** The line under the photos: what just happened, or what is wrong. */
 data class SubNote(val text: String, val isError: Boolean)
@@ -61,7 +71,8 @@ internal fun withStatus(raw: JsonObject, statuses: Map<String, String>): JsonObj
 }
 
 /**
- * Submissions for one class: one student at a time, their photos, an optional score per photo,
+ * Submissions for one class: one student at a time, their photos, an optional score per task
+ * (three photos of one task still get one score),
  * then Approve (or Send back for one photo). The decision shows at once and goes into the
  * outbox, one at a time and in the order made; the saved copy of the list is updated too, so the
  * queue and the tab badge stay right after a reopen while offline.
@@ -83,7 +94,7 @@ class SubmissionsViewModel(
     /** Work for the outbox, run one after another so decisions keep their order. */
     private val work = Channel<suspend () -> Unit>(Channel.UNLIMITED)
 
-    /** Scores typed and not yet approved, by subId. */
+    /** Scores typed and not yet approved, by [taskKey]. */
     private val scores = mutableStateMapOf<String, String>()
     private var selectedNo by mutableStateOf<String?>(null)
 
@@ -117,6 +128,18 @@ class SubmissionsViewModel(
     val position: Int get() = current?.let { c -> groups.indexOfFirst { it.studentNo == c.studentNo } } ?: -1
 
     val currentItem: SubmissionRow? get() = current?.items?.let { it.getOrNull(slide) ?: it.firstOrNull() }
+
+    /** The current student's waiting tasks, in the order their photos come: one score box each. */
+    val waitingTasks: List<TaskScore> by derivedStateOf {
+        val g = current ?: return@derivedStateOf emptyList()
+        g.items.filter { it.status == PENDING }
+            .groupBy { taskKey(g.studentNo, it.task) }
+            .map { (key, photos) ->
+                val task = photos.first().task.trim()
+                val place = Core.taskToChapterCol(task)?.let { "Chapter ${(it.chapter.toIntOrNull() ?: 4) - 3} ${it.column}" }
+                TaskScore(key, task, place, photos.size)
+            }
+    }
 
     /** True while a typed score would be lost by leaving. */
     val hasTypedScores: Boolean by derivedStateOf { scores.values.any { it.isNotBlank() } }
@@ -193,14 +216,14 @@ class SubmissionsViewModel(
         groups.getOrNull(position + 1)?.let { choose(it.studentNo) }
     }
 
-    fun typed(subId: String): String = scores[subId].orEmpty()
+    fun typed(key: String): String = scores[key].orEmpty()
 
-    fun type(subId: String, text: String) {
-        scores[subId] = text
+    fun type(key: String, text: String) {
+        scores[key] = text
         note = null
     }
 
-    fun scoreOk(subId: String): Boolean = Core.validateScore(typed(subId)).ok
+    fun scoreOk(key: String): Boolean = Core.validateScore(typed(key)).ok
 
     /** Drops typed scores (the teacher chose to leave without approving). */
     fun forgetTyped() {
@@ -208,44 +231,44 @@ class SubmissionsViewModel(
     }
 
     /**
-     * Approves every waiting photo of the current student. For each photo, in order: its score
-     * (if one was typed and the task has a score column), the review, then the task tick.
+     * Approves every waiting photo of the current student. For each task, in order: its score (if
+     * one was typed and the task has a score column), the review of each of its photos, then the
+     * task tick. The score also goes into the saved Scores sheet, so Scores shows it at once.
      */
     fun approve() {
         val g = current ?: return
         val before = raw ?: return
         val pend = g.items.filter { it.status == PENDING }
         if (pend.isEmpty()) return
-        for (item in pend) {
-            val check = Core.validateScore(typed(item.subId))
+        val tasks = pend.groupBy { taskKey(g.studentNo, it.task) }
+        for ((key, photos) in tasks) {
+            val check = Core.validateScore(typed(key))
             if (!check.ok) {
-                slide = g.items.indexOf(item)
-                note = SubNote("${check.error} (${Core.taskLabel(item.task)})", isError = true)
+                slide = g.items.indexOf(photos.first())
+                note = SubNote("${check.error} (${Core.taskLabel(photos.first().task)})", isError = true)
                 return
             }
         }
-        val plan = pend.map { it to Core.validateScore(typed(it.subId)).value }
+        val plan = tasks.map { (key, photos) -> Triple(key, photos, Core.validateScore(typed(key)).value) }
         val first = Core.firstName(g.studentName)
         val oldGroups = groups
         raw = withStatus(before, pend.associate { it.subId to REVIEWED })
-        pend.forEach { scores.remove(it.subId) }
+        tasks.keys.forEach { scores.remove(it) }
         moveOnFrom(g, oldGroups)
         note = SubNote("Approved ${pend.size} · $first", isError = false)
         inFlight++
         work.trySend {
-            var done = 0
+            val queued = mutableSetOf<String>()
             try {
                 try {
-                    for ((item, score) in plan) {
-                        enqueueApproval(item, score)
-                        done++
-                    }
+                    for ((_, photos, score) in plan) enqueueApproval(g.studentNo, photos, score) { queued += it }
                 } catch (e: Throwable) {
                     // The rest never reached the outbox: put them back as waiting, with their scores.
-                    val left = plan.drop(done)
+                    val left = plan.filter { (_, photos, _) -> photos.any { it.subId !in queued } }
+                    val back = left.flatMap { it.second }.filter { it.subId !in queued }.associate { it.subId to PENDING }
                     scope.onMain {
-                        raw = raw?.let { r -> withStatus(r, left.associate { it.first.subId to PENDING }) }
-                        left.forEach { (item, score) -> if (score.isNotEmpty()) scores[item.subId] = score }
+                        raw = raw?.let { withStatus(it, back) }
+                        left.forEach { (key, _, score) -> if (score.isNotEmpty()) scores[key] = score }
                         note = SubNote("Could not approve $first's work. Please try again.", isError = true)
                     }
                 }
@@ -263,7 +286,11 @@ class SubmissionsViewModel(
         if (item.status != PENDING) return
         val oldGroups = groups
         raw = withStatus(before, mapOf(item.subId to REJECTED))
-        scores.remove(item.subId)
+        // The score stays while another photo of the same task is still waiting.
+        val key = taskKey(g.studentNo, item.task)
+        if (g.items.none { it.status == PENDING && it.subId != item.subId && taskKey(g.studentNo, it.task) == key }) {
+            scores.remove(key)
+        }
         if (g.items.none { it.status == PENDING && it.subId != item.subId }) moveOnFrom(g, oldGroups)
         slide = slide.coerceAtMost((current?.items?.size ?: 1) - 1).coerceAtLeast(0)
         val label = Core.taskLabel(item.task).ifBlank { "photo" }
@@ -300,8 +327,15 @@ class SubmissionsViewModel(
         select(now.getOrNull(idx)?.studentNo)
     }
 
-    private suspend fun enqueueApproval(item: SubmissionRow, score: String) {
-        val map = Core.taskToChapterCol(item.task)
+    /** Queues one task: its score, each photo's review (reported through [reviewed]), then the tick. */
+    private suspend fun enqueueApproval(
+        studentNo: String,
+        photos: List<SubmissionRow>,
+        score: String,
+        reviewed: (String) -> Unit,
+    ) {
+        val task = photos.first().task.trim()
+        val map = Core.taskToChapterCol(task)
         if (score.isNotEmpty() && map != null) {
             graph.outbox.enqueue(
                 "saveChapterScore",
@@ -309,21 +343,28 @@ class SubmissionsViewModel(
                 mapOf(
                     "className" to classInfo.id,
                     "chapter" to map.chapter,
-                    "studentNo" to item.studentNo,
+                    "studentNo" to studentNo,
                     "column" to map.column,
                     "value" to score,
                 ),
             )
+            // Scores shows its saved copy first: put the score there too, so it is there before the server has it.
+            val key = Repo.cacheKey("getChapterScores", classInfo.id, map.chapter)
+            runCatching {
+                graph.repo.storedJson(key)?.let { graph.repo.putStored(key, withScore(it, studentNo, map.column, score, final = false)) }
+            }
         }
-        graph.outbox.enqueue("reviewTaskSubmission", classInfo.id, mapOf("subId" to item.subId, "decision" to "approved"))
-        val task = item.task.trim()
+        for (item in photos) {
+            graph.outbox.enqueue("reviewTaskSubmission", classInfo.id, mapOf("subId" to item.subId, "decision" to "approved"))
+            reviewed(item.subId)
+        }
         if (task.isNotEmpty()) {
             graph.outbox.enqueue(
                 "saveTaskStatus",
                 classInfo.id,
                 mapOf(
                     "className" to classInfo.id,
-                    "studentNo" to item.studentNo,
+                    "studentNo" to studentNo,
                     "tasks" to JsonObject(mapOf(task to JsonPrimitive(true))).toString(),
                 ),
             )

@@ -12,6 +12,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performTextReplacement
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeDown
 import com.engquest.teacher.AppGraph
 import com.engquest.teacher.testGraph
 import com.engquest.teacher.ui.TeacherApp
@@ -45,6 +47,7 @@ class ScoresTest {
     val compose = createComposeRule()
 
     private val server = MockWebServer()
+    private val chapterReads = java.util.concurrent.atomic.AtomicInteger(0)
     private val context: Context = RuntimeEnvironment.getApplication()
     private lateinit var graph: AppGraph
 
@@ -60,9 +63,11 @@ class ScoresTest {
     fun setUp() {
         server.start()
         server.dispatcher = object : Dispatcher() {
-            override fun dispatch(request: RecordedRequest) = MockResponse().setBody(
-                if (request.requestUrl?.queryParameter("action") == "getFinalScores") final else chapter,
-            )
+            override fun dispatch(request: RecordedRequest): MockResponse {
+                val action = request.requestUrl?.queryParameter("action")
+                if (action == "getChapterScores") chapterReads.incrementAndGet()
+                return MockResponse().setBody(if (action == "getFinalScores") final else chapter)
+            }
         }
         context.getSharedPreferences("session-test", Context.MODE_PRIVATE).edit().clear()
             .putString("username", "teacher").putString("password", "pw1").commit()
@@ -85,6 +90,15 @@ class ScoresTest {
     private fun oldest() = runBlocking { graph.db.outboxDao().oldestPending() }
 
     private fun params(json: String) = Json.parseToJsonElement(json) as JsonObject
+
+    @Test
+    fun `pulling the list down reads the sheet again`() {
+        show()
+        waitFor("score-1")
+        compose.waitUntil(5_000) { chapterReads.get() == 1 }
+        compose.onNodeWithTag("scoresList").performTouchInput { swipeDown() }
+        compose.waitUntil(5_000) { chapterReads.get() == 2 }
+    }
 
     @Test
     fun `Final tab labels the exam column ASAS`() {

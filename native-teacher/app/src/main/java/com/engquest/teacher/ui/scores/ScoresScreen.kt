@@ -20,7 +20,9 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -128,6 +130,7 @@ private fun shortLabel(col: String): String = when (val l = Core.colLabel(col)) 
 }
 
 @Composable
+@OptIn(ExperimentalMaterial3Api::class)
 private fun ColumnScope.ScoresBody(vm: ScoresViewModel) {
     val focus = LocalFocusManager.current
     val columns = vm.columns
@@ -164,15 +167,25 @@ private fun ColumnScope.ScoresBody(vm: ScoresViewModel) {
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(start = 4.dp, bottom = 8.dp).testTag("scStatus"),
     )
-    Column(
-        Modifier.weight(1f).verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
+    // Pull the list down to read the sheet again (e.g. after scoring in Submissions).
+    PullToRefreshBox(
+        isRefreshing = vm.refreshing,
+        onRefresh = {
+            focus.clearFocus()
+            vm.refresh()
+        },
+        modifier = Modifier.weight(1f).fillMaxWidth().testTag("scoresRefresh"),
     ) {
-        val last = vm.students.lastIndex
-        vm.students.forEachIndexed { i, s ->
-            ScoreRow(vm, s, label = Core.colLabel(vm.column.orEmpty()), isLast = i == last)
+        Column(
+            Modifier.fillMaxSize().verticalScroll(rememberScrollState()).testTag("scoresList"),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            val last = vm.students.lastIndex
+            vm.students.forEachIndexed { i, s ->
+                ScoreRow(vm, s, label = Core.colLabel(vm.column.orEmpty()), isLast = i == last)
+            }
+            Box(Modifier.height(24.dp))
         }
-        Box(Modifier.height(24.dp))
     }
 }
 

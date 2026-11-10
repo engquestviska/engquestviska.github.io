@@ -196,6 +196,18 @@ class ScoresViewModel(
         note = null
     }
 
+    /** True while a pull-down refresh is reading the sheet again. */
+    var refreshing by mutableStateOf(false)
+        private set
+
+    /** Pull down: saves what is typed, sends any waiting changes now, then reads the sheet again. */
+    fun refresh() {
+        commitAll()
+        graph.outbox.sendNow()
+        refreshing = true
+        start()
+    }
+
     /** (Re)starts reading the current chapter; also what "Try again" does. */
     fun start() {
         loader?.cancel()
@@ -217,6 +229,11 @@ class ScoresViewModel(
                 }
                 loading = raw == null && c.refreshing
                 error = if (raw == null) c.error else null
+                if (!c.refreshing) {
+                    // A pull-down that could not reach the server says so instead of just stopping.
+                    if (refreshing && raw != null && c.error != null) note = ScoreNote(c.error, isError = true)
+                    refreshing = false
+                }
             }
         }
     }
@@ -315,7 +332,7 @@ class ScoresViewModel(
     companion object {
         const val KEY_CHAPTER = "scoreChapter"
         const val KEY_COLUMN = "scoreCol_"
-        const val HINT = "Type a score, then tap Next. Each score saves by itself."
+        const val HINT = "Type a score, then tap Next. Pull down to refresh."
     }
 }
 

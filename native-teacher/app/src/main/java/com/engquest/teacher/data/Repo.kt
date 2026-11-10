@@ -63,6 +63,9 @@ class Repo(
         db.cacheDao().put(CacheEntry(key, json.toString(), clock()))
     }
 
+    /** The saved copy for [key], if there is one. */
+    suspend fun storedJson(key: String): JsonObject? = stored(key).json
+
     private fun readFlow(key: String, store: Boolean, fetch: suspend () -> JsonObject): Flow<Cached> = channelFlow {
         val className = key.split('|').getOrNull(1).orEmpty()
         val rereads = Channel<Unit>(Channel.CONFLATED)

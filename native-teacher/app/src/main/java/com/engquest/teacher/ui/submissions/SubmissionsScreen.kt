@@ -88,8 +88,8 @@ private val PhotoNote = Color(0xFF94A3B8)
 
 /**
  * The Submissions tab: Waiting / All, one student at a time with their photos (swipe between
- * them, tap one to see it full screen), a score box when the task has a score column, then
- * Approve or Send back, and a strip of the other students below.
+ * them, tap one to see it full screen), one score box per waiting task that has a score column
+ * (however many photos it has), then Approve or Send back, and a strip of the other students below.
  */
 @Composable
 fun SubmissionsScreen(vm: SubmissionsViewModel, photos: Photos, classInfo: ClassInfo, guard: LeaveGuard) {
@@ -176,7 +176,8 @@ private fun ColumnScope.SubmissionsBody(vm: SubmissionsViewModel, g: SubmissionG
         key(g.studentNo, vm.showAll) {
             PhotoPager(vm, g, photos, onOpen = { viewing = it })
         }
-        SlideInfo(vm, g, item)
+        SlideInfo(g, item)
+        TaskScores(vm)
         if (vm.groups.size > 1) Queue(vm)
         Box(Modifier.height(12.dp))
     }
@@ -308,7 +309,7 @@ private fun PhotoPage(fileId: String, photos: Photos, onOpen: (ImageBitmap) -> U
 }
 
 @Composable
-private fun SlideInfo(vm: SubmissionsViewModel, g: SubmissionGroup, item: SubmissionRow) {
+private fun SlideInfo(g: SubmissionGroup, item: SubmissionRow) {
     val label = Core.taskLabel(item.task).ifBlank { "—" }
     val (pillText, pillBack, pillInk) = when (item.status) {
         REVIEWED -> Triple("$label · Approved", OkSoft, OkInk)
@@ -336,24 +337,32 @@ private fun SlideInfo(vm: SubmissionsViewModel, g: SubmissionGroup, item: Submis
             modifier = Modifier.background(pillBack, RoundedCornerShape(8.dp)).padding(horizontal = 8.dp, vertical = 4.dp),
         )
     }
-    if (item.status != PENDING) return
-    val map = Core.taskToChapterCol(item.task)
-    if (map == null) {
+}
+
+/** One score box per waiting task (a task sent as three photos is still one task, one score). */
+@Composable
+private fun TaskScores(vm: SubmissionsViewModel) {
+    val tasks = vm.waitingTasks
+    if (tasks.isEmpty()) return
+    tasks.filter { it.place != null }.forEach { ScoreBox(vm, it) }
+    val noColumn = tasks.filter { it.place == null }
+    if (noColumn.isNotEmpty()) {
+        val names = noColumn.joinToString(", ") { Core.taskLabel(it.task).ifBlank { "A photo without a task" } }
         Text(
-            "This task code has no score column, so approving only ticks it.",
+            if (noColumn.size == 1) "$names has no score column, so approving only ticks it."
+            else "$names have no score column, so approving only ticks them.",
             color = Muted,
             fontSize = 13.sp,
             modifier = Modifier.padding(top = 10.dp, start = 2.dp),
         )
-    } else {
-        ScoreBox(vm, item, "Chapter ${(map.chapter.toIntOrNull() ?: 4) - 3} ${map.column}")
     }
 }
 
 @Composable
-private fun ScoreBox(vm: SubmissionsViewModel, item: SubmissionRow, place: String) {
+private fun ScoreBox(vm: SubmissionsViewModel, task: TaskScore) {
     val focus = LocalFocusManager.current
-    val ok = vm.scoreOk(item.subId)
+    val ok = vm.scoreOk(task.key)
+    val label = Core.taskLabel(task.task)
     val shape = RoundedCornerShape(12.dp)
     Row(
         Modifier
@@ -366,12 +375,16 @@ private fun ScoreBox(vm: SubmissionsViewModel, item: SubmissionRow, place: Strin
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         Column(Modifier.weight(1f)) {
-            Text("Score · $place", color = Ink, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-            Text("Leave empty to approve without a score", color = Muted, fontSize = 12.sp)
+            Text("Score · ${task.place}", color = Ink, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            Text(
+                (if (task.photos > 1) "${task.photos} photos, one score · " else "") + "Leave empty for no score",
+                color = Muted,
+                fontSize = 12.sp,
+            )
         }
         BasicTextField(
-            value = vm.typed(item.subId),
-            onValueChange = { vm.type(item.subId, it) },
+            value = vm.typed(task.key),
+            onValueChange = { vm.type(task.key, it) },
             singleLine = true,
             textStyle = TextStyle(
                 color = if (ok) Brand else Bad,
@@ -385,8 +398,8 @@ private fun ScoreBox(vm: SubmissionsViewModel, item: SubmissionRow, place: Strin
             modifier = Modifier
                 .width(80.dp)
                 .height(46.dp)
-                .semantics { contentDescription = "Score for ${Core.taskLabel(item.task)}" }
-                .testTag("scoreBox"),
+                .semantics { contentDescription = "Score for $label" }
+                .testTag("scoreBox-${task.task.uppercase()}"),
             decorationBox = { inner ->
                 Box(
                     Modifier
@@ -395,7 +408,7 @@ private fun ScoreBox(vm: SubmissionsViewModel, item: SubmissionRow, place: Strin
                         .border(BorderStroke(1.5.dp, if (ok) Color(0xFF6366F1) else Bad), shape),
                     contentAlignment = Alignment.Center,
                 ) {
-                    if (vm.typed(item.subId).isEmpty()) Text("–", color = PhotoNote, fontSize = 19.sp, fontWeight = FontWeight.ExtraBold)
+                    if (vm.typed(task.key).isEmpty()) Text("–", color = PhotoNote, fontSize = 19.sp, fontWeight = FontWeight.ExtraBold)
                     inner()
                 }
             },
