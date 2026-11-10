@@ -1,0 +1,551 @@
+{
+ "students": [
+  {
+   "no": 1,
+   "name": "Student 1",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 80.25,
+    "Summative": 0
+   },
+   "average": 76.05,
+   "finalScore": 76,
+   "indicator": "Safe"
+  },
+  {
+   "no": 2,
+   "name": "Student 3",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 95,
+    "Summative": 85
+   },
+   "average": 96,
+   "finalScore": 96,
+   "indicator": "Safe"
+  },
+  {
+   "no": 3,
+   "name": "Student 4",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 90.75,
+    "Summative": 0
+   },
+   "average": 78.15,
+   "finalScore": 78,
+   "indicator": "Safe"
+  },
+  {
+   "no": 4,
+   "name": "Student 5",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 48.75,
+    "Summative": 85
+   },
+   "average": 86.75,
+   "finalScore": 87,
+   "indicator": "Safe"
+  },
+  {
+   "no": 5,
+   "name": "Student 6",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 80.75,
+    "Summative": 0
+   },
+   "average": 76.15,
+   "finalScore": 76,
+   "indicator": "Safe"
+  },
+  {
+   "no": 6,
+   "name": "Student 7",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 31.25,
+    "Summative": 0
+   },
+   "average": 66.25,
+   "finalScore": 66,
+   "indicator": "Not Safe"
+  },
+  {
+   "no": 7,
+   "name": "Student 8",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 60,
+    "Summative": 0
+   },
+   "average": 72,
+   "finalScore": 72,
+   "indicator": "Not Safe"
+  },
+  {
+   "no": 8,
+   "name": "Student 9",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 8.75,
+    "Summative": 82
+   },
+   "average": 78.15,
+   "finalScore": 78,
+   "indicator": "Safe"
+  },
+  {
+   "no": 9,
+   "name": "Student 10",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 80,
+    "Summative": 0
+   },
+   "average": 76,
+   "finalScore": 76,
+   "indicator": "Safe"
+  },
+  {
+   "no": 10,
+   "name": "Student 11",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 80,
+    "Summative": 0
+   },
+   "average": 76,
+   "finalScore": 76,
+   "indicator": "Safe"
+  },
+  {
+   "no": 11,
+   "name": "Student 12",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 84,
+    "Summative": 0
+   },
+   "average": 76.8,
+   "finalScore": 77,
+   "indicator": "Safe"
+  },
+  {
+   "no": 12,
+   "name": "Student 13",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 75,
+    "Summative": 95
+   },
+   "average": 94,
+   "finalScore": 94,
+   "indicator": "Safe"
+  },
+  {
+   "no": 13,
+   "name": "Student 14",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 67,
+    "Summative": 0
+   },
+   "average": 73.4,
+   "finalScore": 73,
+   "indicator": "Not Safe"
+  },
+  {
+   "no": 14,
+   "name": "Student 15",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 81,
+    "Summative": 0
+   },
+   "average": 76.2,
+   "finalScore": 76,
+   "indicator": "Safe"
+  },
+  {
+   "no": 15,
+   "name": "Student 16",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 97.5,
+    "Summative": 95
+   },
+   "average": 98.5,
+   "finalScore": 99,
+   "indicator": "Safe"
+  },
+  {
+   "no": 16,
+   "name": "Student 17",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 25,
+    "Summative": 85
+   },
+   "average": 82,
+   "finalScore": 82,
+   "indicator": "Safe"
+  },
+  {
+   "no": 17,
+   "name": "Student 18",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 68.75,
+    "Summative": 85
+   },
+   "average": 90.75,
+   "finalScore": 91,
+   "indicator": "Safe"
+  },
+  {
+   "no": 18,
+   "name": "Student 19",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 82.5,
+    "Summative": 0
+   },
+   "average": 76.5,
+   "finalScore": 77,
+   "indicator": "Safe"
+  },
+  {
+   "no": 19,
+   "name": "Student 20",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 33.75,
+    "Summative": 0
+   },
+   "average": 66.75,
+   "finalScore": 67,
+   "indicator": "Not Safe"
+  },
+  {
+   "no": 20,
+   "name": "Student 21",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": "",
+    "Task 2": "",
+    "Task 3": "",
+    "Formative": "",
+    "Summative": ""
+   },
+   "average": "",
+   "finalScore": "",
+   "indicator": ""
+  },
+  {
+   "no": 21,
+   "name": "Student 22",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 86,
+    "Summative": 0
+   },
+   "average": 77.2,
+   "finalScore": 77,
+   "indicator": "Safe"
+  },
+  {
+   "no": 22,
+   "name": "Student 23",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 80.25,
+    "Summative": 85
+   },
+   "average": 93.05,
+   "finalScore": 93,
+   "indicator": "Safe"
+  },
+  {
+   "no": 23,
+   "name": "Student 24",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 88.25,
+    "Summative": 0
+   },
+   "average": 77.65,
+   "finalScore": 78,
+   "indicator": "Safe"
+  },
+  {
+   "no": 24,
+   "name": "Student 25",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 86,
+    "Summative": 0
+   },
+   "average": 77.2,
+   "finalScore": 77,
+   "indicator": "Safe"
+  },
+  {
+   "no": 25,
+   "name": "Student 26",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 15,
+    "Summative": 0
+   },
+   "average": 63,
+   "finalScore": 63,
+   "indicator": "Not Safe"
+  },
+  {
+   "no": 26,
+   "name": "Student 27",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 45,
+    "Summative": 0
+   },
+   "average": 69,
+   "finalScore": 69,
+   "indicator": "Not Safe"
+  },
+  {
+   "no": 27,
+   "name": "Student 28",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 53.75,
+    "Summative": 85
+   },
+   "average": 87.75,
+   "finalScore": 88,
+   "indicator": "Safe"
+  },
+  {
+   "no": 28,
+   "name": "Student 29",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": "",
+    "Task 2": "",
+    "Task 3": "",
+    "Formative": "",
+    "Summative": ""
+   },
+   "average": "",
+   "finalScore": "",
+   "indicator": ""
+  },
+  {
+   "no": 29,
+   "name": "Student 30",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 41.25,
+    "Summative": 0
+   },
+   "average": 68.25,
+   "finalScore": 68,
+   "indicator": "Not Safe"
+  },
+  {
+   "no": 30,
+   "name": "Student 31",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 80.25,
+    "Summative": 0
+   },
+   "average": 76.05,
+   "finalScore": 76,
+   "indicator": "Safe"
+  },
+  {
+   "no": 31,
+   "name": "Student 32",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 10,
+    "Summative": 85
+   },
+   "average": 79,
+   "finalScore": 79,
+   "indicator": "Safe"
+  },
+  {
+   "no": 32,
+   "name": "Student 33",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 36.25,
+    "Summative": 0
+   },
+   "average": 67.25,
+   "finalScore": 67,
+   "indicator": "Not Safe"
+  },
+  {
+   "no": 33,
+   "name": "Student 34",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 36,
+    "Summative": 0
+   },
+   "average": 67.2,
+   "finalScore": 67,
+   "indicator": "Not Safe"
+  },
+  {
+   "no": 34,
+   "name": "Student 35",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 5,
+    "Summative": 0
+   },
+   "average": 61,
+   "finalScore": 61,
+   "indicator": "Not Safe"
+  },
+  {
+   "no": 35,
+   "name": "Student 36",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": 100,
+    "Task 2": 100,
+    "Task 3": 100,
+    "Formative": 37.5,
+    "Summative": 85
+   },
+   "average": 84.5,
+   "finalScore": 85,
+   "indicator": "Safe"
+  },
+  {
+   "no": 36,
+   "name": "Student 37",
+   "nickname": "Nick 2",
+   "scores": {
+    "Task 1": "",
+    "Task 2": "",
+    "Task 3": "",
+    "Formative": 18.75,
+    "Summative": 82
+   },
+   "average": 20.15,
+   "finalScore": 20,
+   "indicator": "Not Safe"
+  }
+ ],
+ "inputCols": [
+  "Task 1",
+  "Task 2",
+  "Task 3",
+  "Formative",
+  "Summative"
+ ]
+}

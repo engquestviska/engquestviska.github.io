@@ -1,0 +1,591 @@
+{
+ "students": [
+  {
+   "no": 1,
+   "name": "Student 1",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 76,
+    "Chapter 2": 76,
+    "Chapter 3": 0,
+    "Average": 38,
+    "Final Score": 38,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 2,
+   "name": "Student 3",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 96,
+    "Chapter 2": 80,
+    "Chapter 3": 0,
+    "Average": 44,
+    "Final Score": 44,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 3,
+   "name": "Student 4",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 78,
+    "Chapter 2": 78,
+    "Chapter 3": 0,
+    "Average": 39,
+    "Final Score": 39,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 4,
+   "name": "Student 5",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 87,
+    "Chapter 2": 72,
+    "Chapter 3": 0,
+    "Average": 39.75,
+    "Final Score": 40,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 5,
+   "name": "Student 6",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 76,
+    "Chapter 2": 76,
+    "Chapter 3": 0,
+    "Average": 38,
+    "Final Score": 38,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 6,
+   "name": "Student 7",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 66,
+    "Chapter 2": 75,
+    "Chapter 3": 0,
+    "Average": 35.25,
+    "Final Score": 35,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 7,
+   "name": "Student 8",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 72,
+    "Chapter 2": 76,
+    "Chapter 3": 0,
+    "Average": 37,
+    "Final Score": 37,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 8,
+   "name": "Student 9",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 78,
+    "Chapter 2": 67,
+    "Chapter 3": 0,
+    "Average": 36.25,
+    "Final Score": 36,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 9,
+   "name": "Student 10",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 76,
+    "Chapter 2": 75,
+    "Chapter 3": 0,
+    "Average": 37.75,
+    "Final Score": 38,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 10,
+   "name": "Student 11",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 76,
+    "Chapter 2": 76,
+    "Chapter 3": 0,
+    "Average": 38,
+    "Final Score": 38,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 11,
+   "name": "Student 12",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 77,
+    "Chapter 2": 76,
+    "Chapter 3": 0,
+    "Average": 38.25,
+    "Final Score": 38,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 12,
+   "name": "Student 13",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 94,
+    "Chapter 2": 76,
+    "Chapter 3": 0,
+    "Average": 42.5,
+    "Final Score": 43,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 13,
+   "name": "Student 14",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 73,
+    "Chapter 2": 77,
+    "Chapter 3": 0,
+    "Average": 37.5,
+    "Final Score": 38,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 14,
+   "name": "Student 15",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 76,
+    "Chapter 2": 76,
+    "Chapter 3": 0,
+    "Average": 38,
+    "Final Score": 38,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 15,
+   "name": "Student 16",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 99,
+    "Chapter 2": 79,
+    "Chapter 3": 0,
+    "Average": 44.5,
+    "Final Score": 45,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 16,
+   "name": "Student 17",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 82,
+    "Chapter 2": 75,
+    "Chapter 3": 0,
+    "Average": 39.25,
+    "Final Score": 39,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 17,
+   "name": "Student 18",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 91,
+    "Chapter 2": 75,
+    "Chapter 3": 0,
+    "Average": 41.5,
+    "Final Score": 42,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 18,
+   "name": "Student 19",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 77,
+    "Chapter 2": 78,
+    "Chapter 3": 0,
+    "Average": 38.75,
+    "Final Score": 39,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 19,
+   "name": "Student 20",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 67,
+    "Chapter 2": 70,
+    "Chapter 3": 0,
+    "Average": 34.25,
+    "Final Score": 34,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 20,
+   "name": "Student 21",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": "",
+    "Chapter 2": 75,
+    "Chapter 3": 0,
+    "Average": 25,
+    "Final Score": 25,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 21,
+   "name": "Student 22",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 77,
+    "Chapter 2": 72,
+    "Chapter 3": 0,
+    "Average": 37.25,
+    "Final Score": 37,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 22,
+   "name": "Student 23",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 93,
+    "Chapter 2": 77,
+    "Chapter 3": 0,
+    "Average": 42.5,
+    "Final Score": 43,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 23,
+   "name": "Student 24",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 78,
+    "Chapter 2": 76,
+    "Chapter 3": 0,
+    "Average": 38.5,
+    "Final Score": 39,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 24,
+   "name": "Student 25",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 77,
+    "Chapter 2": 0,
+    "Chapter 3": 0,
+    "Average": 19.25,
+    "Final Score": 19,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 25,
+   "name": "Student 26",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 63,
+    "Chapter 2": 0,
+    "Chapter 3": 0,
+    "Average": 15.75,
+    "Final Score": 16,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 26,
+   "name": "Student 27",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 69,
+    "Chapter 2": 75,
+    "Chapter 3": 0,
+    "Average": 36,
+    "Final Score": 36,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 27,
+   "name": "Student 28",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 88,
+    "Chapter 2": 75,
+    "Chapter 3": 0,
+    "Average": 40.75,
+    "Final Score": 41,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 28,
+   "name": "Student 29",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": "",
+    "Chapter 2": 0,
+    "Chapter 3": 0,
+    "Average": 0,
+    "Final Score": 0,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 29,
+   "name": "Student 30",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 68,
+    "Chapter 2": 75,
+    "Chapter 3": 0,
+    "Average": 35.75,
+    "Final Score": 36,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 30,
+   "name": "Student 31",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 76,
+    "Chapter 2": 77,
+    "Chapter 3": 0,
+    "Average": 38.25,
+    "Final Score": 38,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 31,
+   "name": "Student 32",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 79,
+    "Chapter 2": 75,
+    "Chapter 3": 0,
+    "Average": 38.5,
+    "Final Score": 39,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 32,
+   "name": "Student 33",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 67,
+    "Chapter 2": 67,
+    "Chapter 3": 0,
+    "Average": 33.5,
+    "Final Score": 34,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 33,
+   "name": "Student 34",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 67,
+    "Chapter 2": 70,
+    "Chapter 3": 0,
+    "Average": 34.25,
+    "Final Score": 34,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 34,
+   "name": "Student 35",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 61,
+    "Chapter 2": 70,
+    "Chapter 3": 0,
+    "Average": 32.75,
+    "Final Score": 33,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 35,
+   "name": "Student 36",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 85,
+    "Chapter 2": 70,
+    "Chapter 3": 0,
+    "Average": 38.75,
+    "Final Score": 39,
+    "Indicator": "Not Safe"
+   }
+  },
+  {
+   "no": 36,
+   "name": "Student 37",
+   "nickname": "Nick 2",
+   "scores": {
+    "ASAT": 0
+   },
+   "calc": {
+    "Chapter 1": 20,
+    "Chapter 2": 75,
+    "Chapter 3": 0,
+    "Average": 23.75,
+    "Final Score": 24,
+    "Indicator": "Not Safe"
+   }
+  }
+ ],
+ "inputCols": [
+  "ASAT"
+ ],
+ "calcCols": [
+  "Chapter 1",
+  "Chapter 2",
+  "Chapter 3",
+  "Average",
+  "Final Score",
+  "Indicator"
+ ]
+}

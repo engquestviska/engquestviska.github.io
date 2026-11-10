@@ -1,0 +1,25 @@
+{
+ "materials": [
+  {
+   "title": "Buku Cetak Kelas X PDF",
+   "link": "https://drive.google.com/file/d/1hXwB6IaJhszSiNtJmFJU04rc3uwqGG3j/view",
+   "fileType": "pdf",
+   "addedAt": "2026-07-20",
+   "fileId": "1hXwB6IaJhszSiNtJmFJU04rc3uwqGG3j"
+  },
+  {
+   "title": "Descriptive Text PPT",
+   "link": "https://drive.google.com/file/d/1kE5XqK0eSg26U701O0z-DcRcj_MipGVS/view",
+   "fileType": "ppt",
+   "addedAt": "2026-07-20",
+   "fileId": "1kE5XqK0eSg26U701O0z-DcRcj_MipGVS"
+  },
+  {
+   "title": "Structure and Language Features",
+   "link": "https://drive.google.com/file/d/1hGDsuvw917oSEJj9mL2mjpU5c12DNnYx/view",
+   "fileType": "ppt",
+   "addedAt": "2026-08-03",
+   "fileId": "1hGDsuvw917oSEJj9mL2mjpU5c12DNnYx"
+  }
+ ]
+}
