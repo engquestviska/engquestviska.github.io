@@ -128,7 +128,7 @@ Internal build order (not separate releases; the owner sees progress on an emula
 ## Builder's calls (my decisions; the owner can overrule)
 
 - Code lives in this repo at `native-student/`, built and tested the same way as `native-teacher/` (Kotlin, Jetpack Compose, Room, WorkManager, OkHttp, FCM). Shared helper code is copied, not split into a shared library. Two small apps are easier to keep working than one shared module.
-- **Level titles:** one title per level band (for example 1–2 Beginner, 3–4 Explorer, 5–6 Word Warrior …). The builder drafts the list and the owner checks the words before release.
+- **Level titles:** the website already has them (`grade10/index.html` `LEVEL_TITLES`: Beginner, Explorer, Achiever, Rising Star, Champion, Legend; level 6+ stays Legend). The app uses the same list and the same level curve (level N→N+1 needs 5+5N XP), so the app and website always agree.
 - Links inside content (a material's PDF or Drive link, a Reading link) open in the phone's browser or viewer. They are not shown in a web view inside the app.
 - Notifications are **off by default** and only switched on when the student says yes.
 - "What's new" on Home shows the latest bell events.
