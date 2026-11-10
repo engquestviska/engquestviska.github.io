@@ -150,12 +150,51 @@
     if (before.scores && now.scores) Object.keys(now.scores).forEach(function(label) {
       if (before.scores[label] !== now.scores[label]) out.push({ kind: 'score', text: label + ' score: ' + now.scores[label] });
     });
-    if (before.subs && now.subs) Object.keys(now.subs).forEach(function(task) {
-      if (before.subs[task] === now.subs[task]) return;
-      if (now.subs[task] === 'approved') out.push({ kind: 'ok', text: taskName(task) + ' approved' });
-      if (now.subs[task] === 'rejected') out.push({ kind: 'back', text: taskName(task) + ' sent back. Please send it again.' });
-    });
+    // Approved / sent-back tasks are not compared here: they come from the server's review
+    // date (reviewedTasks), so they show even on a phone that never saw the "before".
     return out;
+  }
+
+  var SCORE_CHAPTER_OFFSET = 3; // Chapter n's task scores are stored as score chapter n+3
+  var REVIEW_DAYS = 3;
+
+  function ymd(date) {
+    return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+  }
+
+  // Tasks the teacher approved or sent back in the last few days (latest photo per task),
+  // each with its task score when the teacher wrote one.
+  function reviewedTasks(classId, studentNo, subData) {
+    var items = (subData && subData.items) || [];
+    var latest = {};
+    items.forEach(function(item) { latest[item.task] = item; }); // items come oldest first
+    var cutoff = ymd(new Date(Date.now() - REVIEW_DAYS * 24 * 60 * 60 * 1000));
+    var recent = Object.keys(latest).map(function(task) { return latest[task]; }).filter(function(item) {
+      return (item.status === 'approved' || item.status === 'rejected') &&
+        String(item.reviewedAt || '').slice(0, 10) >= cutoff;
+    });
+    if (!recent.length) return Promise.resolve([]);
+    var chapters = {};
+    recent.forEach(function(item) {
+      var m = String(item.task).match(/^C(\d+)T(\d+)$/i);
+      if (m && item.status === 'approved') chapters[m[1]] = true;
+    });
+    var scoreReqs = Object.keys(chapters).map(function(ch) {
+      return quiet(EQApi.get({ action: 'getChapterScores', className: classId, chapter: Number(ch) + SCORE_CHAPTER_OFFSET }))
+        .then(function(data) { var s = me(data, studentNo); return [ch, (s && s.scores) || {}]; });
+    });
+    return Promise.all(scoreReqs).then(function(pairs) {
+      var byChapter = {};
+      pairs.forEach(function(p) { byChapter[p[0]] = p[1]; });
+      return recent.sort(function(a, b) { return String(b.reviewedAt).localeCompare(String(a.reviewedAt)) || b.id - a.id; })
+        .map(function(item) {
+          var when = shortDate(item.reviewedAt);
+          if (item.status === 'rejected') return { kind: 'back', text: taskName(item.task) + ' sent back · ' + when + '. Please send it again.' };
+          var m = String(item.task).match(/^C(\d+)T(\d+)$/i);
+          var score = m && byChapter[m[1]] ? byChapter[m[1]]['Task ' + m[2]] : '';
+          return { kind: 'ok', text: taskName(item.task) + ' approved' + (score !== '' && score != null ? ' · score ' + score : '') + ' · ' + when };
+        });
+    });
   }
 
   var NEWS_ICON = { xp: 'zap', score: 'chart-no-axes-column-increasing', ok: 'circle-check-big', back: 'rotate-ccw' };
@@ -206,13 +245,18 @@
       var at = Date.now();
       var fresh = seen && seen.snap ? changes(seen.snap, now) : [];
       fresh.forEach(function(n) { n.at = at; });
-      var kept = ((seen && seen.news) || []).filter(function(n) { return at - n.at < NEWS_KEEP_MS; });
+      var kept = ((seen && seen.news) || []).filter(function(n) {
+        return at - n.at < NEWS_KEEP_MS && n.kind !== 'ok' && n.kind !== 'back';
+      });
       var news = fresh.concat(kept).slice(0, NEWS_MAX);
       // Keep the old numbers for any part that failed to load this time.
       var prev = (seen && seen.snap) || {};
       ['xp', 'custom', 'scores', 'subs'].forEach(function(part) { if (now[part] === null) now[part] = prev[part] || null; });
       writeSeen(key, { snap: now, news: news });
-      renderNews(box, news, !seen, recentAttendance(r[3], studentNo));
+      reviewedTasks(classId, studentNo, r[2]).catch(function() { return []; }).then(function(reviewed) {
+        var all = reviewed.concat(news).slice(0, NEWS_MAX + 3);
+        renderNews(box, all, !seen && !all.length, recentAttendance(r[3], studentNo));
+      });
     });
   }
 
