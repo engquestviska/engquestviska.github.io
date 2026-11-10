@@ -38,6 +38,13 @@ body.student-shell-enabled .strike-hero::before,
 body.student-shell-enabled .strike-hero::after { display: none !important; }
 body.student-shell-enabled .subpage-header .brand-title { color: var(--eq-ink) !important; }
 body.student-shell-enabled .subpage-header .brand-sub { color: #64748b !important; }
+/* The small label above the title was light blue for the old blue header; on white it vanished. */
+body.student-shell-enabled .subpage-header .kicker,
+body.student-shell-enabled .dashboard-hero .kicker,
+body.student-shell-enabled .strike-hero .kicker { color: #1d4ed8 !important; }
+body.student-shell-enabled[class*="grade11"] .subpage-header .kicker,
+body.student-shell-enabled[class*="grade11"] .dashboard-hero .kicker,
+body.student-shell-enabled[class*="grade11"] .strike-hero .kicker { color: #0f766e !important; }
 body.student-shell-enabled .subpage-hero,
 body.student-shell-enabled .dashboard-hero,
 body.student-shell-enabled .strike-hero {
