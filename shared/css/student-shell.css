@@ -513,3 +513,95 @@ body.student-shell-enabled.grade11-subpage > header { padding: 20px 28px 0; }
   body.student-shell-enabled.grade11-subpage > header { padding: 14px 14px 0; }
   body.student-shell-enabled.grade11-subpage > main { padding: 14px 14px 36px; }
 }
+
+/* ---- My Vocabulary word book: the grade's own colours instead of purple ---- */
+body.student-shell-enabled .almanac-title { color: var(--eq-ink, #101936); }
+body.student-shell-enabled .almanac-title span,
+body.student-shell-enabled .almanac-sec h4 em { color: #475569; }
+body.student-shell-enabled .almanac-empty { background: #f8fafc; border-color: #e2e8f0; color: #475569; }
+body.student-shell-enabled .almanac-sec { background: #fff; border-color: #e5ecf6; }
+body.student-shell-enabled .almanac-sec h4 { color: var(--eq-accent, #1d4ed8); }
+body.student-shell-enabled .alm-entry { border-bottom-color: #eef2f7; }
+body.student-shell-enabled .alm-type { color: var(--eq-accent, #1d4ed8); }
+body.student-shell-enabled .alm-type:focus { border-color: var(--eq-accent, #1d4ed8); }
+body.student-shell-enabled .alm-type.untyped { border-color: #fcd34d; background: #fffbeb; color: #92400e; }
+
+/* ---- Homepage: what's new since the last visit + recent attendance ---- */
+.eqh-news {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 14px;
+}
+.eqh-news[hidden] { display: none; }
+.eqh-news-col {
+  background: #fff;
+  border: 1px solid #e5ecf6;
+  border-radius: 20px;
+  padding: 18px 20px;
+}
+.eqh-news-col h2 {
+  margin: 0 0 10px;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #101936;
+}
+.eqh-news-list,
+.eqh-att-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.eqh-news-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #101936;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.eqh-news-list .ic {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: #eef4ff;
+  color: #1d4ed8;
+}
+.eqh-news-list .ic svg { width: 17px; height: 17px; }
+.eqh-news-list .is-xp .ic { background: #fef3c7; color: #a16207; }
+.eqh-news-list .is-ok .ic { background: #dcfce7; color: #15803d; }
+.eqh-news-list .is-back .ic { background: #fee2e2; color: #b91c1c; }
+.eqh-news-empty { margin: 0; color: #475569; font-size: 0.88rem; line-height: 1.5; }
+.eqh-att-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid #eef2f7;
+  color: #33415c;
+  font-size: 0.9rem;
+}
+.eqh-att-list li:last-child { border-bottom: 0; }
+.eqh-att-list b {
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 0.78rem;
+  background: #f1f5f9;
+  color: #33415c;
+}
+.eqh-att-list .att-present { background: #dcfce7; color: #166534; }
+.eqh-att-list .att-absent { background: #fee2e2; color: #991b1b; }
+.eqh-att-list .att-sick,
+.eqh-att-list .att-permit { background: #fef3c7; color: #92400e; }
+.eqh-news-link {
+  display: inline-block;
+  margin-top: 10px;
+  color: var(--eq-accent, #1d4ed8);
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+@media (max-width: 760px) {
+  .eqh-news { grid-template-columns: 1fr; }
+}
