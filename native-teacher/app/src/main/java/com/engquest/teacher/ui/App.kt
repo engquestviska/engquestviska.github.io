@@ -263,7 +263,6 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
                 onBell = ::openUploads,
                 onBack = if (showUploads) ({ showUploads = false }) else null,
             )
-            StatusBar(pending, failed.size, online, onOpenFailed = { sheet = ShellSheet.FAILED })
             graph.updates?.let { checker ->
                 val context = LocalContext.current
                 UpdateBanner(checker) { url, onFailed -> UpdateInstaller(context).start(url, onFailed) }
@@ -274,6 +273,12 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
                 } else {
                     TabContent(tab, graph, classInfo, guard, submissions, feed)
                 }
+                // Floats above the page, so the page doesn't jump when it appears or goes away.
+                StatusBar(
+                    pending, failed.size, online,
+                    onOpenFailed = { sheet = ShellSheet.FAILED },
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                )
             }
             TabBar(tab, badges = mapOf(Tab.SUBMISSIONS to submissions.waiting)) { picked ->
                 if (picked != tab || showUploads) leaveThen {

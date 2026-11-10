@@ -1,6 +1,6 @@
 {
-  "versionCode": 10,
-  "versionName": "3.7",
+  "versionCode": 11,
+  "versionName": "3.8",
   "apk": "EngQuestTeacher-k4m8q2zt.apk",
-  "notes": "Give exact XP: tap + New for any reason and amount, keep your favourites as buttons."
+  "notes": "\"Changes waiting to send\" now floats above the tabs, so the page no longer jumps."
 }

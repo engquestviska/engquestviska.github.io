@@ -1,5 +1,9 @@
 package com.engquest.teacher.ui
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.ui.draw.shadow
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -33,40 +37,48 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
 
 /**
- * Under the top bar: how many changes are still on their way, and how many the server refused.
- * Shows nothing when everything is sent.
+ * A small floating pill just above the bottom tabs: how many changes are still on their way, and
+ * how many the server refused. It sits over the page (not in it), so the page never jumps when it
+ * appears or goes away. Shows nothing when everything is sent.
  */
 @Composable
-fun StatusBar(pending: Int, failed: Int, online: Boolean, onOpenFailed: () -> Unit) {
-    if (pending == 0 && failed == 0) return
-    Column(
-        Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, top = 10.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
+fun StatusBar(pending: Int, failed: Int, online: Boolean, onOpenFailed: () -> Unit, modifier: Modifier = Modifier) {
+    AnimatedVisibility(
+        visible = pending > 0 || failed > 0,
+        modifier = modifier,
+        enter = fadeIn(),
+        exit = fadeOut(),
     ) {
-        if (pending > 0) {
-            val changes = if (pending == 1) "1 change" else "$pending changes"
-            StatusChip(
-                text = if (online) "$changes waiting to send" else "You're offline — $changes waiting to send",
-                icon = AppIcons.Cloud,
-                color = if (online) Brand else Warn,
-                background = if (online) BrandSoft else WarnSoft,
-            )
-        }
-        if (failed > 0) {
-            StatusChip("$failed not saved — tap to see", AppIcons.Warning, Bad, BadSoft, onOpenFailed)
+        Column(
+            Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            if (pending > 0) {
+                val changes = if (pending == 1) "1 change" else "$pending changes"
+                StatusChip(
+                    text = if (online) "$changes waiting to send" else "You're offline — $changes waiting to send",
+                    icon = AppIcons.Cloud,
+                    color = if (online) Brand else Warn,
+                    background = if (online) BrandSoft else WarnSoft,
+                )
+            }
+            if (failed > 0) {
+                StatusChip("$failed not saved — tap to see", AppIcons.Warning, Bad, BadSoft, onOpenFailed)
+            }
         }
     }
 }
 
 @Composable
 private fun StatusChip(text: String, icon: ImageVector, color: Color, background: Color, onClick: (() -> Unit)? = null) {
-    val shape = RoundedCornerShape(12.dp)
+    val shape = RoundedCornerShape(999.dp)
     Row(
         Modifier
-            .fillMaxWidth()
+            .shadow(6.dp, shape)
             .background(background, shape)
             .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier)
-            .padding(horizontal = 12.dp, vertical = 9.dp),
+            .padding(horizontal = 14.dp, vertical = 9.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
