@@ -23,12 +23,12 @@ class SendWorker(context: Context, params: WorkerParameters) : CoroutineWorker(c
         private const val NAME = "photo-send"
 
         /** Runs [SendWorker] once there is a connection (a waiting run is kept, not doubled). */
-        fun kick(context: Context) {
+        fun kick(context: Context, now: Boolean = false) {
             val request = OneTimeWorkRequestBuilder<SendWorker>()
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
                 .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, TimeUnit.SECONDS)
                 .build()
-            WorkManager.getInstance(context).enqueueUniqueWork(NAME, ExistingWorkPolicy.KEEP, request)
+            WorkManager.getInstance(context).enqueueUniqueWork(NAME, if (now) ExistingWorkPolicy.REPLACE else ExistingWorkPolicy.KEEP, request)
         }
     }
 }

@@ -46,6 +46,8 @@ class AppGraph(
     kickSender: () -> Unit,
     /** Gets this phone's push token (Firebase); tests pass one that never answers. */
     private val pushToken: ((String) -> Unit) -> Unit = {},
+    /** Subscribes this phone to the first set of Firebase topics and out of the second (class-wide news). */
+    private val topics: (Set<String>, Set<String>) -> Unit = { _, _ -> },
     /** Looks for a newer app build; null (tests) means no update check. */
     val updates: com.engquest.app.ui.UpdateChecker? = null,
 ) {
@@ -67,12 +69,19 @@ class AppGraph(
         }
         val body = mapOf("token" to token, "className" to p.classId, "studentNo" to p.studentNo.toString(), "prefs" to notify.json())
         scope.launch { runCatching { api.write("registerStudentDevice", body) } }
+        // Class-wide news (materials, announcements) comes through one topic per grade and kind.
+        val want = if (!notify.on) emptySet() else CLASS_KINDS.filter { notify.wants(it) }.map { "eq_g${p.grade.number}_$it" }.toSet()
+        topics(want, ALL_TOPICS - want)
     }
 
     /** Log out: the server stops notifying this phone for that student. */
     fun forgetDevice() {
         val token = notify.token() ?: return
         scope.launch { runCatching { api.write("unregisterStudentDevice", mapOf("token" to token)) } }
+        topics(emptySet(), ALL_TOPICS)
+        // The next student on this phone is asked about notifications again.
+        notify.on = false
+        notify.asked = false
     }
 
     /** The grade the old 1.8 app remembered, used once to preselect the login. */
@@ -88,6 +97,9 @@ class AppGraph(
     companion object {
         const val BASE_URL = "https://engquest-api.engquestviska.workers.dev/exec"
         const val KEY_BELL_SEEN = "bellSeenId"
+        /** News sent to a whole grade (the server sends these to topic eq_g<grade>_<kind>). */
+        val CLASS_KINDS = listOf("material", "announcement")
+        val ALL_TOPICS = listOf("10", "11").flatMap { g -> CLASS_KINDS.map { "eq_g${g}_$it" } }.toSet()
 
         fun create(context: Context): AppGraph = AppGraph(
             api = Api(BASE_URL, OkHttpClient()),
@@ -99,6 +111,7 @@ class AppGraph(
             sendDir = File(context.filesDir, "sends"),
             kickSender = { SendWorker.kick(context) },
             pushToken = { cb -> com.engquest.app.push.Notify.token(cb) },
+            topics = { on, off -> com.engquest.app.push.Notify.topics(on, off) },
             updates = com.engquest.app.ui.UpdateChecker(
                 com.engquest.app.ui.UpdateChecker.VERSION_URL,
                 com.engquest.app.ui.UpdateChecker.SITE_BASE,

@@ -86,6 +86,10 @@ interface PhotoSendDao {
 
     @Query("DELETE FROM photo_send")
     suspend fun deleteAll()
+
+    /** A renumbered student: their waiting sends move to the new number. */
+    @Query("UPDATE photo_send SET studentNo = :newNo WHERE classId = :classId AND studentNo = :oldNo AND state != 'SENDING'")
+    suspend fun renumber(classId: String, oldNo: Int, newNo: Int)
 }
 
 @Database(entities = [CacheEntry::class, PhotoSend::class], version = 1, exportSchema = true)

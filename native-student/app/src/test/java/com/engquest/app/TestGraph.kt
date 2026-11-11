@@ -18,6 +18,8 @@ fun testGraph(
     scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined),
     /** False shows the one-time "Want a buzz?" question; most tests start past it. */
     buzzAsked: Boolean = true,
+    /** Records Firebase topic changes: "+topic" subscribed, "-topic" unsubscribed. */
+    topicLog: MutableList<String> = mutableListOf(),
 ): AppGraph = AppGraph(
     api = Api(baseUrl, OkHttpClient()),
     prefs = context.getSharedPreferences("student-test", Context.MODE_PRIVATE).also {
@@ -29,4 +31,5 @@ fun testGraph(
     scope = scope,
     sendDir = java.io.File(context.cacheDir, "sends-test"),
     kickSender = {},
+    topics = { on, off -> on.sorted().forEach { topicLog += "+$it" }; off.sorted().forEach { topicLog += "-$it" } },
 )

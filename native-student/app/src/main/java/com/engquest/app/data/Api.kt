@@ -44,6 +44,8 @@ sealed class ApiError(message: String, val userMessage: String, cause: Throwable
 class Api(baseUrl: String, client: OkHttpClient) {
     private val base = baseUrl.toHttpUrl()
     private val client = client.newBuilder().callTimeout(20, TimeUnit.SECONDS).build()
+    /** Photo sends can be ~1.5 MB: a slow classroom connection needs minutes, not 20 seconds. */
+    private val uploadClient = client.newBuilder().callTimeout(3, TimeUnit.MINUTES).build()
 
     suspend fun read(action: String, params: Map<String, String>): JsonObject {
         val url = base.newBuilder().addQueryParameter("action", action).apply {
@@ -62,12 +64,12 @@ class Api(baseUrl: String, client: OkHttpClient) {
     suspend fun writeJson(action: String, body: JsonObject): JsonObject {
         val url = base.newBuilder().addQueryParameter("action", action).build()
         val full = JsonObject(body + ("action" to JsonPrimitive(action)))
-        return send(Request.Builder().url(url).post(full.toString().toRequestBody(JSON_TYPE)).build())
+        return send(Request.Builder().url(url).post(full.toString().toRequestBody(JSON_TYPE)).build(), uploadClient)
     }
 
-    private suspend fun send(request: Request): JsonObject {
+    private suspend fun send(request: Request, via: OkHttpClient = client): JsonObject {
         val text = suspendCancellableCoroutine { cont ->
-            val call = client.newCall(request)
+            val call = via.newCall(request)
             cont.invokeOnCancellation { call.cancel() }
             call.enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {

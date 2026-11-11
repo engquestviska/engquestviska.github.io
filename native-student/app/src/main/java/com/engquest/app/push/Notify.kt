@@ -55,6 +55,15 @@ object Notify {
         return true
     }
 
+    /** Joins and leaves Firebase topics (does nothing without Firebase). */
+    fun topics(subscribe: Set<String>, unsubscribe: Set<String>) {
+        runCatching {
+            val fm = FirebaseMessaging.getInstance()
+            subscribe.forEach { fm.subscribeToTopic(it) }
+            unsubscribe.forEach { fm.unsubscribeFromTopic(it) }
+        }
+    }
+
     /** Calls [onToken] with this phone's push token once Firebase has one (never, without Firebase). */
     fun token(onToken: (String) -> Unit) {
         runCatching { FirebaseMessaging.getInstance().token.addOnSuccessListener { if (!it.isNullOrBlank()) onToken(it) } }

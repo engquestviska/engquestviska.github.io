@@ -22,6 +22,7 @@ import com.engquest.app.testGraph
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -122,5 +123,41 @@ class ShellTest {
         start(Profile(Grade.G10, "XE2", 1, "Nobody Here"))
         waitText("We couldn't find your name in XE2 any more. Please pick it again.")
         assertNull(graph.profiles.get())
+    }
+
+    @Test fun openingTheAppTellsTheServerWhenNotificationsWereTurnedOff() {
+        graph = testGraph(context, fake.start())
+        graph.notify.on = false
+        graph.notify.saveToken("tok-9")
+        graph.profiles.save(Profile(Grade.G10, "XE2", 1, "Student 1"))
+        compose.setContent {
+            CompositionLocalProvider(LocalOnBackPressedDispatcherOwner provides backOwner) { StudentApp(graph) }
+        }
+        compose.waitUntil(10_000) { fake.calls("registerStudentDevice").isNotEmpty() }
+        assertTrue(fake.calls("registerStudentDevice").last().contains("\\\"on\\\":false"))
+    }
+
+    @Test fun renumberedStudentsWaitingPhotosFollowThem() {
+        graph = testGraph(context, fake.start())
+        val photo = java.io.File(context.cacheDir, "p.jpg").apply { writeBytes(byteArrayOf(1)) }
+        kotlinx.coroutines.runBlocking { graph.sendQueue.enqueue(Profile(Grade.G10, "XE2", 9, "Student 3"), "C1T1", listOf(photo)) }
+        graph.profiles.save(Profile(Grade.G10, "XE2", 9, "Student 3"))
+        compose.setContent {
+            CompositionLocalProvider(LocalOnBackPressedDispatcherOwner provides backOwner) { StudentApp(graph) }
+        }
+        compose.waitUntil(5000) { graph.profiles.get()?.studentNo == 2 }
+        compose.waitUntil(5000) { kotlinx.coroutines.runBlocking { graph.db.photoSendDao().all().single().studentNo } == 2 }
+    }
+
+    @Test fun studentWhoLeftLosesTheirWaitingPhotos() {
+        graph = testGraph(context, fake.start())
+        val photo = java.io.File(context.cacheDir, "q.jpg").apply { writeBytes(byteArrayOf(1)) }
+        kotlinx.coroutines.runBlocking { graph.sendQueue.enqueue(Profile(Grade.G10, "XE2", 1, "Nobody Here"), "C1T1", listOf(photo)) }
+        graph.profiles.save(Profile(Grade.G10, "XE2", 1, "Nobody Here"))
+        compose.setContent {
+            CompositionLocalProvider(LocalOnBackPressedDispatcherOwner provides backOwner) { StudentApp(graph) }
+        }
+        waitText("We couldn't find your name in XE2 any more. Please pick it again.")
+        compose.waitUntil(5000) { kotlinx.coroutines.runBlocking { graph.db.photoSendDao().all().isEmpty() } }
     }
 }

@@ -4,6 +4,7 @@ import androidx.room.Room
 import com.engquest.app.FakeServer
 import com.engquest.app.domain.Grade
 import com.engquest.app.domain.Profile
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
@@ -109,5 +110,21 @@ class SendQueueTest {
         assertEquals(1000 to 750, shrinkTo(4000, 3000, 1000))
         assertEquals(750 to 1000, shrinkTo(3000, 4000, 1000))
         assertEquals(800 to 600, shrinkTo(800, 600, 1000))
+    }
+
+    @Test fun aSendCutOffMidUploadGoesBackInLine() = runBlocking {
+        queue.enqueue(me, "C2T2", listOf(photo("a.jpg")))
+        fake.replies["submitTaskPhoto"] = """{"success":true}"""
+        fake.server.dispatcher.let { real ->
+            fake.server.dispatcher = object : okhttp3.mockwebserver.Dispatcher() {
+                override fun dispatch(request: okhttp3.mockwebserver.RecordedRequest) =
+                    real.dispatch(request).setBodyDelay(5, java.util.concurrent.TimeUnit.SECONDS)
+            }
+        }
+        val job = kotlinx.coroutines.GlobalScope.launch(kotlinx.coroutines.Dispatchers.IO) { queue.drain() }
+        kotlinx.coroutines.delay(700)
+        job.cancel()
+        job.join()
+        assertEquals(SendState.PENDING, db.photoSendDao().all().single().state)
     }
 }

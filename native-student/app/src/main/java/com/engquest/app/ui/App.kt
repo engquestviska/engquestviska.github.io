@@ -70,8 +70,15 @@ fun StudentApp(graph: AppGraph, link: String? = null, onLinkUsed: () -> Unit = {
         val roster = try { graph.repo.classmates(p.classId).value } catch (e: ApiError) { return@LaunchedEffect }
         when (val r = checkRoster(p, roster)) {
             RosterResult.Same -> Unit
-            is RosterResult.Moved -> p.copy(studentNo = r.newNo, name = r.name).also { graph.profiles.save(it); profile = it }
+            is RosterResult.Moved -> {
+                // Photos still waiting on this phone go out under the student's new number.
+                graph.sendQueue.renumber(p.classId, p.studentNo, r.newNo)
+                p.copy(studentNo = r.newNo, name = r.name).also { graph.profiles.save(it); profile = it }
+            }
             RosterResult.Gone -> {
+                // As at log out: nothing waiting goes out under a number that is now someone else's.
+                graph.sendQueue.clear()
+                graph.forgetDevice()
                 graph.profiles.clear()
                 note = "We couldn't find your name in ${p.classId} any more. Please pick it again."
                 profile = null
@@ -107,7 +114,7 @@ fun Shell(graph: AppGraph, profile: Profile, link: String? = null, onLinkUsed: (
 
     // Each start re-tells the server about this phone, so a "yes" given while the server was
     // unreachable (or before its update) still takes effect, and a renumbered student is followed.
-    LaunchedEffect(profile) { if (graph.notify.on) graph.syncNotifyPrefs(profile) }
+    LaunchedEffect(profile) { if (graph.notify.on || graph.notify.token() != null) graph.syncNotifyPrefs(profile) }
 
     // A tapped notification opens its page (after login, if the student had to pick their name).
     LaunchedEffect(link) {

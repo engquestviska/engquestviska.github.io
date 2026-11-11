@@ -71,4 +71,20 @@ class SettingsTest {
         compose.waitUntil(5000) { compose.onAllNodes(hasText("Notifications are off")).fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithTag("switch-xp").assertDoesNotExist()
     }
+
+    @Test fun classNewsFollowsTheSwitchesThroughGradeTopics() {
+        val log = mutableListOf<String>()
+        val graph = testGraph(context, fake.start(), topicLog = log)
+        graph.notify.on = true
+        graph.notify.saveToken("tok-1")
+        graph.notify.set("material", false)
+        graph.syncNotifyPrefs(me)
+        assertTrue(log.contains("+eq_g10_announcement"))
+        assertTrue(log.contains("-eq_g10_material"))
+        assertTrue(log.contains("-eq_g11_announcement"))
+        log.clear()
+        graph.notify.on = false
+        graph.syncNotifyPrefs(me)
+        assertFalse(log.any { it.startsWith("+") })
+    }
 }

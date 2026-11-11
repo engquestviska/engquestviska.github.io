@@ -83,6 +83,10 @@ class SendQueue(
                 )
                 dao.delete(item.id)
                 paths.forEach { File(it).delete() }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                // Stopped mid-upload (signal lost, job cancelled): back in line with the same rid.
+                kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) { dao.setState(item.id, SendState.PENDING, null, item.attempts) }
+                throw e
             } catch (e: ApiError) {
                 when (e) {
                     is ApiError.Offline, is ApiError.RetryLater -> {
@@ -115,6 +119,8 @@ class SendQueue(
         dao.resetSending()
         kick()
     }
+
+    suspend fun renumber(classId: String, oldNo: Int, newNo: Int) = dao.renumber(classId, oldNo, newNo)
 
     suspend fun clear() {
         dao.all().forEach { remove(it.id) }
@@ -157,8 +163,22 @@ fun compressPhoto(context: Context, uri: Uri, out: File): Boolean = runCatching 
     val bmp = context.contentResolver.openInputStream(uri)?.use {
         BitmapFactory.decodeStream(it, null, BitmapFactory.Options().apply { inSampleSize = sample })
     } ?: return false
+    // Re-saving as JPEG drops the orientation tag, so turn the photo upright first.
+    val degrees = runCatching {
+        context.contentResolver.openInputStream(uri)?.use {
+            when (android.media.ExifInterface(it).getAttributeInt(android.media.ExifInterface.TAG_ORIENTATION, android.media.ExifInterface.ORIENTATION_NORMAL)) {
+                android.media.ExifInterface.ORIENTATION_ROTATE_90 -> 90f
+                android.media.ExifInterface.ORIENTATION_ROTATE_180 -> 180f
+                android.media.ExifInterface.ORIENTATION_ROTATE_270 -> 270f
+                else -> 0f
+            }
+        } ?: 0f
+    }.getOrDefault(0f)
     val (w, h) = shrinkTo(bmp.width, bmp.height, 1000)
-    val scaled = if (w == bmp.width && h == bmp.height) bmp else Bitmap.createScaledBitmap(bmp, w, h, true)
+    val sized = if (w == bmp.width && h == bmp.height) bmp else Bitmap.createScaledBitmap(bmp, w, h, true)
+    val scaled = if (degrees == 0f) sized
+        else Bitmap.createBitmap(sized, 0, 0, sized.width, sized.height, android.graphics.Matrix().apply { postRotate(degrees) }, true)
+            .also { if (sized !== bmp) sized.recycle() }
     out.parentFile?.mkdirs()
     out.outputStream().use { scaled.compress(Bitmap.CompressFormat.JPEG, 50, it) }
     if (scaled !== bmp) scaled.recycle()
