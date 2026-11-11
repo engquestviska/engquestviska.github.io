@@ -138,9 +138,18 @@ private fun MaterialRow(m: Material, onClick: () -> Unit) {
             Spacer(Modifier.width(10.dp))
             Column(Modifier.weight(1f)) {
                 Text(m.title, style = MaterialTheme.typography.bodyMedium, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                Text(listOf(m.fileType.uppercase(), m.addedAt).filter { it.isNotBlank() }.joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = LocalEq.current.muted)
+                Text(listOf(fileLabel(m.fileType), m.addedAt).filter { it.isNotBlank() }.joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = LocalEq.current.muted)
             }
             Text("Open", style = MaterialTheme.typography.labelLarge, color = LocalEq.current.accent)
         }
     }
+}
+
+private val FILE_TYPES = setOf("pdf", "ppt", "pptx", "doc", "docx", "video", "youtube", "link", "file", "slides", "image", "jpg", "png")
+
+/** A file type ("pdf") in capitals; anything longer (assignments keep a description there) as written, shortened. */
+private fun fileLabel(t: String): String = when {
+    t.isBlank() -> ""
+    t.lowercase() in FILE_TYPES -> t.uppercase()
+    else -> t.lowercase().replaceFirstChar { it.uppercase() }.let { if (it.length > 40) it.take(39) + "…" else it }
 }

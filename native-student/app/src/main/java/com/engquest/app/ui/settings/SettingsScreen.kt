@@ -73,7 +73,7 @@ fun SettingsScreen(
                         if (v && !permissionGranted()) askPermission()
                         changed()
                     },
-                    colors = SwitchDefaults.colors(checkedTrackColor = eq.accent),
+                    colors = SwitchDefaults.colors(checkedTrackColor = eq.accent, uncheckedThumbColor = eq.muted, uncheckedTrackColor = eq.line, uncheckedBorderColor = eq.muted),
                     modifier = Modifier.testTag("switch-on"),
                 )
             }
@@ -90,7 +90,7 @@ fun SettingsScreen(
                         Text(label, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
                         Switch(
                             checked = n.wants(k), onCheckedChange = { n.set(k, it); changed() },
-                            colors = SwitchDefaults.colors(checkedTrackColor = eq.accent),
+                            colors = SwitchDefaults.colors(checkedTrackColor = eq.accent, uncheckedThumbColor = eq.muted, uncheckedTrackColor = eq.line, uncheckedBorderColor = eq.muted),
                             modifier = Modifier.testTag("switch-$k"),
                         )
                     }

@@ -3,6 +3,7 @@ package com.engquest.app.ui.more
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -160,7 +161,9 @@ private fun LevelXp(graph: AppGraph, p: Profile) = Loaded({ graph.repo.activenes
         Text("Level ${lv.level} · ${levelTitle(lv.level)}", style = MaterialTheme.typography.titleLarge)
         Text("${me.total} XP · ${lv.toNext} XP to level ${lv.level + 1}", style = MaterialTheme.typography.bodySmall, color = eq.muted)
         Spacer(Modifier.height(10.dp))
-        androidx.compose.material3.LinearProgressIndicator(progress = { lv.progress }, color = eq.act1, trackColor = eq.line, modifier = Modifier.fillMaxWidth().height(10.dp).clip(RoundedCornerShape(99.dp)))
+        Box(Modifier.fillMaxWidth().height(10.dp).clip(RoundedCornerShape(99.dp)).background(eq.line)) {
+            Box(Modifier.fillMaxWidth(lv.progress.coerceIn(0f, 1f)).height(10.dp).clip(RoundedCornerShape(99.dp)).background(eq.act1))
+        }
         if (me.indicator.isNotBlank()) Pill(me.indicator, Tint.amber, Tint.amberInk, Modifier.padding(top = 10.dp))
     }
     SectionTitle("Where your XP comes from")
