@@ -58,6 +58,13 @@ class Api(baseUrl: String, client: OkHttpClient) {
         return send(Request.Builder().url(url).post(body.toString().toRequestBody(JSON_TYPE)).build())
     }
 
+    /** A write whose params are not all plain text (the photo list of submitTaskPhoto). */
+    suspend fun writeJson(action: String, body: JsonObject): JsonObject {
+        val url = base.newBuilder().addQueryParameter("action", action).build()
+        val full = JsonObject(body + ("action" to JsonPrimitive(action)))
+        return send(Request.Builder().url(url).post(full.toString().toRequestBody(JSON_TYPE)).build())
+    }
+
     private suspend fun send(request: Request): JsonObject {
         val text = suspendCancellableCoroutine { cont ->
             val call = client.newCall(request)
