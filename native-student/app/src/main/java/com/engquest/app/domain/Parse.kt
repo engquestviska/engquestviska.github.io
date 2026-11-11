@@ -41,6 +41,7 @@ object Parse {
                 no = s.i("no"),
                 scores = s.obj("scores").mapValues { it.value.num() },
                 average = s["average"].num(), finalScore = s["finalScore"].num(), indicator = s.s("indicator"),
+                name = s.s("name"),
             )
         },
     )

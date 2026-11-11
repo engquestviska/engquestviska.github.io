@@ -30,6 +30,7 @@ data class ChapterRow(
     val average: Double?,
     val finalScore: Double?,
     val indicator: String,
+    val name: String = "",
 )
 
 data class ChapterScores(val columns: List<String>, val rows: List<ChapterRow>)
