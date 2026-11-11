@@ -41,8 +41,16 @@ class AppGraph(
     /** The grade the old 1.8 app remembered, used once to preselect the login. */
     fun legacyGrade(): Grade? = Grade.of(legacyPrefs.getString("grade", null))
 
+    /** True when [newestEventId] is newer than what the student last saw in the bell. */
+    fun bellUnread(newestEventId: Long): Boolean = newestEventId > prefs.getLong(KEY_BELL_SEEN, 0L)
+
+    fun markBellSeen(newestEventId: Long) {
+        if (newestEventId > prefs.getLong(KEY_BELL_SEEN, 0L)) prefs.edit().putLong(KEY_BELL_SEEN, newestEventId).apply()
+    }
+
     companion object {
         const val BASE_URL = "https://engquest-api.engquestviska.workers.dev/exec"
+        const val KEY_BELL_SEEN = "bellSeenId"
 
         fun create(context: Context): AppGraph = AppGraph(
             api = Api(BASE_URL, OkHttpClient()),
