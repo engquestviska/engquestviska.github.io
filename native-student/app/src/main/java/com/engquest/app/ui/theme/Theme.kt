@@ -61,8 +61,17 @@ object Tint {
 
 val LocalEq = staticCompositionLocalOf { eqColors(Grade.G10) }
 
-/** The app font. Kept in one place so a bundled rounded font (Nunito) can replace it. */
-val AppFont: FontFamily = FontFamily.Default
+/**
+ * The app font: Nunito (SIL Open Font License, see native-student/NUNITO-OFL.txt), one variable-weight
+ * file. Android 8+ draws each weight; older phones show the regular weight.
+ */
+@OptIn(androidx.compose.ui.text.ExperimentalTextApi::class)
+private fun nunito(w: Int) = androidx.compose.ui.text.font.Font(
+    com.engquest.app.R.font.nunito,
+    weight = FontWeight(w),
+    variationSettings = androidx.compose.ui.text.font.FontVariation.Settings(androidx.compose.ui.text.font.FontVariation.weight(w)),
+)
+val AppFont: FontFamily = FontFamily(nunito(400), nunito(600), nunito(700), nunito(800), nunito(900))
 
 private fun style(size: Int, weight: FontWeight, line: Int = size + 6) =
     TextStyle(fontFamily = AppFont, fontSize = size.sp, fontWeight = weight, lineHeight = line.sp)

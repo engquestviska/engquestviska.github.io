@@ -74,14 +74,13 @@ fun BottomBar(current: String, onTab: (String) -> Unit, modifier: Modifier = Mod
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     if (send) {
+                        // In line with the other tabs (owner found the lifted button odd): a small orange
+                        // tile the same height as the icons, label on the same line as the rest.
                         Box(
-                            Modifier.offset(y = (-12).dp).shadow(6.dp, RoundedCornerShape(14.dp))
-                                .size(44.dp).clip(RoundedCornerShape(14.dp)).background(eq.act)
-                                .then(if (on) Modifier.border(2.dp, Color.White, RoundedCornerShape(14.dp)) else Modifier),
+                            Modifier.size(width = 40.dp, height = 24.dp).clip(RoundedCornerShape(8.dp)).background(eq.act),
                             contentAlignment = Alignment.Center,
-                        ) { Canvas(Modifier.size(22.dp)) { item.icon(this, Color.White) } }
-                        Spacer(Modifier.height(0.dp))
-                        Text(item.label, style = MaterialTheme.typography.labelSmall, color = tint, modifier = Modifier.offset(y = (-8).dp))
+                        ) { Canvas(Modifier.size(18.dp)) { item.icon(this, Color.White) } }
+                        Text(item.label, style = MaterialTheme.typography.labelSmall, color = tint)
                     } else {
                         Canvas(Modifier.size(24.dp)) { item.icon(this, tint) }
                         Text(item.label, style = MaterialTheme.typography.labelSmall, color = tint)
