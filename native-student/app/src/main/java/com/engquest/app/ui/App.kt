@@ -35,6 +35,7 @@ import kotlinx.coroutines.launch
 import com.engquest.app.ui.learn.MaterialKind
 import com.engquest.app.ui.learn.MaterialsScreen
 import com.engquest.app.ui.learn.VocabScreen
+import com.engquest.app.ui.settings.SettingsScreen
 import com.engquest.app.ui.scores.ScoresScreen
 import com.engquest.app.ui.send.SendScreen
 import com.engquest.app.ui.shell.BottomBar
@@ -122,10 +123,30 @@ fun Shell(graph: AppGraph, profile: Profile, onLogOut: () -> Unit) {
                     "scores" -> ScoresScreen(graph, profile)
                     "learn" -> LearnScreen(onOpen = ::open)
                     "more" -> MoreScreen(profile, onOpen = ::open, onLogOut = {
+                        graph.forgetDevice()
                         graph.scope.launch { graph.sendQueue.clear(); graph.repo.forgetAll() }
                         onLogOut()
                     })
                     "vocab" -> VocabScreen(graph, profile, onBack = { page = null })
+                    "settings" -> {
+                        var asked by remember { mutableStateOf(false) }
+                        val launcher = androidx.activity.compose.rememberLauncherForActivityResult(
+                            androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
+                        ) { asked = true }
+                        SettingsScreen(
+                            graph, profile, onBack = { page = null },
+                            permissionGranted = { notificationsAllowed(context) },
+                            askPermission = {
+                                if (android.os.Build.VERSION.SDK_INT >= 33 && !asked) launcher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                                else runCatching {
+                                    context.startActivity(
+                                        android.content.Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                                            .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, context.packageName),
+                                    )
+                                }
+                            },
+                        )
+                    }
                     "bell" -> BellScreen(graph, profile, onBack = { page = null }, onOpen = ::open)
                     "levelxp", "attendance", "strikes", "taskstatus", "students", "stats" ->
                         MorePage(graph, profile, current, onBack = { page = null })
@@ -145,6 +166,10 @@ fun Shell(graph: AppGraph, profile: Profile, onLogOut: () -> Unit) {
         if (page == null) BottomBar(tab, onTab = { tab = it; page = null }, modifier = Modifier.navigationBarsPadding())
     }
 }
+
+/** True when Android lets this app show notifications (always before Android 13, which has no question). */
+fun notificationsAllowed(context: android.content.Context): Boolean =
+    androidx.core.app.NotificationManagerCompat.from(context).areNotificationsEnabled()
 
 /** Screens not built yet (internal builds only; 2.0 ships with every screen built). */
 @Composable

@@ -12,6 +12,9 @@ import com.engquest.app.data.Repo
 import com.engquest.app.data.SendQueue
 import com.engquest.app.data.SendWorker
 import java.io.File
+import com.engquest.app.domain.Profile
+import com.engquest.app.push.NotifyPrefs
+import kotlinx.coroutines.launch
 import com.engquest.app.domain.Grade
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -45,6 +48,23 @@ class AppGraph(
     val repo = Repo(api, db)
     val profiles = ProfileStore(prefs)
     val sendQueue = SendQueue(db, api, sendDir, kickSender)
+    val notify = NotifyPrefs(prefs)
+
+    /**
+     * Tells the server this phone's notification switches (best effort, in the background).
+     * Without a push token yet (no Firebase, or not registered) there is nothing to tell.
+     */
+    fun syncNotifyPrefs(p: Profile) {
+        val token = notify.token() ?: return
+        val body = mapOf("token" to token, "className" to p.classId, "studentNo" to p.studentNo.toString(), "prefs" to notify.json())
+        scope.launch { runCatching { api.write("registerStudentDevice", body) } }
+    }
+
+    /** Log out: the server stops notifying this phone for that student. */
+    fun forgetDevice() {
+        val token = notify.token() ?: return
+        scope.launch { runCatching { api.write("unregisterStudentDevice", mapOf("token" to token)) } }
+    }
 
     /** The grade the old 1.8 app remembered, used once to preselect the login. */
     fun legacyGrade(): Grade? = Grade.of(legacyPrefs.getString("grade", null))
