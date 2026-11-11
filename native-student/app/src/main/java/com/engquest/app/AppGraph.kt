@@ -46,6 +46,8 @@ class AppGraph(
     kickSender: () -> Unit,
     /** Gets this phone's push token (Firebase); tests pass one that never answers. */
     private val pushToken: ((String) -> Unit) -> Unit = {},
+    /** Looks for a newer app build; null (tests) means no update check. */
+    val updates: com.engquest.app.ui.UpdateChecker? = null,
 ) {
     val repo = Repo(api, db)
     val profiles = ProfileStore(prefs)
@@ -97,6 +99,12 @@ class AppGraph(
             sendDir = File(context.filesDir, "sends"),
             kickSender = { SendWorker.kick(context) },
             pushToken = { cb -> com.engquest.app.push.Notify.token(cb) },
+            updates = com.engquest.app.ui.UpdateChecker(
+                com.engquest.app.ui.UpdateChecker.VERSION_URL,
+                com.engquest.app.ui.UpdateChecker.SITE_BASE,
+                BuildConfig.VERSION_CODE,
+                OkHttpClient(),
+            ),
         )
 
         private fun networkStatus(context: Context): StateFlow<Boolean> {

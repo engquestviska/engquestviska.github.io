@@ -158,6 +158,10 @@ fun HomeScreen(graph: AppGraph, profile: Profile, onOpen: (String) -> Unit) {
         }
         Column(Modifier.offset(y = (-42).dp)) {
             if (data.offlineSince != null) OfflineNote(data.offlineSince!!)
+            graph.updates?.let { checker ->
+                val ctx = androidx.compose.ui.platform.LocalContext.current
+                com.engquest.app.ui.UpdateBanner(checker) { url, onFailed -> com.engquest.app.ui.UpdateInstaller(ctx).start(url, onFailed) }
+            }
             Row(Modifier.padding(horizontal = 14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Chip(data.finalScore ?: "–", "Score", Tint.blue, Tint.blueInk, Modifier.weight(1f)) { onOpen("scores") }
                 Chip(if (data.tasksDone != null) "${data.tasksDone}/${data.tasksTotal}" else "–", "Tasks", Tint.green, Tint.greenInk, Modifier.weight(1f)) { onOpen("taskstatus") }
