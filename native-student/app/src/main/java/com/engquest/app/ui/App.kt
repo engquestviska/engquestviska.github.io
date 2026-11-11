@@ -27,6 +27,7 @@ import com.engquest.app.ui.common.Message
 import com.engquest.app.ui.common.QuestHeader
 import com.engquest.app.ui.home.HomeScreen
 import com.engquest.app.ui.login.LoginScreen
+import com.engquest.app.ui.bell.BellScreen
 import com.engquest.app.ui.learn.LearnScreen
 import com.engquest.app.ui.more.MorePage
 import com.engquest.app.ui.more.MoreScreen
@@ -123,6 +124,7 @@ fun Shell(graph: AppGraph, profile: Profile, onLogOut: () -> Unit) {
                         graph.scope.launch { graph.sendQueue.clear(); graph.repo.forgetAll() }
                         onLogOut()
                     })
+                    "bell" -> BellScreen(graph, profile, onBack = { page = null }, onOpen = ::open)
                     "levelxp", "attendance", "strikes", "taskstatus", "students", "stats" ->
                         MorePage(graph, profile, current, onBack = { page = null })
                     "materials", "assignments", "reading" -> MaterialsScreen(
