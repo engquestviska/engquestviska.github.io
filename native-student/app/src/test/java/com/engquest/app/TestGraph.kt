@@ -16,9 +16,13 @@ fun testGraph(
     baseUrl: String,
     online: MutableStateFlow<Boolean> = MutableStateFlow(true),
     scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined),
+    /** False shows the one-time "Want a buzz?" question; most tests start past it. */
+    buzzAsked: Boolean = true,
 ): AppGraph = AppGraph(
     api = Api(baseUrl, OkHttpClient()),
-    prefs = context.getSharedPreferences("student-test", Context.MODE_PRIVATE),
+    prefs = context.getSharedPreferences("student-test", Context.MODE_PRIVATE).also {
+        it.edit().putBoolean("notifyAsked", buzzAsked).commit()
+    },
     legacyPrefs = context.getSharedPreferences("engquest-test", Context.MODE_PRIVATE),
     db = Room.inMemoryDatabaseBuilder(context, AppDb::class.java).allowMainThreadQueries().build(),
     online = online,

@@ -44,6 +44,8 @@ class AppGraph(
     sendDir: File,
     /** Starts the background sender; tests pass a no-op and call [SendQueue.drain] themselves. */
     kickSender: () -> Unit,
+    /** Gets this phone's push token (Firebase); tests pass one that never answers. */
+    private val pushToken: ((String) -> Unit) -> Unit = {},
 ) {
     val repo = Repo(api, db)
     val profiles = ProfileStore(prefs)
@@ -55,7 +57,12 @@ class AppGraph(
      * Without a push token yet (no Firebase, or not registered) there is nothing to tell.
      */
     fun syncNotifyPrefs(p: Profile) {
-        val token = notify.token() ?: return
+        val token = notify.token()
+        if (token == null) {
+            // First time: ask Firebase for this phone's token, then send (never happens without Firebase).
+            pushToken { t -> notify.saveToken(t); syncNotifyPrefs(p) }
+            return
+        }
         val body = mapOf("token" to token, "className" to p.classId, "studentNo" to p.studentNo.toString(), "prefs" to notify.json())
         scope.launch { runCatching { api.write("registerStudentDevice", body) } }
     }
@@ -89,6 +96,7 @@ class AppGraph(
             scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
             sendDir = File(context.filesDir, "sends"),
             kickSender = { SendWorker.kick(context) },
+            pushToken = { cb -> com.engquest.app.push.Notify.token(cb) },
         )
 
         private fun networkStatus(context: Context): StateFlow<Boolean> {

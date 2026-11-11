@@ -11,6 +11,8 @@ class StudentApplication : Application(), GraphOwner {
     override fun onCreate() {
         super.onCreate()
         graph = AppGraph.create(this)
+        // The channel must exist before the phone shows a notification while the app is closed.
+        com.engquest.app.push.Notify.ensureChannel(this)
         // A send cut off when the app last closed goes back in line and is retried.
         graph.scope.launch { graph.sendQueue.recover() }
     }

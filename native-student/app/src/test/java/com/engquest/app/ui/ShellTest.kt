@@ -58,6 +58,28 @@ class ShellTest {
 
     private fun waitText(t: String) = compose.waitUntil(5000) { compose.onAllNodes(hasText(t)).fetchSemanticsNodes().isNotEmpty() }
 
+    @Test fun askedOnceAboutNotificationsAndNotNowRemembers() {
+        graph = testGraph(context, fake.start(), buzzAsked = false)
+        graph.profiles.save(Profile(Grade.G10, "XE2", 1, "Student 1"))
+        compose.setContent {
+            CompositionLocalProvider(LocalOnBackPressedDispatcherOwner provides backOwner) { StudentApp(graph) }
+        }
+        compose.onNodeWithText("Want a buzz?").assertIsDisplayed()
+        compose.onNodeWithText("Not now").performClick()
+        compose.onNodeWithText("Want a buzz?").assertDoesNotExist()
+        assertEquals(true, graph.notify.asked)
+        assertEquals(false, graph.notify.on)
+    }
+
+    @Test fun aNotificationLinkOpensItsPage() {
+        graph = testGraph(context, fake.start())
+        graph.profiles.save(Profile(Grade.G10, "XE2", 1, "Student 1"))
+        compose.setContent {
+            CompositionLocalProvider(LocalOnBackPressedDispatcherOwner provides backOwner) { StudentApp(graph, link = "strikes") }
+        }
+        compose.onNodeWithTag("screen-strikes").assertIsDisplayed()
+    }
+
     @Test fun noProfileShowsLogin() {
         start(null)
         compose.onNodeWithText("Which grade are you in?").assertIsDisplayed()

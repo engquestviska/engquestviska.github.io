@@ -54,7 +54,7 @@ val ROUTE_TITLES = mapOf(
 
 /** Login first; once a student is saved, checks the class list (renumbered or left) and shows the app. */
 @Composable
-fun StudentApp(graph: AppGraph) {
+fun StudentApp(graph: AppGraph, link: String? = null, onLinkUsed: () -> Unit = {}) {
     var profile by remember { mutableStateOf(graph.profiles.get()) }
     var note by rememberSaveable { mutableStateOf<String?>(null) }
     val p = profile
@@ -79,7 +79,7 @@ fun StudentApp(graph: AppGraph) {
         }
     }
     EqTheme(p.grade) {
-        Shell(graph, p, onLogOut = {
+        Shell(graph, p, link, onLinkUsed, onLogOut = {
             graph.profiles.clear()
             profile = null
         })
@@ -91,14 +91,43 @@ fun StudentApp(graph: AppGraph) {
  * other than Home goes Home; on Home, a second back within 2 seconds closes the app.
  */
 @Composable
-fun Shell(graph: AppGraph, profile: Profile, onLogOut: () -> Unit) {
+fun Shell(graph: AppGraph, profile: Profile, link: String? = null, onLinkUsed: () -> Unit = {}, onLogOut: () -> Unit) {
     var tab by rememberSaveable { mutableStateOf("home") }
     var page by rememberSaveable { mutableStateOf<String?>(null) }
     var lastBackAt by remember { mutableLongStateOf(0L) }
+    var askBuzz by remember { mutableStateOf(!graph.notify.asked) }
     val context = LocalContext.current
+    val askPermission = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
+    ) { }
 
     fun open(route: String) {
         if (route in TABS) { tab = route; page = null } else page = route
+    }
+
+    // A tapped notification opens its page (after login, if the student had to pick their name).
+    LaunchedEffect(link) {
+        if (link != null) { open(link); onLinkUsed() }
+    }
+
+    if (askBuzz) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { },
+            title = { androidx.compose.material3.Text("Want a buzz?") },
+            text = { androidx.compose.material3.Text("Get a notification when your task is approved, you get XP, or your teacher posts news. You can change this any time in More › Settings.") },
+            confirmButton = {
+                androidx.compose.material3.TextButton(onClick = {
+                    askBuzz = false
+                    graph.notify.asked = true
+                    graph.notify.on = true
+                    if (android.os.Build.VERSION.SDK_INT >= 33 && !notificationsAllowed(context)) askPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                    graph.syncNotifyPrefs(profile)
+                }) { androidx.compose.material3.Text("Yes, turn on") }
+            },
+            dismissButton = {
+                androidx.compose.material3.TextButton(onClick = { askBuzz = false; graph.notify.asked = true }) { androidx.compose.material3.Text("Not now") }
+            },
+        )
     }
 
     BackHandler {
