@@ -110,9 +110,11 @@ fun VocabScreen(graph: AppGraph, profile: Profile, onBack: () -> Unit) {
 
     LaunchedEffect(reload) {
         error = null
-        try { vocab = withContext(Dispatchers.IO) { graph.repo.vocabulary(profile).value } } catch (e: ApiError) { error = e.userMessage }
+        try { vocab = run { graph.repo.vocabulary(profile).value } } catch (e: ApiError) { error = e.userMessage }
     }
-    LaunchedEffect(Unit) { while (true) { delay(30_000); now = System.currentTimeMillis() } }
+    val counting = (vocab?.weeklyRemaining ?: 1) <= 0
+    // The countdown ticks only while the week is full (nothing else needs a clock).
+    LaunchedEffect(counting) { while (counting) { delay(30_000); now = System.currentTimeMillis() } }
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         QuestHeader(title = "My Vocabulary", subtitle = "Each new word = +2 XP · up to 30 a week", onBack = onBack)
@@ -153,7 +155,7 @@ fun VocabScreen(graph: AppGraph, profile: Profile, onBack: () -> Unit) {
                                 scope.launch {
                                     val words = JsonArray(listOf(JsonObject(mapOf("english" to JsonPrimitive(english.trim()), "indonesian" to JsonPrimitive(meaning.trim()), "type" to JsonPrimitive(type)))))
                                     try {
-                                        val res = withContext(Dispatchers.IO) { graph.repo.write("addVocabulary", me + ("words" to words.toString())) }
+                                        val res = run { graph.repo.write("addVocabulary", me + ("words" to words.toString())) }
                                         val added = res["added"]?.jsonPrimitive?.intOrNull ?: 0
                                         val reason = (res["rejected"] as? JsonArray)?.firstOrNull()?.let { (it as? JsonObject)?.get("reason")?.jsonPrimitive?.contentOrNull }
                                         msg = if (added > 0) "✅ +${res["xp"]?.jsonPrimitive?.intOrNull ?: 2} XP for \"${english.trim()}\"!" to true
@@ -206,7 +208,7 @@ fun VocabScreen(graph: AppGraph, profile: Profile, onBack: () -> Unit) {
                 TextButton(onClick = {
                     removeWord = null
                     scope.launch {
-                        runCatching { withContext(Dispatchers.IO) { graph.repo.write("removeVocabulary", me + ("english" to w)) } }
+                        runCatching { run { graph.repo.write("removeVocabulary", me + ("english" to w)) } }
                             .onFailure { msg = "Couldn't remove it. Check your connection." to false }
                         reload++
                     }

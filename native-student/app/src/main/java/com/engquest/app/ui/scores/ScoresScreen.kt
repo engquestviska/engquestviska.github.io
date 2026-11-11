@@ -100,7 +100,7 @@ fun ScoresScreen(graph: AppGraph, profile: Profile) {
     var data by remember(profile) { mutableStateOf(ScoresData()) }
     var reload by remember { mutableIntStateOf(0) }
     var tab by rememberSaveable { mutableIntStateOf(0) } // 0..2 chapters, 3 final
-    LaunchedEffect(profile, reload) { data = withContext(Dispatchers.IO) { loadScores(graph, profile) } }
+    LaunchedEffect(profile, reload) { data = run { loadScores(graph, profile) } }
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         QuestHeader(title = "Scores", subtitle = "${profile.classId} · No. ${profile.studentNo}")

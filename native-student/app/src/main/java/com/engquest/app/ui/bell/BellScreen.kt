@@ -50,7 +50,7 @@ fun BellScreen(graph: AppGraph, profile: Profile, onBack: () -> Unit, onOpen: (S
 
     LaunchedEffect(attempt) {
         error = null
-        runCatching { withContext(Dispatchers.IO) { graph.repo.myEvents(profile, 0) } }
+        runCatching { run { graph.repo.myEvents(profile, 0) } }
             .onSuccess { f ->
                 events = f.value
                 more = f.value.size >= PAGE
@@ -79,7 +79,7 @@ fun BellScreen(graph: AppGraph, profile: Profile, onBack: () -> Unit, onOpen: (S
                     TextButton(onClick = {
                         scope.launch {
                             val last = list.last().id
-                            runCatching { withContext(Dispatchers.IO) { graph.repo.myEvents(profile, last) } }.onSuccess { f ->
+                            runCatching { run { graph.repo.myEvents(profile, last) } }.onSuccess { f ->
                                 events = list + f.value
                                 more = f.value.size >= PAGE
                             }

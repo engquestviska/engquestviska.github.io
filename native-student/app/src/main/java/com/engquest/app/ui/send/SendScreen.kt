@@ -126,7 +126,7 @@ fun SendScreen(graph: AppGraph, profile: Profile) {
     var confirmDelete by remember { mutableStateOf<Long?>(null) }
     val queued by graph.sendQueue.observe().collectAsState(initial = emptyList())
 
-    LaunchedEffect(profile, reload, queued.size) { data = withContext(Dispatchers.IO) { loadSend(graph, profile) } }
+    LaunchedEffect(profile, reload, queued.size) { data = run { loadSend(graph, profile) } }
 
     // First open: jump to the first chapter with work still to do.
     LaunchedEffect(data.subs) {

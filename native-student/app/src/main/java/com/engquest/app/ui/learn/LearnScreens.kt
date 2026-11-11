@@ -86,7 +86,7 @@ fun MaterialsScreen(graph: AppGraph, profile: Profile, kind: MaterialKind, onBac
     var data by remember(kind) { mutableStateOf(MatData()) }
     var reload by remember { mutableIntStateOf(0) }
     LaunchedEffect(kind, reload) {
-        data = withContext(Dispatchers.IO) {
+        data = run {
             coroutineScope {
                 val units = async { runCatching { graph.repo.unitNames(profile.grade).value }.getOrDefault(emptyList()) }
                 val chapters = kind.chapters ?: listOf("reading")

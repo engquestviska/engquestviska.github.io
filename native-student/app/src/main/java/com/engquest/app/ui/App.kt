@@ -105,6 +105,10 @@ fun Shell(graph: AppGraph, profile: Profile, link: String? = null, onLinkUsed: (
         if (route in TABS) { tab = route; page = null } else page = route
     }
 
+    // Each start re-tells the server about this phone, so a "yes" given while the server was
+    // unreachable (or before its update) still takes effect, and a renumbered student is followed.
+    LaunchedEffect(profile) { if (graph.notify.on) graph.syncNotifyPrefs(profile) }
+
     // A tapped notification opens its page (after login, if the student had to pick their name).
     LaunchedEffect(link) {
         if (link != null) { open(link); onLinkUsed() }

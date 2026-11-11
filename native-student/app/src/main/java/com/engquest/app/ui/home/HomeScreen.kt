@@ -122,7 +122,7 @@ fun greeting(now: Calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Jak
 fun HomeScreen(graph: AppGraph, profile: Profile, onOpen: (String) -> Unit) {
     var data by remember(profile) { mutableStateOf(HomeData()) }
     var refresh by remember { mutableIntStateOf(0) }
-    LaunchedEffect(profile, refresh) { data = withContext(Dispatchers.IO) { loadHome(graph, profile) } }
+    LaunchedEffect(profile, refresh) { data = run { loadHome(graph, profile) } }
     val eq = LocalEq.current
     val lv = levelFromXp(data.totalXp ?: 0)
 

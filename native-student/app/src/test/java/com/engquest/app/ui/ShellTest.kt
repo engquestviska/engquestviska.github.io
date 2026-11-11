@@ -71,6 +71,17 @@ class ShellTest {
         assertEquals(false, graph.notify.on)
     }
 
+    @Test fun openingTheAppReRegistersAPhoneWithNotificationsOn() {
+        graph = testGraph(context, fake.start())
+        graph.notify.on = true
+        graph.notify.saveToken("tok-9")
+        graph.profiles.save(Profile(Grade.G10, "XE2", 1, "Student 1"))
+        compose.setContent {
+            CompositionLocalProvider(LocalOnBackPressedDispatcherOwner provides backOwner) { StudentApp(graph) }
+        }
+        compose.waitUntil(10_000) { fake.calls("registerStudentDevice").isNotEmpty() }
+    }
+
     @Test fun aNotificationLinkOpensItsPage() {
         graph = testGraph(context, fake.start())
         graph.profiles.save(Profile(Grade.G10, "XE2", 1, "Student 1"))

@@ -131,7 +131,7 @@ private fun <T> Loaded(load: suspend () -> Fresh<T>, content: @Composable (T) ->
     var attempt by remember { mutableIntStateOf(0) }
     LaunchedEffect(attempt) {
         error = null
-        try { value = withContext(Dispatchers.IO) { load() } } catch (e: Exception) { error = (e as? com.engquest.app.data.ApiError)?.userMessage ?: "Please try again." }
+        try { value = run { load() } } catch (e: Exception) { error = (e as? com.engquest.app.data.ApiError)?.userMessage ?: "Please try again." }
     }
     val v = value
     when {
@@ -260,7 +260,7 @@ private fun StudentsPage(graph: AppGraph, p: Profile) = Loaded({ graph.repo.acti
 private fun StatsPage(graph: AppGraph, p: Profile) {
     var stats by remember { mutableStateOf<List<Pair<String, String>>?>(null) }
     LaunchedEffect(p) {
-        stats = withContext(Dispatchers.IO) {
+        stats = run {
             val xp = runCatching { graph.repo.activeness(p.classId).value.firstOrNull { it.no == p.studentNo }?.total }.getOrNull()
             val fin = runCatching { graph.repo.finalScores(p.classId).value.rows.firstOrNull { it.no == p.studentNo }?.calc?.get("Final Score") }.getOrNull()
             val att = runCatching { graph.repo.classAttendance(p).value.byStudent[p.studentNo].orEmpty().values.filter { it.isNotBlank() } }.getOrNull()
