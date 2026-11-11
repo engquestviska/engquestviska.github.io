@@ -219,7 +219,7 @@ private fun StrikesPage(graph: AppGraph, p: Profile) = Loaded({ graph.repo.strik
         Column(Modifier.fillMaxWidth().padding(vertical = 10.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(if (n == 0) "🎉" else "⚠️", style = MaterialTheme.typography.headlineMedium)
             Text(if (n == 0) "No strikes" else "$n strike${if (n == 1) "" else "s"}", style = MaterialTheme.typography.titleLarge, color = if (n == 0) Tint.greenInk else Tint.redInk)
-            Text(if (n == 0) "Keep it up!" else "The reasons appear in What's new when your teacher gives a strike.", style = MaterialTheme.typography.bodySmall, color = LocalEq.current.muted)
+            Text(if (n == 0) "Keep it up!" else "Talk to your teacher if you're not sure why.", style = MaterialTheme.typography.bodySmall, color = LocalEq.current.muted)
         }
     }
 }
