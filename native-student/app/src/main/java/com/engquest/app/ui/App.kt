@@ -34,6 +34,7 @@ import com.engquest.app.ui.more.MoreScreen
 import kotlinx.coroutines.launch
 import com.engquest.app.ui.learn.MaterialKind
 import com.engquest.app.ui.learn.MaterialsScreen
+import com.engquest.app.ui.learn.VocabScreen
 import com.engquest.app.ui.scores.ScoresScreen
 import com.engquest.app.ui.send.SendScreen
 import com.engquest.app.ui.shell.BottomBar
@@ -124,6 +125,7 @@ fun Shell(graph: AppGraph, profile: Profile, onLogOut: () -> Unit) {
                         graph.scope.launch { graph.sendQueue.clear(); graph.repo.forgetAll() }
                         onLogOut()
                     })
+                    "vocab" -> VocabScreen(graph, profile, onBack = { page = null })
                     "bell" -> BellScreen(graph, profile, onBack = { page = null }, onOpen = ::open)
                     "levelxp", "attendance", "strikes", "taskstatus", "students", "stats" ->
                         MorePage(graph, profile, current, onBack = { page = null })
