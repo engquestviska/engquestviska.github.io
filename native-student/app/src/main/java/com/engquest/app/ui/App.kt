@@ -28,6 +28,9 @@ import com.engquest.app.ui.common.QuestHeader
 import com.engquest.app.ui.home.HomeScreen
 import com.engquest.app.ui.login.LoginScreen
 import com.engquest.app.ui.learn.LearnScreen
+import com.engquest.app.ui.more.MorePage
+import com.engquest.app.ui.more.MoreScreen
+import kotlinx.coroutines.launch
 import com.engquest.app.ui.learn.MaterialKind
 import com.engquest.app.ui.learn.MaterialsScreen
 import com.engquest.app.ui.scores.ScoresScreen
@@ -116,6 +119,12 @@ fun Shell(graph: AppGraph, profile: Profile, onLogOut: () -> Unit) {
                     "send" -> SendScreen(graph, profile)
                     "scores" -> ScoresScreen(graph, profile)
                     "learn" -> LearnScreen(onOpen = ::open)
+                    "more" -> MoreScreen(profile, onOpen = ::open, onLogOut = {
+                        graph.scope.launch { graph.sendQueue.clear(); graph.repo.forgetAll() }
+                        onLogOut()
+                    })
+                    "levelxp", "attendance", "strikes", "taskstatus", "students", "stats" ->
+                        MorePage(graph, profile, current, onBack = { page = null })
                     "materials", "assignments", "reading" -> MaterialsScreen(
                         graph, profile,
                         when (current) { "materials" -> MaterialKind.MATERIALS; "assignments" -> MaterialKind.ASSIGNMENTS; else -> MaterialKind.READING },
