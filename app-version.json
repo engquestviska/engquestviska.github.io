@@ -1,9 +1,10 @@
 {
-  "versionCode": 11,
-  "versionName": "2.0.1",
+  "versionCode": 12,
+  "versionName": "2.0.2",
   "apk": "EngQuest-app-7fq93kx2.apk",
-  "notes": "A rounder, friendlier font, the Send button sits in line with the other tabs, and the app starts at the grade choice.",
+  "notes": "Easier-to-read text.",
   "history": [
+    {"version": "2.0.2", "date": "2026-11-12", "notes": ["Easier-to-read text"]},
     {"version": "2.0.1", "date": "2026-11-11", "notes": ["New rounder, friendlier font", "The Send button now sits in line with the other tabs", "The app starts at the grade choice when you first open it or after you log out"]},
     {"version": "2.0", "date": "2026-11-11", "notes": ["A brand-new app, built just for Android phones", "Send your task photos even with no signal: they go when you are back online", "A bell for news: approved tasks, XP, attendance and announcements", "Optional notifications: choose which ones buzz your phone", "Scores, Level/XP, Materials, Vocabulary and more, all inside the app", "After updating, pick your class and name once more"]},
     {"version": "1.8", "date": "2026-10-27", "notes": ["Submit page: choose Take photo (camera) or From gallery", "Pick many photos from your gallery at once (up to 10)"]},
