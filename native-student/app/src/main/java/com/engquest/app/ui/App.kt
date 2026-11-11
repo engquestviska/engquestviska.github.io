@@ -59,7 +59,8 @@ fun StudentApp(graph: AppGraph, link: String? = null, onLinkUsed: () -> Unit = {
     var note by rememberSaveable { mutableStateOf<String?>(null) }
     val p = profile
     if (p == null) {
-        LoginScreen(graph.repo, graph.legacyGrade(), note, onDone = {
+        // Always start at the grade choice (owner, 2026-11-11): first open and after log out.
+        LoginScreen(graph.repo, preselect = null, note, onDone = {
             graph.profiles.save(it)
             note = null
             profile = it

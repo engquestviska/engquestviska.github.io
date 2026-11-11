@@ -97,6 +97,13 @@ class ShellTest {
         compose.onNodeWithText("Which grade are you in?").assertIsDisplayed()
     }
 
+    @Test fun firstOpenStartsAtTheGradeChoiceEvenIfTheOldAppSavedAGrade() {
+        context.getSharedPreferences("engquest-test", Context.MODE_PRIVATE).edit().putString("grade", "11").commit()
+        start(null)
+        compose.onNodeWithText("Which grade are you in?").assertIsDisplayed()
+        context.getSharedPreferences("engquest-test", Context.MODE_PRIVATE).edit().clear().commit()
+    }
+
     @Test fun fiveTabsAndSendOpensSend() {
         start(Profile(Grade.G10, "XE2", 1, "Student 1"))
         for (t in listOf("Home", "Scores", "Send", "Learn", "More")) compose.onNodeWithTag("tab-$t").assertIsDisplayed()

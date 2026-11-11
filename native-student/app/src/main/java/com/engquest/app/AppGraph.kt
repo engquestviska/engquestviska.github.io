@@ -85,7 +85,7 @@ class AppGraph(
     }
 
     /** The grade the old 1.8 app remembered, used once to preselect the login. */
-    fun legacyGrade(): Grade? = Grade.of(legacyPrefs.getString("grade", null))
+    @Suppress("unused") fun legacyGrade(): Grade? = Grade.of(legacyPrefs.getString("grade", null))
 
     /** True when [newestEventId] is newer than what the student last saw in the bell. */
     fun bellUnread(newestEventId: Long): Boolean = newestEventId > prefs.getLong(KEY_BELL_SEEN, 0L)
