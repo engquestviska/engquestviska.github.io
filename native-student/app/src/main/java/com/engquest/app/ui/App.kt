@@ -27,6 +27,9 @@ import com.engquest.app.ui.common.Message
 import com.engquest.app.ui.common.QuestHeader
 import com.engquest.app.ui.home.HomeScreen
 import com.engquest.app.ui.login.LoginScreen
+import com.engquest.app.ui.learn.LearnScreen
+import com.engquest.app.ui.learn.MaterialKind
+import com.engquest.app.ui.learn.MaterialsScreen
 import com.engquest.app.ui.scores.ScoresScreen
 import com.engquest.app.ui.send.SendScreen
 import com.engquest.app.ui.shell.BottomBar
@@ -112,6 +115,16 @@ fun Shell(graph: AppGraph, profile: Profile, onLogOut: () -> Unit) {
                     "home" -> HomeScreen(graph, profile, onOpen = ::open)
                     "send" -> SendScreen(graph, profile)
                     "scores" -> ScoresScreen(graph, profile)
+                    "learn" -> LearnScreen(onOpen = ::open)
+                    "materials", "assignments", "reading" -> MaterialsScreen(
+                        graph, profile,
+                        when (current) { "materials" -> MaterialKind.MATERIALS; "assignments" -> MaterialKind.ASSIGNMENTS; else -> MaterialKind.READING },
+                        onBack = { page = null },
+                        openLink = { link ->
+                            runCatching { context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(link))) }
+                                .onFailure { Toast.makeText(context, "No app on this phone can open this link.", Toast.LENGTH_SHORT).show() }
+                        },
+                    )
                     else -> Placeholder(current, onBack = if (page != null) ({ page = null }) else null)
                 }
             }
