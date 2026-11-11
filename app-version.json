@@ -1,14 +1,15 @@
 {
-  "versionCode": 9,
-  "versionName": "1.8",
+  "versionCode": 10,
+  "versionName": "2.0",
   "apk": "EngQuest-app-7fq93kx2.apk",
-  "notes": "Submit photos more easily: take a photo or pick many from your gallery at once.",
+  "notes": "The new EngQuest app: rebuilt from scratch, with a bell for news and optional notifications.",
   "history": [
-    { "version": "1.8", "date": "2026-10-27", "notes": ["Submit page: choose Take photo (camera) or From gallery", "Pick many photos from your gallery at once (up to 10)"] },
-    { "version": "1.7", "date": "2026-07-27", "notes": ["New Updates page — see what's new before you install, instead of a blank download", "The Download button installs the app for you"] },
-    { "version": "1.6", "date": "2026-07-27", "notes": ["Smoother updates: the app downloads and opens the installer for you", "No more browser or duplicate downloaded files"] },
-    { "version": "1.5", "date": "2026-07-27", "notes": ["Added the menu button (top-left) for the full menu: Assignments, Attendance, Reading, Vocabulary, Strikes, and more"] },
-    { "version": "1.4", "date": "2026-07-27", "notes": ["A real app feel with a bottom menu bar: Home, Materials, Submit, Scores, Me", "Your grade is remembered — no more grade-choosing every time"] },
-    { "version": "1.3", "date": "2026-07-27", "notes": ["The back button remembers where you were", "Added update notices"] }
+    {"version": "2.0", "date": "2026-11-11", "notes": ["A brand-new app, built just for Android phones", "Send your task photos even with no signal: they go when you are back online", "A bell for news: approved tasks, XP, attendance and announcements", "Optional notifications: choose which ones buzz your phone", "Scores, Level/XP, Materials, Vocabulary and more, all inside the app", "After updating, pick your class and name once more"]},
+    {"version": "1.8", "date": "2026-10-27", "notes": ["Submit page: choose Take photo (camera) or From gallery", "Pick many photos from your gallery at once (up to 10)"]},
+    {"version": "1.7", "date": "2026-07-27", "notes": ["New Updates page — see what's new before you install, instead of a blank download", "The Download button installs the app for you"]},
+    {"version": "1.6", "date": "2026-07-27", "notes": ["Smoother updates: the app downloads and opens the installer for you", "No more browser or duplicate downloaded files"]},
+    {"version": "1.5", "date": "2026-07-27", "notes": ["Added the menu button (top-left) for the full menu: Assignments, Attendance, Reading, Vocabulary, Strikes, and more"]},
+    {"version": "1.4", "date": "2026-07-27", "notes": ["A real app feel with a bottom menu bar: Home, Materials, Submit, Scores, Me", "Your grade is remembered — no more grade-choosing every time"]},
+    {"version": "1.3", "date": "2026-07-27", "notes": ["The back button remembers where you were", "Added update notices"]}
   ]
 }
