@@ -23,4 +23,6 @@ fun testGraph(
     db = Room.inMemoryDatabaseBuilder(context, AppDb::class.java).allowMainThreadQueries().build(),
     online = online,
     scope = scope,
+    sendDir = java.io.File(context.cacheDir, "sends-test"),
+    kickSender = {},
 )

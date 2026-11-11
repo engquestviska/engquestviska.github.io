@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
     <external-files-path name="files" path="." />
+    <!-- Photos taken with the camera for a task send, before they are compressed. -->
+    <cache-path name="camera" path="camera/" />
 </paths>

@@ -9,6 +9,9 @@ import com.engquest.app.data.Api
 import com.engquest.app.data.AppDb
 import com.engquest.app.data.ProfileStore
 import com.engquest.app.data.Repo
+import com.engquest.app.data.SendQueue
+import com.engquest.app.data.SendWorker
+import java.io.File
 import com.engquest.app.domain.Grade
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,9 +37,14 @@ class AppGraph(
     /** True while the phone has an internet connection. */
     val online: StateFlow<Boolean>,
     val scope: CoroutineScope,
+    /** Where task photos wait until they are sent. */
+    sendDir: File,
+    /** Starts the background sender; tests pass a no-op and call [SendQueue.drain] themselves. */
+    kickSender: () -> Unit,
 ) {
     val repo = Repo(api, db)
     val profiles = ProfileStore(prefs)
+    val sendQueue = SendQueue(db, api, sendDir, kickSender)
 
     /** The grade the old 1.8 app remembered, used once to preselect the login. */
     fun legacyGrade(): Grade? = Grade.of(legacyPrefs.getString("grade", null))
@@ -59,6 +67,8 @@ class AppGraph(
             db = AppDb.open(context),
             online = networkStatus(context),
             scope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
+            sendDir = File(context.filesDir, "sends"),
+            kickSender = { SendWorker.kick(context) },
         )
 
         private fun networkStatus(context: Context): StateFlow<Boolean> {

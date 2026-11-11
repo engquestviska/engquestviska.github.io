@@ -27,6 +27,7 @@ import com.engquest.app.ui.common.Message
 import com.engquest.app.ui.common.QuestHeader
 import com.engquest.app.ui.home.HomeScreen
 import com.engquest.app.ui.login.LoginScreen
+import com.engquest.app.ui.send.SendScreen
 import com.engquest.app.ui.shell.BottomBar
 import com.engquest.app.ui.theme.EqTheme
 import com.engquest.app.ui.theme.LocalEq
@@ -108,6 +109,7 @@ fun Shell(graph: AppGraph, profile: Profile, onLogOut: () -> Unit) {
             Box(Modifier.fillMaxSize().testTag("screen-$current")) {
                 when (current) {
                     "home" -> HomeScreen(graph, profile, onOpen = ::open)
+                    "send" -> SendScreen(graph, profile)
                     else -> Placeholder(current, onBack = if (page != null) ({ page = null }) else null)
                 }
             }
