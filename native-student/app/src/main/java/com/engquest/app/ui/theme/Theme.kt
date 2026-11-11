@@ -31,7 +31,7 @@ data class EqColors(
     val bg: Color = Color(0xFFEEF2FF),
     val card: Color = Color.White,
     val ink: Color = Color(0xFF0F172A),
-    val muted: Color = Color(0xFF64748B),
+    val muted: Color = Color(0xFF475569), // darker grey: small grey text must stay readable
     val line: Color = Color(0xFFE0E7FF),
 ) {
     val header: Brush get() = Brush.linearGradient(listOf(headerStart, headerMid, headerEnd))
@@ -62,16 +62,17 @@ object Tint {
 val LocalEq = staticCompositionLocalOf { eqColors(Grade.G10) }
 
 /**
- * The app font: Nunito (SIL Open Font License, see native-student/NUNITO-OFL.txt), one variable-weight
- * file. Android 8+ draws each weight; older phones show the regular weight.
+ * The app font: Nunito (SIL Open Font License, see native-student/NUNITO-OFL.txt) as four fixed-weight
+ * files cut from the variable font. Fixed files look the same on every phone; the variable file fell
+ * back to its thinnest weight (200) on many phones. Nothing lighter than SemiBold, so text stays readable.
  */
-@OptIn(androidx.compose.ui.text.ExperimentalTextApi::class)
-private fun nunito(w: Int) = androidx.compose.ui.text.font.Font(
-    com.engquest.app.R.font.nunito,
-    weight = FontWeight(w),
-    variationSettings = androidx.compose.ui.text.font.FontVariation.Settings(androidx.compose.ui.text.font.FontVariation.weight(w)),
+private fun nunito(res: Int, w: FontWeight) = androidx.compose.ui.text.font.Font(res, weight = w)
+val AppFont: FontFamily = FontFamily(
+    nunito(com.engquest.app.R.font.nunito_semibold, FontWeight.SemiBold),
+    nunito(com.engquest.app.R.font.nunito_bold, FontWeight.Bold),
+    nunito(com.engquest.app.R.font.nunito_extrabold, FontWeight.ExtraBold),
+    nunito(com.engquest.app.R.font.nunito_black, FontWeight.Black),
 )
-val AppFont: FontFamily = FontFamily(nunito(400), nunito(600), nunito(700), nunito(800), nunito(900))
 
 private fun style(size: Int, weight: FontWeight, line: Int = size + 6) =
     TextStyle(fontFamily = AppFont, fontSize = size.sp, fontWeight = weight, lineHeight = line.sp)
@@ -80,8 +81,8 @@ private val AppType = Typography(
     headlineMedium = style(24, FontWeight.Black, 30),
     titleLarge = style(18, FontWeight.ExtraBold),
     titleMedium = style(15, FontWeight.ExtraBold),
-    bodyLarge = style(15, FontWeight.SemiBold),
-    bodyMedium = style(14, FontWeight.SemiBold),
+    bodyLarge = style(15, FontWeight.Bold),
+    bodyMedium = style(14, FontWeight.Bold),
     bodySmall = style(12, FontWeight.SemiBold),
     labelLarge = style(14, FontWeight.ExtraBold),
     labelMedium = style(12, FontWeight.Bold),
