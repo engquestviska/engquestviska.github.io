@@ -1,6 +1,6 @@
 {
-  "versionCode": 12,
-  "versionName": "3.9",
+  "versionCode": 13,
+  "versionName": "4.0",
   "apk": "EngQuestTeacher-k4m8q2zt.apk",
-  "notes": "Changes send faster on slow wifi, and \"waiting to send\" now floats at the top so it never covers Approve."
+  "notes": "One score box per task."
 }
