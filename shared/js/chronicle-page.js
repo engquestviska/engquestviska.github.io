@@ -106,7 +106,7 @@
       return;
     }
     var p = profile();
-    if (!p) { location.replace('index.html'); return; }
+    if (!p) { location.replace('index.html'); return; } // pick a grade and sign in first
     message('EngQuest Chronicle', 'Getting your semester ready…');
     window.EQApi.get({ action: 'getChronicle', className: p.classId, studentNo: p.studentNo })
       .then(function (b) {
