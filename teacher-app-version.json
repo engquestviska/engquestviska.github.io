@@ -1,6 +1,6 @@
 {
-  "versionCode": 14,
-  "versionName": "4.1",
+  "versionCode": 15,
+  "versionName": "4.2",
   "apk": "EngQuestTeacher-k4m8q2zt.apk",
-  "notes": "Leaderboard on Home."
+  "notes": "Reset a student's Chronicle PIN from Home."
 }

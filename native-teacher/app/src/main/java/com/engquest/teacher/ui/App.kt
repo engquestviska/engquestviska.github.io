@@ -428,7 +428,10 @@ fun TabContent(
     onLeaderboard: (com.engquest.teacher.ui.home.Board) -> Unit = {},
 ) {
     when (tab) {
-        Tab.HOME -> HomeScreen(feed, graph.session.savedUsername().orEmpty(), onLeaderboard)
+        Tab.HOME -> {
+            val pinReset = remember { com.engquest.teacher.data.PinReset(graph.api) { graph.session.creds() } }
+            HomeScreen(feed, graph.session.savedUsername().orEmpty(), onLeaderboard, onResetPin = pinReset::reset)
+        }
         Tab.ATTENDANCE -> AttendanceScreen(graph, classInfo, guard)
         Tab.SUBMISSIONS -> SubmissionsScreen(submissions, graph.photos, classInfo, guard)
         Tab.XP -> XpScreen(graph, classInfo)
