@@ -78,7 +78,7 @@
     if (!_attempt && needsRequestId(params)) {
       params = Object.assign({}, params, { rid: 'web-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10) });
     }
-    var attempt = params.password ? attemptPost : attemptGet;
+    var attempt = (params.password || params.pin) ? attemptPost : attemptGet; // secrets go in the body, never the link
     return attempt(params).catch(function(err) {
       if (_attempt < 3) {
         var delay = 800 * Math.pow(2, _attempt); // 0.8s → 1.6s → 3.2s

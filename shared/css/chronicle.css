@@ -116,3 +116,21 @@ body.records-mode{background:var(--bg)}
 }
 
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* PIN screen (on the dark message background) */
+.cq-pin{width:min(340px,100%);background:var(--paper);color:var(--ink);border-radius:20px;padding:24px 22px;text-align:left;font-family:var(--head)}
+.cq-pin h1{font:italic 800 30px var(--disp);margin-bottom:6px}
+.cq-pin p{font:600 14px/1.45 var(--body);margin-bottom:14px}
+.cq-pin label{display:block;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.7;margin-bottom:6px}
+.cq-pin input{width:100%;font:800 28px var(--disp);letter-spacing:.5em;text-align:center;padding:10px 6px;border:2px solid var(--ink);border-radius:12px;background:#fff;color:var(--ink);margin-bottom:14px}
+.cq-pin input:focus-visible{outline:3px solid var(--a);outline-offset:2px}
+.cq-pin .cq-pin-err{min-height:20px;color:#B42318;font-weight:800;margin:-4px 0 10px}
+.cq-pin button{width:100%;margin:0;border:0;background:var(--ink);color:var(--paper);border-radius:999px;padding:12px;font:800 15px var(--body);cursor:pointer}
+.cq-pin button:disabled{opacity:.6}
+.cq-pin .cq-pin-help{font-size:12px;opacity:.7;margin:12px 0 0}
+
+/* records: Watch button + Materials/Assignments links */
+.btn.cq-watch{flex:1 1 100%;background:var(--a);border-color:var(--a);color:#fff;font-size:15px;padding:13px 14px}
+.cq-links{display:flex;gap:10px;flex-wrap:wrap}
+.cq-links a{font:800 14px var(--body);color:var(--ink);border:2px solid var(--ink);border-radius:999px;padding:8px 16px;text-decoration:none}
+.cq-links a:focus-visible{outline:3px solid var(--a);outline-offset:2px}

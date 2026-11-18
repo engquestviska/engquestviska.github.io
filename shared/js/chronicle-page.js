@@ -1,7 +1,7 @@
-/* EngQuest Chronicle page: loads the student's semester, plays the story the first time,
-   then shows the records page (Share / Replay). ?demo=1 or ?demo=longname shows sample numbers. */
+/* EngQuest Chronicle page: after the student's 6-digit PIN, shows their semester stats with
+   Watch your Chronicle (the story), Share, and links to Materials and Assignments.
+   ?demo=1 / ?demo=longname / ?demo=11 shows sample numbers (add &story to start the story). */
 (function () {
-  var SEEN = 'eq_chronicle_seen';
   var params = new URLSearchParams(location.search);
   var demo = params.get('demo');
   var $msg = document.getElementById('cq-msg');
@@ -36,7 +36,6 @@
     document.body.classList.remove('records-mode');
     story = S.render($story, vm);
     story.onDone(function () {
-      store(function (ls) { ls.setItem(SEEN, '1'); });
       story.destroy(); story = null;
       showRecords();
     });
@@ -57,6 +56,9 @@
     var words = r.words.map(function (w) { return '<span>' + esc(w) + '</span>'; }).join('');
     var shareLabel = window.EQChronicleCard ? window.EQChronicleCard.primaryLabel() : 'Share';
     var instagram = window.EQChronicleCard && window.EQChronicleCard.canInstagram();
+    // In the app, Materials and Assignments are their own tabs; on the website they are links.
+    var folder = vm.grade === '11' ? 'grade11' : 'grade10';
+    var links = inApp() ? '' : '<a href="' + folder + '/lessons.html">Materials</a><a href="' + folder + '/assignments.html">Assignments</a>';
 
     $rec.innerHTML = '<div class="cq-rec">' +
       '<div class="mast"><i>EngQuest Chronicle</i><span>' + esc(vm.card.label.toUpperCase()) + ' · ENDED</span></div>' +
@@ -64,10 +66,11 @@
       '<div class="cq-hero"><div style="min-width:0"><div class="k">' + esc(vm.classLabel + ' · ' + vm.gradeLabel).toUpperCase() + '</div>' +
       '<div class="num name fitname" data-max="' + (window.innerWidth >= 900 ? 96 : 64) + '">' + esc(vm.name) + '</div></div>' +
       '<div class="cq-ranks">' + (r.rank != null ? '<div><div class="k">CLASS RANK</div><div class="num ac" style="font-size:64px;line-height:.85"><span style="font-size:.45em;vertical-align:.8em">#</span>' + r.rank + '</div></div>' : '') + '</div></div>' +
+      '<div class="cq-btns"><button type="button" class="btn pri cq-watch" data-act="watch">Watch your Chronicle</button></div>' +
       '<div class="cq-btns">' +
       (instagram ? '<button type="button" class="btn pri" data-act="instagram">Share to Instagram Story</button><button type="button" class="btn" data-act="share">More ways to share</button>'
         : '<button type="button" class="btn pri" data-act="share">' + esc(shareLabel) + '</button>') +
-      '<button type="button" class="btn" data-act="replay" style="flex:0 1 110px">Replay</button></div>' +
+      '</div>' +
       '<p class="cq-note k" style="min-height:14px;margin:-8px 0 10px" aria-live="polite"></p>' +
       sec('FINAL', '<span class="num" style="font-size:34px">' + esc(r.final) + '</span> <span style="font-size:12px;font-weight:800;opacity:.6">/ 100</span>') +
       (r.gradeRank != null ? sec('GRADE', '<b>#' + r.gradeRank + '</b> of ' + r.gradeOf + ' in ' + esc(vm.gradeLabel)) : '') +
@@ -75,12 +78,13 @@
       (r.meetings ? sec('PRESENT', '<div style="font-weight:800;margin-bottom:6px">' + r.present + ' of ' + r.meetings + ' days · ' + esc(r.percent) + '</div><div class="dots" style="gap:3px;max-width:340px">' + dots + '</div>') : '') +
       sec('LEVEL', '<b>Level ' + r.level + '</b> · ' + r.xp.toLocaleString('en-US') + ' XP · ' + r.tasksDone + ' tasks' + (r.best ? ' · best: ' + esc(r.best.label) + ', ' + esc(r.best.score) : '')) +
       (r.wordTotal ? sec('WORDS', '<div style="font-weight:800;margin-bottom:4px">' + r.wordTotal + ' collected' + (r.classTop5 ? ' · top 5 in class' : '') + '</div><div style="overflow:hidden"><div class="mqrow it" style="--t:40s;font-size:18px">' + words + words + '</div></div>') : '') +
+      (links ? '<div class="sec"><div class="k">LEARN</div><div class="cq-links">' + links + '</div></div>' : '') +
       '</div></div></div>';
 
     var slot = $rec.querySelector('.cq-card-slot');
     slot.innerHTML = S.cardHtml(vm.card);
     S.fitNames($rec);
-    $rec.querySelector('[data-act="replay"]').onclick = playStory;
+    $rec.querySelector('[data-act="watch"]').onclick = playStory;
     if (window.EQChronicleCard && !window.EngQuestApp) window.EQChronicleCard.prepare(vm);
     $rec.querySelectorAll('[data-act="share"],[data-act="instagram"]').forEach(function (b) {
       b.onclick = function () {
@@ -95,8 +99,66 @@
 
   function start(bundle) {
     vm = D.build(bundle, { grade: bundle.student && bundle.student.grade });
-    var seen = store(function (ls) { return ls.getItem(SEEN); });
-    if (seen && !params.has('story')) showRecords(); else playStory();
+    if (params.has('story')) playStory(); else showRecords();
+  }
+
+  function inApp() { return !!(window.EngQuestApp && window.EngQuestApp.profile); }
+
+  // ---- PIN: made once, kept on this device, needed by the server for the stats ----
+  function pinKey(p) { return 'eq_chronicle_pin_' + p.classId + '_' + p.studentNo; }
+  function savedPin(p) { return store(function (ls) { return ls.getItem(pinKey(p)); }) || ''; }
+  function savePin(p, pin) { store(function (ls) { if (pin) ls.setItem(pinKey(p), pin); else ls.removeItem(pinKey(p)); }); }
+
+  function pinForm(p, mode, note) {
+    $story.hidden = true; $rec.hidden = true; $msg.hidden = false;
+    document.body.classList.remove('records-mode');
+    var make = mode === 'make';
+    $msg.innerHTML = '<form class="cq-pin" novalidate><h1>' + (make ? 'Make your PIN' : 'Enter your PIN') + '</h1>' +
+      '<p>' + (make ? 'Pick 6 numbers only you know. You need them to open your Chronicle.' : 'Your Chronicle is locked with your 6-number PIN.') + '</p>' +
+      '<label for="cq-pin1">' + (make ? 'New PIN' : 'PIN') + '</label>' +
+      '<input id="cq-pin1" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off">' +
+      (make ? '<label for="cq-pin2">Type it again</label><input id="cq-pin2" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off">' : '') +
+      '<p class="cq-pin-err" role="alert">' + esc(note || '') + '</p>' +
+      '<button type="submit">' + (make ? 'Save PIN' : 'Open') + '</button>' +
+      '<p class="cq-pin-help">' + (make ? 'Don’t share it. ' : '') + 'Forgot it? Ask your teacher to reset it.</p></form>';
+    var form = $msg.querySelector('form'), err = $msg.querySelector('.cq-pin-err');
+    var a = document.getElementById('cq-pin1'), b = document.getElementById('cq-pin2');
+    [a, b].forEach(function (el) {
+      if (el) el.addEventListener('input', function () { el.value = el.value.replace(/\D/g, '').slice(0, 6); err.textContent = ''; });
+    });
+    a.focus();
+    form.onsubmit = function (e) {
+      e.preventDefault();
+      if (!/^\d{6}$/.test(a.value)) { err.textContent = 'Enter 6 numbers.'; return; }
+      if (make && a.value !== b.value) { err.textContent = 'The two PINs don’t match. Type them again.'; b.value = ''; b.focus(); return; }
+      form.querySelector('button').disabled = true;
+      if (!make) { savePin(p, a.value); fetchStats(p); return; }
+      window.EQApi.get({ action: 'setChroniclePin', className: p.classId, studentNo: p.studentNo, pin: a.value })
+        .then(function (r) {
+          if (r && r.success) { savePin(p, a.value); fetchStats(p); }
+          else if (r && r.error === 'PIN already set') pinForm(p, 'enter', 'This Chronicle already has a PIN. Enter it, or ask your teacher to reset it.');
+          else pinForm(p, 'make', (r && r.error) || 'Couldn’t save the PIN. Try again.');
+        })
+        .catch(function () { pinForm(p, 'make', 'Can’t reach EngQuest right now. Try again.'); });
+    };
+  }
+
+  function lockedText(retryAt) {
+    var mins = Math.max(1, Math.ceil((retryAt - Date.now()) / 60000));
+    return 'Too many wrong tries. Try again in ' + mins + ' minute' + (mins === 1 ? '' : 's') + ', or ask your teacher to reset your PIN.';
+  }
+
+  function fetchStats(p) {
+    message('EngQuest Chronicle', 'Getting your semester ready…');
+    window.EQApi.get({ action: 'getChronicle', className: p.classId, studentNo: p.studentNo, pin: savedPin(p) })
+      .then(function (b) {
+        if (b && b.error === 'PIN not set') { savePin(p, ''); pinForm(p, 'make'); return; }
+        if (b && b.error === 'Wrong PIN') { savePin(p, ''); pinForm(p, 'enter', 'Wrong PIN. ' + b.triesLeft + ' tr' + (b.triesLeft === 1 ? 'y' : 'ies') + ' left.'); return; }
+        if (b && b.error === 'Locked') { savePin(p, ''); pinForm(p, 'enter', lockedText(b.retryAt)); return; }
+        if (!b || b.error) { message('We couldn’t find your record', 'Talk to your teacher.'); return; }
+        start(b);
+      })
+      .catch(function () { message('Can’t reach EngQuest right now', 'Check your internet, then try again.', function () { fetchStats(p); }); });
   }
 
   function load() {
@@ -107,24 +169,27 @@
       return;
     }
     var p = profile();
-    var inApp = !!(window.EngQuestApp && window.EngQuestApp.profile);
     if (!p) {
-      if (inApp) message('EngQuest Chronicle', 'Sign in again from the app, then come back.');
+      if (inApp()) message('EngQuest Chronicle', 'Sign in again from the app, then come back.');
       else location.replace('index.html'); // pick a grade and sign in first
       return;
     }
     message('EngQuest Chronicle', 'Getting your semester ready…');
-    window.EQApi.get({ action: 'getChronicle', className: p.classId, studentNo: p.studentNo })
-      .then(function (b) {
-        if (!b || b.error) { message('We couldn’t find your record', 'Talk to your teacher.'); return; }
-        if (!b.active) {
-          // Tell the student pages' switch it is off now, or they would send the student straight back here.
-          try { sessionStorage.setItem('eq_chronicle_status', JSON.stringify({ active: false, at: Date.now() })); } catch (e) {}
-          if (inApp) message('EngQuest Chronicle', 'Your Chronicle opens when the semester ends.');
+    window.EQApi.get({ action: 'getChronicleStatus', className: p.classId })
+      .then(function (st) {
+        if (!st || !st.active) {
+          // Tell the student pages' switch it is off, or they would send the student straight back here.
+          try { sessionStorage.setItem('eq_chronicle_status', JSON.stringify({ cls: p.classId, active: false, at: Date.now() })); } catch (e) {}
+          if (inApp()) message('EngQuest Chronicle', 'Your Chronicle opens when the semester ends.');
           else location.replace((String(p.grade) === '11' ? 'grade11' : 'grade10') + '/index.html');
           return;
         }
-        start(b);
+        if (savedPin(p)) { fetchStats(p); return; }
+        return window.EQApi.get({ action: 'getChroniclePinState', className: p.classId, studentNo: p.studentNo })
+          .then(function (s2) {
+            if (!s2 || s2.error) { message('We couldn’t find your record', 'Talk to your teacher.'); return; }
+            pinForm(p, s2.hasPin ? 'enter' : 'make');
+          });
       })
       .catch(function () { message('Can’t reach EngQuest right now', 'Check your internet, then try again.', load); });
   }
