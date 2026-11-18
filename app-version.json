@@ -1,9 +1,10 @@
 {
-  "versionCode": 14,
-  "versionName": "2.1",
+  "versionCode": 15,
+  "versionName": "2.2",
   "apk": "EngQuest-app-7fq93kx2.apk",
-  "notes": "Ready for the end of the semester.",
+  "notes": "Ready for the end of the semester. Please update before Nov 20.",
   "history": [
+    {"version": "2.2", "date": "2026-11-18", "notes": ["Ready for the end of the semester"]},
     {"version": "2.1", "date": "2026-11-18", "notes": ["Ready for the end of the semester"]},
     {"version": "2.0.3", "date": "2026-11-18", "notes": ["Scores: Class Rank shows the whole class, ranked by Final Score"]},
     {"version": "2.0.2", "date": "2026-11-12", "notes": ["Easier-to-read text"]},

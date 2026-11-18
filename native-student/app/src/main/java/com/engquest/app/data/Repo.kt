@@ -57,9 +57,10 @@ class Repo(
     suspend fun myEvents(p: Profile, beforeId: Long) =
         cached("getMyEvents", me(p) + (if (beforeId > 0) mapOf("beforeId" to beforeId.toString()) else emptyMap()), Parse::events)
 
-    /** True once the semester has ended and the app shows EngQuest Chronicle. Any error -> false (normal app). */
-    suspend fun chronicleActive(): Boolean = try {
-        api.read("getChronicleStatus", emptyMap())["active"]?.jsonPrimitive?.booleanOrNull == true
+    /** True once the semester has ended for [classId] (exempt classes such as XE5 never) and the app
+     *  shows EngQuest Chronicle. Any error -> false (normal app). */
+    suspend fun chronicleActive(classId: String): Boolean = try {
+        api.read("getChronicleStatus", mapOf("className" to classId))["active"]?.jsonPrimitive?.booleanOrNull == true
     } catch (e: ApiError) {
         false
     }

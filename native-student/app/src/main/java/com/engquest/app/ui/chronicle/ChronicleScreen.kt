@@ -9,7 +9,19 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -110,4 +122,31 @@ fun ChronicleScreen(profile: Profile, url: String = CHRONICLE_URL, modifier: Mod
             }
         },
     )
+}
+
+/** The three tabs students keep once the semester has ended: Chronicle, Materials, Assignments. */
+@Composable
+fun ChronicleBar(current: String, onTab: (String) -> Unit, modifier: Modifier = Modifier) {
+    val eq = com.engquest.app.ui.theme.LocalEq.current
+    androidx.compose.foundation.layout.Column(modifier.fillMaxWidth().background(androidx.compose.ui.graphics.Color.White)) {
+        androidx.compose.foundation.layout.Box(Modifier.fillMaxWidth().height(1.dp).background(eq.line))
+        androidx.compose.foundation.layout.Row(
+            Modifier.fillMaxWidth().padding(vertical = 8.dp),
+            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceAround,
+        ) {
+            listOf("chronicle" to "Chronicle", "materials" to "Materials", "assignments" to "Assignments").forEach { (route, label) ->
+                val on = route == current
+                androidx.compose.material3.Text(
+                    label,
+                    modifier = Modifier.testTag("tab-$label")
+                        .semantics { role = Role.Tab; selected = on }
+                        .clip(RoundedCornerShape(12.dp))
+                        .clickable { onTab(route) }
+                        .padding(horizontal = 14.dp, vertical = 8.dp),
+                    style = androidx.compose.material3.MaterialTheme.typography.labelLarge,
+                    color = if (on) eq.accent else eq.muted,
+                )
+            }
+        }
+    }
 }

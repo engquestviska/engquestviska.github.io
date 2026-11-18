@@ -173,6 +173,21 @@ class ShellTest {
         start(Profile(Grade.G10, "XE2", 1, "Student 1"))
         compose.waitUntil(5000) { compose.onAllNodes(androidx.compose.ui.test.hasTestTag("chronicle")).fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithTag("screen-home").assertDoesNotExist()
+        compose.onNodeWithTag("tab-Send").assertDoesNotExist()
+        compose.onNodeWithTag("tab-Materials").assertExists()
+        compose.onNodeWithTag("tab-Assignments").assertExists()
+        assertTrue(fake.calls("getChronicleStatus").single().contains("className=XE2"))
+    }
+
+    @Test fun chronicleModeOpensMaterialsAndComesBack() {
+        fake.replies["getChronicleStatus"] = """{"success":true,"active":true,"start":"2026-11-17T00:00:00+07:00"}"""
+        start(Profile(Grade.G10, "XE2", 1, "Student 1"))
+        compose.waitUntil(5000) { compose.onAllNodes(androidx.compose.ui.test.hasTestTag("tab-Materials")).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithTag("tab-Materials").performClick()
+        compose.onNodeWithTag("screen-materials").assertExists()
+        compose.onNodeWithTag("chronicle").assertDoesNotExist()
+        compose.onNodeWithTag("tab-Chronicle").performClick()
+        compose.onNodeWithTag("chronicle").assertExists()
     }
 
     @Test fun theTabsStayWhenChronicleIsOff() {
