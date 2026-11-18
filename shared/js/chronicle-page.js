@@ -10,6 +10,21 @@
   var D = window.EQChronicleData, S = window.EQChronicleStory;
   var esc = S.esc;
   var vm = null, story = null;
+  var opensAt = ''; // set while Chronicle is not open yet: only the PIN can be made
+
+  function homeUrl(p) { return (String(p && p.grade) === '11' ? 'grade11' : 'grade10') + '/index.html'; }
+  function dayText(iso) {
+    try { return new Date(iso).toLocaleDateString('en-US', { month: 'long', day: 'numeric', timeZone: 'Asia/Jakarta' }); }
+    catch (e) { return 'soon'; }
+  }
+  // Before Chronicle opens: the PIN is made, nothing else to see yet.
+  function allSet(p, note) {
+    $story.hidden = true; $rec.hidden = true; $msg.hidden = false;
+    document.body.classList.remove('records-mode');
+    $msg.innerHTML = '<div class="cq-pin"><h1>You’re all set</h1><p>' + esc(note || 'Your PIN is ready.') + '</p>' +
+      '<p>Your EngQuest Chronicle opens on <b>' + esc(dayText(opensAt)) + '</b>. Come back then and enter your PIN.</p>' +
+      (inApp() ? '' : '<a class="cq-home" href="' + homeUrl(p) + '">Back to Home</a>') + '</div>';
+  }
 
   function store(fn) { try { return fn(window.localStorage); } catch (e) { return null; } }
 
@@ -58,7 +73,7 @@
     var instagram = window.EQChronicleCard && window.EQChronicleCard.canInstagram();
     // In the app, Materials and Assignments are their own tabs; on the website they are links.
     var folder = vm.grade === '11' ? 'grade11' : 'grade10';
-    var links = inApp() ? '' : '<a href="' + folder + '/lessons.html">Materials</a><a href="' + folder + '/assignments.html">Assignments</a>';
+    var links = inApp() ? '' : '<a href="' + folder + '/index.html">Home</a><a href="' + folder + '/lessons.html">Materials</a><a href="' + folder + '/assignments.html">Assignments</a>';
 
     $rec.innerHTML = '<div class="cq-rec">' +
       '<div class="mast"><i>EngQuest Chronicle</i><span>' + esc(vm.card.label.toUpperCase()) + ' · ENDED</span></div>' +
@@ -135,7 +150,8 @@
       if (!make) { savePin(p, a.value); fetchStats(p); return; }
       window.EQApi.get({ action: 'setChroniclePin', className: p.classId, studentNo: p.studentNo, pin: a.value })
         .then(function (r) {
-          if (r && r.success) { savePin(p, a.value); fetchStats(p); }
+          if (r && r.success) { savePin(p, a.value); if (opensAt) allSet(p, 'Your PIN is saved.'); else fetchStats(p); }
+          else if (r && r.error === 'PIN already set' && opensAt) allSet(p, 'This Chronicle already has a PIN. If you didn’t make it, ask your teacher to reset it.');
           else if (r && r.error === 'PIN already set') pinForm(p, 'enter', 'This Chronicle already has a PIN. Enter it, or ask your teacher to reset it.');
           else pinForm(p, 'make', (r && r.error) || 'Couldn’t save the PIN. Try again.');
         })
@@ -152,6 +168,7 @@
     message('EngQuest Chronicle', 'Getting your semester ready…');
     window.EQApi.get({ action: 'getChronicle', className: p.classId, studentNo: p.studentNo, pin: savedPin(p) })
       .then(function (b) {
+        if (b && b.error === 'Not open yet') { opensAt = b.openAt || opensAt; allSet(p); return; }
         if (b && b.error === 'PIN not set') { savePin(p, ''); pinForm(p, 'make'); return; }
         if (b && b.error === 'Wrong PIN') { savePin(p, ''); pinForm(p, 'enter', 'Wrong PIN. ' + b.triesLeft + ' tr' + (b.triesLeft === 1 ? 'y' : 'ies') + ' left.'); return; }
         if (b && b.error === 'Locked') { savePin(p, ''); pinForm(p, 'enter', lockedText(b.retryAt)); return; }
@@ -181,13 +198,15 @@
           // Tell the student pages' switch it is off, or they would send the student straight back here.
           try { sessionStorage.setItem('eq_chronicle_status', JSON.stringify({ cls: p.classId, active: false, at: Date.now() })); } catch (e) {}
           if (inApp()) message('EngQuest Chronicle', 'Your Chronicle opens when the semester ends.');
-          else location.replace((String(p.grade) === '11' ? 'grade11' : 'grade10') + '/index.html');
+          else location.replace(homeUrl(p));
           return;
         }
-        if (savedPin(p)) { fetchStats(p); return; }
+        if (!st.open) opensAt = st.openAt || 'soon';
+        if (savedPin(p) && !opensAt) { fetchStats(p); return; }
         return window.EQApi.get({ action: 'getChroniclePinState', className: p.classId, studentNo: p.studentNo })
           .then(function (s2) {
             if (!s2 || s2.error) { message('We couldn’t find your record', 'Talk to your teacher.'); return; }
+            if (opensAt) { if (s2.hasPin) allSet(p); else pinForm(p, 'make'); return; }
             pinForm(p, s2.hasPin ? 'enter' : 'make');
           });
       })
