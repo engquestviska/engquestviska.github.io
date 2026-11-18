@@ -20,6 +20,14 @@ val keystorePropsFile = file(
 val keystoreProps = Properties().apply {
     if (keystorePropsFile.exists()) keystorePropsFile.inputStream().use { load(it) }
 }
+// Meta (Facebook) App ID for "Share to Instagram Story": native-student/local.properties
+// `meta.appId=...` (git-ignored). Without it the Instagram button is hidden.
+val localProps = Properties().apply {
+    val f = rootProject.file("local.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+val metaAppId = localProps.getProperty("meta.appId").orEmpty().trim()
+
 val hasSigning = listOf("storeFile", "storePassword", "keyAlias", "keyPassword")
     .all { !keystoreProps.getProperty(it).isNullOrBlank() }
 
@@ -33,6 +41,7 @@ android {
         targetSdk = 34
         versionCode = 13
         versionName = "2.0.3"
+        buildConfigField("String", "META_APP_ID", "\"$metaAppId\"")
     }
 
     signingConfigs {

@@ -3,4 +3,6 @@
     <external-files-path name="files" path="." />
     <!-- Photos taken with the camera for a task send, before they are compressed. -->
     <cache-path name="camera" path="camera/" />
+    <!-- EngQuest Chronicle pictures handed to Instagram / the share sheet. -->
+    <cache-path name="share" path="share/" />
 </paths>

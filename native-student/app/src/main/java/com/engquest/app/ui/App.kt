@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -140,6 +141,21 @@ fun Shell(graph: AppGraph, profile: Profile, link: String? = null, onLinkUsed: (
                 androidx.compose.material3.TextButton(onClick = { askBuzz = false; graph.notify.asked = true }) { androidx.compose.material3.Text("Not now") }
             },
         )
+    }
+
+    // Once the semester has ended (the server decides), the whole app becomes EngQuest Chronicle.
+    var chronicle by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { chronicle = graph.repo.chronicleActive() }
+    if (chronicle) {
+        BackHandler {
+            if (System.currentTimeMillis() - lastBackAt < 2000) (context as? android.app.Activity)?.finish()
+            else {
+                lastBackAt = System.currentTimeMillis()
+                Toast.makeText(context, "Press back again to exit", Toast.LENGTH_SHORT).show()
+            }
+        }
+        com.engquest.app.ui.chronicle.ChronicleScreen(profile, modifier = Modifier.statusBarsPadding())
+        return
     }
 
     BackHandler {

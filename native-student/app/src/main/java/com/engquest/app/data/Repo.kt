@@ -5,7 +5,9 @@ import com.engquest.app.domain.Parse
 import com.engquest.app.domain.Profile
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 /** A reply plus where it came from: [fromCache] means no signal, showing what was saved at [savedAt]. */
 data class Fresh<T>(val value: T, val fromCache: Boolean, val savedAt: Long)
@@ -54,6 +56,13 @@ class Repo(
     suspend fun announcement(p: Profile) = cached("getAnnouncement", mapOf("className" to p.classId), Parse::announcement)
     suspend fun myEvents(p: Profile, beforeId: Long) =
         cached("getMyEvents", me(p) + (if (beforeId > 0) mapOf("beforeId" to beforeId.toString()) else emptyMap()), Parse::events)
+
+    /** True once the semester has ended and the app shows EngQuest Chronicle. Any error -> false (normal app). */
+    suspend fun chronicleActive(): Boolean = try {
+        api.read("getChronicleStatus", emptyMap())["active"]?.jsonPrimitive?.booleanOrNull == true
+    } catch (e: ApiError) {
+        false
+    }
 
     /** Writes go straight to the server (no cache); they throw [ApiError] when they could not be saved. */
     suspend fun write(action: String, params: Map<String, String>): JsonObject = api.write(action, params)

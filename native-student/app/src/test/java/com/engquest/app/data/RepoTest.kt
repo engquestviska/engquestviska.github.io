@@ -83,4 +83,16 @@ class RepoTest {
         store.clear()
         assertNull(store.get())
     }
+
+    @Test fun chronicleActiveTrueWhenTheServerSaysSo() = runBlocking {
+        server.enqueue(MockResponse().setBody("""{"success":true,"active":true,"start":"2026-12-19T00:00:00+07:00"}"""))
+        assertTrue(repo.chronicleActive())
+    }
+
+    @Test fun chronicleActiveFalseWhenOffOrOnError() = runBlocking {
+        server.enqueue(MockResponse().setBody("""{"success":true,"active":false,"start":""}"""))
+        assertFalse(repo.chronicleActive())
+        server.enqueue(MockResponse().setResponseCode(500))
+        assertFalse(repo.chronicleActive())
+    }
 }

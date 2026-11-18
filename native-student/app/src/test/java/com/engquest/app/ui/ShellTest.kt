@@ -167,4 +167,20 @@ class ShellTest {
         waitText("We couldn't find your name in XE2 any more. Please pick it again.")
         compose.waitUntil(5000) { kotlinx.coroutines.runBlocking { graph.db.photoSendDao().all().isEmpty() } }
     }
+
+    @Test fun chronicleReplacesTheTabsWhenItIsOn() {
+        fake.replies["getChronicleStatus"] = """{"success":true,"active":true,"start":"2026-11-17T00:00:00+07:00"}"""
+        start(Profile(Grade.G10, "XE2", 1, "Student 1"))
+        compose.waitUntil(5000) { compose.onAllNodes(androidx.compose.ui.test.hasTestTag("chronicle")).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithTag("screen-home").assertDoesNotExist()
+    }
+
+    @Test fun theTabsStayWhenChronicleIsOff() {
+        fake.replies["getChronicleStatus"] = """{"success":true,"active":false,"start":""}"""
+        start(Profile(Grade.G10, "XE2", 1, "Student 1"))
+        compose.waitUntil(5000) { fake.calls("getChronicleStatus").isNotEmpty() }
+        compose.waitForIdle()
+        compose.onNodeWithTag("screen-home").assertExists()
+        compose.onNodeWithTag("chronicle").assertDoesNotExist()
+    }
 }
