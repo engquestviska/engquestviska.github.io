@@ -29,8 +29,8 @@ android {
         applicationId = "com.engquest.teacher"
         minSdk = 24
         targetSdk = 34
-        versionCode = 13
-        versionName = "4.0"
+        versionCode = 14
+        versionName = "4.1"
     }
 
     signingConfigs {

@@ -51,13 +51,15 @@ private val MONTHS = listOf("January", "February", "March", "April", "May", "Jun
 
 /** The first screen: a welcome with what's waiting, and the top students of the semester. */
 @Composable
-fun HomeScreen(vm: HomeViewModel, name: String) {
+fun HomeScreen(vm: HomeViewModel, name: String, onLeaderboard: (Board) -> Unit = {}) {
     LazyColumn(Modifier.fillMaxSize().testTag("home"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         item { Welcome(name, vm.waiting) }
         if (vm.champions.isNotEmpty()) {
             item { Heading("🏆 Champions of the semester") }
             item { Champions(vm.champions) }
         }
+        item { Heading("📊 Leaderboard") }
+        item { LeaderboardButtons(onLeaderboard) }
         item { Box(Modifier.padding(8.dp)) }
     }
 }

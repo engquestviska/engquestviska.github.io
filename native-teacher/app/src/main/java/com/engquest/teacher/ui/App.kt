@@ -185,6 +185,9 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
     val feed = remember { HomeViewModel(graph, scope) }
     LaunchedEffect(feed) { feed.start() }
     var showUploads by rememberSaveable { mutableStateOf(false) }
+    // The leaderboard opened from Home (Score or Level), shown over the tab like the uploads list.
+    var board by rememberSaveable { mutableStateOf<com.engquest.teacher.ui.home.Board?>(null) }
+    BackHandler(enabled = board != null) { board = null }
     var seenUpload by remember { mutableStateOf(prefs.getLong(AppGraph.KEY_SEEN_UPLOAD, 0L)) }
     val newUploads = feed.newSince(seenUpload)
     fun openUploads() {
@@ -266,13 +269,13 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
     Box(Modifier.fillMaxSize().background(PageBackground)) {
         Column(Modifier.fillMaxSize().imePadding()) {
             TopBar(
-                title = if (showUploads) "Recent uploads" else tab.title,
+                title = if (showUploads) "Recent uploads" else if (board != null) "Leaderboard" else tab.title,
                 classLabel = classInfo.label,
                 onClassClick = { sheet = ShellSheet.CLASS },
                 onLogOutClick = { leaveThen { askLogout = true } },
                 newUploads = newUploads,
                 onBell = ::openUploads,
-                onBack = if (showUploads) ({ showUploads = false }) else null,
+                onBack = if (showUploads) ({ showUploads = false }) else if (board != null) ({ board = null }) else null,
             )
             graph.updates?.let { checker ->
                 val context = LocalContext.current
@@ -281,8 +284,10 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
             Box(Modifier.weight(1f).fillMaxWidth()) {
                 if (showUploads) {
                     ActivityScreen(feed, ::openSubmission)
+                } else if (board != null) {
+                    com.engquest.teacher.ui.home.LeaderboardScreen(board!!) { action, cls -> graph.repo.load(action, cls) }
                 } else {
-                    TabContent(tab, graph, classInfo, guard, submissions, feed)
+                    TabContent(tab, graph, classInfo, guard, submissions, feed, onLeaderboard = { board = it })
                 }
                 // Floats at the top of the page (not in it), so the page doesn't jump when it
                 // appears or goes away, and it never covers the buttons at the bottom.
@@ -293,8 +298,9 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
                 )
             }
             TabBar(tab, badges = mapOf(Tab.SUBMISSIONS to submissions.waiting)) { picked ->
-                if (picked != tab || showUploads) leaveThen {
+                if (picked != tab || showUploads || board != null) leaveThen {
                     showUploads = false
+                    board = null
                     tab = picked
                 }
             }
@@ -419,9 +425,10 @@ fun TabContent(
     guard: LeaveGuard,
     submissions: SubmissionsViewModel,
     feed: HomeViewModel,
+    onLeaderboard: (com.engquest.teacher.ui.home.Board) -> Unit = {},
 ) {
     when (tab) {
-        Tab.HOME -> HomeScreen(feed, graph.session.savedUsername().orEmpty())
+        Tab.HOME -> HomeScreen(feed, graph.session.savedUsername().orEmpty(), onLeaderboard)
         Tab.ATTENDANCE -> AttendanceScreen(graph, classInfo, guard)
         Tab.SUBMISSIONS -> SubmissionsScreen(submissions, graph.photos, classInfo, guard)
         Tab.XP -> XpScreen(graph, classInfo)
