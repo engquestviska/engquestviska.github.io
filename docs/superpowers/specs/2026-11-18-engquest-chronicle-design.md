@@ -93,7 +93,7 @@ Rejected along the way: a plain card-only version (too much like a report card),
 2. **Build it twice: web for the website, Compose for the native app.** Fully native feel, but every slide and animation is built and maintained twice.
 3. **Native app only, website shows just the records.** Cheaper, but iPhone students (website only) would miss the story.
 
-**Recommendation: 1**, because the story is a one-off seasonal screen where the animation and type quality matter more than native feel, and it keeps the website and app identical. The owner hasn't picked yet. **Owner to confirm before planning.**
+**Picked: 1 (owner, 2026-11-18).** The story is a one-off seasonal screen where animation and type quality matter more than native feel, and one page keeps the website and app identical. The native student app shows the shared Chronicle page in a WebView while records mode is on.
 
 ## Switching on and off
 
@@ -116,5 +116,5 @@ Proposal (my call; owner can override): a single "semester ended" setting on the
 
 ## Open questions for the owner
 
-1. Build approach: 1, 2, or 3 above?
+1. ~~Build approach~~ answered: 1, one shared page.
 2. Who flips the switch, and when: the teacher with a toggle (proposed), or a fixed date?
