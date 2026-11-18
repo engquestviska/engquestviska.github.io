@@ -91,7 +91,7 @@ Students share without saving to the gallery first.
 
 ## Share card (the picture students post)
 
-9:16 portrait (export at 1080×1920). Masthead; "Starring" + name + class/grade; giant accent "#rank" with "Class Rank" label; Final Score and Grade Rank ("#11/178") on the right; a bottom strip separated by thin rules with Level · Present % · Tasks · Words. On screen a soft shine passes over it; the exported image is static.
+9:16 portrait (export at 1080×1920). Masthead; "Starring" + name + class/grade; giant accent "#rank" with "Class Rank" label; Final Score alone on the right; Grade Rank as one quiet line under the big number ("#11 of 178 in Grade 10"), so the card stays uncluttered; a bottom strip separated by thin rules with Level · Present % · Tasks · Words. On screen a soft shine passes over it; the exported image is static.
 
 ## Records page (after the story, until next semester)
 

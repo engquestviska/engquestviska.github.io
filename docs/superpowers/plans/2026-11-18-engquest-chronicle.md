@@ -225,7 +225,7 @@ test('class label reads X-E2 for XE2', () => { assert.equal(build(SAMPLE, { grad
 **Files:** Create `shared/js/chronicle-card.js`. Modify `chronicle-page.js` to wire the buttons.
 
 **Interfaces:**
-- Produces `EQChronicleCard.toBlob(vm.card, { accent }) → Promise<Blob>` (PNG, 1080×1920), drawn on a canvas with the share-card layout (masthead, Starring + name, giant accent `#rank`, Final and Grade Rank on the right, a 4-cell bottom strip: Level, Present, Tasks, Words). Await `document.fonts.ready` before drawing. No shine effect in the image.
+- Produces `EQChronicleCard.toBlob(vm.card, { accent }) → Promise<Blob>` (PNG, 1080×1920), drawn on a canvas with the share-card layout (masthead, Starring + name, giant accent `#rank` with one line under it ("#11 of 178 in Grade 10"), Final alone on the right, a 4-cell bottom strip: Level, Present, Tasks, Words). Await `document.fonts.ready` before drawing. No shine effect in the image.
 - Also produces `EQChronicleCard.stickerBlob(vm.card, { accent }) → Promise<Blob>`: the card at 720×1280, rounded corners, transparent outside.
 - Buttons: in the app (`window.EngQuestApp`): if `EngQuestApp.canShareToInstagram()` returns true, show **Share to Instagram Story** → `EngQuestApp.shareToInstagramStory(stickerBase64)`, and **More ways to share** → `EngQuestApp.shareImage(cardBase64)`; otherwise show only **Share** → `shareImage`. On the website: if `navigator.canShare({ files })` → **Share** via `navigator.share`; else **Download picture** as `EngQuest-Chronicle-<Name>.png`.
 
