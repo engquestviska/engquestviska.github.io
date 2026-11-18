@@ -143,3 +143,15 @@ Students share without saving to the gallery first.
 
 1. ~~Build approach~~ answered: 1, one shared page.
 2. ~~Who flips the switch~~ answered: a fixed date (owner supplies the date before launch).
+
+## Revision 2026-11-18 (owner): earlier start, stats-only, PIN
+
+Replaces the parts above that disagree.
+
+- **Start:** 2026-11-20 00:00 WIB (was Dec 17).
+- **XE5 is exempt:** the server's `chronicle_exempt` setting (`["XE5"]`) keeps XE5 on the normal website and app (they still submit).
+- **Everyone else:** stats only, plus **Materials** and **Assignments**. Website: every student page except `lessons.html` / `assignments.html` sends the student to `chronicle.html`. App 2.2: three tabs (Chronicle, Materials, Assignments).
+- **The story no longer plays by itself.** The stats page has a **Watch your Chronicle** button.
+- **6-digit PIN:** made once (typed twice), stored salted + hashed (`chronicle_pins`). `getChronicle` needs the right PIN. 5 wrong tries lock it for 15 minutes. The device remembers it. The PIN is sent in the request body (POST), never in the link. Known gap, accepted: whoever opens a student's Chronicle first sets the PIN.
+- **Teacher reset:** teacher app 4.2 Home has "Reset a student's Chronicle PIN" (class + number, teacher login required).
+- **Not covered:** older read actions (class lists, scores) remain readable without a login; no student page shows them after Nov 20.
