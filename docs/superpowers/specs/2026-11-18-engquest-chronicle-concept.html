@@ -42,10 +42,19 @@ section{margin-bottom:56px}
 .play .sl{animation:slideL .9s cubic-bezier(.2,.9,.2,1) both;animation-delay:var(--d,0s)}
 .play .sticker{animation:pop .6s both;animation-delay:var(--d,1s)}
 .play .ch span{display:inline-block;animation:up .6s cubic-bezier(.2,.9,.3,1.2) both;animation-delay:calc(.25s + var(--i)*45ms)}
-.play .tile,.play .dot{animation:pop .35s both;animation-delay:calc(.5s + var(--i)*45ms)}
+.play .tile,.play .dot{animation:pop .35s calc(.5s + var(--i)*45ms) both,wave 2.6s calc(2.6s + var(--i)*70ms) ease-in-out infinite}
 .play .tile.best{animation:pop .35s calc(.5s + var(--i)*45ms) both,glowT 1.6s 2s ease-in-out infinite}
-.play .fillbar{animation:fill 1.6s .7s cubic-bezier(.6,0,.2,1) both}
-.play .pin{animation:slideX 1.6s .5s cubic-bezier(.6,0,.2,1) both}
+.play .fillbar{animation:fill 3.6s .7s cubic-bezier(.45,0,.25,1) both}
+.play .pin{animation:slideX 1.6s .5s cubic-bezier(.6,0,.2,1) both,bob 1.8s 2.2s ease-in-out infinite}
+.play .float{animation:up .7s var(--d,0s) cubic-bezier(.2,.9,.3,1.15) both,float 4s 2s ease-in-out infinite}
+.play .blob.grow{animation:grow 1s cubic-bezier(.2,.9,.3,1.1) both,breathe 6s 1s ease-in-out infinite}
+.player .stage>.ph.leaving .blob{animation:shrinkOut .45s ease-in both}
+.player .stage>.ph.leaving .num,.player .stage>.ph.leaving .float{animation:outDown .4s ease-in both}
+@keyframes wave{0%,100%{transform:none}50%{transform:scale(.72)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes float{0%,100%{transform:none}50%{transform:translateY(-6px) rotate(-1deg)}}
+@keyframes shrinkOut{to{transform:scale(0)}}
+@keyframes outDown{to{opacity:0;transform:translateY(30px)}}
 .play .grow{animation:grow 1s cubic-bezier(.2,.9,.3,1.1) both}
 @keyframes up{from{opacity:0;transform:translateY(26px)}}
 @keyframes slideL{from{opacity:0;transform:translateX(90px)}}
@@ -74,7 +83,13 @@ section{margin-bottom:56px}
 .player{width:300px;height:533px;position:relative;flex:none}
 .player .stage{position:absolute;left:0;top:0;transform:scale(1.2);transform-origin:0 0}
 .player .stage>.ph{position:absolute;left:0;top:0;visibility:hidden}
-.player .stage>.ph.on{visibility:visible}
+.player .stage>.ph.on{visibility:visible;z-index:2}
+.player .stage>.ph.leaving{visibility:visible;z-index:1;animation:leave .45s ease-in both}
+.player .stage>.ph.on.push{animation:push .55s cubic-bezier(.2,.8,.2,1) both}
+.player .stage>.ph.on.wipe{animation:wipe .8s cubic-bezier(.7,0,.2,1) both}
+@keyframes leave{to{opacity:0;transform:translateX(-30px) scale(.97)}}
+@keyframes push{from{opacity:0;transform:translateX(40px)}}
+@keyframes wipe{from{clip-path:circle(0% at 50% 80%)}to{clip-path:circle(140% at 50% 80%)}}
 .pbars{position:absolute;top:10px;left:16px;right:16px;display:flex;gap:4px;z-index:10}
 .pbars i{flex:1;height:3px;border-radius:2px;background:rgba(128,128,128,.35);overflow:hidden}
 .pbars i b{display:block;height:100%;width:0;background:var(--ink)}
@@ -104,7 +119,7 @@ section{margin-bottom:56px}
 <div class="playwrap">
  <div><div class="player" id="player"><div class="pbars" id="pbars"></div><div class="stage" id="stage"></div></div>
  <div class="ctrl"><button id="prev">Back</button><button id="pause">Pause</button><button id="restart">Restart</button></div></div>
- <div class="notes"><p><b>One look on every slide:</b> a printed masthead at the top, thin rules, and one giant number cropped off the edge. Blue is used once per slide, on the thing that matters.</p><p style="margin-top:12px"><b>Motion:</b> rules draw in, numbers count up, tiles and dots fill one by one, the student's own words scroll past, the score marker slides along the 0–100 scale, and the class rank counts down from 36 to the student's place.</p></div>
+ <div class="notes"><p><b>One look on every slide:</b> a printed masthead at the top, thin rules, and one giant number cropped off the edge. Blue is used once per slide, on the thing that matters.</p><p style="margin-top:12px"><b>Transitions:</b> when the background stays the same, the next slide glides in from the side. When it changes (paper to black, black to blue), the new color spreads out in a circle.</p><p style="margin-top:12px"><b>Motion:</b> rules draw in, numbers count up, tiles and dots fill one by one, the student's own words scroll past, the score marker slides along the 0–100 scale, and the class rank counts down from 36 to the student's place.</p></div>
 </div></section>
 
 <section><div class="tag"><b>All slides</b><span>Click a slide to replay it.</span></div>
@@ -120,7 +135,7 @@ section{margin-bottom:56px}
  </div>
  <div style="position:absolute;left:16px;bottom:58px;z-index:2">
   <div class="k r" style="--d:.9s">STARRING</div>
-  <div class="num r" style="--d:1s;font-size:84px">Rafi</div>
+  <div class="num float" style="--d:1s;font-size:84px">Rafi</div>
  </div>
  <div class="r" style="--d:1.3s;position:absolute;left:16px;right:16px;bottom:20px;display:flex;justify-content:space-between;font-size:12px;font-weight:800"><span>X-E2</span><span>Tap to begin →</span></div>
 </div><p class="cap">1 · Cover</p></div>
@@ -162,7 +177,7 @@ section{margin-bottom:56px}
  <div class="k r" style="position:absolute;left:16px;top:66px">YOU REACHED</div>
  <div class="num sl ac" style="position:absolute;right:-8px;top:96px;font-size:160px;--d:.1s">12</div>
  <div style="position:absolute;left:16px;right:16px;bottom:30px">
-  <div class="lead r" style="--d:.4s">Level 12.<br><span class="count" data-to="4820">4,820</span> XP earned.</div>
+  <div class="lead r" style="--d:.4s">Level 12.<br><span class="count" data-to="4820" data-dur="4000">4,820</span> XP earned.</div>
   <div style="position:relative;height:26px;margin-top:16px;border:1.5px solid var(--ink)">
    <div class="fillbar" style="position:absolute;left:0;top:0;bottom:0;width:70%;background:var(--ink)"></div>
    <div style="position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 9px,rgba(128,128,128,.6) 9px 10px)"></div>
@@ -260,9 +275,9 @@ function build(root){
  root.querySelectorAll('[data-days]').forEach(d=>{d.innerHTML=[...d.dataset.days].map((c,i)=>`<i class="dot ${c==='s'?'s':''}" style="--i:${i*.5}"></i>`).join('')});
  root.querySelectorAll('[data-tiles]').forEach(t=>{const n=+t.dataset.tiles,b=+t.dataset.best;t.innerHTML=Array.from({length:n},(_,i)=>`<i class="tile ${i===b?'best':''}" style="--i:${i}"></i>`).join('')});
  root.querySelectorAll('[data-words]').forEach(m=>{const s=WORDS.map(w=>`<span>${w}</span>`).join('');m.innerHTML=s+s});
- root.querySelectorAll('.wall').forEach(w=>{if(w.childElementCount)return;for(let r=0;r<5;r++){const ws=WORDS.slice(r*3).concat(WORDS.slice(0,r*3));const s=ws.map((x,i)=>`<span class="${(i+r)%6===0?'ac':''}" style="${(i+r)%6===0?'color:#7d9bff':''}">${x}</span>`).join('');w.insertAdjacentHTML('beforeend',`<div class="mqrow ${r%2?'rev':''}" style="--t:${16+r*3}s">${s+s}</div>`)}});
+ root.querySelectorAll('.wall').forEach(w=>{if(w.childElementCount)return;for(let r=0;r<5;r++){const ws=WORDS.slice(r*3).concat(WORDS.slice(0,r*3));const s=ws.map((x,i)=>`<span class="${(i+r)%6===0?'ac':''}" style="${(i+r)%6===0?'color:#7d9bff':''}">${x}</span>`).join('');w.insertAdjacentHTML('beforeend',`<div class="mqrow ${r%2?'rev':''}" style="--t:${9+r*2}s">${s+s}</div>`)}});
 }
-function counts(root){root.querySelectorAll('.count').forEach(el=>{const to=+el.dataset.to,from=+(el.dataset.from||0),dec=+(el.dataset.dec||0),t0=performance.now(),d=el.dataset.from?1800:1400;
+function counts(root){root.querySelectorAll('.count').forEach(el=>{const to=+el.dataset.to,from=+(el.dataset.from||0),dec=+(el.dataset.dec||0),t0=performance.now(),d=+(el.dataset.dur||(el.dataset.from?1800:1400));
  (function f(t){const p=Math.min((t-t0)/d,1),e=1-Math.pow(1-p,3),v=from+(to-from)*e;el.textContent=(el.dataset.from?Math.round(v):v).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});if(p<1)requestAnimationFrame(f)})(t0)})}
 function play(el){el.classList.remove('play');void el.offsetWidth;el.classList.add('play');counts(el)}
 build(document);
@@ -273,7 +288,11 @@ const stage=document.getElementById('stage'),pb=document.getElementById('pbars')
 const slides=[...document.querySelectorAll('#strip .ph')].map(p=>{const c=p.cloneNode(true);c.classList.remove('play');stage.appendChild(c);return c});
 pb.innerHTML=slides.map(()=>'<i><b></b></i>').join('');
 const fills=[...pb.querySelectorAll('b')];let cur=0,t0=0,paused=false,elapsed=0;const DUR=4500;
-function show(i){cur=(i+slides.length)%slides.length;slides.forEach((s,j)=>s.classList.toggle('on',j===cur));play(slides[cur]);
+const kind=s=>s.classList.contains('dark')?'dark':s.classList.contains('blue')?'blue':'paper';
+function show(i){const prev=slides[cur];cur=(i+slides.length)%slides.length;const next=slides[cur];
+ slides.forEach(s=>s.classList.remove('on','leaving','push','wipe'));
+ if(prev&&prev!==next){prev.classList.add('leaving');setTimeout(()=>prev.classList.remove('leaving'),800)}
+ next.classList.add('on',prev&&prev!==next&&kind(prev)!==kind(next)?'wipe':'push');play(next);
  pb.classList.toggle('lt',slides[cur].classList.contains('dark')||slides[cur].classList.contains('blue'));
  fills.forEach((f,j)=>f.style.width=j<cur?'100%':'0');elapsed=0;t0=performance.now()}
 function tick(t){if(!paused){elapsed=t-t0;fills[cur].style.width=Math.min(elapsed/DUR*100,100)+'%';if(elapsed>=DUR)show(cur+1)}else t0=t-elapsed;requestAnimationFrame(tick)}

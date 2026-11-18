@@ -65,6 +65,27 @@ Rejected along the way: a plain card-only version (too much like a report card),
 7. **Class Rank**: full accent slide; "In <class> you finished"; the number counts down from class size to the student's rank; "out of N".
 8. **Share card**: see below.
 
+## Transitions and idle motion (owner, 2026-11-18)
+
+- **Between slides:** same background → the old slide fades out and slides left while the new one glides in from the right; background changes (paper → black → blue) → the new slide's color spreads out in a circle from near the bottom. Leaving slides also shrink their circle away and drop their big number.
+- **While a slide is on screen** (nothing sits fully still):
+  1. Cover: the circle grows in and then slowly breathes; the name floats gently; both animate out when the slide leaves.
+  2. Attendance: after the dots fill, they pulse in a slow wave.
+  3. Tasks: after the tiles fill, they pulse in a slow wave; the best task keeps glowing.
+  4. Vocabulary: the student's words run as text, rows alternating left and right.
+  5. Level: the XP bar fills slowly (about 3.5 s) while the XP number counts up alongside it.
+  6. Final Score: the blue marker slides to the score, then keeps bobbing gently.
+  7. Class Rank and 8. Share card: as in the concept (countdown; soft shine).
+- `prefers-reduced-motion`: no transitions or idle motion; slides show at rest.
+
+## Sharing (owner, 2026-11-18)
+
+Students share without saving to the gallery first.
+
+- **Level 2: "Share to Instagram Story" (student app, primary button).** One tap opens Instagram's Story editor directly with the Chronicle card as a movable sticker over a background in Chronicle colors (paper top / ink bottom), the way Spotify and Strava do it. Uses Instagram's `com.instagram.share.ADD_TO_STORY` intent, which requires a **Meta (Facebook) developer App ID**. The owner creates that (free, ~10 min at developers.facebook.com); only the ID number goes into the app. If Instagram isn't installed, the button is hidden.
+- **Level 1: "More ways to share" (fallback, everywhere).** Opens the phone's share sheet with the picture attached (Instagram, WhatsApp status, TikTok…). App: Android share sheet. Website on a phone (incl. iPhone): Web Share. Website on a laptop: downloads the picture instead.
+- Instagram Story sharing is not possible from a website, so iPhone and website users get level 1 only.
+
 ## Share card (the picture students post)
 
 9:16 portrait (export at 1080×1920). Masthead; "Starring" + name + class/grade; giant accent "#rank" with "Class Rank" label; Final Score on the right; a bottom strip separated by thin rules with Level · Present % · Tasks · Words. On screen a soft shine passes over it; the exported image is static.

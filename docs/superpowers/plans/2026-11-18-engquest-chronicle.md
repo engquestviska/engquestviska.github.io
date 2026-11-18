@@ -21,7 +21,9 @@
 - Real numbers for every student, including rank. No softening.
 - Switch: on at 00:00 WIB (`+07:00`) on the date in setting `chronicle_start`; the **server** decides, never the phone clock.
 - Teacher website and teacher app: no changes.
-- Share picture: 1080×1920 PNG.
+- Share picture: 1080×1920 PNG. Instagram sticker: the same card at 720×1280 with rounded corners on a transparent background.
+- Transitions: same background → push (old fades left, new glides in from the right, ~0.55 s); background change → circle wipe from 50% 80% (~0.8 s); leaving slides shrink their circle and drop their big number. Idle motion per slide as listed in the spec's "Transitions and idle motion" section (XP bar fill ~3.5 s, XP count 4 s).
+- Sharing: in the app, the primary button is **Share to Instagram Story** (hidden if Instagram isn't installed) and the second is **More ways to share** (share sheet). On the website: **Share** (Web Share), or **Download picture** when Web Share with files is unavailable.
 - Story plays once per device (localStorage `eq_chronicle_seen`); Replay plays it again.
 - Missing data: skip that slide, never show a celebratory 0.
 - Copy rules (owner): short and plain; no exclamation marks in system text.
@@ -180,6 +182,7 @@ test('class label reads X-E2 for XE2', () => { assert.equal(build(SAMPLE, { grad
 - `chronicle.html?demo=1` (and `?demo=longname`) renders `SAMPLE` without calling the API, for checking the look.
 
 - [ ] **Step 1:** Port the concept's CSS tokens, masthead, rules, giant numerals, blob, sticker, tiles, dots, marquee wall, ruler, score scale, and keyframes into `chronicle.css`. Use the final sizes from the concept page (stat numerals 150–160px; rank 250px, fully visible). Then port each slide's markup into a render function per slide id in `chronicle-story.js`, filled from the view model rather than hard-coded values.
+- [ ] **Step 1b:** Port the concept's transitions and idle motion: the `leaving`/`push`/`wipe` classes with the `kind()` rule (paper/dark/blue) from the concept's `show()`, and the idle keyframes (`wave`, `bob`, `float`, `breathe`, marquee rows at 9–17 s). The player owns transitions; slides own entrance and idle motion.
 - [ ] **Step 2:** Fit long names: shrink the font until the name fits two lines (stop at 28px). Use the same helper for the cover, card, and records.
 - [ ] **Step 3: Check it in the browser.** Add a `.claude/launch.json` static server entry if none exists, open `/chronicle.html?demo=1`, and watch all 8 slides play. Compare against the concept page. Then open `?demo=longname` and confirm the name isn't cropped. Use `resize_window` mobile (375×812) and confirm the slides fill the screen with no sideways scroll. Turn on reduced motion and confirm the slides show at rest.
 - [ ] **Step 4:** `node scripts/check-site.mjs`. Expected: no errors.
@@ -207,7 +210,8 @@ test('class label reads X-E2 for XE2', () => { assert.equal(build(SAMPLE, { grad
 
 **Interfaces:**
 - Produces `EQChronicleCard.toBlob(vm.card, { accent }) → Promise<Blob>` (PNG, 1080×1920), drawn on a canvas with the share-card layout (masthead, Starring + name, giant accent `#rank`, Final on the right, a 4-cell bottom strip: Level, Present, Tasks, Words). Await `document.fonts.ready` before drawing. No shine effect in the image.
-- Buttons: in the app (`window.EngQuestApp`), call `EngQuestApp.shareImage(base64Png)`. Else, if `navigator.canShare({ files })` → `navigator.share`. Else, download as `EngQuest-Chronicle-<Name>.png`.
+- Also produces `EQChronicleCard.stickerBlob(vm.card, { accent }) → Promise<Blob>`: the card at 720×1280, rounded corners, transparent outside.
+- Buttons: in the app (`window.EngQuestApp`): if `EngQuestApp.canShareToInstagram()` returns true, show **Share to Instagram Story** → `EngQuestApp.shareToInstagramStory(stickerBase64)`, and **More ways to share** → `EngQuestApp.shareImage(cardBase64)`; otherwise show only **Share** → `shareImage`. On the website: if `navigator.canShare({ files })` → **Share** via `navigator.share`; else **Download picture** as `EngQuest-Chronicle-<Name>.png`.
 
 - [ ] **Step 1:** Implement `toBlob`, reusing the name-fit rule from Task 4 (measure with `ctx.measureText`).
 - [ ] **Step 2: Check it.** On `?demo=1`, press Download and open the PNG: it should be 1080×1920, with every number matching the records page and the fonts correct (not a fallback). Repeat with `?demo=longname`.
@@ -232,6 +236,10 @@ test('class label reads X-E2 for XE2', () => { assert.equal(build(SAMPLE, { grad
 - `@Composable fun ChronicleScreen(profile: Profile, url: String = CHRONICLE_URL)`, where `const val CHRONICLE_URL = "https://engquestviska.github.io/chronicle.html"`. It's a full-screen WebView with JavaScript and DOM storage on, and a JS interface named `EngQuestApp` (class `ChronicleBridge`):
   - `@JavascriptInterface fun profile(): String`, which returns `profileJson(profile)`.
   - `@JavascriptInterface fun shareImage(base64: String)`, which writes the PNG to `cacheDir/share/chronicle.png` and fires `ACTION_SEND` (`image/png`) through the existing FileProvider (add a `share/` cache path to its xml if missing).
+  - `@JavascriptInterface fun canShareToInstagram(): Boolean`: true when `com.instagram.android` is installed (add a `<queries><package android:name="com.instagram.android"/></queries>` entry to the manifest) and `BuildConfig.META_APP_ID` isn't blank.
+  - `@JavascriptInterface fun shareToInstagramStory(base64: String)`: writes `cacheDir/share/chronicle-sticker.png`, then starts `Intent("com.instagram.share.ADD_TO_STORY")` with `setType("image/png")`, extra `source_application` = `BuildConfig.META_APP_ID`, `interactive_asset_uri` = the FileProvider uri, `top_background_color` = `#F4F2ED`, `bottom_background_color` = `#141414`, plus `grantUriPermission("com.instagram.android", uri, FLAG_GRANT_READ_URI_PERMISSION)`. If the activity can't be resolved, fall back to `shareImage`.
+  - `META_APP_ID` is a `buildConfigField` read from `local.properties` (`meta.appId`, git-ignored like `google-services.json`), and empty when missing.
+- `fun instagramStoryIntent(uri: Uri, appId: String): Intent` (pure, so it can be tested).
 - `fun profileJson(p: Profile): String` → `{"grade":"10","classId":"XE2","studentNo":"5","name":"…"}`.
 - In `Shell`: run `chronicleActive()` once per app start in a `LaunchedEffect`. While it's loading, show the normal shell. When true, render `ChronicleScreen` instead of the tabs. The update banner stays visible above it. Back on Chronicle closes the app with the same double-back rule as Home.
 
@@ -242,15 +250,17 @@ test('class label reads X-E2 for XE2', () => { assert.equal(build(SAMPLE, { grad
 @Test fun shell_shows_chronicle_when_active()              // tabs (Home/Scores/Send/Learn/More) not shown; chronicle tag shown
 @Test fun shell_shows_tabs_when_not_active()
 @Test fun profileJson_has_all_fields()
+@Test fun instagramStoryIntent_has_action_type_and_extras() // action, image/png, source_application, both background colors
 ```
 - [ ] **Step 2:** Run `pwsh -File native-student/build.ps1 -Tests RepoTest,ShellTest,ChronicleTest`. Expected: FAIL.
 - [ ] **Step 3:** Implement the interfaces above. Use `Modifier.testTag("chronicle")` on the WebView host so `ShellTest` can find it.
 - [ ] **Step 4:** Run the full suite: `pwsh -File native-student/build.ps1`. Expected: all tests pass (85 existing + new).
-- [ ] **Step 5: Check it on a device or emulator** against lab (temporarily point the app at lab, don't commit that): the story plays, Share opens Android's share sheet with the picture, and with the setting off the normal tabs show.
+- [ ] **Step 5: Check it on a device or emulator** against lab (temporarily point the app at lab, don't commit that): the story plays; Share to Instagram Story opens Instagram's Story editor with the card as a sticker; More ways to share opens the share sheet; with Instagram uninstalled only Share shows; with the setting off the normal tabs show.
 - [ ] **Step 6: Commit:** `git commit -m "feat(student-app): Chronicle mode"`.
 
 ### Task 9: Go live (owner approval needed at each step)
 
+- [ ] **Step 0 (before Task 8's device check):** The owner creates a free Meta developer app at developers.facebook.com and gives Claude the App ID. Claude walks them through it; Claude never creates the account. The ID goes into `native-student/local.properties` as `meta.appId=…`.
 - [ ] **Step 1:** The owner gives the start date. Ask for approval, then deploy the Worker to production following `Engquest-turso-lab/DEPLOY.md`, and run `node migrate/set-chronicle.mjs --db prod --start <date> --yes`.
 - [ ] **Step 2:** On prod, confirm `getChronicleStatus` reads `active: false` before the date. Confirm `getChronicle` for one real student returns sensible numbers (cross-check Final Score and rank against the Scores "Class Rank" tab).
 - [ ] **Step 3:** Release the student app: `versionCode = 14`, `versionName = "2.1"`. Build release, copy over the hidden APK name, and add an `app-version.json` entry with a short note ("EngQuest Chronicle: your semester story, ready on <date>."). Run `node scripts/check-site.mjs` and commit. The owner pushes the website repo and the lab repo.
