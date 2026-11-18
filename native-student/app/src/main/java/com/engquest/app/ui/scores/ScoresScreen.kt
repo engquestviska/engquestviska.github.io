@@ -114,7 +114,7 @@ fun ScoresScreen(graph: AppGraph, profile: Profile) {
                     Tab("Final Score", tab == 3, Modifier.testTag("tab-final")) { tab = 3 }
                 }
                 if (tab < 3) ChapterBlock(data.chapters.getOrNull(tab), profile.studentNo) else FinalBlock(data.final, profile.studentNo)
-                Leaderboard(data.chapters, profile.studentNo)
+                Leaderboard(data.chapters, data.final, profile.studentNo)
                 Spacer(Modifier.height(20.dp))
             }
         }
@@ -191,33 +191,35 @@ private fun FinalBlock(fin: FinalScores?, no: Int) {
     ResultRow(row.calc["Final Score"]?.toDoubleOrNull()?.let(::one) ?: "-", row.calc["Indicator"].orEmpty())
 }
 
-/** Top 5 by chapter average, like the website's class leaderboard ("Overall" = mean of the chapters entered). */
+/**
+ * Class Rank (default): the whole class, 1 to last, by the same Final Score shown on the
+ * Final Score tab (and the report). Ch 1-3: top 5 by that chapter's average. Ties share a rank.
+ */
 @Composable
-private fun Leaderboard(chapters: List<ChapterScores?>, myNo: Int) {
-    var filter by rememberSaveable { mutableIntStateOf(0) } // 0 overall, 1..3 chapter
+private fun Leaderboard(chapters: List<ChapterScores?>, final: FinalScores?, myNo: Int) {
+    var filter by rememberSaveable { mutableIntStateOf(0) } // 0 class rank, 1..3 chapter
     val eq = LocalEq.current
-    val names = mutableMapOf<Int, String>()
-    val avgs = mutableMapOf<Int, MutableMap<Int, Double>>()
-    chapters.forEachIndexed { i, ch ->
-        ch?.rows?.forEach { r ->
-            names[r.no] = r.name
-            r.average?.let { avgs.getOrPut(r.no) { mutableMapOf() }[i + 1] = it }
-        }
-    }
-    val ranked = avgs.mapNotNull { (no, m) ->
-        val score = if (filter == 0) m.values.takeIf { it.isNotEmpty() }?.average() else m[filter]
-        score?.let { Triple(no, names[no].orEmpty(), it) }
+    val sorted = if (filter == 0) {
+        final?.rows.orEmpty().mapNotNull { r -> r.calc["Final Score"]?.toDoubleOrNull()?.let { Triple(r.no, r.name, it) } }
+    } else {
+        chapters.getOrNull(filter - 1)?.rows.orEmpty().mapNotNull { r -> r.average?.let { Triple(r.no, r.name, it) } }
     }.sortedByDescending { it.third }
+    val places = sorted.mapIndexed { i, t -> if (i > 0 && t.third == sorted[i - 1].third) -1 else i + 1 }
+        .runningReduce { prev, p -> if (p == -1) prev else p }
+    val ranked = sorted.zip(places)
+    val shown = if (filter == 0) ranked else ranked.take(5)
 
-    SectionTitle("Class leaderboard")
+    SectionTitle(if (filter == 0) "Class rank" else "Chapter $filter top 5")
     Row(Modifier.horizontalScroll(rememberScrollState()).padding(horizontal = 14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Tab("Overall", filter == 0, Modifier) { filter = 0 }
+        Tab("Class Rank", filter == 0, Modifier.testTag("lb-rank")) { filter = 0 }
         (1..3).forEach { c -> Tab("Ch $c", filter == c, Modifier) { filter = c } }
     }
     Spacer(Modifier.height(8.dp))
     EqCard(Modifier.padding(horizontal = 14.dp)) {
-        if (ranked.isEmpty()) Text("No scores yet.", color = eq.muted, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(vertical = 8.dp))
-        ranked.take(5).forEachIndexed { i, (no, name, score) ->
+        if (shown.isEmpty()) Text("No scores yet.", color = eq.muted, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(vertical = 8.dp))
+        shown.forEach { (t, place) ->
+            val (no, name, score) = t
+            val i = place - 1
             val me = no == myNo
             Row(
                 Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(if (me) eq.accentSoft else Color.Transparent)
@@ -230,10 +232,10 @@ private fun Leaderboard(chapters: List<ChapterScores?>, myNo: Int) {
                 }
                 Spacer(Modifier.width(10.dp))
                 Text(name + if (me) " (you)" else "", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(one(score), style = MaterialTheme.typography.titleMedium, color = eq.accent)
+                Text(if (filter == 0) raw(score) else one(score), style = MaterialTheme.typography.titleMedium, color = eq.accent)
             }
         }
-        val mine = ranked.indexOfFirst { it.first == myNo }
-        if (mine >= 5) Text("You are #${mine + 1} of ${ranked.size}", style = MaterialTheme.typography.bodySmall, color = eq.muted, modifier = Modifier.padding(6.dp))
+        val mine = ranked.firstOrNull { it.first.first == myNo }
+        if (filter != 0 && mine != null && mine.second > 5) Text("You are #${mine.second} of ${ranked.size}", style = MaterialTheme.typography.bodySmall, color = eq.muted, modifier = Modifier.padding(6.dp))
     }
 }

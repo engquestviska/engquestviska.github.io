@@ -4,8 +4,11 @@ import android.content.Context
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.performSemanticsAction
 import com.engquest.app.FakeServer
 import com.engquest.app.domain.Grade
 import com.engquest.app.domain.Profile
@@ -58,11 +61,22 @@ class ScoresTest {
         waitText("ASAT")
     }
 
-    @Test fun leaderboardShowsTopFiveAndMarksMe() {
+    @Test fun classRankListsEveryoneByFinalScore() {
         start()
-        waitText("Class leaderboard")
+        waitText("Class rank")
+        // The fixture's Final Score tab has 36 students; the top one (No. 15) scores 45.
+        compose.waitUntil(15_000) { compose.onAllNodes(hasTestTag("rank-row")).fetchSemanticsNodes().size == 36 }
+        assertEquals(36, compose.onAllNodes(hasTestTag("rank-row")).fetchSemanticsNodes().size)
+        waitText("45")
+    }
+
+    @Test fun chapterFilterShowsTopFive() {
+        start()
+        waitText("Class rank")
+        // Press it through its click action: the test window is too short for a real tap down there.
+        compose.onAllNodes(hasText("Ch 1")).onFirst().performSemanticsAction(SemanticsActions.OnClick)
+        waitText("Chapter 1 top 5")
         compose.waitUntil(15_000) { compose.onAllNodes(hasTestTag("rank-row")).fetchSemanticsNodes().size == 5 }
-        assertEquals(5, compose.onAllNodes(hasTestTag("rank-row")).fetchSemanticsNodes().size)
     }
 
     @Test fun studentWithNoRowSeesNoDataYet() {

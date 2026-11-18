@@ -113,7 +113,7 @@
     .lb-row.rank-2 { background: linear-gradient(135deg, #F8FAFC, #F1F5F9); border-color: #CBD5E1; }
     .lb-row.rank-3 { background: linear-gradient(135deg, #FFF7ED, #FFEDD5); border-color: #FDBA74; }
     .lb-medal { font-size: 1.4rem; width: 32px; text-align: center; flex-shrink: 0; }
-    .lb-rank-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); width: 20px; text-align: center; flex-shrink: 0; }
+    .lb-rank-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; font-weight: 700; color: var(--text-muted); width: 30px; text-align: center; flex-shrink: 0; }
     .lb-name { flex: 1; font-weight: 600; font-size: 0.92rem; color: var(--text-dark); }
     .lb-name .lb-nick { font-size: 0.75rem; color: var(--text-muted); font-weight: 400; display: block; }
     .lb-avg { font-family: 'IBM Plex Mono', monospace; font-size: 1.1rem; font-weight: 800; color: var(--purple); background: var(--purple-soft); border: 1.5px solid var(--purple-mid); padding: 4px 12px; border-radius: 999px; flex-shrink: 0; }
@@ -757,7 +757,7 @@ function switchStudentTab(ch) {
 }
 
 // ── LEADERBOARD ───────────────────────────────────────────────
-var lbChapter = 'overall'; // 'overall' | '1' | '2' | '3'
+var lbChapter = 'rank'; // 'rank' (whole class by Final Score) | '4' | '5' | '6' (one chapter, top 5)
 
 function renderLeaderboard(cls) {
   var container = document.getElementById('leaderboardArea');
@@ -767,8 +767,8 @@ function renderLeaderboard(cls) {
     '<div class="leaderboard">' +
       '<div class="leaderboard-header">' +
         '<div>' +
-          '<h3>Class Leaderboard</h3>' +
-          '<div class="lb-sub">' + escapeHtml(clsLabel) + ' &mdash; Top 5 by Average Score</div>' +
+          '<h3>Class Rank</h3>' +
+          '<div class="lb-sub" id="lbSub">' + escapeHtml(clsLabel) + '</div>' +
         '</div>' +
       '</div>' +
       '<div class="leaderboard-body">' +
@@ -781,7 +781,7 @@ function renderLeaderboard(cls) {
   // Build filter buttons via JS (avoids string escaping issues)
   var lbFilters = document.getElementById('lbFilters');
   if (lbFilters) {
-    [['overall','Overall']].concat(CHAPTERS.map(function(ch, i) { return [String(ch), 'Chapter ' + (i + 1)]; })).forEach(function(f) {
+    [['rank','Class Rank']].concat(CHAPTERS.map(function(ch, i) { return [String(ch), 'Chapter ' + (i + 1)]; })).forEach(function(f) {
       var btn = document.createElement('button');
       btn.className = 'lb-filter-btn' + (lbChapter === f[0] ? ' active' : '');
       btn.textContent = f[1];
@@ -803,43 +803,41 @@ function switchLbFilter(cls, chapter) {
 }
 
 function loadLbRankings(cls) {
-  Promise.all(CHAPTERS.map(function(ch) {
+  var isRank = lbChapter === 'rank';
+  var sub = document.getElementById('lbSub');
+  if (sub) sub.textContent = (CLASS_LABELS[cls] || cls) + ' — ' + (isRank ? 'Everyone, ranked by Final Score' : 'Top 5 by chapter score');
+  var calls = CHAPTERS.map(function(ch) {
     return cachedApiGet({ action: 'getChapterScores', className: cls, chapter: ch });
-  })).then(function(responses) {
-    // Build map: studentNo -> { name, nickname, avgs: {chapter: value} }
-    var map = {};
-    CHAPTERS.forEach(function(ch, i) {
-      var students = (responses[i] && responses[i].students) || [];
-      students.forEach(function(s) {
-        if (!map[s.no]) map[s.no] = { name: s.name, nickname: s.nickname || '', avgs: {} };
-        var v = Number(s.average);
-        if (s.average !== '' && s.average !== undefined && s.average !== null && !isNaN(v))
-          map[s.no].avgs[ch] = v;
-      });
-    });
-
-    // Compute score based on selected filter
+  });
+  calls.push(cachedApiGet({ action: 'getFinalScores', className: cls }));
+  Promise.all(calls).then(function(responses) {
     var ranked = [];
-    Object.keys(map).forEach(function(no) {
-      var entry = map[no];
-      var score = null;
-      if (lbChapter === 'overall') {
-        var vals = CHAPTERS.map(function(ch) { return entry.avgs[ch]; }).filter(function(v) { return v !== undefined && v !== null; });
-        if (vals.length) score = vals.reduce(function(a, b) { return a + b; }, 0) / vals.length;
-      } else {
-        var sv = entry.avgs[Number(lbChapter)];
-        score = (sv === undefined) ? null : sv;
-      }
-      if (score === null || isNaN(score)) return;
-      ranked.push({ name: entry.name, nickname: entry.nickname, avg: score });
-    });
+    if (isRank) {
+      // Class Rank = the same Final Score students see on their Final Score tab (and their report).
+      var fin = responses[CHAPTERS.length] || {};
+      ((fin && fin.students) || []).forEach(function(s) {
+        var f = s.calc ? s.calc['Final Score'] : '';
+        var v = Number(f);
+        if (f === '' || f === undefined || f === null || isNaN(v)) return;
+        ranked.push({ name: s.name, nickname: s.nickname || '', avg: v });
+      });
+    } else {
+      CHAPTERS.forEach(function(ch, i) {
+        if (String(ch) !== String(lbChapter)) return;
+        ((responses[i] && responses[i].students) || []).forEach(function(s) {
+          var v = Number(s.average);
+          if (s.average === '' || s.average === undefined || s.average === null || isNaN(v)) return;
+          ranked.push({ name: s.name, nickname: s.nickname || '', avg: v });
+        });
+      });
+    }
 
     ranked.sort(function(a, b) { return b.avg - a.avg; });
-    var top5 = ranked.slice(0, 5);
+    var shown = isRank ? ranked : ranked.slice(0, 5);
     var rankings = document.getElementById('lbRankings');
     if (!rankings) return;
 
-    if (!top5.length) {
+    if (!shown.length) {
       rankings.innerHTML = '<div class="lb-empty">No scores available yet.</div>';
       return;
     }
@@ -847,8 +845,8 @@ function loadLbRankings(cls) {
     var medals = ['&#129351;','&#129352;','&#129353;'];
     var html = '';
     var displayRank = 1;
-    top5.forEach(function(s, i) {
-      if (i > 0 && s.avg === top5[i - 1].avg) { /* tied */ }
+    shown.forEach(function(s, i) {
+      if (i > 0 && s.avg === shown[i - 1].avg) { /* tied: same rank */ }
       else { displayRank = i + 1; }
       var rankClass = displayRank <= 3 ? ' rank-' + displayRank : '';
       var medal     = displayRank <= 3 ? medals[displayRank - 1] : '';
@@ -857,7 +855,7 @@ function loadLbRankings(cls) {
       html += '<div class="lb-medal">' + medal + '</div>';
       html += '<div class="lb-rank-num">' + rankNum + '</div>';
       html += '<div class="lb-name">' + escapeHtml(s.name) + (s.nickname ? '<span class="lb-nick">' + escapeHtml(s.nickname) + '</span>' : '') + '</div>';
-      html += '<div class="lb-avg">' + s.avg.toFixed(1) + '</div>';
+      html += '<div class="lb-avg">' + (isRank ? String(Math.round(s.avg)) : s.avg.toFixed(1)) + '</div>';
       html += '</div>';
     });
     rankings.innerHTML = html;

@@ -50,7 +50,7 @@ object Parse {
         inputColumns = j.strings("inputCols"),
         calcColumns = j.strings("calcCols"),
         rows = j.arr("students").map { s ->
-            FinalRow(s.i("no"), s.obj("scores").mapValues { it.value.num() }, s.obj("calc").mapValues { it.value.str() })
+            FinalRow(s.i("no"), s.obj("scores").mapValues { it.value.num() }, s.obj("calc").mapValues { it.value.str() }, s.s("name"))
         },
     )
 

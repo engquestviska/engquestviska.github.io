@@ -36,7 +36,7 @@ data class ChapterRow(
 data class ChapterScores(val columns: List<String>, val rows: List<ChapterRow>)
 
 /** getFinalScores: typed inputs (ASAT) and computed columns (Chapter 1…, Average, Final Score, Indicator). */
-data class FinalRow(val no: Int, val inputs: Map<String, Double?>, val calc: Map<String, String>)
+data class FinalRow(val no: Int, val inputs: Map<String, Double?>, val calc: Map<String, String>, val name: String = "")
 
 data class FinalScores(val inputColumns: List<String>, val calcColumns: List<String>, val rows: List<FinalRow>)
 
