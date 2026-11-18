@@ -4,7 +4,26 @@ import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
-const { build, rankFontSize, SAMPLE, SAMPLE_LONGNAME } = require('../shared/js/chronicle-data.js');
+const { build, rankFontSize, fitNameLines, SAMPLE, SAMPLE_LONGNAME } = require('../shared/js/chronicle-data.js');
+
+// A stand-in for canvas measureText: every character is half the font size wide.
+const measure = (text, size) => text.length * size * 0.5;
+const fitsWidth = (fit, width) => fit.lines.every((l) => measure(l, fit.size) <= width);
+
+test('a very long name shrinks below 28 and stays inside the width', () => {
+  const fit = fitNameLines('Muhammad Rafi Alfarizi Pratama Wijaya Kusuma Ningrat', 218, 58, measure);
+  assert.ok(fit.lines.length <= 3);
+  assert.ok(fitsWidth(fit, 218), JSON.stringify(fit));
+});
+
+test('a single very long word is broken rather than cropped', () => {
+  const fit = fitNameLines('Wiryawicaksanakusumaningratadiningrat', 218, 58, measure);
+  assert.ok(fitsWidth(fit, 218), JSON.stringify(fit));
+});
+
+test('a short name keeps the big size on one line', () => {
+  assert.deepEqual(fitNameLines('Rafi', 218, 58, measure), { size: 58, lines: ['Rafi'] });
+});
 
 test('a full bundle gives 8 slides in order', () => {
   assert.deepEqual(build(SAMPLE, { grade: '10' }).slides.map((s) => s.id),

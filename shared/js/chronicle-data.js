@@ -22,6 +22,33 @@
     return String(label || '').replace(/semester/i, 'SEM').replace(/20(\d\d)\/(?:20)?(\d\d)/, '$1/$2');
   }
 
+  // Lays a name out in `width`: two lines from `max` down to 28px, then three lines down to 16px,
+  // and as a last resort breaks inside a long word. `measure(text, size)` returns the text width.
+  function fitNameLines(text, width, max, measure) {
+    var words = String(text || '').split(/\s+/).filter(Boolean);
+    function wrap(size) {
+      var lines = [''];
+      words.forEach(function (w) {
+        var cur = lines[lines.length - 1], next = cur ? cur + ' ' + w : w;
+        if (!cur || measure(next, size) <= width) lines[lines.length - 1] = next; else lines.push(w);
+      });
+      return lines;
+    }
+    var passes = [[2, 28], [3, 16]];
+    for (var p = 0; p < passes.length; p++) {
+      for (var size = max; size >= passes[p][1]; size -= 2) {
+        var lines = wrap(size);
+        if (lines.length <= passes[p][0] && lines.every(function (l) { return measure(l, size) <= width; })) return { size: size, lines: lines };
+      }
+    }
+    var out = [], line = '';
+    String(text || '').replace(/\s+/g, ' ').split('').forEach(function (ch) {
+      if (line && measure(line + ch, 16) > width) { out.push(line.trim()); line = ch.trim(); } else line += ch;
+    });
+    if (line) out.push(line.trim());
+    return { size: 16, lines: out };
+  }
+
   function percent(part, whole) { return whole ? Math.round((part / whole) * 100) + '%' : DASH; }
 
   function build(b, opts) {
@@ -102,7 +129,7 @@
   SAMPLE_LONGNAME.student.name = 'Muhammad Rafi Alfarizi Pratama';
   SAMPLE_LONGNAME.student.nickname = '';
 
-  var api = { build: build, rankFontSize: rankFontSize, classLabel: classLabel, SAMPLE: SAMPLE, SAMPLE_LONGNAME: SAMPLE_LONGNAME };
+  var api = { build: build, rankFontSize: rankFontSize, fitNameLines: fitNameLines, classLabel: classLabel, SAMPLE: SAMPLE, SAMPLE_LONGNAME: SAMPLE_LONGNAME };
   global.EQChronicleData = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);

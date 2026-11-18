@@ -10,20 +10,14 @@
   function font(ctx, style, size, family) { ctx.font = style + ' ' + size + 'px ' + family; }
   function spaced(ctx, px) { if ('letterSpacing' in ctx) ctx.letterSpacing = px + 'px'; }
 
-  // Break a name into at most two lines that fit `width`, shrinking from `max` down to 28.
+  // Lays the name out so it always fits `width` (rules in EQChronicleData.fitNameLines).
   function fitLines(ctx, text, width, max) {
-    for (var size = max; size >= 28; size -= 2) {
+    var fit = global.EQChronicleData.fitNameLines(text, width, max, function (t, size) {
       font(ctx, '800', size, DISP);
-      var words = String(text).split(/\s+/), lines = [''];
-      for (var i = 0; i < words.length; i++) {
-        var tryLine = lines[lines.length - 1] ? lines[lines.length - 1] + ' ' + words[i] : words[i];
-        if (ctx.measureText(tryLine).width <= width || !lines[lines.length - 1]) lines[lines.length - 1] = tryLine;
-        else lines.push(words[i]);
-      }
-      var fits = lines.length <= 2 && lines.every(function (l) { return ctx.measureText(l).width <= width; });
-      if (fits) return { size: size, lines: lines };
-    }
-    return { size: 28, lines: [String(text)] };
+      return ctx.measureText(t).width;
+    });
+    font(ctx, '800', fit.size, DISP);
+    return fit;
   }
 
   // Draws the card in 250x444 design units; `k` scales to the real pixel size.
@@ -145,9 +139,22 @@
 
   function primaryLabel() { return app() || webShareFiles() ? 'Share' : 'Download picture'; }
 
+  // iPhone Safari only lets a page share right after the tap, so the picture is made in advance.
+  var prepared = null;
+  function prepare(vm) {
+    var mine = prepared = { vm: vm, file: null };
+    toBlob(vm.card, { accent: vm.accent }).then(function (b) {
+      mine.file = new File([b], fileName(vm), { type: 'image/png' });
+    }).catch(function () {});
+  }
+
   // Resolves to a short note for the page ('' when the share sheet handled it).
   function share(vm, act) {
     var a = app();
+    if (!a && prepared && prepared.vm === vm && prepared.file && webShareFiles()) {
+      return navigator.share({ files: [prepared.file], title: 'EngQuest Chronicle' }).then(function () { return ''; })
+        .catch(function (e) { if (e && e.name === 'AbortError') return ''; throw e; });
+    }
     if (act === 'instagram' && a && a.shareToInstagramStory) {
       return stickerBlob(vm.card, { accent: vm.accent }).then(base64).then(function (b) { a.shareToInstagramStory(b); return ''; });
     }
@@ -166,5 +173,5 @@
     });
   }
 
-  global.EQChronicleCard = { toBlob: toBlob, stickerBlob: stickerBlob, share: share, canInstagram: canInstagram, primaryLabel: primaryLabel };
+  global.EQChronicleCard = { toBlob: toBlob, stickerBlob: stickerBlob, share: share, prepare: prepare, canInstagram: canInstagram, primaryLabel: primaryLabel };
 })(window);

@@ -26,6 +26,10 @@ const val CHRONICLE_URL = "https://engquestviska.github.io/chronicle.html"
 
 private const val INSTAGRAM = "com.instagram.android"
 
+/** Only the Chronicle page itself (with any ?query or #part) loads inside the app; the rest opens outside. */
+fun staysInChronicle(url: String): Boolean =
+    url == CHRONICLE_URL || url.startsWith("$CHRONICLE_URL?") || url.startsWith("$CHRONICLE_URL#")
+
 /** What the page reads through `EngQuestApp.profile()` to know whose semester to show. */
 fun profileJson(p: Profile): String = buildJsonObject {
     put("grade", p.grade.number)
@@ -92,7 +96,15 @@ fun ChronicleScreen(profile: Profile, url: String = CHRONICLE_URL, modifier: Mod
             WebView(ctx).apply {
                 settings.javaScriptEnabled = true
                 settings.domStorageEnabled = true
-                webViewClient = WebViewClient()
+                // Keep the bridge on the Chronicle page only; any other link opens in the browser.
+                webViewClient = object : WebViewClient() {
+                    override fun shouldOverrideUrlLoading(view: WebView, request: android.webkit.WebResourceRequest): Boolean {
+                        val target = request.url.toString()
+                        if (staysInChronicle(target)) return false
+                        runCatching { ctx.startActivity(Intent(Intent.ACTION_VIEW, request.url).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+                        return true
+                    }
+                }
                 addJavascriptInterface(ChronicleBridge(ctx.applicationContext, profile), "EngQuestApp")
                 loadUrl(url)
             }

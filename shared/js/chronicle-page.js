@@ -51,7 +51,7 @@
     document.body.classList.add('records-mode');
     $rec.style.setProperty('--a', vm.accent);
     var units = r.units.filter(function (u) { return u.score !== '' && u.score != null; })
-      .map(function (u) { return '<div><span class="k">' + esc(u.label.toUpperCase()) + '</span><span class="num" style="font-size:26px">' + esc(u.score) + '</span></div>'; });
+      .map(function (u) { return '<div><span class="k">' + esc(String(u.label || '').toUpperCase()) + '</span><span class="num" style="font-size:26px">' + esc(u.score) + '</span></div>'; });
     if (r.asat !== '' && r.asat != null) units.push('<div><span class="k">ASAT</span><span class="num" style="font-size:26px">' + esc(r.asat) + '</span></div>');
     var dots = r.days.map(function (d) { return '<i class="dot ' + (d === 's' ? 's' : d === 'a' ? 'a' : d === '' ? 'u' : '') + '"></i>'; }).join('');
     var words = r.words.map(function (w) { return '<span>' + esc(w) + '</span>'; }).join('');
@@ -81,6 +81,7 @@
     slot.innerHTML = S.cardHtml(vm.card);
     S.fitNames($rec);
     $rec.querySelector('[data-act="replay"]').onclick = playStory;
+    if (window.EQChronicleCard && !window.EngQuestApp) window.EQChronicleCard.prepare(vm);
     $rec.querySelectorAll('[data-act="share"],[data-act="instagram"]').forEach(function (b) {
       b.onclick = function () {
         if (!window.EQChronicleCard) return;
@@ -106,12 +107,23 @@
       return;
     }
     var p = profile();
-    if (!p) { location.replace('index.html'); return; } // pick a grade and sign in first
+    var inApp = !!(window.EngQuestApp && window.EngQuestApp.profile);
+    if (!p) {
+      if (inApp) message('EngQuest Chronicle', 'Sign in again from the app, then come back.');
+      else location.replace('index.html'); // pick a grade and sign in first
+      return;
+    }
     message('EngQuest Chronicle', 'Getting your semester ready…');
     window.EQApi.get({ action: 'getChronicle', className: p.classId, studentNo: p.studentNo })
       .then(function (b) {
         if (!b || b.error) { message('We couldn’t find your record', 'Talk to your teacher.'); return; }
-        if (!b.active) { location.replace((String(p.grade) === '11' ? 'grade11' : 'grade10') + '/index.html'); return; }
+        if (!b.active) {
+          // Tell the student pages' switch it is off now, or they would send the student straight back here.
+          try { sessionStorage.setItem('eq_chronicle_status', JSON.stringify({ active: false, at: Date.now() })); } catch (e) {}
+          if (inApp) message('EngQuest Chronicle', 'Your Chronicle opens when the semester ends.');
+          else location.replace((String(p.grade) === '11' ? 'grade11' : 'grade10') + '/index.html');
+          return;
+        }
         start(b);
       })
       .catch(function () { message('Can’t reach EngQuest right now', 'Check your internet, then try again.', load); });

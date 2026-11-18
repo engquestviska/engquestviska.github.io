@@ -132,13 +132,17 @@
       stat(c.level, 'LEVEL', true) + stat(c.present, 'PRESENT') + stat(c.tasks, 'TASKS') + stat(c.words, 'WORDS') + '</div></div>';
   }
 
-  // Shrink a long name until it fits two lines of its box (never below 28px).
+  // Shrink a long name until it fits its box: two lines down to 28px, then three lines down to
+  // 16px; at 16px a word that is still too wide may break inside itself rather than be cut off.
   function fitNames(root) {
     root.querySelectorAll('.fitname').forEach(function (el) {
       var size = +el.getAttribute('data-max') || 60;
+      el.style.overflowWrap = 'normal';
       el.style.fontSize = size + 'px';
-      var limit = function () { return el.scrollHeight > size * 0.95 * 2 + 2 || el.scrollWidth > el.clientWidth + 1; };
-      while (size > 28 && limit()) { size -= 2; el.style.fontSize = size + 'px'; }
+      var tooBig = function (lines) { return el.scrollHeight > size * 0.95 * lines + 2 || el.scrollWidth > el.clientWidth + 1; };
+      while (size > 28 && tooBig(2)) { size -= 2; el.style.fontSize = size + 'px'; }
+      while (size > 16 && tooBig(3)) { size -= 2; el.style.fontSize = size + 'px'; }
+      if (tooBig(3)) el.style.overflowWrap = 'anywhere';
     });
   }
 

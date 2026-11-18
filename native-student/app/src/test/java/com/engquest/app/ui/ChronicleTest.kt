@@ -23,6 +23,14 @@ class ChronicleTest {
         assertEquals("Nadia Putri", o["name"]!!.jsonPrimitive.content)
     }
 
+    @Test fun onlyTheChroniclePageStaysInsideTheApp() {
+        assertEquals(true, com.engquest.app.ui.chronicle.staysInChronicle("https://engquestviska.github.io/chronicle.html"))
+        assertEquals(true, com.engquest.app.ui.chronicle.staysInChronicle("https://engquestviska.github.io/chronicle.html?story#x"))
+        assertEquals(false, com.engquest.app.ui.chronicle.staysInChronicle("https://engquestviska.github.io/grade10/index.html"))
+        assertEquals(false, com.engquest.app.ui.chronicle.staysInChronicle("https://engquestviska.github.io/chronicle.html.evil.com/"))
+        assertEquals(false, com.engquest.app.ui.chronicle.staysInChronicle("https://drive.google.com/file/d/x"))
+    }
+
     @Test fun instagramStoryIntentHasActionTypeAndExtras() {
         val uri = Uri.parse("content://com.engquest.app.fileprovider/share/chronicle-sticker.png")
         val i = instagramStoryIntent(uri, "123456")

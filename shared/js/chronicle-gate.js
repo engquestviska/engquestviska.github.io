@@ -28,5 +28,7 @@
   }
 
   global.EQChronicleGate = { check: check };
-  check();
+  // The API helper adds a <script> to <body>, so wait until the body exists.
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', check);
+  else check();
 })(window);
