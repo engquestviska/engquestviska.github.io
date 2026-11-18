@@ -144,8 +144,8 @@ fun Shell(graph: AppGraph, profile: Profile, link: String? = null, onLinkUsed: (
     }
 
     // Once the semester has ended (the server decides), the whole app becomes EngQuest Chronicle.
-    var chronicle by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) { chronicle = graph.repo.chronicleActive() }
+    var chronicle by remember { mutableStateOf(com.engquest.app.BuildConfig.CHRONICLE_DEMO) }
+    LaunchedEffect(Unit) { if (!chronicle) chronicle = graph.repo.chronicleActive() }
     if (chronicle) {
         BackHandler {
             if (System.currentTimeMillis() - lastBackAt < 2000) (context as? android.app.Activity)?.finish()
@@ -154,7 +154,11 @@ fun Shell(graph: AppGraph, profile: Profile, link: String? = null, onLinkUsed: (
                 Toast.makeText(context, "Press back again to exit", Toast.LENGTH_SHORT).show()
             }
         }
-        com.engquest.app.ui.chronicle.ChronicleScreen(profile, modifier = Modifier.statusBarsPadding())
+        com.engquest.app.ui.chronicle.ChronicleScreen(
+            profile,
+            url = com.engquest.app.ui.chronicle.CHRONICLE_URL + if (com.engquest.app.BuildConfig.CHRONICLE_DEMO) "?demo=1" else "",
+            modifier = Modifier.statusBarsPadding(),
+        )
         return
     }
 

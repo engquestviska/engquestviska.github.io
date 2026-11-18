@@ -28,6 +28,10 @@ val localProps = Properties().apply {
 }
 val metaAppId = localProps.getProperty("meta.appId").orEmpty().trim()
 
+// Test-only: `-PchronicleDemo=true` builds an app that opens EngQuest Chronicle at once with sample
+// numbers (version "2.1-test"), so the story and sharing can be tried before the real date.
+val chronicleDemo = (project.findProperty("chronicleDemo") as String?) == "true"
+
 val hasSigning = listOf("storeFile", "storePassword", "keyAlias", "keyPassword")
     .all { !keystoreProps.getProperty(it).isNullOrBlank() }
 
@@ -39,9 +43,10 @@ android {
         applicationId = "com.engquest.app"
         minSdk = 24
         targetSdk = 34
-        versionCode = 13
-        versionName = "2.0.3"
+        versionCode = 14
+        versionName = if (chronicleDemo) "2.1-test" else "2.1"
         buildConfigField("String", "META_APP_ID", "\"$metaAppId\"")
+        buildConfigField("boolean", "CHRONICLE_DEMO", chronicleDemo.toString())
     }
 
     signingConfigs {
