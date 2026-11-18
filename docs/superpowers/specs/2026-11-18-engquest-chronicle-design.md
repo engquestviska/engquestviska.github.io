@@ -61,9 +61,12 @@ Rejected along the way: a plain card-only version (too much like a report card),
 3. **Tasks**: tasks finished (giant); one tile per task pops in; the best-scoring task glows in accent; "Your best: <task> · <score>".
 4. **Vocabulary**: dark slide; the student's own My Vocabulary words scroll in rows (alternating directions); a paper panel shows the word count and the latest word. Optional "top 5 in class" tag.
 5. **Level and XP**: the level number in accent slides in; XP counts up; a ruler-style XP bar fills; "N XP to next level".
-6. **Final Score**: dark slide; score counts up; a marker slides along a 0–100 scale; chapter + ASAT scores fade in below.
+6. **Final Score**: dark slide; score counts up as a whole number (no decimals, anywhere in Chronicle); a marker slides along a 0–100 scale; chapter + ASAT scores fade in below.
 7. **Class Rank**: full accent slide; "In <class> you finished"; the number counts down from class size to the student's rank; "out of N".
-8. **Share card**: see below.
+8. **Grade Rank** (owner, 2026-11-18): dark slide; "Across all of Grade 10"; a row of class chips with the student's class in accent; the number counts down from the grade size to the student's place, in accent; "out of N students in Grade 10". The ranking covers every active student in that grade the owner teaches (all G10 classes, or all G11 classes), by Final Score, with ties sharing a place.
+9. **Share card**: see below.
+
+Rank numerals scale with their digit count so they never run off the screen: 1 digit 250px, 2 digits 170px, 3 digits 120px (Grade Rank starts at 170px).
 
 ## Transitions and idle motion (owner, 2026-11-18)
 
@@ -72,8 +75,8 @@ Rejected along the way: a plain card-only version (too much like a report card),
   1. Cover: the circle grows in and then slowly breathes; the name floats gently; both animate out when the slide leaves.
   2. Attendance: after the dots fill, they pulse in a slow wave.
   3. Tasks: after the tiles fill, they pulse in a slow wave; the best task keeps glowing.
-  4. Vocabulary: the student's words run as text, rows alternating left and right.
-  5. Level: the XP bar fills slowly (about 3.5 s) while the XP number counts up alongside it.
+  4. Vocabulary: the student's words run slowly as text, rows alternating left and right (each row loops in 22–38 s).
+  5. Level: the XP bar fills over about 2.4 s while the XP number counts up alongside it.
   6. Final Score: the blue marker slides to the score, then keeps bobbing gently.
   7. Class Rank and 8. Share card: as in the concept (countdown; soft shine).
 - `prefers-reduced-motion`: no transitions or idle motion; slides show at rest.
@@ -88,7 +91,7 @@ Students share without saving to the gallery first.
 
 ## Share card (the picture students post)
 
-9:16 portrait (export at 1080×1920). Masthead; "Starring" + name + class/grade; giant accent "#rank" with "Class Rank" label; Final Score on the right; a bottom strip separated by thin rules with Level · Present % · Tasks · Words. On screen a soft shine passes over it; the exported image is static.
+9:16 portrait (export at 1080×1920). Masthead; "Starring" + name + class/grade; giant accent "#rank" with "Class Rank" label; Final Score and Grade Rank ("#11/178") on the right; a bottom strip separated by thin rules with Level · Present % · Tasks · Words. On screen a soft shine passes over it; the exported image is static.
 
 ## Records page (after the story, until next semester)
 
@@ -107,6 +110,7 @@ Students share without saving to the gallery first.
 | Level, XP, XP to next level | XP system |
 | Final Score, chapter scores, ASAT | `getFinalScores` (blank ASAT/chapter = 0, owner decision 2026-11-18) |
 | Class Rank + class size | same ranking as the Scores "Class Rank" tab (ties share a place) |
+| Grade Rank + grade size | the same Final Scores across every active class of that grade (ties share a place) |
 
 ## Approaches considered (how it gets built)
 

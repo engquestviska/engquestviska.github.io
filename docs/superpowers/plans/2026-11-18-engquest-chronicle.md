@@ -22,7 +22,10 @@
 - Switch: on at 00:00 WIB (`+07:00`) on the date in setting `chronicle_start`; the **server** decides, never the phone clock.
 - Teacher website and teacher app: no changes.
 - Share picture: 1080×1920 PNG. Instagram sticker: the same card at 720×1280 with rounded corners on a transparent background.
-- Transitions: same background → push (old fades left, new glides in from the right, ~0.55 s); background change → circle wipe from 50% 80% (~0.8 s); leaving slides shrink their circle and drop their big number. Idle motion per slide as listed in the spec's "Transitions and idle motion" section (XP bar fill ~3.5 s, XP count 4 s).
+- Transitions: same background → push (old fades left, new glides in from the right, ~0.55 s); background change → circle wipe from 50% 80% (~0.8 s); leaving slides shrink their circle and drop their big number. Idle motion per slide as listed in the spec's "Transitions and idle motion" section (XP bar fill 2.4 s, XP count 2.6 s, vocabulary rows loop in 22–38 s).
+- Final Score is always a whole number (no decimals) on slides, records, and the share card.
+- Rank numerals scale with digit count: 1 digit 250px, 2 digits 170px, 3 digits 120px. Grade Rank uses 170px for 1–2 digits and 120px for 3.
+- The story is 8 slides (cover, attendance, tasks, vocab, level, final, rank, gradeRank), then the share card.
 - Sharing: in the app, the primary button is **Share to Instagram Story** (hidden if Instagram isn't installed) and the second is **More ways to share** (share sheet). On the website: **Share** (Web Share), or **Download picture** when Web Share with files is unavailable.
 - Story plays once per device (localStorage `eq_chronicle_seen`); Replay plays it again.
 - Missing data: skip that slide, never show a celebratory 0.
@@ -83,10 +86,11 @@ App (`native-student/`):
   vocab: { total, words: [english...], latest: string | '', classTop5: boolean }, // words oldest→newest
   xp: { total, level, toNext },                  // levelFromXp from pilot/events.mjs
   scores: { units: [{ label, score }], asat, final }, // same numbers as getFinalScores; final '' when none
-  rank: { place: number | null, of: number } }    // of = active students in class with a Final Score
+  rank: { place: number | null, of: number },     // of = active students in class with a Final Score
+  gradeRank: { place: number | null, of: number, classes: [classId...] } } // across all active classes of the student's grade
 ```
   Otherwise `{ error: 'Student not found' }`.
-- Produces exported helpers `classFinalScores(query, className)` → the `students` array `getFinalScores` returns today, and `rankPlaces(students)` → `Map<no, place>` using competition ranking on `calc['Final Score']` (blank excluded).
+- Produces exported helpers `classFinalScores(query, className)` → the `students` array `getFinalScores` returns today, and `rankPlaces(students, key = (s) => s.no)` → `Map<key, place>` using competition ranking on `calc['Final Score']` (blank excluded). For the grade rank, call `classFinalScores` for every active class of that grade, tag each row with `classId`, and rank with `key = (s) => s.classId + ':' + s.no`.
 
 - [ ] **Step 1: Write the failing tests** in `pilot/test/chronicle.test.mjs`, using `makeTestDb`, `seedTeacher`, and `seedStudents` like `compat.test.mjs`:
 
@@ -116,7 +120,14 @@ test('getChronicle bundles one student', async () => {
   assert.equal(r.rank.of, 3);
   assert.equal(typeof r.xp.level, 'number');
 });
-test('getChronicle with no Final Score gives rank null', async () => { /* student with no chapter rows */ });
+test('getChronicle with no Final Score gives rank null', async () => { /* student with no chapter rows: rank.place and gradeRank.place null */ });
+test('grade rank spans every class of the grade and ignores the other grade', async () => {
+  // XE1 x2 (finals 90, 80), XE2 x2 (finals 85, 80), XIF7 x1 (final 99)
+  // Grade 10 finals 90, 85, 80, 80 -> places 1, 2, 3, 3; the G11 student is not counted
+  const r = await handleCompat(db, 'getChronicle', { className: 'XE2', studentNo: 2 }, null);
+  assert.deepEqual([r.gradeRank.place, r.gradeRank.of], [3, 4]);
+  assert.deepEqual(r.gradeRank.classes, ['XE1', 'XE2']);
+});
 test('getChronicle for an unknown or inactive student returns an error', async () => {
   assert.deepEqual(await handleCompat(db, 'getChronicle', { className: 'XE1', studentNo: 99 }, null), { error: 'Student not found' });
 });
@@ -146,20 +157,25 @@ test('getChronicle for an unknown or inactive student returns an error', async (
 
 **Interfaces:**
 - Consumes: the `getChronicle` response (Task 1).
-- Produces `EQChronicleData.build(bundle, { grade })` → `{ name, classLabel, gradeLabel, label, accent, slides: [{ id, ...fields }], card: { name, classLine, rank, final, level, present, tasks, words }, records: {...} }`. Slide ids, in order: `cover, attendance, tasks, vocab, level, final, rank` (the share card is slide 8, added by the story). Also `EQChronicleData.SAMPLE` (the concept's Rafi numbers) and `EQChronicleData.SAMPLE_LONGNAME`.
+- Produces `EQChronicleData.build(bundle, { grade })` → `{ name, classLabel, gradeLabel, label, accent, slides: [{ id, ...fields }], card: { name, classLine, rank, final, level, present, tasks, words }, records: {...} }`. Slide ids, in order: `cover, attendance, tasks, vocab, level, final, rank, gradeRank` (the share card is slide 9, added by the story). The card gains `gradeRank` (e.g. `'#11/178'`, or `'—'`). Also produces `rankFontSize(place: number, base: 250 | 170) → number`, implementing the digit-count rule from Global Constraints. Also `EQChronicleData.SAMPLE` (the concept's Rafi numbers) and `EQChronicleData.SAMPLE_LONGNAME`.
 - The file is a UMD-style IIFE that sets `window.EQChronicleData`, and also sets `module.exports` when `module` exists, so Node can `require` it.
 
 - [ ] **Step 1: Write the failing tests** (`node:test`, loading the file with `createRequire`):
 
 ```js
-test('a full bundle gives 7 slides in order', () => {
-  assert.deepEqual(build(SAMPLE, { grade: '10' }).slides.map(s => s.id), ['cover','attendance','tasks','vocab','level','final','rank']);
+test('a full bundle gives 8 slides in order', () => {
+  assert.deepEqual(build(SAMPLE, { grade: '10' }).slides.map(s => s.id), ['cover','attendance','tasks','vocab','level','final','rank','gradeRank']);
 });
+test('rank numerals shrink with more digits', () => {
+  assert.deepEqual([4, 24, 105].map(n => rankFontSize(n, 250)), [250, 170, 120]);
+  assert.deepEqual([11, 105].map(n => rankFontSize(n, 170)), [170, 120]);
+});
+test('final score shows as a whole number', () => { /* final 87 -> card.final === '87' */ });
 test('no attendance meetings skips the attendance slide', () => { /* meetings: 0 -> no 'attendance' */ });
 test('no vocabulary skips the vocab slide', () => { /* total: 0 */ });
 test('blank final skips final and rank, card shows a dash', () => {
   const vm = build({ ...SAMPLE, scores: { ...SAMPLE.scores, final: '' }, rank: { place: null, of: 36 } }, { grade: '10' });
-  assert.ok(!vm.slides.some(s => s.id === 'final' || s.id === 'rank'));
+  assert.ok(!vm.slides.some(s => ['final', 'rank', 'gradeRank'].includes(s.id)));
   assert.equal(vm.card.final, '—'); assert.equal(vm.card.rank, '—');
 });
 test('present percent rounds to a whole number', () => { /* 31 of 34 -> '91%' */ });
@@ -209,7 +225,7 @@ test('class label reads X-E2 for XE2', () => { assert.equal(build(SAMPLE, { grad
 **Files:** Create `shared/js/chronicle-card.js`. Modify `chronicle-page.js` to wire the buttons.
 
 **Interfaces:**
-- Produces `EQChronicleCard.toBlob(vm.card, { accent }) → Promise<Blob>` (PNG, 1080×1920), drawn on a canvas with the share-card layout (masthead, Starring + name, giant accent `#rank`, Final on the right, a 4-cell bottom strip: Level, Present, Tasks, Words). Await `document.fonts.ready` before drawing. No shine effect in the image.
+- Produces `EQChronicleCard.toBlob(vm.card, { accent }) → Promise<Blob>` (PNG, 1080×1920), drawn on a canvas with the share-card layout (masthead, Starring + name, giant accent `#rank`, Final and Grade Rank on the right, a 4-cell bottom strip: Level, Present, Tasks, Words). Await `document.fonts.ready` before drawing. No shine effect in the image.
 - Also produces `EQChronicleCard.stickerBlob(vm.card, { accent }) → Promise<Blob>`: the card at 720×1280, rounded corners, transparent outside.
 - Buttons: in the app (`window.EngQuestApp`): if `EngQuestApp.canShareToInstagram()` returns true, show **Share to Instagram Story** → `EngQuestApp.shareToInstagramStory(stickerBase64)`, and **More ways to share** → `EngQuestApp.shareImage(cardBase64)`; otherwise show only **Share** → `shareImage`. On the website: if `navigator.canShare({ files })` → **Share** via `navigator.share`; else **Download picture** as `EngQuest-Chronicle-<Name>.png`.
 

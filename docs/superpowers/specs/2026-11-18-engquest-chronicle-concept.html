@@ -44,7 +44,7 @@ section{margin-bottom:56px}
 .play .ch span{display:inline-block;animation:up .6s cubic-bezier(.2,.9,.3,1.2) both;animation-delay:calc(.25s + var(--i)*45ms)}
 .play .tile,.play .dot{animation:pop .35s calc(.5s + var(--i)*45ms) both,wave 2.6s calc(2.6s + var(--i)*70ms) ease-in-out infinite}
 .play .tile.best{animation:pop .35s calc(.5s + var(--i)*45ms) both,glowT 1.6s 2s ease-in-out infinite}
-.play .fillbar{animation:fill 3.6s .7s cubic-bezier(.45,0,.25,1) both}
+.play .fillbar{animation:fill 2.4s .6s cubic-bezier(.45,0,.25,1) both}
 .play .pin{animation:slideX 1.6s .5s cubic-bezier(.6,0,.2,1) both,bob 1.8s 2.2s ease-in-out infinite}
 .play .float{animation:up .7s var(--d,0s) cubic-bezier(.2,.9,.3,1.15) both,float 4s 2s ease-in-out infinite}
 .play .blob.grow{animation:grow 1s cubic-bezier(.2,.9,.3,1.1) both,breathe 6s 1s ease-in-out infinite}
@@ -176,7 +176,7 @@ section{margin-bottom:56px}
  <div class="k r" style="position:absolute;left:16px;top:66px">YOU REACHED</div>
  <div class="num sl ac" style="position:absolute;right:-8px;top:96px;font-size:160px;--d:.1s">12</div>
  <div style="position:absolute;left:16px;right:16px;bottom:30px">
-  <div class="lead r" style="--d:.4s">Level 12.<br><span class="count" data-to="4820" data-dur="4000">4,820</span> XP earned.</div>
+  <div class="lead r" style="--d:.4s">Level 12.<br><span class="count" data-to="4820" data-dur="2600">4,820</span> XP earned.</div>
   <div style="position:relative;height:26px;margin-top:16px;border:1.5px solid var(--ink)">
    <div class="fillbar" style="position:absolute;left:0;top:0;bottom:0;width:70%;background:var(--ink)"></div>
    <div style="position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 9px,rgba(128,128,128,.6) 9px 10px)"></div>
@@ -188,12 +188,12 @@ section{margin-bottom:56px}
 <div><div class="ph dark">
  <div class="mast"><i>EngQuest Chronicle</i><span>FINAL SCORE</span></div>
  <div class="k r" style="position:absolute;left:16px;top:72px">YOUR FINAL SCORE</div>
- <div class="num count" data-to="87.4" data-dec="1" style="position:absolute;left:12px;top:96px;font-size:120px">87.4</div>
+ <div class="num count" data-to="87" style="position:absolute;left:12px;top:96px;font-size:140px">87</div>
  <div style="position:absolute;left:16px;right:16px;top:250px">
   <div style="position:relative;height:40px">
    <div style="position:absolute;left:0;right:0;top:19px;height:2px;background:currentColor;opacity:.4"></div>
    <div style="position:absolute;left:0;right:0;top:14px;height:12px;background:repeating-linear-gradient(90deg,currentColor 0 1px,transparent 1px 10%);opacity:.5"></div>
-   <div class="pin" style="position:absolute;left:87.4%;top:6px;width:16px;height:28px;margin-left:-8px;background:var(--a);border-radius:3px"></div>
+   <div class="pin" style="position:absolute;left:87%;top:6px;width:16px;height:28px;margin-left:-8px;background:var(--a);border-radius:3px"></div>
   </div>
   <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:800;opacity:.7"><span>0</span><span>50</span><span>100</span></div>
   <div class="rule" style="margin:22px 0 10px"></div>
@@ -208,7 +208,17 @@ section{margin-bottom:56px}
  <div class="r" style="--d:1.8s;position:absolute;right:16px;top:110px;text-align:right;font-weight:800;font-size:15px;line-height:1.3">out of<br><span class="num" style="font-size:44px">36</span></div>
 </div><p class="cap">7 · Class Rank</p></div>
 
-<div><div class="ph card"></div><p class="cap">8 · Share card</p></div>
+<div><div class="ph dark">
+ <div class="mast"><i>EngQuest Chronicle</i><span>GRADE RANK</span></div>
+ <div class="k r" style="position:absolute;left:16px;top:72px;opacity:1">ACROSS ALL OF GRADE 10</div>
+ <div class="r" style="--d:.3s;position:absolute;left:16px;right:16px;top:96px;display:flex;gap:6px;flex-wrap:wrap;font-size:11px;font-weight:800">
+  <span style="border:1px solid currentColor;border-radius:999px;padding:3px 8px">X-E1</span><span style="border:1px solid var(--a);background:var(--a);border-radius:999px;padding:3px 8px">X-E2</span><span style="border:1px solid currentColor;border-radius:999px;padding:3px 8px">X-E3</span><span style="border:1px solid currentColor;border-radius:999px;padding:3px 8px">X-E4</span><span style="border:1px solid currentColor;border-radius:999px;padding:3px 8px">X-E5</span>
+ </div>
+ <div class="num ac" style="position:absolute;left:6px;bottom:52px;font-size:170px;line-height:.9"><span style="font-size:.5em;vertical-align:.7em">#</span><span class="count" data-from="178" data-to="11" data-dur="2400">11</span></div>
+ <div class="r" style="--d:2.2s;position:absolute;left:16px;right:16px;bottom:22px;font-weight:800;font-size:14px">out of 178 students in Grade 10</div>
+</div><p class="cap">8 · Grade Rank</p></div>
+
+<div><div class="ph card"></div><p class="cap">9 · Share card</p></div>
 </div></section>
 
 <section><div class="tag"><b>After the story</b><span>What the app and website open to until next semester. No boxes, same poster look.</span></div>
@@ -221,7 +231,8 @@ section{margin-bottom:56px}
    <div class="num ac sl" style="font-size:80px;line-height:.85"><span style="font-size:.45em;vertical-align:.8em">#</span>4</div>
   </div>
   <div style="display:flex;gap:8px;margin:10px 0 14px"><div class="btn pri">Share my Chronicle</div><div class="btn" style="flex:0 0 80px">Replay</div></div>
-  <div class="sec"><div class="k">FINAL</div><div><span class="num count" data-to="87.4" data-dec="1" style="font-size:34px">87.4</span> <span style="font-size:12px;font-weight:800;opacity:.6">/ 100</span></div></div>
+  <div class="sec"><div class="k">FINAL</div><div><span class="num count" data-to="87" style="font-size:34px">87</span> <span style="font-size:12px;font-weight:800;opacity:.6">/ 100</span></div></div>
+  <div class="sec"><div class="k">GRADE</div><div style="font-weight:800;font-size:13px">#11 of 178 in Grade 10</div></div>
   <div class="sec"><div class="k">SCORES</div><div class="chs"><div><span class="k">CH 3</span><b>90</b></div><div><span class="k">CH 4</span><b>85</b></div><div><span class="k">CH 5</span><b>88</b></div><div><span class="k">ASAT</span><b>84</b></div></div></div>
   <div class="sec"><div class="k">PRESENT</div><div><div style="font-weight:800;font-size:13px;margin-bottom:6px">31 of 34 days · 91%</div><div class="dots" data-days="ppppppsppppppppppppppspppppppppspp" style="gap:3px"></div></div></div>
   <div class="sec"><div class="k">LEVEL</div><div style="font-weight:800;font-size:13px">Level 12 · 4,820 XP · 28 tasks</div></div>
@@ -236,9 +247,10 @@ section{margin-bottom:56px}
    <div style="display:flex;gap:8px;margin-top:12px"><div class="btn pri">Download picture</div><div class="btn" style="flex:0 0 80px">Replay</div></div></div>
   <div style="min-width:0">
    <div style="display:flex;justify-content:space-between;align-items:flex-end;overflow:hidden">
-    <div><div class="k">STARRING</div><div class="num r" style="font-size:96px">Rafi</div></div>
-    <div style="display:flex;gap:28px;align-items:flex-end">
-     <div><div class="k">FINAL</div><div class="num count" data-to="87.4" data-dec="1" style="font-size:64px">87.4</div></div>
+    <div><div class="k">STARRING</div><div class="num r" style="font-size:72px">Rafi</div></div>
+    <div style="display:flex;gap:18px;align-items:flex-end">
+     <div><div class="k">FINAL</div><div class="num count" data-to="87" style="font-size:64px">87</div></div>
+     <div><div class="k">GRADE RANK</div><div class="num" style="font-size:48px;line-height:.8">#11<span style="font-size:16px">/178</span></div></div>
      <div><div class="k">CLASS RANK</div><div class="num ac" style="font-size:72px;line-height:.8"><span style="font-size:.45em;vertical-align:.8em">#</span><span class="count" data-from="36" data-to="4">4</span></div></div>
     </div>
    </div>
@@ -257,7 +269,7 @@ section{margin-bottom:56px}
  <div style="position:absolute;left:16px;top:64px"><div class="k">STARRING</div><div class="num" style="font-size:58px;margin-top:4px">Rafi</div><div class="k" style="margin-top:6px">X-E2 · GRADE 10</div></div>
  <div class="k" style="position:absolute;left:16px;top:170px;opacity:1">CLASS RANK</div>
  <div class="num ac" style="position:absolute;left:-8px;top:182px;font-size:200px;line-height:1"><span style="font-size:.45em;vertical-align:.75em">#</span>4</div>
- <div style="position:absolute;right:16px;top:212px;text-align:right"><div class="k">FINAL</div><div class="num" style="font-size:46px">87.4</div></div>
+ <div style="position:absolute;right:16px;top:206px;text-align:right"><div class="k">FINAL</div><div class="num" style="font-size:46px">87</div><div class="k" style="margin-top:14px">GRADE 10</div><div class="num" style="font-size:28px">#11<span style="font-size:13px">/178</span></div></div>
  <div style="position:absolute;left:16px;right:16px;bottom:18px;border-top:1.5px solid var(--ink);padding-top:8px;display:grid;grid-template-columns:repeat(4,1fr);text-align:center">
   <div><div class="num" style="font-size:22px">12</div><div class="k" style="font-size:8px;margin-top:3px">LEVEL</div></div>
   <div style="border-left:1px solid var(--line)"><div class="num" style="font-size:22px">91%</div><div class="k" style="font-size:8px;margin-top:3px">PRESENT</div></div>
@@ -274,7 +286,7 @@ function build(root){
  root.querySelectorAll('[data-days]').forEach(d=>{d.innerHTML=[...d.dataset.days].map((c,i)=>`<i class="dot ${c==='s'?'s':''}" style="--i:${i*.5}"></i>`).join('')});
  root.querySelectorAll('[data-tiles]').forEach(t=>{const n=+t.dataset.tiles,b=+t.dataset.best;t.innerHTML=Array.from({length:n},(_,i)=>`<i class="tile ${i===b?'best':''}" style="--i:${i}"></i>`).join('')});
  root.querySelectorAll('[data-words]').forEach(m=>{const s=WORDS.map(w=>`<span>${w}</span>`).join('');m.innerHTML=s+s});
- root.querySelectorAll('.wall').forEach(w=>{if(w.childElementCount)return;for(let r=0;r<5;r++){const ws=WORDS.slice(r*3).concat(WORDS.slice(0,r*3));const s=ws.map((x,i)=>`<span class="${(i+r)%6===0?'ac':''}" style="${(i+r)%6===0?'color:#7d9bff':''}">${x}</span>`).join('');w.insertAdjacentHTML('beforeend',`<div class="mqrow ${r%2?'rev':''}" style="--t:${9+r*2}s">${s+s}</div>`)}});
+ root.querySelectorAll('.wall').forEach(w=>{if(w.childElementCount)return;for(let r=0;r<5;r++){const ws=WORDS.slice(r*3).concat(WORDS.slice(0,r*3));const s=ws.map((x,i)=>`<span class="${(i+r)%6===0?'ac':''}" style="${(i+r)%6===0?'color:#7d9bff':''}">${x}</span>`).join('');w.insertAdjacentHTML('beforeend',`<div class="mqrow ${r%2?'rev':''}" style="--t:${22+r*4}s">${s+s}</div>`)}});
 }
 function counts(root){root.querySelectorAll('.count').forEach(el=>{const to=+el.dataset.to,from=+(el.dataset.from||0),dec=+(el.dataset.dec||0),t0=performance.now(),d=+(el.dataset.dur||(el.dataset.from?1800:1400));
  (function f(t){const p=Math.min((t-t0)/d,1),e=1-Math.pow(1-p,3),v=from+(to-from)*e;el.textContent=(el.dataset.from?Math.round(v):v).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});if(p<1)requestAnimationFrame(f)})(t0)})}
