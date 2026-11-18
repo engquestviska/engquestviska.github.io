@@ -1,6 +1,6 @@
 # EngQuest Chronicle: end-of-semester records mode
 
-Date: 2026-11-18 · Status: design approved in conversation, not built
+Date: 2026-11-18 · Status: APPROVED by owner 2026-11-18, not built (launch date still to come)
 Visual reference: [2026-11-18-engquest-chronicle-concept.html](2026-11-18-engquest-chronicle-concept.html) (open in a browser; it plays). Published copy: https://claude.ai/artifact/SgghHR9g4rBpb7Jpm2Yp4h
 
 ## Intent
