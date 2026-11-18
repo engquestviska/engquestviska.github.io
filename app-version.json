@@ -1,9 +1,10 @@
 {
-  "versionCode": 13,
-  "versionName": "2.0.3",
+  "versionCode": 14,
+  "versionName": "2.1",
   "apk": "EngQuest-app-7fq93kx2.apk",
-  "notes": "Class Rank on the Scores page.",
+  "notes": "Ready for the end of the semester.",
   "history": [
+    {"version": "2.1", "date": "2026-11-18", "notes": ["Ready for the end of the semester"]},
     {"version": "2.0.3", "date": "2026-11-18", "notes": ["Scores: Class Rank shows the whole class, ranked by Final Score"]},
     {"version": "2.0.2", "date": "2026-11-12", "notes": ["Easier-to-read text"]},
     {"version": "2.0.1", "date": "2026-11-11", "notes": ["New rounder, friendlier font", "The Send button now sits in line with the other tabs", "The app starts at the grade choice when you first open it or after you log out"]},
