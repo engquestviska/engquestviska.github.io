@@ -1,6 +1,8 @@
 # EngQuest Chronicle Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+>
+> **Owner's choice (2026-11-18): Native.** Build every task inline in one session, then one fresh review of the whole change at the end. No per-task subagents.
 
 **Goal:** From a fixed date, the student website and student app open EngQuest Chronicle (an animated 8-slide semester story, a 9:16 share picture, and a records page) instead of the normal student pages.
 
