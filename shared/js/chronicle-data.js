@@ -17,6 +17,11 @@
     return digits <= 2 ? 170 : 120;
   }
 
+  // "Semester 1 · 2026/27" -> "SEM 1 · 26/27", short enough for the card masthead.
+  function shortLabel(label) {
+    return String(label || '').replace(/semester/i, 'SEM').replace(/20(\d\d)\/(?:20)?(\d\d)/, '$1/$2');
+  }
+
   function percent(part, whole) { return whole ? Math.round((part / whole) * 100) + '%' : DASH; }
 
   function build(b, opts) {
@@ -55,7 +60,7 @@
       label: b.label || '', accent: ACCENT[grade] || ACCENT['10'],
       slides: slides,
       card: {
-        name: name, classLine: cls + ' · ' + gradeLabel, label: b.label || '',
+        name: name, classLine: cls + ' · ' + gradeLabel, label: shortLabel(b.label),
         rank: rankPlace != null ? '#' + rankPlace : DASH,
         rankFontSize: rankPlace != null ? rankFontSize(rankPlace, 170) : 170,
         gradeRank: gradePlace != null ? '#' + gradePlace + ' of ' + b.gradeRank.of + ' in ' + gradeLabel : '',

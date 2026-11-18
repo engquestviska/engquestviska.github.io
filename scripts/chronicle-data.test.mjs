@@ -69,6 +69,11 @@ test('card lines read the way the share card shows them', () => {
     { rank: '#4', gradeRank: '#11 of 178 in Grade 10', classLine: 'X E-2 · Grade 10', level: '12', tasks: '28', words: '142' });
 });
 
+test('the card masthead uses a short semester label', () => {
+  assert.equal(build(SAMPLE, { grade: '10' }).card.label, 'SEM 1 · 26/27');
+  assert.equal(build({ ...SAMPLE, label: 'Semester 2 · 2026/27' }, { grade: '10' }).card.label, 'SEM 2 · 26/27');
+});
+
 test('the nickname is the display name, the full name is kept', () => {
   const vm = build(SAMPLE, { grade: '10' });
   assert.equal(vm.name, 'Rafi');
