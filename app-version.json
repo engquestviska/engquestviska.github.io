@@ -1,9 +1,10 @@
 {
-  "versionCode": 12,
-  "versionName": "2.0.2",
+  "versionCode": 13,
+  "versionName": "2.0.3",
   "apk": "EngQuest-app-7fq93kx2.apk",
-  "notes": "Easier-to-read text.",
+  "notes": "Class Rank on the Scores page.",
   "history": [
+    {"version": "2.0.3", "date": "2026-11-18", "notes": ["Scores: Class Rank shows the whole class, ranked by Final Score"]},
     {"version": "2.0.2", "date": "2026-11-12", "notes": ["Easier-to-read text"]},
     {"version": "2.0.1", "date": "2026-11-11", "notes": ["New rounder, friendlier font", "The Send button now sits in line with the other tabs", "The app starts at the grade choice when you first open it or after you log out"]},
     {"version": "2.0", "date": "2026-11-11", "notes": ["A brand-new app, built just for Android phones", "Send your task photos even with no signal: they go when you are back online", "A bell for news: approved tasks, XP, attendance and announcements", "Optional notifications: choose which ones buzz your phone", "Scores, Level/XP, Materials, Vocabulary and more, all inside the app", "After updating, pick your class and name once more"]},
