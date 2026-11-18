@@ -1,0 +1,285 @@
+<title>EngQuest Chronicle</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,800&family=Playfair+Display:ital,wght@0,800;1,700;1,800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* print-poster system: paper, ink, one accent; giant cropped numerals + masthead rules */
+:root{--bg:#E9E6DF;--muted:#6b6a66;--paper:#F4F2ED;--ink:#141414;--a:#2450E0;--line:#cfcbc2;
+--disp:'Playfair Display',Georgia,serif;--head:'Bricolage Grotesque',system-ui,sans-serif;--body:Nunito,system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);padding-block:32px 72px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header,section{max-width:1120px;margin:0 auto}
+header{margin-bottom:24px}
+h1{font-family:var(--disp);font-style:italic;font-weight:800;font-size:40px;line-height:1}
+h1 small{font-family:var(--head);font-style:normal;font-size:14px;letter-spacing:.12em;display:block;margin-bottom:6px;color:var(--muted)}
+header p{color:var(--muted);max-width:640px;margin-top:8px}
+section{margin-bottom:56px}
+.tag{display:flex;align-items:baseline;gap:12px;margin-bottom:14px;flex-wrap:wrap;border-top:1.5px solid var(--ink);padding-top:10px}
+.tag b{font-family:var(--head);font-size:20px;font-weight:800}
+.tag span{color:var(--muted)}
+.row{display:flex;gap:20px;overflow-x:auto;padding:4px 2px 14px}
+.row>div{flex:0 0 250px;min-width:250px}
+.cap{font-size:13px;color:var(--muted);margin-top:8px;text-align:center}
+
+/* slide */
+.ph{width:250px;height:444px;border-radius:24px;position:relative;overflow:hidden;box-shadow:0 18px 40px -18px rgba(0,0,0,.45);font-family:var(--head);background:var(--paper);color:var(--ink);cursor:pointer}
+.ph.dark{background:var(--ink);color:var(--paper);--line:#3a3a3a}
+.ph.blue{background:var(--a);color:var(--paper);--line:rgba(255,255,255,.35)}
+.mast{position:absolute;left:16px;right:16px;top:22px;display:flex;justify-content:space-between;align-items:baseline;border-top:1.5px solid currentColor;border-bottom:1px solid currentColor;padding:4px 0;font-size:10px;font-weight:800;letter-spacing:.1em;transform-origin:left}
+.mast i{font-family:var(--disp);font-size:13px;letter-spacing:0;font-weight:700}
+.num{font-family:var(--disp);font-weight:800;line-height:.8;letter-spacing:-.02em}
+.it{font-family:var(--disp);font-style:italic;font-weight:700}
+.k{font-size:10px;font-weight:800;letter-spacing:.12em;opacity:.65}
+.lead{font-size:19px;font-weight:800;line-height:1.15}
+.ac{color:var(--a)}
+.blob{position:absolute;border-radius:50%;background:var(--a);animation:breathe 6s ease-in-out infinite}
+.sticker{position:absolute;background:var(--ink);color:var(--paper);font-weight:800;padding:7px 12px;border-radius:999px;font-size:12px;z-index:4;transform:rotate(-6deg)}
+.dark .sticker{background:var(--paper);color:var(--ink)}
+.rule{height:1px;background:currentColor;opacity:.4;transform-origin:left}
+
+/* motion: everything visible at rest, .play runs the entrance */
+.play .mast,.play .rule{animation:draw .8s cubic-bezier(.6,0,.2,1) both}
+.play .r{animation:up .7s cubic-bezier(.2,.9,.3,1.15) both;animation-delay:var(--d,0s)}
+.play .sl{animation:slideL .9s cubic-bezier(.2,.9,.2,1) both;animation-delay:var(--d,0s)}
+.play .sticker{animation:pop .6s both;animation-delay:var(--d,1s)}
+.play .ch span{display:inline-block;animation:up .6s cubic-bezier(.2,.9,.3,1.2) both;animation-delay:calc(.25s + var(--i)*45ms)}
+.play .tile,.play .dot{animation:pop .35s both;animation-delay:calc(.5s + var(--i)*45ms)}
+.play .tile.best{animation:pop .35s calc(.5s + var(--i)*45ms) both,glowT 1.6s 2s ease-in-out infinite}
+.play .fillbar{animation:fill 1.6s .7s cubic-bezier(.6,0,.2,1) both}
+.play .pin{animation:slideX 1.6s .5s cubic-bezier(.6,0,.2,1) both}
+.play .grow{animation:grow 1s cubic-bezier(.2,.9,.3,1.1) both}
+@keyframes up{from{opacity:0;transform:translateY(26px)}}
+@keyframes slideL{from{opacity:0;transform:translateX(90px)}}
+@keyframes draw{from{transform:scaleX(0)}}
+@keyframes pop{0%{opacity:0;transform:scale(0) rotate(-20deg)}70%{transform:scale(1.15)}}
+@keyframes grow{from{transform:scale(.15)}}
+@keyframes breathe{50%{transform:scale(1.06) translate(-4px,4px)}}
+@keyframes fill{from{width:0}}
+@keyframes slideX{from{left:0}}
+@keyframes mq{to{transform:translateX(-50%)}}
+@keyframes glowT{50%{box-shadow:0 0 0 4px rgba(36,80,224,.25)}}
+@keyframes shine{0%,60%{transform:translateX(-120%) rotate(20deg)}100%{transform:translateX(220%) rotate(20deg)}}
+.tiles{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.tile{aspect-ratio:1;border-radius:4px;background:currentColor}
+.tile.best{background:var(--a)}
+.dots{display:grid;grid-template-columns:repeat(9,1fr);gap:5px}
+.dot{aspect-ratio:1;border-radius:50%;background:currentColor}
+.dot.s{background:var(--a)}
+.mqrow{display:flex;white-space:nowrap;width:max-content;animation:mq var(--t,18s) linear infinite}
+.mqrow.rev{animation-direction:reverse}
+.mqrow span{padding-right:14px}
+.shine{position:absolute;inset:-40% auto -40% 0;width:60px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);animation:shine 4.5s ease-in-out infinite;pointer-events:none}
+
+/* player */
+.playwrap{display:flex;gap:36px;align-items:center;flex-wrap:wrap}
+.player{width:300px;height:533px;position:relative;flex:none}
+.player .stage{position:absolute;left:0;top:0;transform:scale(1.2);transform-origin:0 0}
+.player .stage>.ph{position:absolute;left:0;top:0;visibility:hidden}
+.player .stage>.ph.on{visibility:visible}
+.pbars{position:absolute;top:10px;left:16px;right:16px;display:flex;gap:4px;z-index:10}
+.pbars i{flex:1;height:3px;border-radius:2px;background:rgba(128,128,128,.35);overflow:hidden}
+.pbars i b{display:block;height:100%;width:0;background:var(--ink)}
+.pbars.lt i b{background:var(--paper)}
+.ctrl{display:flex;gap:10px;margin-top:14px}
+.ctrl button{font:800 13px var(--body);padding:9px 16px;border-radius:999px;border:2px solid var(--ink);background:var(--paper);color:var(--ink);cursor:pointer}
+.notes{max-width:420px;color:var(--muted);font-size:15px;line-height:1.6}
+.notes b{color:var(--ink)}
+
+/* records */
+.app{width:300px;height:640px;border-radius:30px;overflow:hidden;background:var(--paper);box-shadow:0 18px 40px -18px rgba(0,0,0,.45);font-family:var(--head);position:relative}
+.sec{border-top:1.5px solid var(--ink);padding:10px 0 4px;display:grid;grid-template-columns:78px 1fr;gap:8px;align-items:start}
+.sec>.k{padding-top:3px;opacity:.8}
+.chs{display:flex;gap:12px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.chs div{display:flex;flex-direction:column}
+.chs .k{font-size:9px}
+.btn{flex:1;text-align:center;padding:9px 0;border-radius:999px;font:800 13px var(--body);border:2px solid var(--ink)}
+.btn.pri{background:var(--ink);color:var(--paper)}
+.row>.web{flex:1 0 720px;min-width:720px}
+.web{height:640px;border-radius:14px;overflow:hidden;background:var(--paper);box-shadow:0 18px 40px -18px rgba(0,0,0,.45);font-family:var(--head);position:relative}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+
+<header><h1><small>CONCEPT · SEMESTER-END</small>EngQuest Chronicle</h1><p>Eight slides, the share card, and the records page. Press play on the phone to watch it the way a student would. Click any slide in the strip to replay its motion. Numbers are made up.</p></header>
+
+<section><div class="tag"><b>Watch it</b><span>Moves on by itself every 4.5 seconds. Click the phone to skip ahead.</span></div>
+<div class="playwrap">
+ <div><div class="player" id="player"><div class="pbars" id="pbars"></div><div class="stage" id="stage"></div></div>
+ <div class="ctrl"><button id="prev">Back</button><button id="pause">Pause</button><button id="restart">Restart</button></div></div>
+ <div class="notes"><p><b>One look on every slide:</b> a printed masthead at the top, thin rules, and one giant number cropped off the edge. Blue is used once per slide, on the thing that matters.</p><p style="margin-top:12px"><b>Motion:</b> rules draw in, numbers count up, tiles and dots fill one by one, the student's own words scroll past, the score marker slides along the 0–100 scale, and the class rank counts down from 36 to the student's place.</p></div>
+</div></section>
+
+<section><div class="tag"><b>All slides</b><span>Click a slide to replay it.</span></div>
+<div class="row" id="strip">
+
+<div><div class="ph" data-light="0">
+ <div class="mast"><i>EngQuest</i><span>NO. 01 · SEM 1</span></div>
+ <div class="blob grow" style="width:280px;height:280px;right:-120px;top:150px"></div>
+ <div style="position:absolute;left:14px;right:0;top:58px">
+  <div class="ch num" style="font-size:66px;font-style:italic;line-height:.9" data-split="Chronicle"></div>
+  <div class="rule" style="margin:14px 16px 8px 2px"></div>
+  <div class="k r" style="--d:.7s;padding-left:2px">SEMESTER 1 · 2026/27 · GRADE 10</div>
+ </div>
+ <div style="position:absolute;left:16px;bottom:58px;z-index:2">
+  <div class="k r" style="--d:.9s">STARRING</div>
+  <div class="num r" style="--d:1s;font-size:84px">Rafi</div>
+ </div>
+ <div class="r" style="--d:1.3s;position:absolute;left:16px;right:16px;bottom:20px;display:flex;justify-content:space-between;font-size:12px;font-weight:800"><span>X-E2</span><span>Tap to begin →</span></div>
+</div><p class="cap">1 · Cover</p></div>
+
+<div><div class="ph">
+ <div class="mast"><i>EngQuest Chronicle</i><span>ATTENDANCE</span></div>
+ <div class="num sl ac" style="position:absolute;right:-6px;top:76px;font-size:150px">31</div>
+ <div style="position:absolute;left:16px;right:16px;top:250px">
+  <div class="lead r" style="--d:.3s">days you showed up,<br>out of 34.</div>
+  <div class="dots r" style="--d:.4s;margin-top:14px" data-days="ppppppsppppppppppppppspppppppppspp"></div>
+  <div class="r" style="--d:.6s;font-size:11px;font-weight:800;margin-top:9px;display:flex;gap:12px"><span>● present</span><span class="ac">● sick / permit</span><span>○ absent</span></div>
+ </div>
+ <div class="sticker" style="left:16px;top:70px;--d:1.4s">91%</div>
+</div><p class="cap">2 · Attendance</p></div>
+
+<div><div class="ph">
+ <div class="mast"><i>EngQuest Chronicle</i><span>TASKS</span></div>
+ <div class="num sl" style="position:absolute;left:8px;top:76px;font-size:150px">28</div>
+ <div style="position:absolute;left:16px;right:16px;top:222px">
+  <div class="lead r" style="--d:.3s">tasks finished. Every one counted.</div>
+  <div class="tiles" style="margin-top:14px" data-tiles="28" data-best="20"></div>
+  <div class="rule" style="margin-top:14px"></div>
+  <div class="r" style="--d:2s;display:flex;justify-content:space-between;align-items:baseline;margin-top:8px"><span class="k" style="opacity:1">YOUR BEST</span><span style="font-weight:800;font-size:13px">Ch 5 Speaking · <span class="ac">96</span></span></div>
+ </div>
+</div><p class="cap">3 · Tasks</p></div>
+
+<div><div class="ph dark">
+ <div class="mast"><i>EngQuest Chronicle</i><span>VOCABULARY</span></div>
+ <div style="position:absolute;left:0;right:0;top:64px;font-family:var(--disp);font-style:italic;font-weight:700;font-size:26px;line-height:1.35;opacity:.9" class="wall"></div>
+ <div style="position:absolute;left:0;right:0;bottom:0;height:178px;background:var(--paper);color:var(--ink);padding:14px 16px">
+  <div style="display:flex;align-items:flex-end;gap:10px"><div class="num count" data-to="142" style="font-size:86px">142</div><div class="lead r" style="--d:.4s;padding-bottom:4px">words<br>collected</div></div>
+  <div class="rule" style="margin:12px 0 8px"></div>
+  <div class="r" style="--d:.7s;font-size:13px;display:flex;justify-content:space-between"><span>Latest: <span class="it ac">thorough</span></span><span class="k" style="opacity:1">TOP 5 IN CLASS</span></div>
+ </div>
+</div><p class="cap">4 · Vocabulary</p></div>
+
+<div><div class="ph">
+ <div class="mast"><i>EngQuest Chronicle</i><span>LEVEL</span></div>
+ <div class="k r" style="position:absolute;left:16px;top:66px">YOU REACHED</div>
+ <div class="num sl ac" style="position:absolute;right:-8px;top:96px;font-size:160px;--d:.1s">12</div>
+ <div style="position:absolute;left:16px;right:16px;bottom:30px">
+  <div class="lead r" style="--d:.4s">Level 12.<br><span class="count" data-to="4820">4,820</span> XP earned.</div>
+  <div style="position:relative;height:26px;margin-top:16px;border:1.5px solid var(--ink)">
+   <div class="fillbar" style="position:absolute;left:0;top:0;bottom:0;width:70%;background:var(--ink)"></div>
+   <div style="position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 9px,rgba(128,128,128,.6) 9px 10px)"></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:800;margin-top:6px"><span>LV 12</span><span>370 XP to LV 13</span></div>
+ </div>
+</div><p class="cap">5 · Level and XP</p></div>
+
+<div><div class="ph dark">
+ <div class="mast"><i>EngQuest Chronicle</i><span>FINAL SCORE</span></div>
+ <div class="k r" style="position:absolute;left:16px;top:72px">YOUR FINAL SCORE</div>
+ <div class="num count" data-to="87.4" data-dec="1" style="position:absolute;left:12px;top:96px;font-size:120px">87.4</div>
+ <div style="position:absolute;left:16px;right:16px;top:250px">
+  <div style="position:relative;height:40px">
+   <div style="position:absolute;left:0;right:0;top:19px;height:2px;background:currentColor;opacity:.4"></div>
+   <div style="position:absolute;left:0;right:0;top:14px;height:12px;background:repeating-linear-gradient(90deg,currentColor 0 1px,transparent 1px 10%);opacity:.5"></div>
+   <div class="pin" style="position:absolute;left:87.4%;top:6px;width:16px;height:28px;margin-left:-8px;background:var(--a);border-radius:3px"></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;font-size:11px;font-weight:800;opacity:.7"><span>0</span><span>50</span><span>100</span></div>
+  <div class="rule" style="margin:22px 0 10px"></div>
+  <div class="r" style="--d:1.6s;font-size:13px;line-height:1.5">Chapter 3 <b>90</b> · Chapter 4 <b>85</b><br>Chapter 5 <b>88</b> · ASAT <b>84</b></div>
+ </div>
+</div><p class="cap">6 · Final Score</p></div>
+
+<div><div class="ph blue">
+ <div class="mast"><i>EngQuest Chronicle</i><span>CLASS RANK</span></div>
+ <div class="k r" style="position:absolute;left:16px;top:72px;opacity:1">IN X-E2 YOU FINISHED</div>
+ <div class="num" style="position:absolute;left:4px;bottom:-4px;font-size:250px;line-height:.9"><span style="font-size:.5em;vertical-align:.7em">#</span><span class="count" data-from="36" data-to="4">4</span></div>
+ <div class="r" style="--d:1.8s;position:absolute;right:16px;top:110px;text-align:right;font-weight:800;font-size:15px;line-height:1.3">out of<br><span class="num" style="font-size:44px">36</span></div>
+</div><p class="cap">7 · Class Rank</p></div>
+
+<div><div class="ph card"></div><p class="cap">8 · Share card</p></div>
+</div></section>
+
+<section><div class="tag"><b>After the story</b><span>What the app and website open to until next semester. No boxes, same poster look.</span></div>
+<div class="row" style="align-items:flex-start">
+<div style="flex:0 0 300px;min-width:300px"><div class="app play">
+ <div class="mast" style="top:20px"><i style="font-size:16px">EngQuest Chronicle</i><span>SEM 1 · ENDED</span></div>
+ <div style="position:absolute;left:16px;right:16px;top:58px">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;position:relative">
+   <div><div class="k">X-E2 · GRADE 10</div><div class="num r" style="font-size:56px;margin-top:6px">Rafi</div></div>
+   <div class="num ac sl" style="font-size:80px;line-height:.85"><span style="font-size:.45em;vertical-align:.8em">#</span>4</div>
+  </div>
+  <div style="display:flex;gap:8px;margin:10px 0 14px"><div class="btn pri">Share my Chronicle</div><div class="btn" style="flex:0 0 80px">Replay</div></div>
+  <div class="sec"><div class="k">FINAL</div><div><span class="num count" data-to="87.4" data-dec="1" style="font-size:34px">87.4</span> <span style="font-size:12px;font-weight:800;opacity:.6">/ 100</span></div></div>
+  <div class="sec"><div class="k">SCORES</div><div class="chs"><div><span class="k">CH 3</span><b>90</b></div><div><span class="k">CH 4</span><b>85</b></div><div><span class="k">CH 5</span><b>88</b></div><div><span class="k">ASAT</span><b>84</b></div></div></div>
+  <div class="sec"><div class="k">PRESENT</div><div><div style="font-weight:800;font-size:13px;margin-bottom:6px">31 of 34 days · 91%</div><div class="dots" data-days="ppppppsppppppppppppppspppppppppspp" style="gap:3px"></div></div></div>
+  <div class="sec"><div class="k">LEVEL</div><div style="font-weight:800;font-size:13px">Level 12 · 4,820 XP · 28 tasks</div></div>
+  <div class="sec" style="grid-template-columns:78px minmax(0,1fr)"><div class="k">WORDS</div><div style="overflow:hidden"><div style="font-weight:800;font-size:13px;margin-bottom:4px">142 collected</div><div class="mqrow it" style="--t:22s;font-size:16px" data-words="1"></div></div></div>
+ </div>
+</div><p class="cap">Student app</p></div>
+
+<div class="web play">
+ <div style="display:flex;justify-content:space-between;align-items:baseline;margin:18px 28px 0;border-top:2px solid var(--ink);border-bottom:1px solid var(--ink);padding:6px 0"><span class="it" style="font-size:22px">EngQuest Chronicle</span><span class="k" style="opacity:1">SEMESTER 1 · 2026/27 · ENDED</span><span style="font-weight:800;font-size:13px">Rafi · X-E2</span></div>
+ <div style="display:grid;grid-template-columns:250px 1fr;gap:32px;padding:22px 28px">
+  <div><div class="ph card" style="box-shadow:0 10px 24px -10px rgba(0,0,0,.4)"></div>
+   <div style="display:flex;gap:8px;margin-top:12px"><div class="btn pri">Download picture</div><div class="btn" style="flex:0 0 80px">Replay</div></div></div>
+  <div style="min-width:0">
+   <div style="display:flex;justify-content:space-between;align-items:flex-end;overflow:hidden">
+    <div><div class="k">STARRING</div><div class="num r" style="font-size:96px">Rafi</div></div>
+    <div style="display:flex;gap:28px;align-items:flex-end">
+     <div><div class="k">FINAL</div><div class="num count" data-to="87.4" data-dec="1" style="font-size:64px">87.4</div></div>
+     <div><div class="k">CLASS RANK</div><div class="num ac" style="font-size:72px;line-height:.8"><span style="font-size:.45em;vertical-align:.8em">#</span><span class="count" data-from="36" data-to="4">4</span></div></div>
+    </div>
+   </div>
+   <div class="sec" style="margin-top:18px;grid-template-columns:110px 1fr"><div class="k">SCORES</div><div class="chs" style="gap:28px"><div><span class="k">CHAPTER 3</span><span class="num" style="font-size:30px">90</span></div><div><span class="k">CHAPTER 4</span><span class="num" style="font-size:30px">85</span></div><div><span class="k">CHAPTER 5</span><span class="num" style="font-size:30px">88</span></div><div><span class="k">ASAT</span><span class="num" style="font-size:30px">84</span></div></div></div>
+   <div class="sec" style="grid-template-columns:110px 1fr"><div class="k">ATTENDANCE</div><div style="display:flex;gap:18px;align-items:center"><div style="font-weight:800;font-size:14px;white-space:nowrap">31 of 34 · 91%</div><div class="dots" data-days="ppppppsppppppppppppppspppppppppspp" style="grid-template-columns:repeat(17,1fr);gap:4px;flex:1"></div></div></div>
+   <div class="sec" style="grid-template-columns:110px 1fr"><div class="k">LEVEL</div><div style="font-weight:800;font-size:14px">Level 12 · 4,820 XP · 28 tasks · best: Ch 5 Speaking, 96</div></div>
+   <div class="sec" style="grid-template-columns:110px minmax(0,1fr)"><div class="k">WORDS</div><div style="overflow:hidden"><div style="font-weight:800;font-size:14px;margin-bottom:4px">142 collected · top 5 in class</div><div class="mqrow it" style="--t:30s;font-size:22px" data-words="1"></div></div></div>
+  </div>
+ </div>
+</div>
+</div></section>
+
+<template id="cardtpl">
+ <div class="shine"></div>
+ <div class="mast"><i>EngQuest Chronicle</i><span>SEM 1 · 26/27</span></div>
+ <div style="position:absolute;left:16px;top:64px"><div class="k">STARRING</div><div class="num" style="font-size:58px;margin-top:4px">Rafi</div><div class="k" style="margin-top:6px">X-E2 · GRADE 10</div></div>
+ <div class="k" style="position:absolute;left:16px;top:170px;opacity:1">CLASS RANK</div>
+ <div class="num ac" style="position:absolute;left:-8px;top:182px;font-size:200px;line-height:1"><span style="font-size:.45em;vertical-align:.75em">#</span>4</div>
+ <div style="position:absolute;right:16px;top:212px;text-align:right"><div class="k">FINAL</div><div class="num" style="font-size:46px">87.4</div></div>
+ <div style="position:absolute;left:16px;right:16px;bottom:18px;border-top:1.5px solid var(--ink);padding-top:8px;display:grid;grid-template-columns:repeat(4,1fr);text-align:center">
+  <div><div class="num" style="font-size:22px">12</div><div class="k" style="font-size:8px;margin-top:3px">LEVEL</div></div>
+  <div style="border-left:1px solid var(--line)"><div class="num" style="font-size:22px">91%</div><div class="k" style="font-size:8px;margin-top:3px">PRESENT</div></div>
+  <div style="border-left:1px solid var(--line)"><div class="num" style="font-size:22px">28</div><div class="k" style="font-size:8px;margin-top:3px">TASKS</div></div>
+  <div style="border-left:1px solid var(--line)"><div class="num" style="font-size:22px">142</div><div class="k" style="font-size:8px;margin-top:3px">WORDS</div></div>
+ </div>
+</template>
+
+<script>
+const WORDS=['brave','thorough','resilient','curious','vivid','journey','achieve','humble','ambition','persuade','genuine','candid','diligent','sincere','eager','fragile','notorious','gratitude'];
+function build(root){
+ root.querySelectorAll('.ph.card').forEach(c=>{if(!c.childElementCount)c.appendChild(document.getElementById('cardtpl').content.cloneNode(true))});
+ root.querySelectorAll('[data-split]').forEach(e=>{e.innerHTML=[...e.dataset.split].map((ch,i)=>`<span style="--i:${i}">${ch}</span>`).join('');e.classList.add('ch')});
+ root.querySelectorAll('[data-days]').forEach(d=>{d.innerHTML=[...d.dataset.days].map((c,i)=>`<i class="dot ${c==='s'?'s':''}" style="--i:${i*.5}"></i>`).join('')});
+ root.querySelectorAll('[data-tiles]').forEach(t=>{const n=+t.dataset.tiles,b=+t.dataset.best;t.innerHTML=Array.from({length:n},(_,i)=>`<i class="tile ${i===b?'best':''}" style="--i:${i}"></i>`).join('')});
+ root.querySelectorAll('[data-words]').forEach(m=>{const s=WORDS.map(w=>`<span>${w}</span>`).join('');m.innerHTML=s+s});
+ root.querySelectorAll('.wall').forEach(w=>{if(w.childElementCount)return;for(let r=0;r<5;r++){const ws=WORDS.slice(r*3).concat(WORDS.slice(0,r*3));const s=ws.map((x,i)=>`<span class="${(i+r)%6===0?'ac':''}" style="${(i+r)%6===0?'color:#7d9bff':''}">${x}</span>`).join('');w.insertAdjacentHTML('beforeend',`<div class="mqrow ${r%2?'rev':''}" style="--t:${16+r*3}s">${s+s}</div>`)}});
+}
+function counts(root){root.querySelectorAll('.count').forEach(el=>{const to=+el.dataset.to,from=+(el.dataset.from||0),dec=+(el.dataset.dec||0),t0=performance.now(),d=el.dataset.from?1800:1400;
+ (function f(t){const p=Math.min((t-t0)/d,1),e=1-Math.pow(1-p,3),v=from+(to-from)*e;el.textContent=(el.dataset.from?Math.round(v):v).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec});if(p<1)requestAnimationFrame(f)})(t0)})}
+function play(el){el.classList.remove('play');void el.offsetWidth;el.classList.add('play');counts(el)}
+build(document);
+document.querySelectorAll('#strip .ph').forEach(p=>{play(p);p.addEventListener('click',()=>play(p))});
+document.querySelectorAll('.app,.web').forEach(play);
+
+const stage=document.getElementById('stage'),pb=document.getElementById('pbars');
+const slides=[...document.querySelectorAll('#strip .ph')].map(p=>{const c=p.cloneNode(true);c.classList.remove('play');stage.appendChild(c);return c});
+pb.innerHTML=slides.map(()=>'<i><b></b></i>').join('');
+const fills=[...pb.querySelectorAll('b')];let cur=0,t0=0,paused=false,elapsed=0;const DUR=4500;
+function show(i){cur=(i+slides.length)%slides.length;slides.forEach((s,j)=>s.classList.toggle('on',j===cur));play(slides[cur]);
+ pb.classList.toggle('lt',slides[cur].classList.contains('dark')||slides[cur].classList.contains('blue'));
+ fills.forEach((f,j)=>f.style.width=j<cur?'100%':'0');elapsed=0;t0=performance.now()}
+function tick(t){if(!paused){elapsed=t-t0;fills[cur].style.width=Math.min(elapsed/DUR*100,100)+'%';if(elapsed>=DUR)show(cur+1)}else t0=t-elapsed;requestAnimationFrame(tick)}
+document.getElementById('player').onclick=()=>show(cur+1);
+document.getElementById('prev').onclick=()=>show(cur-1);
+document.getElementById('restart').onclick=()=>show(0);
+document.getElementById('pause').onclick=e=>{paused=!paused;e.target.textContent=paused?'Play':'Pause'};
+show(0);requestAnimationFrame(tick);
+</script>
