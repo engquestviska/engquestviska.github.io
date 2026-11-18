@@ -97,7 +97,7 @@ Rejected along the way: a plain card-only version (too much like a report card),
 
 ## Switching on and off
 
-Proposal (my call; owner can override): a single "semester ended" setting on the backend that the teacher turns on, which the website and app read at startup. Off = normal EngQuest. "Story already seen" is remembered per device so the story plays once and Replay brings it back.
+**Owner decision (2026-11-18): a fixed date.** Chronicle switches on by itself at 00:00 WIB (Asia/Jakarta) on a set date. The date is stored in one backend setting that the website and app read at startup, so it can be moved without a new app release; before that date EngQuest works normally. The owner gives the actual date before launch. Known trade-off, accepted: if some scores are still missing on that date, students see incomplete numbers; any teacher fix after the switch shows up the next time Chronicle is opened. "Story already seen" is remembered per device, so the story plays once and Replay brings it back.
 
 ## Edge cases (my calls, marked so the owner can check)
 
@@ -117,4 +117,4 @@ Proposal (my call; owner can override): a single "semester ended" setting on the
 ## Open questions for the owner
 
 1. ~~Build approach~~ answered: 1, one shared page.
-2. Who flips the switch, and when: the teacher with a toggle (proposed), or a fixed date?
+2. ~~Who flips the switch~~ answered: a fixed date (owner supplies the date before launch).
