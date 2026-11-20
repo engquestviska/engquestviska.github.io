@@ -485,7 +485,12 @@
       }).then(function() {
         return confirmSaved(4);
       }).then(function(res) {
-        if (!res) { failed('Your photos did not arrive. Please try again.'); return; }
+        if (!res) {
+          // The server refuses uploads once the semester's submissions close; say so instead of "try again".
+          return EQApi.get({ action: 'getChronicleStatus', className: STUDENT.classId }).then(function(st) {
+            failed(st && st.active ? 'Submissions are closed for this semester. Your work so far is saved.' : 'Your photos did not arrive. Please try again.');
+          }, function() { failed('Your photos did not arrive. Please try again.'); });
+        }
         msg.className = 'modal-msg ok';
         msg.textContent = 'Sent! Your teacher will check it soon.';
         applySubmissions(res);
