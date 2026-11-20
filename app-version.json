@@ -1,9 +1,10 @@
 {
-  "versionCode": 16,
-  "versionName": "2.3",
+  "versionCode": 17,
+  "versionName": "2.4",
   "apk": "EngQuest-app-7fq93kx2.apk",
-  "notes": "See whose account you are on, and change it if it is not you.",
+  "notes": "The full app is back. Chronicle is now a card on Home.",
   "history": [
+    {"version": "2.4", "date": "2026-11-20", "notes": ["The full app is back. Chronicle is now a card on Home"]},
     {"version": "2.3", "date": "2026-11-20", "notes": ["See whose account you are on, and change it if it is not you"]},
     {"version": "2.2", "date": "2026-11-18", "notes": ["Ready for the end of the semester"]},
     {"version": "2.1", "date": "2026-11-18", "notes": ["Ready for the end of the semester"]},

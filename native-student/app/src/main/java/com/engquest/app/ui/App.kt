@@ -149,51 +149,14 @@ fun Shell(graph: AppGraph, profile: Profile, link: String? = null, onLinkUsed: (
         onLogOut()
     }
 
-    // Once the semester has ended for this class (the server decides), the app keeps only
-    // Chronicle (stats, behind the student's PIN), Materials and Assignments.
-    var chronicle by remember { mutableStateOf(com.engquest.app.BuildConfig.CHRONICLE_DEMO) }
-    LaunchedEffect(profile.classId) { if (!chronicle) chronicle = graph.repo.chronicleActive(profile.classId) }
-    if (chronicle) {
-        var ctab by rememberSaveable { mutableStateOf("chronicle") }
-        BackHandler {
-            when {
-                ctab != "chronicle" -> ctab = "chronicle"
-                System.currentTimeMillis() - lastBackAt < 2000 -> (context as? android.app.Activity)?.finish()
-                else -> {
-                    lastBackAt = System.currentTimeMillis()
-                    Toast.makeText(context, "Press back again to exit", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-        val openLink: (String) -> Unit = { link ->
-            runCatching { context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(link))) }
-                .onFailure { Toast.makeText(context, "No app on this phone can open this link.", Toast.LENGTH_SHORT).show() }
-        }
-        // statusBarsPadding here consumes the inset, so the screens below don't add it twice.
-        Column(Modifier.fillMaxSize().background(LocalEq.current.bg).statusBarsPadding()) {
-            // Home (where the update notice normally sits) is hidden now, so show it here.
-            graph.updates?.let { checker ->
-                com.engquest.app.ui.UpdateBanner(checker) { url, onFailed -> com.engquest.app.ui.UpdateInstaller(context).start(url, onFailed) }
-            }
-            Box(Modifier.weight(1f)) {
-                when (ctab) {
-                    "materials" -> Box(Modifier.fillMaxSize().testTag("screen-materials")) {
-                        MaterialsScreen(graph, profile, MaterialKind.MATERIALS, onBack = { ctab = "chronicle" }, openLink = openLink)
-                    }
-                    "assignments" -> Box(Modifier.fillMaxSize().testTag("screen-assignments")) {
-                        MaterialsScreen(graph, profile, MaterialKind.ASSIGNMENTS, onBack = { ctab = "chronicle" }, openLink = openLink)
-                    }
-                    else -> com.engquest.app.ui.chronicle.ChronicleScreen(
-                        profile,
-                        url = com.engquest.app.ui.chronicle.CHRONICLE_URL + if (com.engquest.app.BuildConfig.CHRONICLE_DEMO) "?demo=1" else "",
-                        onLogOut = ::logOut,
-                        modifier = Modifier.statusBarsPadding(),
-                    )
-                }
-            }
-            com.engquest.app.ui.chronicle.ChronicleBar(ctab, onTab = { ctab = it }, modifier = Modifier.navigationBarsPadding())
-        }
-        return
+    // Once the semester has ended for this class (the server decides; exempt classes such as XE5 keep
+    // everything), Send and My Vocabulary close and Home shows the Chronicle banner. The rest stays.
+    var chronicle by remember { mutableStateOf(com.engquest.app.data.ChronicleStatus(active = com.engquest.app.BuildConfig.CHRONICLE_DEMO)) }
+    LaunchedEffect(profile.classId) { if (!chronicle.active) chronicle = graph.repo.chronicleStatus(profile.classId) }
+    val closed = if (chronicle.active) setOf("send", "vocab") else emptySet()
+    LaunchedEffect(closed) {
+        if (tab in closed) tab = "home"
+        if (page in closed) page = null
     }
 
     BackHandler {
@@ -210,15 +173,24 @@ fun Shell(graph: AppGraph, profile: Profile, link: String? = null, onLinkUsed: (
 
     Column(Modifier.fillMaxSize().background(LocalEq.current.bg)) {
         Box(Modifier.weight(1f)) {
-            val current = page ?: tab
+            // A closed route (from an old notification, say) shows Home instead.
+            val current = (page ?: tab).let { if (it in closed) "home" else it }
             Box(Modifier.fillMaxSize().testTag("screen-$current")) {
                 when (current) {
-                    "home" -> HomeScreen(graph, profile, onOpen = ::open)
+                    "home" -> HomeScreen(graph, profile, onOpen = ::open, chronicle = chronicle)
                     "send" -> SendScreen(graph, profile)
                     "scores" -> ScoresScreen(graph, profile)
-                    "learn" -> LearnScreen(onOpen = ::open)
+                    "learn" -> LearnScreen(onOpen = ::open, showVocab = !chronicle.active)
                     "more" -> MoreScreen(profile, onOpen = ::open, onLogOut = ::logOut)
                     "vocab" -> VocabScreen(graph, profile, onBack = { page = null })
+                    "chronicle" -> Column(Modifier.fillMaxSize()) {
+                        QuestHeader(title = "Chronicle", onBack = { page = null })
+                        com.engquest.app.ui.chronicle.ChronicleScreen(
+                            profile,
+                            url = com.engquest.app.ui.chronicle.CHRONICLE_URL + if (com.engquest.app.BuildConfig.CHRONICLE_DEMO) "?demo=1" else "",
+                            onLogOut = ::logOut,
+                        )
+                    }
                     "settings" -> {
                         var asked by remember { mutableStateOf(false) }
                         val launcher = androidx.activity.compose.rememberLauncherForActivityResult(
@@ -254,7 +226,7 @@ fun Shell(graph: AppGraph, profile: Profile, link: String? = null, onLinkUsed: (
                 }
             }
         }
-        if (page == null) BottomBar(tab, onTab = { tab = it; page = null }, modifier = Modifier.navigationBarsPadding())
+        if (page == null) BottomBar(tab, onTab = { tab = it; page = null }, modifier = Modifier.navigationBarsPadding(), hide = closed)
     }
 }
 

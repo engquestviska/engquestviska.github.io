@@ -45,14 +45,14 @@ import kotlinx.coroutines.withContext
 
 /** The Learn tab: four places to go. */
 @Composable
-fun LearnScreen(onOpen: (String) -> Unit) {
+fun LearnScreen(onOpen: (String) -> Unit, showVocab: Boolean = true) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
         QuestHeader(title = "Learn", subtitle = "Lessons, assignments, reading and your words")
         Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Place("📘", "Materials", "Slides and books for each chapter", Tint.blue) { onOpen("materials") }
             Place("📝", "Assignments", "Work your teacher gave you", Tint.amber) { onOpen("assignments") }
             Place("📖", "Reading", "Texts to read", Tint.green) { onOpen("reading") }
-            Place("🔤", "My Vocabulary", "Save new words, up to 30 a week", Tint.violet) { onOpen("vocab") }
+            if (showVocab) Place("🔤", "My Vocabulary", "Save new words, up to 30 a week", Tint.violet) { onOpen("vocab") }
         }
     }
 }

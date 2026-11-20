@@ -6,6 +6,7 @@ import com.engquest.app.domain.Profile
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
@@ -59,10 +60,19 @@ class Repo(
 
     /** True once the semester has ended for [classId] (exempt classes such as XE5 never) and the app
      *  shows EngQuest Chronicle. Any error -> false (normal app). */
-    suspend fun chronicleActive(classId: String): Boolean = try {
-        api.read("getChronicleStatus", mapOf("className" to classId))["active"]?.jsonPrimitive?.booleanOrNull == true
+    suspend fun chronicleActive(classId: String): Boolean = chronicleStatus(classId).active
+
+    /** Chronicle for [classId]: on (stats-only), open (the story can be watched), and when it opens.
+     *  Any error -> off (normal app). */
+    suspend fun chronicleStatus(classId: String): ChronicleStatus = try {
+        val o = api.read("getChronicleStatus", mapOf("className" to classId))
+        ChronicleStatus(
+            active = o["active"]?.jsonPrimitive?.booleanOrNull == true,
+            open = o["open"]?.jsonPrimitive?.booleanOrNull == true,
+            openAt = o["openAt"]?.jsonPrimitive?.contentOrNull.orEmpty(),
+        )
     } catch (e: ApiError) {
-        false
+        ChronicleStatus()
     }
 
     /** Writes go straight to the server (no cache); they throw [ApiError] when they could not be saved. */
@@ -70,3 +80,6 @@ class Repo(
 
     suspend fun forgetAll() = db.cacheDao().clear()
 }
+
+/** What the server says about EngQuest Chronicle for one class. */
+data class ChronicleStatus(val active: Boolean = false, val open: Boolean = false, val openAt: String = "")

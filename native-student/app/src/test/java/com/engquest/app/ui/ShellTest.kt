@@ -168,26 +168,31 @@ class ShellTest {
         compose.waitUntil(5000) { kotlinx.coroutines.runBlocking { graph.db.photoSendDao().all().isEmpty() } }
     }
 
-    @Test fun chronicleReplacesTheTabsWhenItIsOn() {
-        fake.replies["getChronicleStatus"] = """{"success":true,"active":true,"start":"2026-11-17T00:00:00+07:00"}"""
+    @Test fun chronicleShowsABannerOnHomeAndClosesSendAndVocabulary() {
+        fake.replies["getChronicleStatus"] = """{"success":true,"active":true,"start":"2026-11-20T14:00:00+07:00","open":false,"openAt":"2026-12-17T00:00:00+07:00"}"""
         start(Profile(Grade.G10, "XE2", 1, "Student 1"))
-        compose.waitUntil(5000) { compose.onAllNodes(androidx.compose.ui.test.hasTestTag("chronicle")).fetchSemanticsNodes().isNotEmpty() }
-        compose.onNodeWithTag("screen-home").assertDoesNotExist()
+        compose.waitUntil(5000) { compose.onAllNodes(androidx.compose.ui.test.hasTestTag("chronicle-banner")).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithTag("screen-home").assertExists()
+        compose.onNodeWithText("Opens on Dec 17. Make your 6-number PIN now so it's ready.").assertExists()
         compose.onNodeWithTag("tab-Send").assertDoesNotExist()
-        compose.onNodeWithTag("tab-Materials").assertExists()
-        compose.onNodeWithTag("tab-Assignments").assertExists()
+        compose.onNodeWithTag("tab-Scores").assertExists()
+        compose.onNodeWithTag("tab-More").assertExists()
+        compose.onNodeWithTag("tab-Learn").performClick()
+        compose.onNodeWithText("Materials").assertExists()
+        compose.onNodeWithText("My Vocabulary").assertDoesNotExist()
         assertTrue(fake.calls("getChronicleStatus").single().contains("className=XE2"))
     }
 
-    @Test fun chronicleModeOpensMaterialsAndComesBack() {
-        fake.replies["getChronicleStatus"] = """{"success":true,"active":true,"start":"2026-11-17T00:00:00+07:00"}"""
+    @Test fun tappingTheChronicleBannerOpensChronicleAndBackReturnsHome() {
+        fake.replies["getChronicleStatus"] = """{"success":true,"active":true,"open":false,"openAt":"2026-12-17T00:00:00+07:00"}"""
         start(Profile(Grade.G10, "XE2", 1, "Student 1"))
-        compose.waitUntil(5000) { compose.onAllNodes(androidx.compose.ui.test.hasTestTag("tab-Materials")).fetchSemanticsNodes().isNotEmpty() }
-        compose.onNodeWithTag("tab-Materials").performClick()
-        compose.onNodeWithTag("screen-materials").assertExists()
-        compose.onNodeWithTag("chronicle").assertDoesNotExist()
-        compose.onNodeWithTag("tab-Chronicle").performClick()
+        compose.waitUntil(5000) { compose.onAllNodes(androidx.compose.ui.test.hasTestTag("chronicle-banner")).fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithTag("chronicle-banner").performClick()
         compose.onNodeWithTag("chronicle").assertExists()
+        compose.runOnUiThread { backOwner.onBackPressedDispatcher.onBackPressed() }
+        compose.waitForIdle()
+        compose.onNodeWithTag("chronicle").assertDoesNotExist()
+        compose.onNodeWithTag("screen-home").assertExists()
     }
 
     @Test fun theTabsStayWhenChronicleIsOff() {
@@ -196,6 +201,7 @@ class ShellTest {
         compose.waitUntil(5000) { fake.calls("getChronicleStatus").isNotEmpty() }
         compose.waitForIdle()
         compose.onNodeWithTag("screen-home").assertExists()
-        compose.onNodeWithTag("chronicle").assertDoesNotExist()
+        compose.onNodeWithTag("chronicle-banner").assertDoesNotExist()
+        compose.onNodeWithTag("tab-Send").assertExists()
     }
 }

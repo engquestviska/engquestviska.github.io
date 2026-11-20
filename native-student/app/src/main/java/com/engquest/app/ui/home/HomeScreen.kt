@@ -119,7 +119,7 @@ fun greeting(now: Calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Jak
     }
 
 @Composable
-fun HomeScreen(graph: AppGraph, profile: Profile, onOpen: (String) -> Unit) {
+fun HomeScreen(graph: AppGraph, profile: Profile, onOpen: (String) -> Unit, chronicle: com.engquest.app.data.ChronicleStatus = com.engquest.app.data.ChronicleStatus()) {
     var data by remember(profile) { mutableStateOf(HomeData()) }
     var refresh by remember { mutableIntStateOf(0) }
     LaunchedEffect(profile, refresh) { data = run { loadHome(graph, profile) } }
@@ -162,6 +162,7 @@ fun HomeScreen(graph: AppGraph, profile: Profile, onOpen: (String) -> Unit) {
                 val ctx = androidx.compose.ui.platform.LocalContext.current
                 com.engquest.app.ui.UpdateBanner(checker) { url, onFailed -> com.engquest.app.ui.UpdateInstaller(ctx).start(url, onFailed) }
             }
+            if (chronicle.active) com.engquest.app.ui.chronicle.ChronicleBanner(chronicle, onOpen = { onOpen("chronicle") }, modifier = Modifier.padding(start = 14.dp, end = 14.dp, bottom = 12.dp))
             Row(Modifier.padding(horizontal = 14.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Chip(data.finalScore ?: "–", "Score", Tint.blue, Tint.blueInk, Modifier.weight(1f)) { onOpen("scores") }
                 Chip(if (data.tasksDone != null) "${data.tasksDone}/${data.tasksTotal}" else "–", "Tasks", Tint.green, Tint.greenInk, Modifier.weight(1f)) { onOpen("taskstatus") }

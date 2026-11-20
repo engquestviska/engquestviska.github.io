@@ -52,12 +52,12 @@ private val ITEMS = listOf(
  * lifted 12 dp above the bar: easy to find, but no bigger than the other tabs need.
  */
 @Composable
-fun BottomBar(current: String, onTab: (String) -> Unit, modifier: Modifier = Modifier) {
+fun BottomBar(current: String, onTab: (String) -> Unit, modifier: Modifier = Modifier, hide: Set<String> = emptySet()) {
     val eq = LocalEq.current
     Column(modifier.fillMaxWidth().background(Color.White)) {
         Box(Modifier.fillMaxWidth().height(1.dp).background(eq.line))
         Row(Modifier.fillMaxWidth().padding(top = 6.dp, bottom = 10.dp), horizontalArrangement = Arrangement.SpaceAround, verticalAlignment = Alignment.Bottom) {
-            ITEMS.forEach { item ->
+            ITEMS.filter { it.route !in hide }.forEach { item ->
                 val on = item.route == current
                 val send = item.route == "send"
                 val tint = when {
