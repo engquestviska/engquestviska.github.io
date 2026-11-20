@@ -62,10 +62,13 @@ fun instagramStoryIntent(uri: Uri, appId: String): Intent =
         .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
 
 /** The page's bridge (`window.EngQuestApp`): who the student is, and Android sharing. */
-class ChronicleBridge(private val context: Context, private val profile: Profile) {
+class ChronicleBridge(private val context: Context, private val profile: Profile, private val onLogOut: () -> Unit = {}) {
     private val main = android.os.Handler(android.os.Looper.getMainLooper())
 
     @JavascriptInterface fun profile(): String = profileJson(profile)
+
+    /** "Not you? Change name" on the page: log out so the student can pick their own name. */
+    @JavascriptInterface fun logOut() { main.post { onLogOut() } }
 
     @JavascriptInterface fun canShareToInstagram(): Boolean =
         BuildConfig.META_APP_ID.isNotBlank() &&
@@ -101,7 +104,7 @@ class ChronicleBridge(private val context: Context, private val profile: Profile
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun ChronicleScreen(profile: Profile, url: String = CHRONICLE_URL, modifier: Modifier = Modifier) {
+fun ChronicleScreen(profile: Profile, url: String = CHRONICLE_URL, onLogOut: () -> Unit = {}, modifier: Modifier = Modifier) {
     AndroidView(
         modifier = modifier.fillMaxSize().testTag("chronicle"),
         factory = { ctx ->
@@ -117,7 +120,7 @@ fun ChronicleScreen(profile: Profile, url: String = CHRONICLE_URL, modifier: Mod
                         return true
                     }
                 }
-                addJavascriptInterface(ChronicleBridge(ctx.applicationContext, profile), "EngQuestApp")
+                addJavascriptInterface(ChronicleBridge(ctx.applicationContext, profile, onLogOut), "EngQuestApp")
                 loadUrl(url)
             }
         },

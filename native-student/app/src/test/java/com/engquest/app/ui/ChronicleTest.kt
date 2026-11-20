@@ -3,6 +3,7 @@ package com.engquest.app.ui
 import android.net.Uri
 import com.engquest.app.domain.Grade
 import com.engquest.app.domain.Profile
+import com.engquest.app.ui.chronicle.ChronicleBridge
 import com.engquest.app.ui.chronicle.instagramStoryIntent
 import com.engquest.app.ui.chronicle.profileJson
 import kotlinx.serialization.json.Json
@@ -41,5 +42,13 @@ class ChronicleTest {
         assertEquals("#F4F2ED", i.getStringExtra("top_background_color"))
         assertEquals("#141414", i.getStringExtra("bottom_background_color"))
         assertEquals("com.instagram.android", i.`package`)
+    }
+
+    @Test fun notYouOnThePageLogsOut() {
+        var loggedOut = false
+        val ctx = org.robolectric.RuntimeEnvironment.getApplication()
+        ChronicleBridge(ctx, Profile(Grade.G10, "XE1", 1, "Adel"), onLogOut = { loggedOut = true }).logOut()
+        org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idle()
+        org.junit.Assert.assertTrue(loggedOut)
     }
 }

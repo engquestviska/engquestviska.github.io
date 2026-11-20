@@ -43,8 +43,8 @@ android {
         applicationId = "com.engquest.app"
         minSdk = 24
         targetSdk = 34
-        versionCode = 15
-        versionName = if (chronicleDemo) "2.2-test" else "2.2"
+        versionCode = 16
+        versionName = if (chronicleDemo) "2.3-test" else "2.3"
         buildConfigField("String", "META_APP_ID", "\"$metaAppId\"")
         buildConfigField("boolean", "CHRONICLE_DEMO", chronicleDemo.toString())
     }

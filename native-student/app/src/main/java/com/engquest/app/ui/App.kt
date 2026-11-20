@@ -143,6 +143,12 @@ fun Shell(graph: AppGraph, profile: Profile, link: String? = null, onLinkUsed: (
         )
     }
 
+    fun logOut() {
+        graph.forgetDevice()
+        graph.scope.launch { graph.sendQueue.clear(); graph.repo.forgetAll() }
+        onLogOut()
+    }
+
     // Once the semester has ended for this class (the server decides), the app keeps only
     // Chronicle (stats, behind the student's PIN), Materials and Assignments.
     var chronicle by remember { mutableStateOf(com.engquest.app.BuildConfig.CHRONICLE_DEMO) }
@@ -163,7 +169,12 @@ fun Shell(graph: AppGraph, profile: Profile, link: String? = null, onLinkUsed: (
             runCatching { context.startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(link))) }
                 .onFailure { Toast.makeText(context, "No app on this phone can open this link.", Toast.LENGTH_SHORT).show() }
         }
-        Column(Modifier.fillMaxSize().background(LocalEq.current.bg)) {
+        // statusBarsPadding here consumes the inset, so the screens below don't add it twice.
+        Column(Modifier.fillMaxSize().background(LocalEq.current.bg).statusBarsPadding()) {
+            // Home (where the update notice normally sits) is hidden now, so show it here.
+            graph.updates?.let { checker ->
+                com.engquest.app.ui.UpdateBanner(checker) { url, onFailed -> com.engquest.app.ui.UpdateInstaller(context).start(url, onFailed) }
+            }
             Box(Modifier.weight(1f)) {
                 when (ctab) {
                     "materials" -> Box(Modifier.fillMaxSize().testTag("screen-materials")) {
@@ -175,6 +186,7 @@ fun Shell(graph: AppGraph, profile: Profile, link: String? = null, onLinkUsed: (
                     else -> com.engquest.app.ui.chronicle.ChronicleScreen(
                         profile,
                         url = com.engquest.app.ui.chronicle.CHRONICLE_URL + if (com.engquest.app.BuildConfig.CHRONICLE_DEMO) "?demo=1" else "",
+                        onLogOut = ::logOut,
                         modifier = Modifier.statusBarsPadding(),
                     )
                 }
@@ -205,11 +217,7 @@ fun Shell(graph: AppGraph, profile: Profile, link: String? = null, onLinkUsed: (
                     "send" -> SendScreen(graph, profile)
                     "scores" -> ScoresScreen(graph, profile)
                     "learn" -> LearnScreen(onOpen = ::open)
-                    "more" -> MoreScreen(profile, onOpen = ::open, onLogOut = {
-                        graph.forgetDevice()
-                        graph.scope.launch { graph.sendQueue.clear(); graph.repo.forgetAll() }
-                        onLogOut()
-                    })
+                    "more" -> MoreScreen(profile, onOpen = ::open, onLogOut = ::logOut)
                     "vocab" -> VocabScreen(graph, profile, onBack = { page = null })
                     "settings" -> {
                         var asked by remember { mutableStateOf(false) }

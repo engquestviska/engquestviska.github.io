@@ -136,3 +136,9 @@ body.records-mode{background:var(--bg)}
 .cq-links a:focus-visible{outline:3px solid var(--a);outline-offset:2px}
 .cq-pin .cq-home{display:block;text-align:center;margin-top:10px;background:var(--ink);color:var(--paper);border-radius:999px;padding:12px;font:800 15px var(--body);text-decoration:none}
 .cq-pin .cq-home:focus-visible{outline:3px solid var(--a);outline-offset:2px}
+/* Whose account the PIN is for, with a way to switch if it is the wrong name. */
+.cq-who{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;border-top:2px solid var(--ink);border-bottom:1px solid var(--ink);padding:8px 0;margin-bottom:16px}
+.cq-who span{width:100%;font:800 11px var(--body);letter-spacing:.12em;text-transform:uppercase;opacity:.65}
+.cq-who b{font:800 20px/1.15 var(--disp)}
+.cq-who small{font:700 13px var(--body);opacity:.75}
+.cq-pin .cq-who .cq-notme{width:auto;margin:4px 0 0;padding:0;background:none;color:var(--a);border-radius:0;font:800 13px var(--body);text-decoration:underline;text-underline-offset:3px}

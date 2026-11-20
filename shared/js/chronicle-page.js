@@ -13,6 +13,23 @@
   var opensAt = ''; // set while Chronicle is not open yet: only the PIN can be made
 
   function homeUrl(p) { return (String(p && p.grade) === '11' ? 'grade11' : 'grade10') + '/index.html'; }
+  // Whose account this is, with a way out if it is the wrong one (shared phone, wrong name picked).
+  function canSwitch() { return inApp() ? !!window.EngQuestApp.logOut : !!window.EQStudent; }
+  function who(p) {
+    var cls = window.EQStudent ? window.EQStudent.classLabel(p.classId) : p.classId;
+    return '<div class="cq-who"><span>For</span><b>' + esc(p.name || 'Student') + '</b><small>' + esc(cls) + ' · No. ' + esc(p.studentNo) + '</small>' +
+      (canSwitch() ? '<button type="button" class="cq-notme">Not you? Change name</button>' : '') + '</div>';
+  }
+  function wireWho(p) {
+    var btn = $msg.querySelector('.cq-notme');
+    if (!btn) return;
+    btn.onclick = function () {
+      if (inApp()) { window.EngQuestApp.logOut(); return; }
+      window.EQStudent.clear();
+      try { sessionStorage.removeItem('eq_chronicle_status'); } catch (e) {}
+      location.href = homeUrl(p);
+    };
+  }
   function dayText(iso) {
     try { return new Date(iso).toLocaleDateString('en-US', { month: 'long', day: 'numeric', timeZone: 'Asia/Jakarta' }); }
     catch (e) { return 'soon'; }
@@ -21,9 +38,10 @@
   function allSet(p, note) {
     $story.hidden = true; $rec.hidden = true; $msg.hidden = false;
     document.body.classList.remove('records-mode');
-    $msg.innerHTML = '<div class="cq-pin"><h1>You’re all set</h1><p>' + esc(note || 'Your PIN is ready.') + '</p>' +
+    $msg.innerHTML = '<div class="cq-pin">' + who(p) + '<h1>You’re all set</h1><p>' + esc(note || 'Your PIN is ready.') + '</p>' +
       '<p>Your EngQuest Chronicle opens on <b>' + esc(dayText(opensAt)) + '</b>. Come back then and enter your PIN.</p>' +
       (inApp() ? '' : '<a class="cq-home" href="' + homeUrl(p) + '">Back to Home</a>') + '</div>';
+    wireWho(p);
   }
 
   function store(fn) { try { return fn(window.localStorage); } catch (e) { return null; } }
@@ -128,7 +146,7 @@
     $story.hidden = true; $rec.hidden = true; $msg.hidden = false;
     document.body.classList.remove('records-mode');
     var make = mode === 'make';
-    $msg.innerHTML = '<form class="cq-pin" novalidate><h1>' + (make ? 'Make your PIN' : 'Enter your PIN') + '</h1>' +
+    $msg.innerHTML = '<form class="cq-pin" novalidate>' + who(p) + '<h1>' + (make ? 'Make your PIN' : 'Enter your PIN') + '</h1>' +
       '<p>' + (make ? 'Pick 6 numbers only you know. You need them to open your Chronicle.' : 'Your Chronicle is locked with your 6-number PIN.') + '</p>' +
       '<label for="cq-pin1">' + (make ? 'New PIN' : 'PIN') + '</label>' +
       '<input id="cq-pin1" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off">' +
@@ -136,6 +154,7 @@
       '<p class="cq-pin-err" role="alert">' + esc(note || '') + '</p>' +
       '<button type="submit">' + (make ? 'Save PIN' : 'Open') + '</button>' +
       '<p class="cq-pin-help">' + (make ? 'Don’t share it. ' : '') + 'Forgot it? Ask your teacher to reset it.</p></form>';
+    wireWho(p);
     var form = $msg.querySelector('form'), err = $msg.querySelector('.cq-pin-err');
     var a = document.getElementById('cq-pin1'), b = document.getElementById('cq-pin2');
     [a, b].forEach(function (el) {
