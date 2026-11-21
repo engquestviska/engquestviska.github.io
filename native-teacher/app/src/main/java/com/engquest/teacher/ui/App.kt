@@ -188,6 +188,9 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
     // The leaderboard opened from Home (Score or Level), shown over the tab like the uploads list.
     var board by rememberSaveable { mutableStateOf<com.engquest.teacher.ui.home.Board?>(null) }
     BackHandler(enabled = board != null) { board = null }
+    // The class Chronicle opened from Home, shown over the tab the same way.
+    var chronicle by rememberSaveable { mutableStateOf(false) }
+    BackHandler(enabled = chronicle) { chronicle = false }
     var seenUpload by remember { mutableStateOf(prefs.getLong(AppGraph.KEY_SEEN_UPLOAD, 0L)) }
     val newUploads = feed.newSince(seenUpload)
     fun openUploads() {
@@ -213,6 +216,7 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
         leaveThen {
             sheet = null
             showUploads = false
+            chronicle = false
             classId = target.id
             prefs.edit().putString(AppGraph.KEY_CLASS, target.id).apply()
             tab = Tab.SUBMISSIONS
@@ -269,13 +273,13 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
     Box(Modifier.fillMaxSize().background(PageBackground)) {
         Column(Modifier.fillMaxSize().imePadding()) {
             TopBar(
-                title = if (showUploads) "Recent uploads" else if (board != null) "Leaderboard" else tab.title,
+                title = if (showUploads) "Recent uploads" else if (board != null) "Leaderboard" else if (chronicle) "Class Chronicle" else tab.title,
                 classLabel = classInfo.label,
                 onClassClick = { sheet = ShellSheet.CLASS },
                 onLogOutClick = { leaveThen { askLogout = true } },
                 newUploads = newUploads,
                 onBell = ::openUploads,
-                onBack = if (showUploads) ({ showUploads = false }) else if (board != null) ({ board = null }) else null,
+                onBack = if (showUploads) ({ showUploads = false }) else if (board != null) ({ board = null }) else if (chronicle) ({ chronicle = false }) else null,
             )
             graph.updates?.let { checker ->
                 val context = LocalContext.current
@@ -286,8 +290,13 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
                     ActivityScreen(feed, ::openSubmission)
                 } else if (board != null) {
                     com.engquest.teacher.ui.home.LeaderboardScreen(board!!) { action, cls -> graph.repo.load(action, cls) }
+                } else if (chronicle) {
+                    com.engquest.teacher.ui.home.ClassChronicleScreen(classInfo.id) { cls ->
+                        val login = graph.session.creds() ?: throw com.engquest.teacher.data.ApiError.Unauthorized()
+                        graph.api.write("getClassChronicle", mapOf("className" to cls, "username" to login.username, "password" to login.password))
+                    }
                 } else {
-                    TabContent(tab, graph, classInfo, guard, submissions, feed, onLeaderboard = { board = it })
+                    TabContent(tab, graph, classInfo, guard, submissions, feed, onLeaderboard = { board = it }, onClassChronicle = { chronicle = true })
                 }
                 // Floats at the top of the page (not in it), so the page doesn't jump when it
                 // appears or goes away, and it never covers the buttons at the bottom.
@@ -298,9 +307,10 @@ private fun AppShell(graph: AppGraph, link: SubmissionLink?, onLinkUsed: () -> U
                 )
             }
             TabBar(tab, badges = mapOf(Tab.SUBMISSIONS to submissions.waiting)) { picked ->
-                if (picked != tab || showUploads || board != null) leaveThen {
+                if (picked != tab || showUploads || board != null || chronicle) leaveThen {
                     showUploads = false
                     board = null
+                    chronicle = false
                     tab = picked
                 }
             }
@@ -426,11 +436,12 @@ fun TabContent(
     submissions: SubmissionsViewModel,
     feed: HomeViewModel,
     onLeaderboard: (com.engquest.teacher.ui.home.Board) -> Unit = {},
+    onClassChronicle: (() -> Unit)? = null,
 ) {
     when (tab) {
         Tab.HOME -> {
             val pinReset = remember { com.engquest.teacher.data.PinReset(graph.api) { graph.session.creds() } }
-            HomeScreen(feed, graph.session.savedUsername().orEmpty(), onLeaderboard, onResetPin = pinReset::reset)
+            HomeScreen(feed, graph.session.savedUsername().orEmpty(), onLeaderboard, onResetPin = pinReset::reset, onClassChronicle = onClassChronicle)
         }
         Tab.ATTENDANCE -> AttendanceScreen(graph, classInfo, guard)
         Tab.SUBMISSIONS -> SubmissionsScreen(submissions, graph.photos, classInfo, guard)

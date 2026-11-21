@@ -54,6 +54,7 @@ private val MONTHS = listOf("January", "February", "March", "April", "May", "Jun
 fun HomeScreen(
     vm: HomeViewModel, name: String, onLeaderboard: (Board) -> Unit = {},
     onResetPin: (suspend (String, String) -> String?)? = null,
+    onClassChronicle: (() -> Unit)? = null,
 ) {
     LazyColumn(Modifier.fillMaxSize().testTag("home"), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         item { Welcome(name, vm.waiting) }
@@ -63,6 +64,14 @@ fun HomeScreen(
         }
         item { Heading("📊 Leaderboard") }
         item { LeaderboardButtons(onLeaderboard) }
+        if (onClassChronicle != null) item {
+            Text(
+                "📜 Class Chronicle", color = Brand, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 12.dp).fillMaxWidth().background(Color.White, RoundedCornerShape(16.dp))
+                    .clickable(onClick = onClassChronicle).padding(vertical = 14.dp).testTag("open-chronicle"),
+            )
+        }
         if (onResetPin != null) item { PinResetCard(onResetPin) }
         item { Box(Modifier.padding(8.dp)) }
     }

@@ -1,6 +1,6 @@
 {
-  "versionCode": 15,
-  "versionName": "4.2",
+  "versionCode": 16,
+  "versionName": "4.3",
   "apk": "EngQuestTeacher-k4m8q2zt.apk",
-  "notes": "Reset a student's Chronicle PIN from Home."
+  "notes": "Class Chronicle on Home: each class's semester at a glance, and who made a PIN."
 }
