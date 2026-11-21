@@ -86,7 +86,7 @@ class AttendanceViewModel(
     private val graph: AppGraph,
     val classInfo: ClassInfo,
     private val scope: CoroutineScope,
-    today: String = todayIso(),
+    today: String = graph.attendanceDate ?: todayIso(),
 ) {
     private val cacheKey = Repo.cacheKey("getClassData", classInfo.id)
     private var raw by mutableStateOf<JsonObject?>(null)
@@ -158,6 +158,7 @@ class AttendanceViewModel(
     fun showDate(iso: String) {
         if (iso == date) return
         date = iso
+        graph.attendanceDate = iso
         edits = emptyMap()
     }
 

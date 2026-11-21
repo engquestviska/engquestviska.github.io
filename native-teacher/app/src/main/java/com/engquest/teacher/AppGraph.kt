@@ -57,6 +57,9 @@ class AppGraph(
     val push: PushTokens? = null,
 ) {
     val session = Session(sessionPrefs, api)
+
+    /** The day last picked on Attendance; kept while the app runs, so switching class stays on it. */
+    var attendanceDate: String? = null
     val repo = Repo(api, session, db)
     val workerFactory = OutboxWorkerFactory(db, session, api, repo)
     val outbox = Outbox(db, session, workManager(workerFactory), scope)

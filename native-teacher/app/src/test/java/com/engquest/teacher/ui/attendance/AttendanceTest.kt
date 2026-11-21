@@ -264,4 +264,15 @@ class AttendanceTest {
         compose.onNodeWithTag("screenTitle").assertTextEquals("Scores")
         assertEquals(0, compose.onAllNodesWithText("Leave without saving?").fetchSemanticsNodes().size)
     }
+
+    @Test
+    fun aPickedDateStaysWhenSwitchingClass() {
+        serve(classData(null))
+        val scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Unconfined)
+        val xe1 = AttendanceViewModel(graph, com.engquest.teacher.domain.Classes.ALL[0], scope)
+        xe1.showDate("2026-11-10")
+        val xe2 = AttendanceViewModel(graph, com.engquest.teacher.domain.Classes.ALL[1], scope)
+        org.junit.Assert.assertEquals("2026-11-10", xe2.date)
+        xe1.close(); xe2.close()
+    }
 }
