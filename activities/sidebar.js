@@ -73,7 +73,6 @@
     '    <div class="sidebar-section-label">&#128196; Legacy Tools</div>',
     '    <a href="submission_status.html" class="sidebar-item" data-page="submission_status"><div class="sidebar-item-icon" style="background:rgba(16,185,129,0.2)">SS</div><div class="sidebar-item-name">Submission Status</div></a>',
     '    <a href="summative.html" class="sidebar-item" data-page="summative"><div class="sidebar-item-icon" style="background:rgba(245,158,11,0.2)">ST</div><div class="sidebar-item-name">Summative Topic</div></a>',
-    '    <a href="gallery.html" class="sidebar-item" data-page="gallery"><div class="sidebar-item-icon" style="background:rgba(236,72,153,0.2)">GL</div><div class="sidebar-item-name">Gallery</div></a>',
     '  </div>',
     '  <div class="sidebar-divider"></div>',
     '  <div class="sidebar-teacher" id="sidebarTeacherState"></div>',

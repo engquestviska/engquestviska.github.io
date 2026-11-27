@@ -93,10 +93,9 @@ English Quest is being reorganized into three tracks.
 
 Older classroom pages now live in `activities/` instead of loose at the root. Root paths still work via redirect stubs for old bookmarks/links.
 - `activities/chapter5_guess_who.html` - legacy classroom game.
-- `activities/gallery.html` - legacy gallery with student upload and teacher approval controls.
 - `activities/jeopardyquiz.html` - legacy classroom quiz game.
 - `activities/quiz.html` - legacy Grade 10 quiz/activity hub, linked from Grade 10 home (`grade10/index.html`).
 - `activities/submission_status.html` - legacy read-only submission status overview.
 - `activities/summative.html` - legacy summative topic lookup with teacher reveal controls.
 - `activities/sidebar.js` - navigation used only by the pages above; current Grade 10/11 pages use `shared/js/sidebar.js` instead.
-- Root `strikes.html`, and `chapter5_guess_who.html`/`gallery.html`/`jeopardyquiz.html`/`quiz.html`/`submission_status.html`/`summative.html` at root, are redirect stubs pointing at their real location (same pattern for all).
+- Root `strikes.html`, and `chapter5_guess_who.html`/`jeopardyquiz.html`/`quiz.html`/`submission_status.html`/`summative.html` at root, are redirect stubs pointing at their real location (same pattern for all).

@@ -278,6 +278,8 @@
         .then(function(res) {
           btn.disabled = false;
           if (res && res.success) {
+            // The new password ends the old saved login; keep this browser logged in with the new one.
+            if (res.token) EQAuth.saveTeacher(teacher.username, res.token);
             document.getElementById('pwCurrent').value = '';
             document.getElementById('pwNew').value = '';
             document.getElementById('pwConfirm').value = '';

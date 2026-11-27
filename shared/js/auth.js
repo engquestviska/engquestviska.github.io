@@ -36,9 +36,10 @@
     };
   }
 
-  function saveTeacher(username, password) {
+  // The server answers a good login with a token; that is what gets saved, never the password.
+  function saveTeacher(username, token) {
     store('eq_tu', username);
-    store('eq_tp', password);
+    store('eq_tp', token);
     markTeacherVerified(username);
   }
 
@@ -56,6 +57,11 @@
   function markTeacherVerified(username) {
     store(VERIFY_KEY, String(Date.now()));
     store(VERIFY_USER_KEY, username || '');
+  }
+
+  // A login saved before tokens existed holds the real password; it is checked once and swapped.
+  function holdsToken(saved) {
+    return /^[A-Za-z0-9+\/=]+\.[0-9a-f]{64}$/.test(saved || '');
   }
 
   function hasFreshVerification(username) {
@@ -132,7 +138,8 @@
     global.EQApi.get({ action: 'checkLogin', username: teacher.username, password: teacher.password }).then(function(data) {
       verifyInFlight = false;
       if (data && data.ok) {
-        markTeacherVerified(teacher.username);
+        if (data.token) saveTeacher(teacher.username, data.token);
+        else markTeacherVerified(teacher.username);
         location.reload();
         return;
       }
@@ -157,7 +164,7 @@
       return true;
     }
     var teacher = getTeacher();
-    if (teacher.username && teacher.password && hasFreshVerification(teacher.username)) {
+    if (teacher.username && holdsToken(teacher.password) && hasFreshVerification(teacher.username)) {
       revealTeacherApp(options, teacher);
       return true;
     }

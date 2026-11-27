@@ -210,11 +210,9 @@
 
       EQApi.get({ action: 'checkLogin', username: username, password: password }).then(function(data) {
         if (!data.ok) throw new Error('Incorrect username or password.');
-        // Store the password exactly as typed. The backend re-hashes it (with a
-        // per-account salt) on every call, so it must receive the plain password
-        // — NOT a pre-hashed one. (The old Apps Script backend also accepted a
-        // pre-hashed value; the Turso/Cloudflare backend does not.)
-        EQAuth.saveTeacher(username, password);
+        // Save the login token the server hands back, not the password. (The old Apps Script
+        // backend sends no token; then the password is kept as before.)
+        EQAuth.saveTeacher(username, data.token || password);
         // Came from another teacher page: go back there instead of staying on the dashboard.
         var next = EQAuth.nextPage();
         if (next) { location.replace(next); return; }
@@ -322,7 +320,8 @@
       displayTeacher(teacher.username);
       EQApi.get({ action: 'checkLogin', username: teacher.username, password: teacher.password }).then(function(data) {
         if (data && data.ok) {
-          EQAuth.markTeacherVerified(teacher.username);
+          if (data.token) EQAuth.saveTeacher(teacher.username, data.token);
+          else EQAuth.markTeacherVerified(teacher.username);
           var next = EQAuth.nextPage();
           if (next) { location.replace(next); return; }
           hideLogin();
