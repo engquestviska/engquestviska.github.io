@@ -1,8 +1,5 @@
 /* English Quest shared API helpers */
 (function(global) {
-  // MIGRATED 2026-07-30 to the new Turso/Cloudflare backend (via its compatibility
-  // bridge). To ROLL BACK, restore the old Apps Script URL on the next line:
-  // var API_URL = 'https://script.google.com/macros/s/AKfycbxK9MSUe75KC7xMhZhy-9a4omw9rVf1RugYR72OaGlzuNiKJvS5XRoZRp9hcTzjibHuxg/exec';
   var API_URL = 'https://engquest-api.engquestviska.workers.dev/exec';
   var classConfig = global.EQClasses || null;
   var CLASS_LABELS = classConfig ? classConfig.labels : {

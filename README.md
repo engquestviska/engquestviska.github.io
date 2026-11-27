@@ -15,8 +15,6 @@ Class website and Android apps for the English classes: Grade 10 (X E-1 to X E-5
 | `activities/` | Older classroom pages still in use (quiz, jeopardy, guess who, summative, submission status) |
 | `native-student/` | Student Android app (Kotlin). APK + update info: `EngQuest-app-*.apk`, `app-version.json` |
 | `native-teacher/` | Teacher Android app (Kotlin). APK + update info: `EngQuestTeacher-*.apk`, `teacher-app-version.json` |
-| `next-semester/` | Next-semester profile pages; still on their own Google Apps Script server (`apps-script-next/`) |
-| `apps-script/`, `chapter5-submission/` | Old Google Apps Script server code, kept only as a backup since the move to Cloudflare (2026-07-30) |
 | `teacher-app/` | Old web version of the teacher app; the native app's rules were copied from `teacher-app/js/core.js` |
 | `docs/` | Planning and reference docs. Some describe the old Google Sheets setup |
 | `mockups/`, `samples/` | Design mockups and sample files, not served to students |
