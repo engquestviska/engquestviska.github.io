@@ -1,84 +1,37 @@
-# English Quest - Next Year Draft
+# English Quest
 
-This branch is a safe draft space for preparing the website for the next school year.
+Class website and Android apps for the English classes: Grade 10 (X E-1 to X E-5) and Grade 11 (XI F-7 to XI F-9).
 
-- Live website branch: `main`
-- Draft branch: `next-year`
-- Changes here do not affect the live website until they are merged into `main`.
+- **Website:** https://engquestviska.github.io (GitHub Pages, served from `main`; a push goes live in about a minute)
+- **Server:** the Cloudflare Worker `engquest-api` at `https://engquest-api.engquestviska.workers.dev/exec`, with data in the Turso database `engquest-prod`. Its code lives in the separate folder `Engquest-turso-lab` (not in this repo).
 
-## What This Site Contains
+## Folders
 
-English Quest is a static GitHub Pages website being rebuilt into three clear tracks:
+| Folder | What it is |
+|---|---|
+| `grade10/`, `grade11/` | Student pages for each grade (home, scores, tasks, attendance, vocabulary, submissions...) |
+| `teacher/` | Teacher pages (login, scores, attendance, XP, strikes, materials, announcements, submissions, settings) |
+| `shared/js/`, `shared/css/` | Code and styles used by every page. `api.js` holds the server address; `auth.js` the teacher login |
+| `activities/` | Older classroom pages still in use (quiz, jeopardy, guess who, summative, submission status) |
+| `native-student/` | Student Android app (Kotlin). APK + update info: `EngQuest-app-*.apk`, `app-version.json` |
+| `native-teacher/` | Teacher Android app (Kotlin). APK + update info: `EngQuestTeacher-*.apk`, `teacher-app-version.json` |
+| `next-semester/` | Next-semester profile pages; still on their own Google Apps Script server (`apps-script-next/`) |
+| `apps-script/`, `chapter5-submission/` | Old Google Apps Script server code, kept only as a backup since the move to Cloudflare (2026-07-30) |
+| `teacher-app/` | Old web version of the teacher app; the native app's rules were copied from `teacher-app/js/core.js` |
+| `docs/` | Planning and reference docs. Some describe the old Google Sheets setup |
+| `mockups/`, `samples/` | Design mockups and sample files, not served to students |
 
-- `teacher/` - teacher-only dashboard and Grade 10 management tools.
-- `grade10/` - Grade 10 student-facing pages for class work and personal data.
-- `grade11/` - Grade 11 student-facing placeholders until real Grade 11 data exists.
+The root pages (`quiz.html`, `strikes.html`...) only redirect to their new place.
 
-Important files and folders:
+## Before you push
 
-- `index.html` - landing page for choosing Grade 10, Grade 11, or Teacher.
-- `docs/` - all planning, contract, and reference docs; see `docs/README.md` for the index (roadmap, product rules, launch checklist, roster/next-semester specs, folder map).
-- `grade10/index.html` - Grade 10 student home and profile setup.
-- `grade10/dashboard.html` - Grade 10 personal statistics dashboard.
-- `grade10/strikes.html` - Grade 10 student-facing strike tracker.
-- `teacher/index.html` - teacher control room.
-- `teacher/materials.html`, `teacher/assignments.html`, `teacher/submissions.html`, `teacher/attendance.html`, `teacher/activeness.html`, `teacher/announcements.html`, `teacher/scores.html`, `teacher/tasks.html`, `teacher/strikes.html` - Grade 10 teacher managers.
-- `grade11/` - matching Grade 11 placeholder structure without spreadsheet connections yet.
-- `shared/css/system.css` - shared design system styles.
-- `shared/js/api.js`, `shared/js/auth.js`, `shared/js/sidebar.js`, `shared/js/teacher-sidebar.js` - shared API, auth, and navigation helpers.
-- `activities/quiz.html`, `activities/jeopardyquiz.html`, `activities/chapter5_guess_who.html`, `activities/submission_status.html`, `activities/summative.html` - legacy classroom pages still used during the transition; old root URLs redirect here.
-- `apps-script/` - Google Apps Script backend source for the main data API.
-- `chapter5-submission/` - Google Apps Script source for the Chapter 5 submission flow.
-- `images/` - local image assets used by activities.
-
-## Preview
-
-GitHub Pages normally serves the live `main` branch, so this branch may not appear at the normal website URL.
-
-Quick draft preview:
-
-https://raw.githack.com/engquestviska/engquestviska.github.io/next-year/index.html
-
-This preview is useful for checking layout and basic behavior, but the final live website should still be tested after merging to `main`.
-
-## Editing Workflow
-
-1. Work on the `next-year` branch.
-2. Preview pages locally with a static server or by opening `index.html` in a browser.
-3. Commit related changes with clear messages.
-4. Push `next-year` to GitHub.
-5. Test the draft preview link above. If RawGitHack branch cache lags, test the exact commit URL.
-6. Merge into `main` only when the next-year version is ready to become live.
-
-Useful commands:
-
-```bash
-git status
-git switch next-year
-git add .
-git commit -m "Describe the change"
-git push
+```
+node scripts/check-site.mjs
+node --test scripts/chronicle-data.test.mjs
 ```
 
-## Deployment Notes
+The first must say `PASS`. Teacher pages must never be linked from student pages.
 
-The live website is served from GitHub Pages on the `main` branch. The `next-year` branch is for preparation only. After merging `next-year` into `main`, check the live site again because GitHub Pages may behave differently from the RawGithack preview.
+## Android apps
 
-Some pages depend on Google Apps Script, Google Sheets, Google Drive, and YouTube links. If a page loads but data does not appear, check that the Apps Script deployment URL and permissions are still valid.
-
-## Next-Year Goals
-
-- Prepare structure for a new school year.
-- Support Grade 10 and Grade 11 as separate student tracks.
-- Keep student lists/data separate by school year and class.
-- Keep teacher editing tools inside `teacher/`.
-- Improve mobile layout, performance, and teacher workflow.
-
-## Before Going Live
-
-- Work through `docs/LAUNCH_CHECKLIST.md`.
-- Confirm all class names and student lists are for the correct school year.
-- Check teacher login and protected actions.
-- Test the main pages on phone and desktop.
-- Confirm Google Apps Script deployments are current.
-- Make sure no draft-only text or test data is visible on the live site.
+Build with `build.ps1` in `native-student/` or `native-teacher/` (output goes to `D:\android-dev\build\...`; see each folder's README). To release: copy the APK to the repo root, update `app-version.json` or `teacher-app-version.json`, commit and push. The apps check that file for updates.
